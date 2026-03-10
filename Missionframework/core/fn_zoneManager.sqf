@@ -1,32 +1,36 @@
 /*
     Author: Theane using Gemini (AGS Project)
     Description: Advanced Hybrid Zone Manager. 
-    Handles auto-detection of map locations, industrial scanning, auto-sizing for small maps,
-    manual overrides via Game Logics, and dynamic map markers.
+    Handles: 
+    - Auto-detection of map locations (Cities/Villages).
+    - Industrial scanning for Factories.
+    - Auto-sizing logic to prevent clipping on small maps (Tilos/Kolgujev).
+    - Manual overrides via Game Logics (KP-style).
+    - Map markers and area clearing (Bulldozer).
+    - Integrated Spawn and Capture monitoring.
 */
 
 if (!isServer) exitWith {};
 
 // --- 1. HELPER FUNCTIONS: MARKERS & CLEANING ---
 
-// Function to draw markers on the map for players to see
+// Function to draw markers on the map for player situational awareness
 AGS_fnc_createZoneMarker = {
     params ["_logic", "_name", "_pos", "_range", "_type"];
     private _markerName = format ["marker_%1", _logic];
     
-    // Create Area Circle
+    // Create Area Circle (Visual boundary)
     private _m = createMarker [_markerName, _pos];
     _m setMarkerShape "ELLIPSE";
     _m setMarkerSize [_range, _range];
     _m setMarkerBrush "SolidBorder";
-    _m setMarkerColor "ColorOPFOR"; // Red (Enemy) at start
+    _m setMarkerColor "ColorOPFOR"; // Red (Enemy) by default
     _m setMarkerAlpha 0.5;
 
-    // Create Text Label (Icon style depends on zone type)
+    // Create Text Label (Identifies the zone for players)
     private _mText = createMarker [format ["text_%1", _logic], _pos];
     _mText setMarkerType "EmptyIcon";
     
-    // Custom label based on type
     private _label = switch (_type) do {
         case "Factory": { format ["Factory: %1", _name] };
         case "City":    { format ["City: %1", _name] };
@@ -40,22 +44,22 @@ AGS_fnc_createZoneMarker = {
     _logic setVariable ["AGS_zoneMarker", _markerName, true];
 };
 
-// Function to clear terrain (Bulldozer)
+// Function to clear terrain (Removes trees/rocks to prevent clipping with spawns)
 AGS_fnc_prepZoneBase = {
     params ["_pos", "_range"];
     private _terrain = nearestTerrainObjects [_pos, ["TREE", "SMALL TREE", "BUSH", "ROCK", "FOREST BORDER"], _range];
     { _x hideObjectGlobal true; } forEach _terrain;
-    diag_log format ["AGS: Cleared %1 terrain objects at %2", count _terrain, _pos];
+    diag_log format ["AGS: Bulldozer cleared %1 objects at %2", count _terrain, _pos];
 };
 
-// --- 2. INITIALIZATION & SCANNING ---
+// --- 2. INITIALIZATION & WORLD SCANNING ---
 
 private _allZones = [];
 
-// A. SCAN FOR CITIES & VILLAGES
+// A. SCAN FOR CITIES & VILLAGES (Built-in Map Locations)
 private _mapLocations = nearestLocations [[worldSize/2, worldSize/2, 0], ["NameCityCapital", "NameCity", "NameVillage"], worldSize];
 
-// FAILSAFE: If no Capital exists, find the biggest City to promote
+// FAILSAFE: Promote biggest location to "Factory" status if no Capitals exist
 private _hasCapital = count (_mapLocations select {type _x == "NameCityCapital"}) > 0;
 if (!_hasCapital && count _mapLocations > 0) then {
     _mapLocations = [_mapLocations, [], {type _x}, "DESCEND"] call BIS_fnc_sortBy;
@@ -67,7 +71,7 @@ if (!_hasCapital && count _mapLocations > 0) then {
     private _locName = text _x;
     private _locType = type _x;
 
-    // AUTO-SIZE (Calculates distance to neighbors to avoid clipping on small maps)
+    // AUTO-SIZE LOGIC (Prevents giant zones on small islands)
     private _nearby = _mapLocations - [_x];
     private _dist = 1000;
     if (count _nearby > 0) then {
@@ -78,11 +82,11 @@ if (!_hasCapital && count _mapLocations > 0) then {
 
     private _logic = "Logic" createVehicleLocal _locPos;
     
-    // Determine Type
+    // Determine Zone Type and Income Weight
     private _type = "Village";
     if (_locType == "NameCity" || _locType == "NameCityCapital" || (_x getVariable ["AGS_isHonoraryCapital", false])) then {
         _type = "City";
-        if (_locType == "NameCityCapital" || (_x getVariable ["AGS_isHonoraryCapital", false])) then { _type = "Factory"; }; // Capitals work as Factories for income
+        if (_locType == "NameCityCapital" || (_x getVariable ["AGS_isHonoraryCapital", false])) then { _type = "Factory"; };
     };
 
     _logic setVariable ["AGS_zoneType", _type, true];
@@ -94,29 +98,28 @@ if (!_hasCapital && count _mapLocations > 0) then {
     _allZones pushBack _logic;
 } forEach _mapLocations;
 
-// B. SCAN FOR INDUSTRIAL BUILDINGS (Factories)
+// B. SCAN FOR INDUSTRIAL BUILDINGS (Automatic Factory Placement)
 private _indClasses = ["Land_Factory_Main_F", "Land_Industrial_Main_F", "Land_PowerStation_01_main_F", "Land_i_Shed_Ind_F"];
 private _industrials = nearestObjects [[worldSize/2, worldSize/2, 0], _indClasses, worldSize];
 private _factoryPoints = [];
 
 {
     private _pos = getPos _x;
-    // Ensure we don't create multiple zones for the same industrial park
     if ({_pos distance _x < 600} count _factoryPoints == 0) then {
         _factoryPoints pushBack _pos;
         private _logic = "Logic" createVehicleLocal _pos;
         _logic setVariable ["AGS_zoneType", "Factory", true];
-        _logic setVariable ["AGS_zoneName", "Industrial Complex", true];
+        _logic setVariable ["AGS_zoneName", "Industrial Zone", true];
         _logic setVariable ["AGS_zoneRange", 300, true];
         _logic setVariable ["AGS_isCaptured", false, true];
 
-        [_logic, "Industrial Complex", _pos, 300, "Factory"] call AGS_fnc_createZoneMarker;
+        [_logic, "Industrial Zone", _pos, 300, "Factory"] call AGS_fnc_createZoneMarker;
         [_pos, 300] spawn AGS_fnc_prepZoneBase;
         _allZones pushBackUnique _logic;
     };
 } forEach _industrials;
 
-// C. MANUAL OVERRIDES (KP-Style Game Logics)
+// C. MANUAL OVERRIDES (KP-Style Editor Game Logics)
 private _manuals = entities "Logic" select { !isNil {_x getVariable "AGS_zoneType"} };
 {
     _allZones pushBackUnique _x;
@@ -131,8 +134,11 @@ private _manuals = entities "Logic" select { !isNil {_x getVariable "AGS_zoneTyp
 missionNamespace setVariable ["AGS_all_mission_zones", _allZones, true];
 diag_log format ["AGS Zone Manager: Successfully initialized %1 zones.", count _allZones];
 
-// --- 3. MONITOR LOOP (Capture Logic) ---
+// --- 3. MONITOR LOOP (Capture & AI Trigger Check) ---
 [] spawn {
+    // Get spawn distance from mission parameters (defaults to 1000m)
+    private _spawnDist = ["AGS_Param_SpawnDist", 1000] call BIS_fnc_getParamValue;
+
     while {true} do {
         uiSleep 15; 
         private _capturedList = missionNamespace getVariable ["AGS_captured_zones_list", []];
@@ -143,8 +149,13 @@ diag_log format ["AGS Zone Manager: Successfully initialized %1 zones.", count _
                 private _pos = getPos _x;
                 private _range = _x getVariable ["AGS_zoneRange", 400];
                 
-                // Only check for enemies if players are actually present
-                if (count (allPlayers select {alive _x && (_x distance _pos) < _range}) > 0) then {
+                // Only act if players are within Spawn Distance
+                private _playersNear = allPlayers select {alive _x && (_x distance _pos) < _spawnDist};
+                
+                if (count _playersNear > 0) then {
+                    // NOTE: Future AI Spawn trigger will go here: [_x] call AGS_fnc_spawnZoneAI;
+
+                    // CHECK CAPTURE: Count remaining OPFOR units within the zone radius
                     private _enemies = count (allUnits select {side _x == east && alive _x && _x distance _pos < _range});
                     
                     if (_enemies == 0) then {
@@ -152,7 +163,7 @@ diag_log format ["AGS Zone Manager: Successfully initialized %1 zones.", count _
                         _capturedList pushBackUnique _x;
                         missionNamespace setVariable ["AGS_captured_zones_list", _capturedList, true];
                         
-                        // Turn marker Blue/Green
+                        // Visual update
                         (_x getVariable ["AGS_zoneMarker", ""]) setMarkerColor "ColorBLUFOR";
                         
                         [format ["Area Secured: %1", _x getVariable "AGS_zoneName"]] remoteExec ["systemChat", 0];
