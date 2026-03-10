@@ -1,45 +1,46 @@
 /*
     Author: Theane (AGS Project)
-    Description: Adds specific FOB actions to the HQ terminal.
+    Description: Adds Build and Architect actions to the FOB HQ terminal.
     Language: English
 */
 
 params ["_terminal"];
 
-// 1. Action för att öppna Base Architect (Zeus - Gratis byggande)
+// 1. Open Base Architect (Zeus Mode - Free building for decor/walls)
 _terminal addAction [
-    "<t color='#00bbff'>Open Base Architect</t>", 
+    "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect</t>", 
     {
         [] spawn AGS_fnc_openBaseArchitect;
     },
     [],
-    6, 
+    10, 
     true, 
     true, 
     "", 
     "_this distance _target < 3"
 ];
 
-// 2. Action för att öppna Logistics Menu (Ghost Mode - Fordon som kostar)
+// 2. Open Logistics Menu (Ghost Mode - Vehicles/Crates that cost Supplies)
 _terminal addAction [
-    "<t color='#00ff00'>Open Logistics Menu</t>", 
+    "<t color='#00ff00' size='1.2'>[ FOB ] Open Logistics Menu</t>", 
     {
-        // Här kallar vi på menyn vi ska bygga (fordon/lådor)
+        // Placeholder for the Menu UI we are building
         [] spawn AGS_fnc_openBuildMenu; 
     },
     [],
-    5, 
+    9, 
     true, 
     true, 
     "", 
     "_this distance _target < 3"
 ];
 
-// 3. Vanlig Login (om man behöver logga in på nytt)
+// 3. Status Check (Optional)
 _terminal addAction [
-    "<t color='#ffffff'>Access Command Network</t>", 
+    "<t color='#ffffff'>Check Resource Levels</t>", 
     {
-        hint "Network stable. Resources synced.";
+        private _supplies = missionNamespace getVariable ["AGS_res_supplies", 0];
+        hint format ["Current FOB Logistics:\nSupplies: %1", _supplies];
     },
     [],
     1, 
