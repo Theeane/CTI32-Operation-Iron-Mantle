@@ -1,26 +1,41 @@
+/*
+    Author: Theeane / Gemini
+    Description: Function definitions for the AGS Mission Framework.
+    Language: English
+*/
+
 class CfgFunctions {
     class AGS {
         tag = "AGS";
-        
+
         class Core {
             file = "Missionframework\core";
             class initGlobals {};
-            class scanZones {};
+            class initSystems {};
             class economy {};
+            class scanZones {};
             class zoneCapture {};
+            class zoneManager {};
             class setupInteractions {};
-            class setupFOBInteractions {}; // For the FOB terminal
-            class setupFOBAction {};       // For the FOB container
-            class startFOBPlacement {};    // The Ghost Preview
-            class spawnFOBComposition {};  // The Global Spawning
-            class openBaseArchitect {};    // Zeus Mode
+            class setupFOBInteractions {};
+            class setupFOBAction {};
+            class spawnFOBComposition {};
+            class startFOBPlacement {};
+            class startBuildPlacement {};
+            class finalizeBuild {};
+            class openBaseArchitect {};
+            class limitZeusAssets {};
+            class persistence {};
+            class undercoverHandler {};
+            class buildMode {};
+            class openBuildZeus {}; // Kept if you chose the Admin option
         };
 
         class UI {
             file = "Missionframework\ui";
             class initUI {};
             class updateResourceUI {};
-            class openBuildMenu {};        // The Build Menu UI
+            class openBuildMenu {};
         };
 
         class Missions {
