@@ -1,6 +1,6 @@
 /*
     Author: Theane (AGS Project)
-    Description: Adds the "Unpack FOB" hold action to a container.
+    Description: Triggers a restricted Zeus session to place the FOB composition.
     Language: English
 */
 
@@ -8,34 +8,31 @@ params ["_container"];
 
 [
     _container,
-    "Unpack Forward Operating Base",
+    "Initiate FOB Deployment",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
     "_this distance _target < 5",
     "_caller distance _target < 5",
-    { systemChat "Unpacking logistics gear..."; },
+    { systemChat "Calibrating deployment site..."; },
     {},
     {
         params ["_target", "_caller"];
-        private _pos = getPos _target;
+        private _pos = getPosATL _target;
         deleteVehicle _target;
 
-        // Spawn FOB Building (e.g., a HQ tent or house)
-        private _fob = "Land_Cargo_HQ_V1_F" createVehicle _pos;
+        // Create a temporary Zeus logic for the player
+        private _group = createGroup sideLogic;
+        private _curator = _group createUnit ["ModuleCurator_F", [0,0,0], [], 0, "NONE"];
         
-        // Register the new FOB position
-        private _fobs = missionNamespace getVariable ["AGS_active_fobs", []];
-        _fobs pushBack (getPos _fob);
-        missionNamespace setVariable ["AGS_active_fobs", _fobs, true];
+        _caller assignCurator _curator;
+        
+        // Give the curator the ability to place the composition
+        // (This part requires a helper script to 'attach' the composition to the cursor)
+        [_curator, _pos] remoteExec ["AGS_fnc_startFOBPlacement", _caller];
 
-        // Trigger the next Mission Stage (Supply Run)
-        if (missionNamespace getVariable ["AGS_current_stage", 0] == 1) then {
-            [2] remoteExec ["AGS_fnc_generateInitialMission", 2];
-        };
-
-        ["FOB Deployed. Communications Established."] remoteExec ["systemChat", 0];
+        systemChat "Deployment Interface Active. Place the FOB Composition.";
     },
-    { systemChat "Deployment interrupted."; },
+    { systemChat "Deployment cancelled."; },
     [],
     10,
     10,
