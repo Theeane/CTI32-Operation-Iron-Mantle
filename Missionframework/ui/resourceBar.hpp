@@ -1,6 +1,8 @@
 /*
     Author: Theane (AGS Project)
-    Description: Dynamic HUD with base-only Notoriety display.
+    Description: Clean CTI HUD. 
+    - Resources & Eye: Always Visible.
+    - Heat/Notoriety: Visible only in FOB/MOB.
 */
 
 class AGS_ResourceBar {
@@ -9,7 +11,7 @@ class AGS_ResourceBar {
     onLoad = "uiNamespace setVariable ['AGS_ctrl_resBar', _this select 0]";
 
     class Controls {
-        // --- RESOURCE PANEL (Always visible) ---
+        // --- 1. RESOURCE PANEL (Always visible) ---
         class ResourceGroup: RscControlsGroup {
             idc = 9000;
             x = safeZoneX + safeZoneW - 0.25; 
@@ -22,11 +24,11 @@ class AGS_ResourceBar {
             };
         };
 
-        // --- NOTORIETY PANEL (Visible only in FOB/MOB) ---
+        // --- 2. NOTORIETY PANEL (FOB/MOB Only) ---
         class NotorietyGroup: RscControlsGroup {
-            idc = 9200; // Unikt ID för att dölja/visa
+            idc = 9200;
             x = safeZoneX + safeZoneW - 0.25; 
-            y = safeZoneY + (safeZoneH * 0.45) + 0.045; // Precis under resursbaren
+            y = safeZoneY + (safeZoneH * 0.45) + 0.045;
             w = 0.23; h = 0.04;
             class Controls {
                 class Background: RscText { idc = -1; x = 0; y = 0; w = 0.23; h = 0.04; colorBackground[] = {0,0,0,0.5}; };
@@ -34,7 +36,7 @@ class AGS_ResourceBar {
             };
         };
 
-        // --- THE EYE (Always visible) ---
+        // --- 3. THE EYE (Always visible - Debug & Immersion) ---
         class EyeGroup: RscControlsGroup {
             idc = 9100;
             x = safeZoneX + safeZoneW - 0.15; 
