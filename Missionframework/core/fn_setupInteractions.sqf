@@ -1,6 +1,7 @@
 /*
     Author: Theane (AGS Project)
-    Description: HQ Login with animation and mission trigger.
+    Description: HQ Terminal Interaction. Handles login animation, unlocks HUD, 
+                 and triggers the initial mission sequence.
     Language: English
 */
 
@@ -15,26 +16,26 @@ AGS_fnc_addTerminalAction = {
         "_this distance _target < 2",
         "_caller distance _target < 2",
         { 
-            // START: Spela animation på spelaren
+            // START: Play keyboard/typing animation on the player
             params ["_target", "_caller"];
             _caller playMoveNow "AinvPknlMstpSnonWnonDnon_medic_1"; 
             systemChat "Accessing Command Terminal...";
         },
         {},
         { 
-            // COMPLETION: Systemet startar
+            // COMPLETION: Systems Online
             params ["_target", "_caller"];
             
-            // 1. Lås upp globala system
+            // 1. Unlock global framework systems
             missionNamespace setVariable ["AGS_system_active", true, true];
             
-            // 2. Starta HUD för spelaren
+            // 2. Initialize the HUD for the local player
             if (hasInterface) then {
                 cutRsc ["AGS_ResourceBar", "PLAIN"];
                 [] spawn AGS_fnc_updateResourceUI;
             };
 
-            // 3. Trigga det första uppdraget (Infiltration / Capture)
+            // 3. Trigger the initial infiltration mission on the server
             if (isServer) then {
                 [] spawn AGS_fnc_generateInitialMission;
             } else {
@@ -42,16 +43,18 @@ AGS_fnc_addTerminalAction = {
             };
 
             [format ["%1 has established a secure link. Operations online.", name _caller]] remoteExec ["systemChat", 0];
-            _caller switchMove ""; // Avbryt animationen snyggt
+            
+            // Stop animation gracefully
+            _caller switchMove ""; 
         },
         { 
-            // INTERRUPT: Om man slutar hålla in knappen
+            // INTERRUPT: Stop animation if the player lets go
             params ["_target", "_caller"];
             _caller switchMove ""; 
             systemChat "Connection Terminated.";
         },
         [],
-        8, // Tid för inloggning (sekunder)
+        8, // Login duration in seconds
         10,
         false,
         false
