@@ -1,42 +1,49 @@
 /*
     Author: Theane (AGS Project)
-    Description: Opens Zeus with area-restricted camera and no units/factions.
-    Language: Swedish/English
+    Description: Opens a restricted 'Base Architect' Zeus mode at the FOB location.
+    Language: English
 */
 
 if (!hasInterface) exitWith {};
 
-private _terminal = _this select 0;
-private _fobPos = getPosATL _terminal;
-private _maxRange = 150; // Radien för byggområdet i meter
+params ["_terminal"];
 
-// 1. Skapa Zeus
+private _fobPos = getPosATL _terminal;
+private _maxRange = 150; // Building radius in meters
+
+// 1. Create a local curator (Zeus) module
 private _group = createGroup sideLogic;
 private _curator = _group createUnit ["ModuleCurator_F", [0,0,0], [], 0, "NONE"];
 player assignCurator _curator;
 
-// 2. Rensa fraktioner via servern
+// 2. Remote execute the asset filter on the server
 [_curator] remoteExec ["AGS_fnc_limitZeusAssets", 2];
 
+// 3. Open the Zeus Interface
 openCuratorInterface;
 
-// 3. Kamera-begränsning (Loop)
+// 4. Boundary Enforcement Loop (Camera Lock)
 [_curator, _fobPos, _maxRange] spawn {
     params ["_curator", "_fobPos", "_range"];
     
-    while {not isNull (getAssignedCuratorLogic player)} do {
+    while {!isNull (getAssignedCuratorLogic player)} do {
+        // If camera leaves the allowed radius, snap it back towards the FOB
         if (getCuratorCameraPos _curator distance _fobPos > _range) then {
-            // Om kameran är för långt bort, flytta den mot FOB:en
             _curator setCuratorCameraScene [
                 _fobPos, 
-                [velocity curatorCamera select 0, velocity curatorCamera select 1, 50], 
+                [0, 0, 50], 
                 0.5
             ];
-            hintSilent "Varning: Du lämnar byggområdet!";
+            hintSilent "WARNING: You are leaving the designated construction zone!";
         };
+        
         uiSleep 0.5;
-        if (isNull (findDisplay 312)) exitWith { deleteVehicle _curator; }; // Stäng vid ESC
+        
+        // If the player closes Zeus (ESC), delete the temporary module
+        if (isNull (findDisplay 312)) exitWith { 
+            [player, _curator] remoteExec ["AGS_fnc_cleanupCurator", 2]; 
+        };
     };
 };
 
-hint parseText format ["<t color='#00bbff' size='1.2'>ARCHITECT MODE</t><br/>Byggområde: %1m radie.", _range];
+hint parseText format ["<t color='#00bbff' size='1.2'>ARCHITECT MODE ACTIVE</t><br/>Construction Area: %1m radius.", _maxRange];
