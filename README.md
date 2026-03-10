@@ -1,0 +1,2 @@
+# CTI32-Operation-Iron-Mantle
+Asymmetric warfare framework for up to 32 players.  Infiltrate or cause mayhem through carefully planned warfare.  Gather intel and resources to help your road to completion and flush out the Red Beret HVT.  Features persistent CBA stats tracking kills, deaths, and teamkills.  Your mission, your way.
