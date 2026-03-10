@@ -1,21 +1,25 @@
 /*
     Author: Theane (AGS Project)
-    Description: Spawns the physical objects after placement is confirmed.
+    Description: Spawns the physical FOB composition and initializes the FOB terminal.
     Language: English
 */
 
 if (!isServer) exitWith {};
 params ["_pos", "_dir"];
 
+// Define your base layout here: [Classname, Offset [x,y,z], Direction Offset]
 private _compositionData = [
-    ["Land_Cargo_HQ_V1_F", [0, 0, 0], 0],
-    ["Land_HBarrier_5_F", [7, 7, 0], 45],
-    ["Land_HBarrier_5_F", [-7, 7, 0], 315],
-    ["Land_BagBunker_Small_F", [0, -10, 0], 180]
+    ["Land_Cargo_HQ_V1_F", [0, 0, 0], 0],           // The Main HQ Building
+    ["Land_HBarrier_5_F", [7, 7, 0], 45],           // Defensive Wall
+    ["Land_HBarrier_5_F", [-7, 7, 0], 315],         // Defensive Wall
+    ["Land_BagBunker_Small_F", [0, -10, 0], 180],   // Guard Post
+    ["Land_PortableLight_Single_F", [5, -5, 0], 0]  // Base Lighting
 ];
 
 {
     _x params ["_type", "_offset", "_dirOffset"];
+    
+    // Calculate global position based on rotation
     private _rotatedOffset = [_offset, -_dir] call BIS_fnc_rotateVector2D;
     private _finalPos = _pos vectorAdd _rotatedOffset;
 
@@ -23,17 +27,19 @@ private _compositionData = [
     _obj setDir (_dir + _dirOffset);
     _obj setPosATL _finalPos;
     
-    // If it's the HQ building, add the interaction to log back in/build
+    // CRITICAL: If this is the HQ building, initialize the FOB Terminal actions
     if (_type == "Land_Cargo_HQ_V1_F") then {
-        [_obj] remoteExec ["AGS_fnc_setupInteractions", 0, true];
+        [_obj] remoteExec ["AGS_fnc_setupFOBInteractions", 0, true];
     };
     
 } forEach _compositionData;
 
-// Update the global FOB list
+// Register the new FOB position globally
 private _fobs = missionNamespace getVariable ["AGS_active_fobs", []];
 _fobs pushBack _pos;
 missionNamespace setVariable ["AGS_active_fobs", _fobs, true];
 
-// Move to next mission stage (Supply Run)
-[2] spawn AGS_fnc_generateInitialMission;
+// Progress to the next Mission Stage (Supply Run)
+[2] remoteExec ["AGS_fnc_generateInitialMission", 2];
+
+["STRATEGIC: FOB Established. Logistics network is now active."] remoteExec ["systemChat", 0];
