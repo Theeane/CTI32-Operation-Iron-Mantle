@@ -1,41 +1,85 @@
 /*
     Author: Theane (AGS Project)
-    Description: Server-side logic to generate the very first objective 
-                 upon framework activation.
+    Description: Sequential starter missions: Deploy FOB -> Supply Op -> Capture Zone.
     Language: English
 */
 
 if (!isServer) exitWith {};
 
-// Prevent duplicate mission generation if multiple players log in simultaneously
-if (missionNamespace getVariable ["AGS_initialMissionActive", false]) exitWith {};
-missionNamespace setVariable ["AGS_initialMissionActive", true, true];
+params [["_stage", 1]];
 
-uiSleep 2;
+switch (_stage) do {
+    // --- STAGE 1: DEPLOY FIRST FOB ---
+    case 1: {
+        [
+            west, 
+            "task_deploy_fob", 
+            [
+                "Use the HQ Terminal to build or deploy your first Forward Operating Base (FOB). This will serve as your respawn point and logistics hub.",
+                "Deploy FOB",
+                ""
+            ], 
+            objNull, 
+            "CREATED", 
+            5, 
+            true, 
+            "setup", 
+            true
+        ] call BIS_fnc_taskCreate;
+        
+        // Logic to wait for FOB deployment would be triggered from the Build Mode script
+        missionNamespace setVariable ["AGS_current_stage", 1, true];
+    };
 
-// Locate the nearest hostile sector to the base
-private _basePos = getMarkerPos "AGS_base_marker";
-private _allZones = missionNamespace getVariable ["AGS_all_mission_zones", []];
+    // --- STAGE 2: INITIAL SUPPLY RUN ---
+    case 2: {
+        ["task_deploy_fob", "SUCCEEDED"] call BIS_fnc_taskSetState;
+        
+        [
+            west, 
+            "task_supply_run", 
+            [
+                "We are low on resources. A supply crate has been located in a nearby village. Recover it to fund our first offensive.",
+                "Conduct Supply Run",
+                ""
+            ], 
+            objNull, // Position will be set by the generator
+            "CREATED", 
+            5, 
+            true, 
+            "container", 
+            true
+        ] call BIS_fnc_taskCreate;
+        
+        // Here we would call a function to spawn a random supply crate mission
+        // [] spawn AGS_fnc_spawnSupplyCrate;
+        missionNamespace setVariable ["AGS_current_stage", 2, true];
+    };
 
-if (count _allZones == 0) exitWith { diag_log "AGS Error: No zones found in AGS_all_mission_zones."; };
+    // --- STAGE 3: SECURE SECTOR ---
+    case 3: {
+        ["task_supply_run", "SUCCEEDED"] call BIS_fnc_taskSetState;
 
-private _targetZone = [_allZones, _basePos] call BIS_fnc_nearestPosition;
+        private _basePos = getMarkerPos "AGS_base_marker";
+        private _allZones = missionNamespace getVariable ["AGS_all_mission_zones", []];
+        private _targetZone = [_allZones, _basePos] call BIS_fnc_nearestPosition;
 
-// Create the first Task
-[
-    west, 
-    "task_initial_capture", 
-    [
-        format ["Infiltrate and capture %1 to establish a resource link. This sector will provide our first steady stream of Supplies.", text _targetZone],
-        "Capture First Sector",
-        _targetZone
-    ], 
-    getMarkerPos _targetZone, 
-    "CREATED", 
-    5, 
-    true, 
-    "target", 
-    true
-] call BIS_fnc_taskCreate;
-
-[format ["STRATEGIC UPDATE: Infiltrate %1 to begin the liberation.", text _targetZone]] remoteExec ["systemChat", 0];
+        [
+            west, 
+            "task_initial_capture", 
+            [
+                format ["With the FOB and supplies secured, capture %1 to establish a permanent Supply Line.", text _targetZone],
+                "Secure First Sector",
+                _targetZone
+            ], 
+            getMarkerPos _targetZone, 
+            "CREATED", 
+            5, 
+            true, 
+            "target", 
+            true
+        ] call BIS_fnc_taskCreate;
+        
+        missionNamespace setVariable ["AGS_current_stage", 3, true];
+    };
+};
