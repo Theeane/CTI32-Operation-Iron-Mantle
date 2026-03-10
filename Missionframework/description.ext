@@ -1,0 +1,11 @@
+#include "CfgFunctions.hpp"
+#include "Missionframework\ui\resourceBar.hpp"
+
+// Required for the Resource HUD to work
+class RscTitles {
+    #include "Missionframework\ui\resourceBar.hpp"
+};
+
+// Mission Info
+author = "Theane";
+onLoadName = "Operation Iron Mantle";
