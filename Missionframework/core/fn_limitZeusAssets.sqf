@@ -1,20 +1,28 @@
 /*
     Author: Theane (AGS Project)
-    Description: Limits Zeus to specific buildings and removes all other tabs.
+    Description: Filters Zeus content to hide all unit factions and show only static objects.
     Language: English
 */
 
-params ["_curator", "_allowedClasses"];
+params ["_curator"];
 
 if (!isServer) exitWith {};
 
-// Remove all default addons (this clears the tabs like 'Units', 'Groups' etc)
+// 1. Clear all default addons (This hides BLUFOR, OPFOR, Rebels, and Civilians)
 removeAllCuratorAddons _curator;
 
-// Add only the classes we want to see in the 'Objects' tab
-_curator addCuratorEditableObjects [ [], true ]; 
+// 2. Re-add only the structure and object libraries
+// This provides the "Objects" tab with Houses, Walls, Camping, etc.
+_curator addCuratorAddons [
+    "A3_Structures_F",
+    "A3_Structures_F_Exp",
+    "A3_Structures_F_Enoch",
+    "A3_Structures_F_Orange",
+    "A3_Structures_F_Heli",
+    "A3_Modules_F_Curator" // Allows basic utility modules
+];
 
-// Add the ability to see things placed by others (for cleanup/moving)
-_curator addCuratorEditableObjects [allUnits + vehicles, true];
+// 3. Allow interaction with existing objects for moving/deleting
+_curator addCuratorEditableObjects [allMissionObjects "Static" + vehicles, true];
 
 true
