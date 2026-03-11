@@ -1,5 +1,15 @@
+/*
+    Author: Theeane / Gemini
+    Description: Buy Menu Dialog for Operation Iron Mantle.
+    Language: English
+*/
+
+#define IDD_BUY_MENU 9000
+#define IDC_SUPPLY_COUNT 9001
+#define IDC_ITEM_LIST 9002
+
 class IronMantle_BuyMenu {
-    idd = 9000;
+    idd = IDD_BUY_MENU;
     movingEnable = false;
     enableSimulation = true;
 
@@ -32,7 +42,7 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Infantry";
-            action = "['Infantry'] spawn CTI_fnc_updateBuyCategory;";
+            action = "['Infantry'] spawn AGS_fnc_updateBuyCategory;";
         };
         // Tab 2: Light Vehicles
         class BtnVeh: RscActivePicture {
@@ -41,7 +51,7 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Light Vehicles";
-            action = "['LightVehicles'] spawn CTI_fnc_updateBuyCategory;";
+            action = "['LightVehicles'] spawn AGS_fnc_updateBuyCategory;";
         };
         // Tab 3: Heavy Armor
         class BtnTank: RscActivePicture {
@@ -50,23 +60,23 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Heavy Armor";
-            action = "['HeavyVehicles'] spawn CTI_fnc_updateBuyCategory;";
+            action = "['HeavyVehicles'] spawn AGS_fnc_updateBuyCategory;";
         };
 
         // Supply Information Display
         class SupplyInfo: RscText {
-            idc = 9001;
+            idc = IDC_SUPPLY_COUNT;
             text = "Supplies: 0";
             style = 1; // Right align
             x = 0.60 * safezoneW + safezoneX;
             y = 0.21 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.03 * safezoneH;
-            colorText[] = {0, 1, 0, 1}; // Green for money/resources
+            colorText[] = {0, 1, 0, 1}; // Green for resources
         };
 
         // Main Item Selection List
         class ListBox: RscListBox {
-            idc = 9002;
+            idc = IDC_ITEM_LIST;
             x = 0.26 * safezoneW + safezoneX;
             y = 0.27 * safezoneH + safezoneY;
             w = 0.48 * safezoneW;
@@ -80,7 +90,7 @@ class IronMantle_BuyMenu {
             y = 0.68 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.05 * safezoneH;
             colorBackground[] = {0, 0.4, 0, 1}; // Dark green
-            action = "[] spawn CTI_fnc_initiatePurchase;";
+            action = "[] spawn AGS_fnc_initiatePurchase;";
         };
 
         // Close/Exit Button
