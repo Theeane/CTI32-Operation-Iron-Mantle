@@ -1,24 +1,53 @@
-/* PRESET: CSAT Pacific (Apex)
-    Author: Theane using Gemini
+/* PRESET: CSAT Standard
+    Author: Theeane
+    Framework: CTI32 - Operation Iron Mantle
 */
 
 GVAR_OPFOR_Preset = createHashMapFromArray [
-    // --- INFANTRY POOLS ---
-    ["Infantry_T1", ["O_T_Soldier_F", "O_T_Soldier_LAT_F", "O_T_Soldier_AR_F"]],
-    ["Infantry_T2", ["O_T_Soldier_TL_F", "O_T_Soldier_GL_F", "O_T_Medic_F", "O_T_Soldier_M_F"]],
-    ["Infantry_T3", ["O_T_Soldier_SL_F", "O_T_HeavyGunner_F", "O_T_Soldier_AT_F", "O_T_Soldier_AA_F"]],
-    ["Infantry_T4", ["O_V_Soldier_ghex_F", "O_T_Soldier_PG_F"]],
-    ["Infantry_T5", ["O_V_Soldier_Viper_F", "O_V_Soldier_Viper_LAT_F", "O_V_Soldier_Viper_M_F"]],
+    // --- INFANTRY Tiers ---
+    ["Infantry_T1", [
+        "O_Soldier_F",                      // Rifleman
+        "O_Soldier_LAT_F",                  // Rifleman (LAT)
+        "O_Medic_F"                         // Medic
+    ]],
+    ["Infantry_T2", [
+        "O_Soldier_GL_F",                   // Grenadier
+        "O_Soldier_AR_F",                   // Autorifleman
+        "O_Soldier_TL_F"                    // Team Leader
+    ]],
+    ["Infantry_T3", [
+        "O_Soldier_AT_F",                   // AT Specialist
+        "O_Soldier_MG_F",                   // Heavy Gunner
+        "O_Soldier_SL_F"                    // Squad Leader
+    ]],
+    ["Infantry_T4", [
+        "O_marksman_F",                     // Marksman
+        "O_Soldier_AA_F",                   // AA Specialist
+        "O_engineer_F"                      // Engineer
+    ]],
+    ["Infantry_T5", [
+        "O_Sharpshooter_F",                 // Sharpshooter
+        "O_HeavyUnit_01_F",                 // Urban Entity (Heavy)
+        "O_Officer_F"                       // Officer
+    ]],
 
-    // --- VEHICLE POOLS ---
-    ["Vehicles_T1", ["O_T_LSV_02_unarmed_F", "O_T_Quadbike_01_ghex_F"]],
-    ["Vehicles_T2", ["O_T_LSV_02_armed_F", "O_T_MRAP_02_hmg_ghex_F"]],
-    ["Vehicles_T3", ["O_T_APC_Wheeled_02_rcws_v2_ghex_F", "O_T_APC_Tracked_02_cannon_ghex_F"]],
-    ["Vehicles_T4", ["O_T_MBT_02_cannon_ghex_F", "O_MBT_04_cannon_F"]],
-    ["Vehicles_T5", ["O_Heli_Attack_02_dynamicLoadout_ghex_F", "O_T_VTOL_02_infantry_dynamicLoadout_F"]],
-
-    // --- SPECIAL UNITS ---
-    ["Officer_Standard", "O_T_Officer_F"],
-    ["Officer_Elite",    "O_V_Soldier_Viper_F"],
-    ["Pilot",           "O_T_Helipilot_F"]
-];
+    // --- VEHICLE Tiers ---
+    ["Vehicles_T1", [
+        "O_Truck_02_transport_F",           // Zamak Transport
+        "O_LSV_02_unarmed_F"                // Qilin (Unarmed)
+    ]],
+    ["Vehicles_T2", [
+        "O_LSV_02_armed_F",                 // Qilin (Minigun)
+        "O_MRAP_02_hmg_F"                   // Ifrit (HMG)
+    ]],
+    ["Vehicles_T3", [
+        "O_APC_Wheeled_02_rcws_v2_F",        // Marid
+        "O_APC_Tracked_02_cannon_F"         // BTR-K Kamysh
+    ]],
+    ["Vehicles_T4", [
+        "O_MBT_02_cannon_F",                // T-100 Varsuk
+        "O_APC_Tracked_02_AA_F"             // Tigris (AA)
+    ]],
+    ["Vehicles_T5", [
+        "O_MBT_04_cannon_F",                // T-140 Angara
+        "O_Heli_Attack_02_dynamicLoadout_F
