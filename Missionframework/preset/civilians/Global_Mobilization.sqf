@@ -1,23 +1,22 @@
 /* PRESET: Global Mobilization Civilians
-    Author: Theane using Gemini
+    Author: Theeane
     Framework: CTI32 - Operation Iron Mantle
 */
 
-// --- Civilian Units (Cold War German style) ---
+// --- Civilian Units ---
 GVAR_CIV_Units = [
-    "gm_gc_civ_man_01_80_blk",
-    "gm_gc_civ_man_02_80_brn",
-    "gm_ge_pol_officer_80_grn",
-    "gm_ge_dbp_man_01_80_blu",
-    "C_Man_casual_1_F_euro",
-    "C_Man_casual_2_F_euro"
+    "gm_gc_civ_man_01_80_blk",          // East German Male (Black)
+    "gm_gc_civ_man_02_80_brn",          // East German Male (Brown)
+    "gm_ge_pol_officer_80_grn",         // West German Police
+    "gm_ge_dbp_man_01_80_blu",          // Bundespost Worker
+    "C_Man_casual_1_F_euro",            // Casual Euro 01
+    "C_Man_casual_2_F_euro"             // Casual Euro 02
 ];
 
-// --- Civilian Vehicles (Period specific) ---
+// --- Civilian Vehicles ---
 GVAR_CIV_Vehicles = [
-    "gm_ge_civ_typ1200_wht",             // Beetle
+    "gm_ge_civ_typ1200_wht",             // VW Beetle (White)
     "gm_ge_civ_u1300l",                  // Unimog
     "gm_ge_pol_typ1200_grn",             // Police Beetle
-    "gm_ge_dbp_typ1200_yel",             // Post Beetle
-    "gm_ge_civ_typ1200_red"              // Beetle (Red)
+    "gm_ge_dbp_typ1200_yel"              // Post Beetle
 ];
