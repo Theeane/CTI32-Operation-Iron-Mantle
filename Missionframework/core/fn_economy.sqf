@@ -1,17 +1,16 @@
 /*
-    Author: Theane using gemini (AGS Project)
+    Author: Theeane / Gemini (AGS Project)
     Description: Central Economy & Resource System.
     Logic: 
     - Generates Supplies from captured zones.
     - Pauses income if a zone is "Under Attack".
-    - Handles Intel collection and Notoriety decay.
-    Language: English
+    - Handles Notoriety decay.
 */
 
 if (!isServer) exitWith {};
 
-// --- INITIALIZE GLOBAL RESOURCES (If not loaded from Persistence) ---
-if (isNil "AGS_res_supplies") then { missionNamespace setVariable ["AGS_res_supplies", 100, true]; };
+// --- INITIALIZE GLOBAL RESOURCES (Synced with Buy Menu) ---
+if (isNil "GVAR_Economy_Supplies") then { missionNamespace setVariable ["GVAR_Economy_Supplies", 100, true]; };
 if (isNil "AGS_res_intel") then { missionNamespace setVariable ["AGS_res_intel", 0, true]; };
 if (isNil "AGS_res_notoriety") then { missionNamespace setVariable ["AGS_res_notoriety", 0, true]; };
 
@@ -31,8 +30,8 @@ if (isNil "AGS_res_notoriety") then { missionNamespace setVariable ["AGS_res_not
 
             if (_isCaptured) then {
                 if (!_isUnderAttack) then {
-                    // Normal Income: +2 Supplies per safe zone
-                    _incomeSupplies = _incomeSupplies + 2;
+                    // Normal Income: +5 Supplies per safe zone (Adjusted for Buy Menu prices)
+                    _incomeSupplies = _incomeSupplies + 5; 
                     _activeZonesCount = _activeZonesCount + 1;
                 } else {
                     // SUPPLY LINE INTERRUPTED
@@ -43,46 +42,40 @@ if (isNil "AGS_res_notoriety") then { missionNamespace setVariable ["AGS_res_not
 
         // Apply Supply Income
         if (_incomeSupplies > 0) then {
-            private _currentSupplies = missionNamespace getVariable ["AGS_res_supplies", 0];
-            missionNamespace setVariable ["AGS_res_supplies", _currentSupplies + _incomeSupplies, true];
+            private _currentSupplies = missionNamespace getVariable ["GVAR_Economy_Supplies", 0];
+            missionNamespace setVariable ["GVAR_Economy_Supplies", _currentSupplies + _incomeSupplies, true];
+            
+            // Notification to players (Optional: only if income > 0)
+            [format ["Income received: +%1 Supplies.", _incomeSupplies]] remoteExec ["systemChat", 0];
         };
 
         // --- NOTORIETY DECAY ---
-        // Your heat levels drop slowly over time (-1% per minute)
         private _currentNotoriety = missionNamespace getVariable ["AGS_res_notoriety", 0];
         if (_currentNotoriety > 0) then {
-            private _decay = 1; 
-            // If no players are fired recently, decay faster? (Optional future logic)
-            missionNamespace setVariable ["AGS_res_notoriety", (0 max (_currentNotoriety - _decay)), true];
+            missionNamespace setVariable ["AGS_res_notoriety", (0 max (_currentNotoriety - 1)), true];
         };
 
-        // --- LOGGING (Server Console) ---
-        diag_log format ["AGS Economy: Safe Zones: %1 | Under Attack: %2 | Income: +%3 Supplies | Notoriety: %4%5", 
-            _activeZonesCount, 
-            _underAttackCount, 
-            _incomeSupplies, 
-            missionNamespace getVariable "AGS_res_notoriety", 
-            "%"
-        ];
+        // Log to Server Console
+        diag_log format ["[AGS Economy] Zones: %1 | Under Attack: %2 | Income: +%3 | Total: %4", 
+            _activeZonesCount, _underAttackCount, _incomeSupplies, missionNamespace getVariable "GVAR_Economy_Supplies"];
 
-        // If zones are under attack, notify players of the lost income
         if (_underAttackCount > 0) then {
-            [format ["Supply lines interrupted in %1 sectors! Defend them to restore income.", _underAttackCount]] remoteExec ["systemChat", 0];
+            ["Supply lines interrupted! Defend sectors to restore full income."] remoteExec ["systemChat", 0];
         };
     };
 };
 
 /**
- * Function to manually add/remove resources (use this in other scripts)
- * Example: [50, "SUPPLIES"] call AGS_fnc_addResource;
+ * Global helper function to add/remove resources
+ * Matches your previous setup but uses synced variable names.
  */
 AGS_fnc_addResource = {
     params ["_amount", "_type"];
     
     switch (toUpper _type) do {
         case "SUPPLIES": {
-            private _val = missionNamespace getVariable ["AGS_res_supplies", 0];
-            missionNamespace setVariable ["AGS_res_supplies", (_val + _amount), true];
+            private _val = missionNamespace getVariable ["GVAR_Economy_Supplies", 0];
+            missionNamespace setVariable ["GVAR_Economy_Supplies", (_val + _amount), true];
         };
         case "INTEL": {
             private _val = missionNamespace getVariable ["AGS_res_intel", 0];
@@ -90,11 +83,10 @@ AGS_fnc_addResource = {
         };
         case "NOTORIETY": {
             private _val = missionNamespace getVariable ["AGS_res_notoriety", 0];
-            // Clamp notoriety between 0 and 100
             missionNamespace setVariable ["AGS_res_notoriety", (0 max (100 min (_val + _amount))), true];
         };
     };
     
-    // Trigger a delayed save when resources change significantly
-    [] spawn AGS_fnc_requestDelayedSave;
+    // Save trigger (Keep this if you have persistence)
+    if (!isNil "AGS_fnc_requestDelayedSave") then { [] spawn AGS_fnc_requestDelayedSave; };
 };
