@@ -1,23 +1,23 @@
 /* PRESET: Eastern European Civilians
-    Author: Theane using Gemini
+    Author: Theeane
     Framework: CTI32 - Operation Iron Mantle
 */
 
-// --- Civilian Units (Post-Soviet / Chernarus style) ---
+// --- Civilian Units ---
 GVAR_CIV_Units = [
-    "RDS_Assistant",
-    "RDS_Doctor",
-    "RDS_Policeman",
-    "RDS_Priest",
-    "RDS_Woodlander1",
-    "RDS_Worker2",
-    "CUP_C_C_Citizen_01",
-    "CUP_C_C_Profiteer_01",
-    "CUP_C_C_Rocker_01",
-    "C_journalist_F"
+    "RDS_Assistant",                    // RDS Assistant
+    "RDS_Doctor",                       // RDS Doctor
+    "RDS_Policeman",                    // RDS Policeman
+    "RDS_Priest",                       // RDS Priest
+    "RDS_Woodlander1",                  // RDS Woodlander
+    "RDS_Worker2",                      // RDS Worker
+    "CUP_C_C_Citizen_01",               // Chernarussian Citizen
+    "CUP_C_C_Profiteer_01",             // Chernarussian Profiteer
+    "CUP_C_C_Rocker_01",                // Chernarussian Rocker
+    "C_journalist_F"                    // Journalist
 ];
 
-// --- Civilian Vehicles (Classic Eastern Bloc) ---
+// --- Civilian Vehicles ---
 GVAR_CIV_Vehicles = [
     "RDS_Gaz24_Civ_03",                  // Gaz-24
     "RDS_Golf4_Civ_01",                  // Golf IV
