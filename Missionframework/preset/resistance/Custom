@@ -1,2 +1,56 @@
-    Description: Use this file to create your own custom faction. 
+/* PRESET: Custom Resistance Template
+    Description: Use this file to create your own custom faction.
     Replace the classnames below with your desired units.
+    Framework: CTI32 - Operation Iron Mantle
+*/
+
+GVAR_RES_Preset = createHashMapFromArray [
+    // --- INFANTRY Tiers ---
+    ["Infantry_T1", [
+        "I_soldier_F",                      // Entry Level Rifleman
+        "I_medic_F"                         // Entry Level Medic
+    ]],
+    ["Infantry_T2", [
+        "I_Soldier_GL_F",                   // Grenadier
+        "I_Soldier_AR_F",                   // Light Machinegunner
+        "I_Soldier_TL_F"                    // Team Leader
+    ]],
+    ["Infantry_T3", [
+        "I_Soldier_AT_F",                   // AT Specialist
+        "I_Soldier_SL_F"                    // Squad Leader
+    ]],
+    ["Infantry_T4", [
+        "I_Soldier_M_F",                    // Designated Marksman
+        "I_engineer_F"                      // Combat Engineer
+    ]],
+    ["Infantry_T5", [
+        "I_ghillie_lsh_F",                  // Sniper / Special Forces
+        "I_Officer_F"                       // High Ranking Officer
+    ]],
+
+    // --- VEHICLE Tiers ---
+    ["Vehicles_T1", [
+        "I_Truck_02_transport_F",           // Light Transport
+        "I_MRAP_03_F"                       // Light Recon
+    ]],
+    ["Vehicles_T2", [
+        "I_MRAP_03_hmg_F",                  // Armed Recon (HMG)
+        "I_MRAP_03_gmg_F"                   // Armed Recon (GMG)
+    ]],
+    ["Vehicles_T3", [
+        "I_LT_01_cannon_F",                 // Light Tank / Weapon Carrier
+        "I_APC_tracked_03_cannon_F"         // IFV
+    ]],
+    ["Vehicles_T4", [
+        "I_APC_Wheeled_03_cannon_F",        // Heavy APC
+        "I_MBT_03_cannon_F"                 // Main Battle Tank
+    ]],
+    ["Vehicles_T5", [
+        "I_Heli_light_03_dynamicLoadout_F", // Attack Helicopter
+        "I_Plane_Fighter_03_dynamicLoadout_F" // CAS Support
+    ]],
+
+    // --- Core Units ---
+    ["Leader", "I_Officer_F"],
+    ["Pilot",  "I_helipilot_F"]
+];
