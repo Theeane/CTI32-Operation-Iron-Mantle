@@ -1,7 +1,8 @@
 /* PRESET: Custom Civilian Template
     Author: Theane using Gemini
+    Description: Use this file to create your own custom faction. 
+    Replace the classnames below with your desired units.
     Framework: CTI32 - Operation Iron Mantle
-    Description: Clean template for adding custom civilian units and vehicles.
 */
 
 // --- Civilian Units ---
