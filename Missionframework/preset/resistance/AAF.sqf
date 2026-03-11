@@ -27,17 +27,33 @@ GVAR_RES_Preset = createHashMapFromArray [
         "I_support_MG_F"                    // HMG Assistant
     ]],
     ["Infantry_T5", [
-        "I_ghillie_ard_F",                  // Sniper
+        "I_ghillie_ard_F",                  // Sniper (Arid)
         "I_ghillie_lsh_F",                  // Sniper (Lush)
         "I_Soldier_exp_F"                   // Explosives Specialist
     ]],
 
-    // --- VEHICLE POOLS (Escalation from Cars to MBTs) ---
-    ["Vehicles_T1", ["I_Truck_02_transport_F", "I_MRAP_03_F"]],
-    ["Vehicles_T2", ["I_MRAP_03_hmg_F", "I_MRAP_03_gmg_F"]],
-    ["Vehicles_T3", ["I_LT_01_scout_F", "I_LT_01_cannon_F"]],         // Nyx (Scout/Cannon)
-    ["Vehicles_T4", ["I_APC_Wheeled_03_cannon_F", "I_APC_tracked_03_cannon_F"]], // Gorgon/Mora
-    ["Vehicles_T5", ["I_MBT_03_cannon_F", "I_Heli_light_03_dynamicLoadout_F"]], // Kuma/Hellcat
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
+    ["Vehicles_T1", [
+        "I_Truck_02_transport_F", 
+        "I_MRAP_03_F"                       // Strider (Unarmed)
+    ]],
+    ["Vehicles_T2", [
+        "I_MRAP_03_hmg_F",                  // Strider (HMG)
+        "I_MRAP_03_gmg_F"                   // Strider (GMG)
+    ]],
+    ["Vehicles_T3", [
+        "I_LT_01_scout_F",                  // Nyx (Radar)
+        "I_LT_01_cannon_F"                  // Nyx (Autocannon)
+    ]],
+    ["Vehicles_T4", [
+        "I_APC_Wheeled_03_cannon_F",        // Gorgon
+        "I_APC_tracked_03_cannon_F"         // Mora
+    ]],
+    ["Vehicles_T5", [
+        "I_MBT_03_cannon_F",                // Kuma (MBT)
+        "I_Heli_light_03_dynamicLoadout_F", // WY-55 Hellcat (Armed)
+        "I_Plane_Fighter_03_dynamicLoadout_F" // A-143 Buzzard (CAS)
+    ]],
 
     // --- SPECIAL UNITS ---
     ["Leader", "I_Officer_F"],
