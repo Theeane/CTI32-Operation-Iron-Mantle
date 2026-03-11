@@ -1,6 +1,7 @@
 /*
-    Author: Theeane / Gemini
+    Author: Theeane / PETG
     Description: Dynamic Faction Loader for Operation Iron Mantle.
+    Language: English
 */
 
 if (!isServer) exitWith {};
@@ -10,10 +11,11 @@ private _startSupplies = "AGS_Param_StartSupplies" call BIS_fnc_getParamValue;
 missionNamespace setVariable ["GVAR_Economy_Supplies", _startSupplies, true];
 
 // --- 2. DYNAMIC LOADER FUNCTION ---
-// Hjälpfunktion för att ladda filer snyggt
+// Helper function to load preset files cleanly and handle missing files
 private _fnc_loadPreset = {
     params ["_folder", "_file"];
     private _path = format ["Missionframework\preset\%1\%2", _folder, _file];
+    
     if (fileExists _path) then {
         [] execVM _path;
         diag_log format ["[AGS] Loaded Preset: %1", _path];
@@ -61,4 +63,8 @@ private _civFile = switch ("AGS_Param_Civs" call BIS_fnc_getParamValue) do {
 };
 ["civilians", _civFile] call _fnc_loadPreset;
 
-diag_log "[AGS] All faction globals initialized.";
+// --- 7. SYSTEM & ECONOMY TIMERS ---
+private _supplyTimer = "AGS_Param_SupplyTimer" call BIS_fnc_getParamValue;
+missionNamespace setVariable ["GVAR_Economy_SupplyInterval", _supplyTimer, true];
+
+diag_log "[AGS] All faction globals and economy parameters initialized.";
