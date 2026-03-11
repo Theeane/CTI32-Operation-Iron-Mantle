@@ -54,7 +54,6 @@ GVAR_OPFOR_Preset = createHashMapFromArray [
         "CUP_O_Su25_Dyn_RU"                  // Su-25 Frogfoot
     ]],
 
-    // --- Special Classes ---
     ["Leader", "CUP_O_RU_Officer_M_EMR"],
     ["Pilot", "CUP_O_RU_Pilot"]
 ];
