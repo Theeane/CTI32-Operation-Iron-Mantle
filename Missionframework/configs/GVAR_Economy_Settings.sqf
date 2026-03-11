@@ -1,9 +1,10 @@
 /* Author: Theeane
     Description: 
     Main economy and resource configuration for Operation Iron Mantle.
-    Focuses on Supplies and Intel. Infantry and gear are free of charge.
+    Focuses on Supplies for logistics/vehicles and Intel for missions/civilian info.
     
-    Income multiplier is based on the 'Medium' default experience.
+    Note: Infantry recruitment and personal gear are free of charge.
+    All code and comments in English.
 */
 
 // --- 1. INCOME MULTIPLIER (Lobby Parameter) ---
@@ -18,30 +19,51 @@ switch (_incomeParam) do {
 };
 
 // --- 2. STARTING CAPITAL ---
-GVAR_Economy_StartSupplies = 200;    
-GVAR_Economy_StartIntel    = 0;      
+// Initial resources granted to players at mission start.
+GVAR_Economy_StartSupplies = 200;    // Logistics for vehicles/buildings
+GVAR_Economy_StartIntel    = 0;      // Intelligence for missions/recon
 
-// --- 3. INCOME INTERVAL ---
+// --- 3. INCOME INTERVAL (Timing) ---
+// Frequency of resource distribution in minutes.
+// Param options: 5, 10, 15, 20, 30.
 GVAR_Economy_IncomeInterval = ["GVAR_Param_SupplyTime", 15] call BIS_fnc_getParamValue; 
 
-// --- 4. PASSIVE INCOME (Scaled) ---
+// --- 4. PASSIVE INCOME (Scaled by Multiplier) ---
+// Base resources generated per income tick regardless of territory control.
 GVAR_Economy_PassiveIncome_Supplies = (20 * _incomeMult);  
 GVAR_Economy_PassiveIncome_Intel    = (2 * _incomeMult);  
 
-// --- 5. ZONE REWARD VALUES (Scaled) ---
-// Values added to each income tick per controlled sector.
-GVAR_Economy_ZoneBonus_Small = (10 * _incomeMult);   // Outposts
-GVAR_Economy_ZoneBonus_Large = (35 * _incomeMult);   // Cities
-GVAR_Economy_ZoneBonus_Base  = (75 * _incomeMult);   // Military Bases
+// --- 5. ZONE REWARD VALUES (Scaled by Multiplier) ---
+// Resources added to the income tick per controlled sector.
+GVAR_Economy_ZoneBonus_Small = (10 * _incomeMult);   // Radio towers, outposts
+GVAR_Economy_ZoneBonus_Large = (35 * _incomeMult);   // Towns, urban centers
+GVAR_Economy_ZoneBonus_Base  = (75 * _incomeMult);   // Military bases, airports
 
-// --- 6. INTEL GATHERING ---
-// Static rewards for battlefield actions.
+// --- 6. INTEL GATHERING VALUES ---
+// Rewards for specific actions on the battlefield.
 GVAR_Economy_Intel_CapturedOfficer = 50;  
 GVAR_Economy_Intel_DataTerminal    = 25;  
 GVAR_Economy_Intel_EnemySoldier    = 1;   
 GVAR_Economy_Intel_CivilianTalk    = 5;   
 
-// --- 7. VEHICLE PRICING (Tier-Based) ---
+// --- 7. INTEL SCALING LOGIC (Diminishing Returns) ---
+// This function calculates the probability of finding intel/informants 
+// based on current reserves. Higher intel = lower find chance.
+GVAR_Economy_fnc_getIntelChance = {
+    params ["_currentIntel"];
+    
+    private _baseChance = 100; // Starting chance at 0 Intel
+    private _softCap = 500;    // Amount where gathering becomes harder
+    private _minChance = 5;    // Minimum floor (never 0%)
+    
+    private _calculatedChance = _baseChance - (_currentIntel / (_softCap / 100));
+    
+    if (_calculatedChance < _minChance) then { _calculatedChance = _minChance };
+    
+    _calculatedChance
+};
+
+// --- 8. VEHICLE PRICING (Tier-Based) ---
 // Final price = BasePrice * TierMultiplier.
 GVAR_Economy_BasePrice_Vehicle = 150; 
 
@@ -53,13 +75,15 @@ GVAR_Economy_TierMultipliers = createHashMapFromArray [
     ["T5", 15.0]   // Strategic Assets (Jets/Attack Helis)
 ];
 
-// --- 8. MOB UPGRADES ---
+// --- 9. MOB UPGRADES ---
+// Costs for expanding Mobile Operations Base capabilities.
 GVAR_Economy_Cost_MOB_Repair   = 100;
 GVAR_Economy_Cost_MOB_Rearm    = 150;
 GVAR_Economy_Cost_MOB_Refuel   = 100;
 GVAR_Economy_Cost_MOB_Garage   = 300; 
 
-// --- 9. RECYCLING ---
+// --- 10. RESOURCE RECOVERY ---
+// Percentage of Supplies returned when recycling assets.
 GVAR_Economy_RefundRate = 0.5;
 
-diag_log format ["[Iron Mantle] Economy Initialized. Mode: %1 (Multiplier: %2x)", _incomeParam, _incomeMult];
+diag_log format ["[Iron Mantle] Economy Settings Initialized. Mode: %1 (Multiplier: %2x)", _incomeParam, _incomeMult];
