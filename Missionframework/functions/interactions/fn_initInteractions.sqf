@@ -1,26 +1,27 @@
-/* Author: Theeane
-    Description: 
-    Initializes interactions for units based on their side and status.
-    All code in English.
+/* Adding the 5-second circular UI interaction 
+    to an informant or object.
 */
 
-params ["_unit"];
-
-if (isNull _unit) exitWith {};
-
-// 1. CIVILIAN INTERACTIONS
-if (side _unit == civilian) exitWith {
-    // Add the Talk option (From our economy module)
-    [_unit] call CTI_fnc_initCivilianActions; 
-};
-
-// 2. ENEMY INTERACTIONS (OPFOR / RESISTANCE)
-if (side _unit == east || side _unit == resistance) exitWith {
-    // Add Search Body, Undercover Trade, and NATO Signal
-    [_unit] call CTI_fnc_initEnemyActions;
-    
-    // Start the background check for "The Signal" (if they are informants)
-    if (_unit getVariable ["GVAR_isInformant", false]) then {
-        [_unit] spawn CTI_fnc_signalPlayer;
-    };
-};
+[
+    _unit,											// Object the action is attached to
+    "Negotiate / Trade Intel",						// Title of the action
+    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_search_ca.paa",	// Idle icon
+    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_search_ca.paa",	// Progress icon
+    "_this distance _target < 3",					// Condition for the action to be shown
+    "_caller distance _target < 3",					// Condition for the action to progress
+    {},												// Code executed when action starts
+    {},												// Code executed on every tick
+    { 
+        // SUCCESS: Code executed when the 5-second circle is full
+        [_target, _caller] spawn CTI_fnc_handleInteractionResult; 
+    },
+    { 
+        // INTERRUPTED: Code executed if player lets go or moves away
+        ["TaskFailed", ["", "Interaction interrupted!"]] call BIS_fnc_showNotification;
+    },
+    [],												// Arguments passed to the scripts
+    5,												// DURATION in seconds (Your 5s circle)
+    0,												// Priority
+    true,											// Remove on completion
+    false											// Show in unconscious state
+] call BIS_fnc_holdActionAdd;
