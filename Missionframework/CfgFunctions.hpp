@@ -17,7 +17,6 @@ class CfgFunctions {
             class zoneCapture {};
             class zoneManager {};
             class setupInteractions {};
-            class setupFOBInteractions {};
             class setupFOBAction {};
             class spawnFOBComposition {};
             class startFOBPlacement {};
@@ -28,7 +27,18 @@ class CfgFunctions {
             class persistence {};
             class undercoverHandler {};
             class buildMode {};
-            class openBuildZeus {}; // Kept if you chose the Admin option
+        };
+
+        // --- NEW: BASE & LOGISTICS ---
+        class Base {
+            file = "Missionframework\functions\base";
+            class initFOB {};
+            class packFOB {};
+            class executeRepack {};
+            class commanderToggleRepack {};
+            class initCommandPC {};
+            class updateBuyCategory {};  // Logic for the Buy Menu list
+            class initiatePurchase {};   // Logic for buying units/vehicles
         };
 
         class UI {
@@ -36,6 +46,8 @@ class CfgFunctions {
             class initUI {};
             class updateResourceUI {};
             class openBuildMenu {};
+            class openBuyMenu {};        // Opens our new Grey/English menu
+            class openCommandMap {};     // The Commander's overview map
         };
 
         class Missions {
