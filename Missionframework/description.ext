@@ -1,5 +1,5 @@
 /*
-    Author: Theeane / Gemini
+    Author: Theeane / PETG
     Project: Operation Iron Mantle (AGS Framework)
     Language: English
 */
@@ -20,7 +20,7 @@ class RscTitles {
 };
 
 // --- 4. Mission Info ---
-author = "Theeane";
+author = "Theeane / PETG";
 onLoadName = "Operation Iron Mantle";
 onLoadMission = "Establish FOBs, capture sectors, and liberate the region.";
 
@@ -33,11 +33,8 @@ respawnDelay = 10;
 respawnDialog = 0;
 
 // --- 6. Mission Parameters ---
-// These can be adjusted in the lobby before starting the mission
+// These can be adjusted in the lobby before starting the mission.
+// We use an external file to keep this clean and load all presets.
 class Params {
-    class SupplyTimer {
-        title = "Supply Delivery Interval (Minutes)";
-        values[] = {5, 10, 15, 20, 30};
-        default = 10;
-    };
+    #include "Params.hpp"
 };
