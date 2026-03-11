@@ -1,46 +1,62 @@
 /* Author: Theeane
     Description: 
-    Spawns infantry, civilians, and informants in a zone.
-    Uses presets from yesterday and interaction-logic from today.
+    Spawns units and applies the interaction logic (Stealth, Interaction, Economy).
+    Integrated with GVAR_Army_Infantry and GVAR_Civ_List presets.
 */
 
 params ["_zonePos", "_tier"];
 
-// 1. Hämta inställningar för denna Tier (mängd gubbar etc)
+// 1. Fetch Tier settings from config
 private _tierData = GVAR_Zone_Tier_Settings get _tier;
 private _multiplier = _tierData select 2;
 
-// 2. SPAWNA INFANTERI (Fiender)
-private _groupCount = round (3 * _multiplier); // Fler grupper vid högre Tier
-for "_i" from 1 to _groupCount do {
-    private _spawnPos = [_zonePos, 10, 100, 3, 0, 20, 0] call BIS_fnc_findSafePos;
-    private _group = [_spawnPos, east, (configfile >> "CfgGroups" >> "Indep" >> "IND_F" >> "Infantry" >> "HAF_InfSquad")] call BIS_fnc_spawnGroup;
+// 2. SPAWN ENEMIES (OPFOR)
+private _enemyCount = round (8 * _multiplier); 
+for "_i" from 1 to _enemyCount do {
+    private _spawnPos = [_zonePos, 10, 150, 3, 0, 20, 0] call BIS_fnc_findSafePos;
+    private _unitClass = selectRandom GVAR_Army_Infantry; 
     
-    // Ge varje soldat i gruppen våra nya interaktioner (Search Body, Undercover etc)
-    {
-        [_x] call CTI_fnc_initInteractions;
-    } forEach units _group;
+    private _group = createGroup east;
+    private _unit = _group createUnit [_unitClass, _spawnPos, [], 0, "NONE"];
+
+    // --- LOGIC APPLICATION ---
     
-    // Sätt dem på patrull i zonen
+    // Assign Rank: Determines detection range in undercoverManager (Elite vs Grunt)
+    if (random 100 < (20 * _multiplier)) then {
+        _unit setRank "SERGEANT"; // Becomes Elite (Higher detection range)
+    } else {
+        _unit setRank "PRIVATE";  // Becomes Grunt (Lower detection range)
+    };
+
+    // Chance for the soldier to be an Informant (Intel Trading)
+    if (random 100 < 15) then {
+        _unit setVariable ["GVAR_isInformant", true, true];
+    };
+
+    // Apply interaction suite (Search Body, Undercover, Hold-Action UI)
+    [_unit] call CTI_fnc_initInteractions; 
+    
     [_group, _zonePos, 150] call bis_fnc_taskPatrol;
 };
 
-// 3. SPAWNA CIVILA & INFORMATÖRER
-private _civCount = round (5 * _multiplier);
+// 3. SPAWN CIVILIANS
+private _civCount = round (6 * _multiplier);
 for "_i" from 1 to _civCount do {
-    private _civClass = selectRandom GVAR_Civ_List; // Hämtas från gårdagens Preset
-    private _spawnPos = [_zonePos, 10, 150, 3, 0, 20, 0] call BIS_fnc_findSafePos;
+    private _civClass = selectRandom GVAR_Civ_List;
+    private _spawnPos = [_zonePos, 20, 200, 3, 0, 20, 0] call BIS_fnc_findSafePos;
     
     private _group = createGroup civilian;
     private _civ = _group createUnit [_civClass, _spawnPos, [], 0, "NONE"];
-    
-    // Bestäm om denna civila är en INFORMATÖR (t.ex. 20% chans)
-    if (random 100 < 20) then {
+
+    // Civilian Informants (Special Quests / Trade)
+    if (random 100 < 25) then {
         _civ setVariable ["GVAR_isInformant", true, true];
     };
 
-    // Applicera våra nya interaktioner (Vinka, Prata, Trade)
+    // Apply interaction suite (Talking / 5s UI Circle)
     [_civ] call CTI_fnc_initInteractions;
     
     [_group, _zonePos, 100] call bis_fnc_taskPatrol;
 };
+
+diag_log format ["[Iron Mantle] Zone Assets spawned at %1 with Tier %2", _zonePos, _tier];
