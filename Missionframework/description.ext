@@ -1,11 +1,43 @@
-#include "CfgFunctions.hpp"
-#include "Missionframework\ui\resourceBar.hpp"
+/*
+    Author: Theeane / Gemini
+    Project: Operation Iron Mantle (AGS Framework)
+    Language: English
+*/
 
-// Required for the Resource HUD to work
+// --- 1. Functions Registry ---
+// This links to your separate CfgFunctions.hpp file
+#include "CfgFunctions.hpp"
+
+// --- 2. UI Definitions (Dialogs) ---
+// These are pop-up menus like the Buy Menu
+#include "Missionframework\ui\defines.hpp"        
+#include "Missionframework\ui\buyMenu.hpp"       
+
+// --- 3. RscTitles (HUD Elements) ---
+// These are elements always visible on the screen (Resource Bar / The Eye)
 class RscTitles {
-    #include "Missionframework\ui\resourceBar.hpp"
+    #include "Missionframework\ui\resourceBar.hpp" 
 };
 
-// Mission Info
-author = "Theane";
+// --- 4. Mission Info ---
+author = "Theeane";
 onLoadName = "Operation Iron Mantle";
+onLoadMission = "Establish FOBs, capture sectors, and liberate the region.";
+
+// --- 5. Identity & System Settings ---
+enableDebugConsole = 1;      // 1 = Logged-in Admin can see the console
+saving = 0;                  // Disable Arma's default save system (using Persistence)
+disabledAI = 1;              // Prevent empty playable slots from becoming AI
+respawn = 3;                 // 3 = Respawn on marker (base_west)
+respawnDelay = 10;
+respawnDialog = 0;
+
+// --- 6. Mission Parameters ---
+// These can be adjusted in the lobby before starting the mission
+class Params {
+    class SupplyTimer {
+        title = "Supply Delivery Interval (Minutes)";
+        values[] = {5, 10, 15, 20, 30};
+        default = 10;
+    };
+};
