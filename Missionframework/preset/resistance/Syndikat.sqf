@@ -32,12 +32,28 @@ GVAR_RES_Preset = createHashMapFromArray [
         "I_C_Soldier_Camo_F"                // Recon Specialist
     ]],
 
-    // --- VEHICLE POOLS (Escalation from Technicals to Looted Armor) ---
-    ["Vehicles_T1", ["C_Offroad_01_F", "I_C_Offroad_02_unarmed_F"]],
-    ["Vehicles_T2", ["I_C_Offroad_02_LMG_F", "O_G_Offroad_01_armed_F"]],
-    ["Vehicles_T3", ["I_C_Van_01_transport_F", "O_G_Offroad_01_AT_F"]],
-    ["Vehicles_T4", ["I_C_Offroad_02_AT_F", "O_G_Van_01_multipurpose_F"]],
-    ["Vehicles_T5", ["I_E_APC_tracked_03_cannon_F", "O_T_LSV_02_armed_F"]],
+    // --- VEHICLE POOLS (Escalation from Technicals to Looted/Stolen Air) ---
+    ["Vehicles_T1", [
+        "C_Offroad_01_F", 
+        "I_C_Offroad_02_unarmed_F"          // MB 4WD
+    ]],
+    ["Vehicles_T2", [
+        "I_C_Offroad_02_LMG_F", 
+        "O_G_Offroad_01_armed_F"            // Offroad HMG
+    ]],
+    ["Vehicles_T3", [
+        "I_C_Van_01_transport_F", 
+        "O_G_Offroad_01_AT_F"               // Offroad AT
+    ]],
+    ["Vehicles_T4", [
+        "I_C_Offroad_02_AT_F", 
+        "O_G_Van_01_multipurpose_F"         // Transport Van
+    ]],
+    ["Vehicles_T5", [
+        "I_E_APC_tracked_03_cannon_F",      // Looted Mora/APC
+        "I_C_Plane_Civil_01_F",             // Caesar BTT (Armed Recon)
+        "C_IDAP_Heli_Light_01_civil_F"      // Stolen/Modified M-900
+    ]],
 
     // --- SPECIAL UNITS ---
     ["Leader", "I_C_Soldier_Para_01_F"],
