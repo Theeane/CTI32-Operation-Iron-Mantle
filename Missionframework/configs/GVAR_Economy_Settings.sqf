@@ -1,47 +1,65 @@
 /* Author: Theeane
     Description: 
-    Economy settings for Operation Iron Mantle.
-    Handles income, starting capital, and Tier-based pricing.
+    Main economy and resource configuration for Operation Iron Mantle.
+    Focuses on Supplies and Intel. Infantry and gear are free of charge.
     
-    Note: All values are subject to balancing during development.
+    Income multiplier is based on the 'Medium' default experience.
 */
 
-// --- 1. STARTING CAPITAL ---
-// Resources available to BLUFOR at mission start.
-GVAR_Economy_StartCredits  = 500;    // Personal funds (weapons, recruitment)
-GVAR_Economy_StartSupplies = 200;    // Global resources (vehicles, base building)
+// --- 1. INCOME MULTIPLIER (Lobby Parameter) ---
+// 0 = Low (0.5x), 1 = Medium (1.0x), 2 = High (2.0x)
+private _incomeParam = ["GVAR_Param_IncomeMultiplier", 1] call BIS_fnc_getParamValue;
+private _incomeMult = 1.0;
 
-// --- 2. SUPPLY LOGIC (Timing) ---
-// Fetched from mission parameters (Lobby). Default is 15 minutes.
-// Available options: 5, 10, 15, 20, 30 minutes.
+switch (_incomeParam) do {
+    case 0: { _incomeMult = 0.5; }; // Hardcore / Scarcity
+    case 1: { _incomeMult = 1.0; }; // Default Experience (Balanced)
+    case 2: { _incomeMult = 2.0; }; // High Resource Flow
+};
+
+// --- 2. STARTING CAPITAL ---
+GVAR_Economy_StartSupplies = 200;    
+GVAR_Economy_StartIntel    = 0;      
+
+// --- 3. INCOME INTERVAL ---
 GVAR_Economy_IncomeInterval = ["GVAR_Param_SupplyTime", 15] call BIS_fnc_getParamValue; 
 
-// --- 3. PASSIVE INCOME ---
-// Resources generated per income tick regardless of controlled zones.
-GVAR_Economy_PassiveIncome_Credits  = 50;  
-GVAR_Economy_PassiveIncome_Supplies = 20;  
+// --- 4. PASSIVE INCOME (Scaled) ---
+GVAR_Economy_PassiveIncome_Supplies = (20 * _incomeMult);  
+GVAR_Economy_PassiveIncome_Intel    = (2 * _incomeMult);  
 
-// --- 4. ZONE BONUSES ---
-// Resource production added per income tick based on controlled locations.
-GVAR_Economy_ZoneBonus_Small = 10;   // Small villages, radio towers
-GVAR_Economy_ZoneBonus_Large = 35;   // Large towns, cities
-GVAR_Economy_ZoneBonus_Base  = 75;   // Military bases, airfields
+// --- 5. ZONE REWARD VALUES (Scaled) ---
+// Values added to each income tick per controlled sector.
+GVAR_Economy_ZoneBonus_Small = (10 * _incomeMult);   // Outposts
+GVAR_Economy_ZoneBonus_Large = (35 * _incomeMult);   // Cities
+GVAR_Economy_ZoneBonus_Base  = (75 * _incomeMult);   // Military Bases
 
-// --- 5. TIER PRICING (Multipliers) ---
-// Base prices for unit types. Final price = BasePrice * TierMultiplier.
-GVAR_Economy_BasePrice_Infantry = 20;  
-GVAR_Economy_BasePrice_Vehicle  = 150; 
+// --- 6. INTEL GATHERING ---
+// Static rewards for battlefield actions.
+GVAR_Economy_Intel_CapturedOfficer = 50;  
+GVAR_Economy_Intel_DataTerminal    = 25;  
+GVAR_Economy_Intel_EnemySoldier    = 1;   
+GVAR_Economy_Intel_CivilianTalk    = 5;   
+
+// --- 7. VEHICLE PRICING (Tier-Based) ---
+// Final price = BasePrice * TierMultiplier.
+GVAR_Economy_BasePrice_Vehicle = 150; 
 
 GVAR_Economy_TierMultipliers = createHashMapFromArray [
-    ["T1", 1.0],   // Standard pricing
-    ["T2", 1.5],   // Enhanced equipment
-    ["T3", 3.0],   // High quality assets
-    ["T4", 6.0],   // Heavy/Elite assets
-    ["T5", 12.0]   // End-game (MBTs/Planes)
+    ["T1", 1.0],   // Logistics / Unarmed
+    ["T2", 2.0],   // Light Armed (HMG/GMG)
+    ["T3", 4.5],   // IFVs / APCs
+    ["T4", 8.0],   // MBTs / Heavy AA
+    ["T5", 15.0]   // Strategic Assets (Jets/Attack Helis)
 ];
 
-// --- 6. REFUND SYSTEM ---
-// Percentage of resources returned when a vehicle is recycled at a friendly base.
-GVAR_Economy_RefundRate = 0.5; // 50% return
+// --- 8. MOB UPGRADES ---
+GVAR_Economy_Cost_MOB_Repair   = 100;
+GVAR_Economy_Cost_MOB_Rearm    = 150;
+GVAR_Economy_Cost_MOB_Refuel   = 100;
+GVAR_Economy_Cost_MOB_Garage   = 300; 
 
-diag_log "[Iron Mantle] Economy Settings Initialized.";
+// --- 9. RECYCLING ---
+GVAR_Economy_RefundRate = 0.5;
+
+diag_log format ["[Iron Mantle] Economy Initialized. Mode: %1 (Multiplier: %2x)", _incomeParam, _incomeMult];
