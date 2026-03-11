@@ -1,6 +1,7 @@
 /* PRESET: Custom NATO (Vanilla Base)
     Author: Theane using Gemini
-    Description: Use this as a template to build your own custom faction.
+    Description: Use this file to create your own custom faction. 
+    Replace the classnames below with your desired units.
 */
 
 // --- Tier 1: Basic Logistics ---
