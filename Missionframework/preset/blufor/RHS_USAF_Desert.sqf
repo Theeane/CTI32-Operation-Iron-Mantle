@@ -1,42 +1,157 @@
-/* PRESET: RHS USAF (Desert)
-    Author: Theane using Gemini
+/*
+    Author: Theeane
+    Function: Blufor Preset - RHS USAF (Desert)
+    Description: Master Template for CTI32 Operation Iron Mantle.
+    Note: Digital economy active. Requires RHS: USAF mod.
+
+    Required Mods:
+    - RHS: USAF (http://www.rhsmods.org/)
+
+    Rules: 
+    1. All names are fetched dynamically via displayName.
+    2. Mandatory Mobile Respawn Truck first in Light Vehicles for 100 S.
+    3. English comments and logs only.
 */
 
-// --- Tier 1: Basic Logistics ---
-GVAR_BLUFOR_T1 = [
-    ["rhsusf_m1025_d", 150, 0],                  // Humvee (Unarmed)
-    ["rhsusf_M1078A1P2_B_D_fmtv_usarmy", 300, 0], // FMTV Transport
-    ["rhsusf_M1083A1P2_B_D_fmtv_usarmy", 400, 0]  // MTV Transport
+// --- 1. CORE SUPPORT UNITS ---
+CTI32_FOB_Truck = "rhsusf_M1083A1P2_B_D_repair_fmtv_usarmy";       // M1083A1 Repair (Desert)
+CTI32_FOB_Box = "B_Slingload_01_Cargo_F"; 
+CTI32_Arsenal_Box = "B_supplyCrate_F";
+CTI32_Respawn_Truck = "rhsusf_M1083A1P2_B_D_fmtv_usarmy";          // M1083A1 Transport as Respawn (Fixed 100 S)
+CTI32_Crewman = "rhsusf_army_ocp_combatcrewman";                   // Default crew
+CTI32_Pilot = "rhsusf_army_ocp_helipilot";                         // Default pilot
+
+// --- 2. LOGISTICS & ECONOMY ---
+// Digital Currency System Active.
+
+// --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
+
+// Button 1: Recon & Marksman Team
+CTI32_Support_Group1 = [
+    "rhsusf_m1025_w_m2",                // HMMWV M2
+    [
+        "rhsusf_army_ocp_teamleader",   // Leader
+        "rhsusf_army_ocp_marksman",     // Marksman
+        "rhsusf_army_ocp_rifleman"      // Scout
+    ],
+    150                                 
 ];
 
-// --- Tier 2: Motorized & MRAP ---
-GVAR_BLUFOR_T2 = [
-    ["rhsusf_m1025_d_m2", 500, 0],               // Humvee (M2)
-    ["rhsusf_m1151_m2cws_usarmy_d", 650, 0],      // M1151 (CWS)
-    ["rhsusf_m1240a1_m2_usmc_d", 850, 0],         // M-ATV (HMG)
-    ["rhsusf_m1230a1_usarmy_d", 1000, 0]          // MaxxPro
+// Button 2: US Army Infantry Section
+CTI32_Support_Group2 = [
+    "rhsusf_M1083A1P2_D_open_fmtv_usarmy", 
+    [
+        "rhsusf_army_ocp_squadleader", 
+        "rhsusf_army_ocp_autorifleman", 
+        "rhsusf_army_ocp_autorifleman", 
+        "rhsusf_army_ocp_riflemanat", 
+        "rhsusf_army_ocp_medic"
+    ],
+    250                                 
 ];
 
-// --- Tier 3: IFVs & Medium Armor ---
-GVAR_BLUFOR_T3 = [
-    ["RHS_M2A2_BUSKI_EK_Desert", 2200, 0],        // Bradley
-    ["rhsusf_m113d_usarmy", 1500, 0],             // M113A3
-    ["rhsusf_stryker_m1126_m2_d", 1800, 0]        // Stryker
+// Button 3: Anti-Tank Squad (Javelin)
+CTI32_Support_Group3 = [
+    "rhsusf_m1167_w",                   // HMMWV TOW
+    [
+        "rhsusf_army_ocp_squadleader", 
+        "rhsusf_army_ocp_javelin",      // Javelin Specialist
+        "rhsusf_army_ocp_javelin",      // Javelin Specialist
+        "rhsusf_army_ocp_medic"
+    ],
+    300                                 
 ];
 
-// --- Tier 4: Heavy Armor ---
-GVAR_BLUFOR_T4 = [
-    ["rhs_m1a1aim_tuski_d", 4500, 0],             // M1A1 Abrams
-    ["rhs_m1a2sep1tuski_d", 5500, 0],             // M1A2 Abrams TUSK
-    ["RHS_M6_wd", 3800, 0]                        // Linebacker (AA)
+// Button 4: Armored Support (Bradley)
+CTI32_Support_Group4 = [
+    "RHS_M2A2_BUSKI_D",                 // M2A2 Bradley
+    [
+        "rhsusf_army_ocp_squadleader", 
+        "rhsusf_army_ocp_rifleman", 
+        "rhsusf_army_ocp_marksman", 
+        "rhsusf_army_ocp_engineer"
+    ],
+    450                                 
 ];
 
-// --- Tier 5: Air Support ---
-GVAR_BLUFOR_T5_Heli = [
-    ["RHS_UH60M_d", 2500, 1],                     // Blackhawk
-    ["RHS_AH64D_wd", 6500, 1]                     // Apache
+// Button 5: Air Assault (Blackhawk)
+CTI32_Support_Group5 = [
+    "RHS_UH60M_d",                      // UH-60M Blackhawk
+    [
+        "rhsusf_army_ocp_teamleader", 
+        "rhsusf_army_ocp_rifleman", 
+        "rhsusf_army_ocp_riflemanat", 
+        "rhsusf_army_ocp_marksman"
+    ],
+    600                                 
 ];
-GVAR_BLUFOR_T5_Plane = [
-    ["RHS_A10", 7000, 2],                         // A-10 Thunderbolt II
-    ["rhsusf_f22", 9000, 2]                       // F-22 Raptor
+
+// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+
+CTI32_Preset_Light = [
+    [CTI32_Respawn_Truck, 100],                                    
+    ["rhsusf_m1025_d", 20],                                        
+    ["rhsusf_m1025_d_m2", 45],                                     
+    ["rhsusf_m1025_d_Mk19", 55],                                   
+    ["rhsusf_M1083A1P2_D_fmtv_usarmy", 50]                         
 ];
+
+CTI32_Preset_APC = [
+    ["RHS_M2A2_BUSKI_D", 200],                                     // Bradley
+    ["rhsusf_stryker_m1126_m2_d", 180]                             // Stryker
+];
+
+CTI32_Preset_Tanks = [
+    ["rhsusf_m1a1aimd_usarmy", 450],                               // M1A1
+    ["rhsusf_m1a2sep1tuskiid_usarmy", 550]                         // M1A2 TUSK II
+];
+
+CTI32_Preset_Helis = [
+    ["RHS_UH60M_d", 220],                                          
+    ["rhsusf_CH47F_10", 300]                                       
+];
+
+CTI32_Preset_Jets = [
+    ["RHS_A10", 550]                                               // A-10 Thunderbolt II
+];
+
+// --- 5. MISSION UNLOCKS ---
+
+// Grand Op 1: Helicopters
+CTI32_Unlock_GrandOp1_Helis = [
+    "RHS_AH64D_wd",                                                // Apache (Wd skin as D is often missing/separate)
+    "RHS_AH6E_wd"                                                  // Little Bird
+];
+
+// Grand Op 2: Fixed Wing
+CTI32_Unlock_GrandOp2_Jets = [
+    "rhsusf_f22"                                                   // F-22 Raptor
+];
+
+// Side Op: Disrupt (Infrastructure/Roadblocks)
+CTI32_Unlock_Disrupt = [
+    "rhsusf_rg33_m2_d",                                            
+    "rhsusf_m113d_usarmy"                                          
+];
+
+// Side Op: Supply (Logistics/FOB)
+CTI32_Unlock_Supply = [
+    CTI32_FOB_Truck,                                               
+    "rhsusf_M1083A1P2_B_D_fuel_fmtv_usarmy",                      
+    "rhsusf_M1083A1P2_B_D_repair_fmtv_usarmy"                     
+];
+
+// Side Op: Intel (Information/Command)
+CTI32_Unlock_Intel = [
+    "rhsusf_m1152_rsv_usarmy_d"                                     // RSV HMMWV
+];
+
+// --- 6. SYNC & BROADCAST ---
+{ publicVariable _x; } forEach [
+    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
+    "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
+    "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
+    "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
+];
+
+diag_log "[CTI32] Preset: RHS_USAF_Desert loaded successfully.";
