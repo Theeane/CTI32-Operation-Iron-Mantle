@@ -1,74 +1,105 @@
 /*
     Author: Theeane / Gemini
-    Description: Mission parameters for Operation Iron Mantle.
-    Covers all presets: Blufor, Opfor, Resistance, and Civilians.
+    Description: Full Mission Parameters for Operation Iron Mantle.
+    Reflects updated presets and project logic as of 2026-03-12.
 */
 
-// --- 1. BLUFOR PRESETS ---
-class AGS_Param_Blufor {
-    title = "BLUFOR Faction (Players)";
-    values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 99};
-    texts[] = {
-        "Vanilla NATO", "NATO Pacific", "CUP ACR (Desert)", "CUP ACR (Woodland)", 
-        "CUP BAF (Desert)", "CUP BAF (Woodland)", "CUP USA (Desert)", "CUP USA (Woodland)", 
-        "CUP USMC (Desert)", "GM West Germany", "LDF Contact", "RHS USAF Desert", "CUSTOM"
+class Params {
+    // --- 1. BLUFOR PRESETS (Players) ---
+    class AGS_Param_Blufor {
+        title = "BLUFOR Faction (Players)";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 99};
+        texts[] = {
+            "NATO (MTP - Full DLC Support)",        // 0
+            "NATO Pacific (Apex)",                  // 1
+            "NATO Woodland (Contact)",              // 2
+            "BW Mod (Desert)",                      // 3
+            "BW Mod (Woodland)",                    // 4
+            "CUP BAF (Desert)",                     // 5
+            "CUP BAF (Woodland)",                   // 6
+            "CUP USMC (Desert)",                    // 7
+            "CUP USMC (Woodland)",                  // 8
+            "GM West Germany",                      // 9
+            "LDF Contact",                          // 10
+            "RHS USAF Desert",                      // 11
+            "RHS USAF Woodland",                    // 12
+            "SOG MACV (SOG PF + Unsung)",           // 13
+            "Western Sahara BLUFOR (Desert)",       // 14
+            "CUSTOM (Template)",                    // 99
+            "OFF (No Preset)"                       // 15
+        };
+        default = 0;
     };
-    default = 0;
-};
 
-// --- 2. OPFOR PRESETS ---
-class AGS_Param_Opfor {
-    title = "OPFOR Faction (Enemy)";
-    values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 99};
-    texts[] = {
-        "Vanilla CSAT", "CSAT Pacific", "CUP AFRF EMR", "CUP AFRF Modern", 
-        "CUP CDF", "CUP ChDKZ", "Contact", "GM East Germany", 
-        "Islamic State", "RHS AFRF", "Takistan Army", "Unsung Vietnam", "CUSTOM"
+    // --- 2. OPFOR PRESETS (Enemy) ---
+    class AGS_Param_Opfor {
+        title = "OPFOR Faction (Enemy)";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 99};
+        texts[] = {
+            "Vanilla CSAT", "CSAT Pacific", "CUP AFRF EMR", "CUP AFRF Modern", 
+            "CUP CDF", "CUP ChDKZ", "Contact", "GM East Germany", 
+            "Islamic State", "RHS AFRF", "Takistan Army", "Unsung Vietnam", "CUSTOM"
+        };
+        default = 0;
     };
-    default = 0;
-};
 
-// --- 3. RESISTANCE PRESETS ---
-class AGS_Param_Resistance {
-    title = "Resistance Faction (Independent)";
-    values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 99};
-    texts[] = {
-        "Vanilla AAF", "CUP NAPA", "LDF Resistance", "Middle Eastern", 
-        "RACS", "RHS GREF", "Syndikat", "Vietnam CIDG", "CUSTOM"
+    // --- 3. ECONOMY & LOGISTICS ---
+    class AGS_Param_SupplyTimer {
+        title = "Supply Delivery Interval (Minutes)";
+        values[] = {5, 10, 15, 20, 30};
+        texts[] = {"5 min", "10 min", "15 min", "20 min", "30 min"};
+        default = 10;
     };
-    default = 0;
-};
 
-// --- 4. CIVILIAN PRESETS ---
-class AGS_Param_Civs {
-    title = "Civilian Faction";
-    values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 99};
-    texts[] = {
-        "Arma 3 Civ", "CUP Cherno", "CUP Taki", "Contact", 
-        "Eastern European", "Global Mobilization", "Middle Eastern", 
-        "RDSCiv", "Tanoa", "Vietnam Unsung", "CUSTOM"
+    class AGS_Param_StartSupplies {
+        title = "Starting Supplies (Digital S)";
+        values[] = {200, 400, 600, 800, 1100};
+        texts[] = {"200", "400", "600", "800", "1100 (Skip Intro)"};
+        default = 200;
     };
-    default = 0;
-};
 
-// --- 5. ECONOMY & SYSTEM ---
-class AGS_Param_SupplyTimer {
-    title = "Supply Delivery Interval (Minutes)";
-    values[] = {5, 10, 15, 20, 30};
-    texts[] = {"5 min", "10 min", "15 min", "20 min", "30 min"};
-    default = 10;
-};
+    // --- 4. TIME & WEATHER ---
+    class AGS_Param_DayDuration {
+        title = "Day Time Duration";
+        values[] = {0.5, 1, 2, 4, 6, 8, 12};
+        texts[] = {"0.5h", "1h", "2h", "4h", "6h", "8h", "12h"};
+        default = 4;
+    };
 
-class AGS_Param_StartSupplies {
-    title = "Starting Supplies";
-    values[] = {200, 400, 600, 800, 1100};
-    texts[] = {"200", "400", "600", "800", "1100 (Skip Intro)"};
-    default = 200;
-};
+    class AGS_Param_TimeMultiplier {
+        title = "Time Acceleration";
+        values[] = {1, 2, 4, 6, 8, 12, 24};
+        texts[] = {"1x", "2x", "4x", "6x", "8x", "12x", "24x"};
+        default = 1;
+    };
 
-class AGS_Param_DebugMode {
-    title = "Debug Mode / Logs";
-    values[] = {0, 1};
-    texts[] = {"Off", "On"};
-    default = 0;
+    // --- 5. AI & UNIT MANAGEMENT ---
+    class AGS_Param_UnitCap {
+        title = "Dynamic Unit Cap (Per Side)";
+        values[] = {50, 80, 100, 120, 150};
+        texts[] = {"50 (Low Perf)", "80", "100 (Recommended)", "120", "150 (High Perf)"};
+        default = 100;
+    };
+
+    class AGS_Param_CivReputation {
+        title = "Starting Civilian Reputation";
+        values[] = {-50, 0, 25, 50};
+        texts[] = {"Hostile (-50)", "Neutral (0)", "Friendly (25)", "Respected (50)"};
+        default = 0;
+    };
+
+    // --- 6. TECHNICAL & DEBUG ---
+    class AGS_Param_DebugMode {
+        title = "Debug Mode / 'The Clean Slate' Logic";
+        values[] = {0, 1};
+        texts[] = {"Disabled", "Enabled (Active Logs)"};
+        default = 0;
+    };
+
+    class AGS_Param_SaveInterval {
+        title = "Auto-Save Interval (Minutes)";
+        values[] = {5, 10, 15, 30, 60};
+        texts[] = {"5 min", "10 min", "15 min", "30 min", "60 min"};
+        default = 15;
+    };
 };
