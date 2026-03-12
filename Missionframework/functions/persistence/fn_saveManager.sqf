@@ -1,7 +1,9 @@
 /*
     Author: Theane using gemini
     Function: KPIN_fnc_saveManager
-    Description: Core persistence engine for Operation Iron Mantle. Manages global states for infrastructure, reputation, and progression without saving volatile data like active quests or Opfor units.
+    Description: 
+    Core persistence engine. Now includes logic to lock lobby parameters (Building Damage Mode) 
+    after the first session and tracks the destruction status of civilian buildings.
 */
 
 if (!isServer) exitWith {};
@@ -10,35 +12,35 @@ params [["_mode", "SAVE"]];
 
 private _saveName = "KPIN_IronMantle_SaveData";
 
-// --- MODE: SAVE ---
 if (_mode == "SAVE") exitWith {
     private _dataToSave = [
-        missionNamespace getVariable ["KPIN_CivRep", 0],               // [0] Civilian Reputation
-        missionNamespace getVariable ["KPIN_RepPenaltyCount", 0],      // [1] Times reached -25 threshold
-        missionNamespace getVariable ["KPIN_DestroyedHQs", 0],          // [2] Counter for destroyed HQs
-        missionNamespace getVariable ["KPIN_DestroyedRoadblocks", 0],   // [3] Counter for destroyed Roadblocks
-        missionNamespace getVariable ["KPIN_FOB_Positions", []],        // [4] Locations and status of FOBs
-        missionNamespace getVariable ["KPIN_CurrentTier", 1],           // [5] Current World Tier (1-3)
-        missionNamespace getVariable ["KPIN_SupplyTimer", 15]           // [6] User-selected supply interval
+        missionNamespace getVariable ["KPIN_CivRep", 0],               // [0]
+        missionNamespace getVariable ["KPIN_RepPenaltyCount", 0],      // [1]
+        missionNamespace getVariable ["KPIN_DestroyedHQs", 0],          // [2]
+        missionNamespace getVariable ["KPIN_DestroyedRoadblocks", 0],   // [3]
+        missionNamespace getVariable ["KPIN_FOB_Positions", []],        // [4]
+        missionNamespace getVariable ["KPIN_CurrentTier", 1],           // [5]
+        missionNamespace getVariable ["KPIN_SupplyTimer", 15],          // [6]
+        missionNamespace getVariable ["KPIN_LockedBuildingMode", -1],   // [7] Locked Param
+        missionNamespace getVariable ["KPIN_CityBuildingStatus", []],   // [8] Damaged Houses IDs
+        missionNamespace getVariable ["KPIN_IntelPool", 0]              // [9] Current Intel Pool
     ];
 
     profileNamespace setVariable [_saveName, _dataToSave];
     saveProfileNamespace;
-    
-    diag_log format ["[KPIN SAVE]: Game state saved. Content: %1", _dataToSave];
-    ["KPIN_Notify", ["Game Saved", "Your progress has been stored."]] call CBA_fnc_globalEvent;
+    diag_log "[KPIN SAVE]: Data saved including Locked Parameters.";
 };
 
-// --- MODE: LOAD ---
 if (_mode == "LOAD") exitWith {
     private _loadedData = profileNamespace getVariable [_saveName, []];
-
-    // Safety check if file exists
     if (count _loadedData == 0) exitWith {
-        diag_log "[KPIN LOAD]: No existing save file found. Initializing fresh session.";
+        // FIRST RUN: Get mode from Lobby Params and lock it
+        private _lobbyParam = ["BuildingDamageMode", 0] call BIS_fnc_getParamValue;
+        missionNamespace setVariable ["KPIN_LockedBuildingMode", _lobbyParam, true];
+        diag_log format ["[KPIN LOAD]: Fresh start. Locking Building Mode to: %1", _lobbyParam];
     };
 
-    // Apply loaded data to Mission Namespace and broadcast globally
+    // Apply standard data
     missionNamespace setVariable ["KPIN_CivRep", (_loadedData select 0), true];
     missionNamespace setVariable ["KPIN_RepPenaltyCount", (_loadedData select 1), true];
     missionNamespace setVariable ["KPIN_DestroyedHQs", (_loadedData select 2), true];
@@ -46,14 +48,11 @@ if (_mode == "LOAD") exitWith {
     missionNamespace setVariable ["KPIN_FOB_Positions", (_loadedData select 4), true];
     missionNamespace setVariable ["KPIN_CurrentTier", (_loadedData select 5), true];
     missionNamespace setVariable ["KPIN_SupplyTimer", (_loadedData select 6), true];
+    
+    // STRICT LOCK: Use saved mode, ignore lobby params
+    missionNamespace setVariable ["KPIN_LockedBuildingMode", (_loadedData select 7), true];
+    missionNamespace setVariable ["KPIN_CityBuildingStatus", (_loadedData select 8), true];
+    missionNamespace setVariable ["KPIN_IntelPool", (_loadedData select 9), true];
 
-    diag_log "[KPIN LOAD]: Game state loaded successfully.";
-    ["KPIN_Notify", ["Game Loaded", "Persistent progress has been restored."]] call CBA_fnc_globalEvent;
-};
-
-// --- MODE: WIPE ---
-if (_mode == "WIPE") exitWith {
-    profileNamespace setVariable [_saveName, nil];
-    saveProfileNamespace;
-    diag_log "[KPIN WIPE]: Profile data for Iron Mantle has been cleared.";
+    diag_log "[KPIN LOAD]: Loaded. Lobby Building Params ignored in favor of Locked State.";
 };
