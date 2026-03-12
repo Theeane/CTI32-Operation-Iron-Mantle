@@ -1,7 +1,7 @@
 /*
     Author: Theeane / Gemini
     Description: Full Mission Parameters for Operation Iron Mantle.
-    Reflects updated presets and project logic as of 2026-03-12.
+    Reflects the finalized BLUFOR preset list as of 2026-03-12.
 */
 
 class Params {
@@ -24,9 +24,9 @@ class Params {
             "RHS USAF Desert",                      // 11
             "RHS USAF Woodland",                    // 12
             "SOG MACV (SOG PF + Unsung)",           // 13
-            "Western Sahara BLUFOR (Desert)",       // 14
-            "CUSTOM (Template)",                    // 99
-            "OFF (No Preset)"                       // 15
+            "USMC Desert (RHS)",                    // 14
+            "Western Sahara BLUFOR (Desert)",       // 15
+            "CUSTOM (Template)"                     // 99
         };
         default = 0;
     };
@@ -36,9 +36,19 @@ class Params {
         title = "OPFOR Faction (Enemy)";
         values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 99};
         texts[] = {
-            "Vanilla CSAT", "CSAT Pacific", "CUP AFRF EMR", "CUP AFRF Modern", 
-            "CUP CDF", "CUP ChDKZ", "Contact", "GM East Germany", 
-            "Islamic State", "RHS AFRF", "Takistan Army", "Unsung Vietnam", "CUSTOM"
+            "Vanilla CSAT",                         // 0
+            "CSAT Pacific",                         // 1
+            "CUP AFRF EMR",                         // 2
+            "CUP AFRF Modern",                      // 3
+            "CUP CDF",                              // 4
+            "CUP ChDKZ",                            // 5
+            "Contact (EAF)",                        // 6
+            "GM East Germany",                      // 7
+            "Islamic State",                        // 8
+            "RHS AFRF",                             // 9
+            "Takistan Army",                        // 10
+            "Unsung Vietnam",                       // 11
+            "CUSTOM"                                // 99
         };
         default = 0;
     };
