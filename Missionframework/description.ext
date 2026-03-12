@@ -1,20 +1,21 @@
 /*
-    Author: Theeane / PETG
-    Project: Operation Iron Mantle (AGS Framework)
-    Language: English
+    Author: Theane using gemini
+    Function: Mission Configuration (Main)
+    Description: The central hub for Operation Iron Mantle. Links UI definitions, 
+    function registries, and mission parameters for the AGS/CTI32 framework.
 */
 
 // --- 1. Functions Registry ---
-// This links to your separate CfgFunctions.hpp file
+// Links to CfgFunctions.hpp which now includes CTI32 systems
 #include "CfgFunctions.hpp"
 
 // --- 2. UI Definitions (Dialogs) ---
-// These are pop-up menus like the Buy Menu
+// Pop-up menus and common UI definitions
 #include "Missionframework\ui\defines.hpp"        
 #include "Missionframework\ui\buyMenu.hpp"       
 
 // --- 3. RscTitles (HUD Elements) ---
-// These are elements always visible on the screen (Resource Bar / The Eye)
+// Persistent on-screen elements like the Resource Bar
 class RscTitles {
     #include "Missionframework\ui\resourceBar.hpp" 
 };
@@ -26,15 +27,26 @@ onLoadMission = "Establish FOBs, capture sectors, and liberate the region.";
 
 // --- 5. Identity & System Settings ---
 enableDebugConsole = 1;      // 1 = Logged-in Admin can see the console
-saving = 0;                  // Disable Arma's default save system (using Persistence)
+saving = 0;                  // Disable Arma's default save system (using CTI32 Persistence)
 disabledAI = 1;              // Prevent empty playable slots from becoming AI
 respawn = 3;                 // 3 = Respawn on marker (base_west)
 respawnDelay = 10;
 respawnDialog = 0;
 
 // --- 6. Mission Parameters ---
-// These can be adjusted in the lobby before starting the mission.
-// We use an external file to keep this clean and load all presets.
+// Accessible in the lobby. Includes Spawn Distance and Unit Cap.
 class Params {
     #include "Params.hpp"
+};
+
+// --- 7. Notifications ---
+// Visual alerts for mission status and the Grand Finale trigger
+class CfgNotifications {
+    class PriorityAlert {
+        title = "%1"; // Title of the notification
+        iconPicture = "\A3\ui_f\data\map\mapcontrol\taskIcon_ca.paa";
+        description = "%2"; // Description text
+        priority = 9;
+        duration = 10;
+    };
 };
