@@ -2,6 +2,7 @@
     Author: Theane using gemini
     Function: Blufor Preset - CUP ACR (Army of the Czech Republic Woodland)
     Description: Master Template for CTI32 Operation Iron Mantle.
+    Note: Digital economy (Supply/Intel). Physical Intel (Laptop/Officer) requires FOB/MOB drop-off.
 
     Required Mods:
     - CUP Weapons: https://steamcommunity.com/sharedfiles/filedetails/?id=497660133
@@ -15,23 +16,23 @@
 */
 
 // --- 1. CORE SUPPORT UNITS ---
-CTI32_FOB_Truck = "CUP_B_T810_Repair_CZ_WDL";                      // Heavy FOB builder truck
+CTI32_FOB_Truck = "CUP_B_T810_Repair_CZ_WDL";                      // Heavy FOB builder truck (Woodland)
 CTI32_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
 CTI32_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
 CTI32_Respawn_Truck = "CUP_B_T810_Reammo_CZ_WDL";                 // Mobile Respawn vehicle (Fixed 100 S)
 CTI32_Crewman = "CUP_B_CZ_Crew_WDL";                              // Default crew for armored vehicles
 CTI32_Pilot = "CUP_B_CZ_Pilot_WDL";                               // Default pilot for helis and jets
 
-// --- 2. LOGISTICS & CRATES ---
-CTI32_Supply_Crate = "CargoNet_01_box_F";                         // Reward crate for Supply side ops
-CTI32_Ammo_Crate = "B_CargoNet_01_ammo_F";                        // Reward crate for Ammo objectives
-CTI32_Fuel_Crate = "CargoNet_01_barrels_F";                       // Reward crate for Fuel objectives
+// --- 2. LOGISTICS & ECONOMY ---
+// Supply and Intel are digital currencies. 
+// Physical Intel (Laptops/Officers) must be returned to FOB/MOB Laptop interaction.
+// Player death with physical Intel: 15 min loot window before garbage cleanup.
 
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
 // Button 1: Recon Team
 CTI32_Support_Group1 = [
-    // Vehicles used
+    // Vehicle used
     "CUP_B_LR_MG_CZ_W",                 // Land Rover HMG (Woodland)
     [
         // AI Units
@@ -44,7 +45,7 @@ CTI32_Support_Group1 = [
 
 // Button 2: Infantry Section
 CTI32_Support_Group2 = [
-    // Vehicles used
+    // Vehicle used
     "CUP_B_T810_Armed_CZ_WDL",          // Transport Vehicle: Tatra (Armed)
     [
         // AI Units
@@ -59,7 +60,7 @@ CTI32_Support_Group2 = [
 
 // Button 3: Anti-Tank Squad
 CTI32_Support_Group3 = [
-    // Vehicles used
+    // Vehicle used
     "CUP_B_UAZ_METIS_ACR",              // UAZ (Metis ATGM)
     [
         // AI Units
@@ -73,8 +74,8 @@ CTI32_Support_Group3 = [
 
 // Button 4: Armored Support
 CTI32_Support_Group4 = [
-    // Vehicles used
-    "CUP_B_Pandur_CZ_WDL",              // Pandur II APC
+    // Vehicle used
+    "CUP_B_Pandur_CZ_WDL",              // Pandur II APC (Woodland)
     [
         // AI Units
         "CUP_B_CZ_Soldier_SL_WDL",      // Unit 1: Squad Leader
@@ -87,7 +88,7 @@ CTI32_Support_Group4 = [
 
 // Button 5: Air Assault
 CTI32_Support_Group5 = [
-    // Vehicles used
+    // Vehicle used
     "CUP_B_Mi171Sh_Unarmed_CZ_WDL",     // Transport Helicopter
     [
         // AI Units
@@ -100,7 +101,6 @@ CTI32_Support_Group5 = [
 ];
 
 // --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
-
 CTI32_Preset_Light = [
     [CTI32_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
     ["CUP_B_UAZ_Unarmed_ACR", 15],                                 // Basic UAZ
@@ -110,7 +110,7 @@ CTI32_Preset_Light = [
 ];
 
 CTI32_Preset_APC = [
-    ["CUP_B_Pandur_CZ_WDL", 150],                                  // Pandur II (Woodland)
+    ["CUP_B_Pandur_CZ_WDL", 150],                                  // Pandur II
     ["CUP_B_BVP2_CZ_WDL", 180]                                     // BVP-2 IFV
 ];
 
@@ -127,6 +127,42 @@ CTI32_Preset_Jets = [
 ];
 
 // --- 5. MISSION UNLOCKS ---
-
 // Grand Op 1: Helicopters
-CTI32_Unlock_GrandOp1_Helis =
+CTI32_Unlock_GrandOp1_Helis = [
+    "CUP_B_Mi24_V_CZ_WDL",                                         // Mi-24V Hind Attack Heli
+    "CUP_B_Mi171Sh_CZ_WDL"                                         // Mi-171Sh Armed
+];
+
+// Grand Op 2: Fixed Wing
+CTI32_Unlock_GrandOp2_Jets = [
+    "CUP_B_L39_CZ_WDL",                                            // L-39ZA Fighter
+    "I_Plane_Fighter_04_F"                                         // JAS 39 Gripen
+];
+
+// Side Op: Disrupt (Infrastructure/Roadblocks)
+CTI32_Unlock_Disrupt = [
+    "CUP_B_Dingo_CZ_Wdl",                                          // Dingo 2 MG
+    "CUP_B_Dingo_GL_CZ_Wdl"                                        // Dingo 2 GL
+];
+
+// Side Op: Supply (Logistics/FOB)
+CTI32_Unlock_Supply = [
+    CTI32_FOB_Truck,                                               // FOB Builder Truck
+    "CUP_B_T810_Refuel_CZ_WDL",                                    // Fuel Truck
+    "CUP_B_T810_Repair_CZ_WDL"                                     // Repair Truck
+];
+
+// Side Op: Intel (Information/Command)
+CTI32_Unlock_Intel = [
+    "CUP_B_BRDM2_HQ_CZ_WDL"                                        // Armored Command Vehicle
+];
+
+// --- 6. SYNC & BROADCAST ---
+{ publicVariable _x; } forEach [
+    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
+    "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
+    "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
+    "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
+];
+
+diag_log "[CTI32] Preset: CUP ACR Woodland loaded. Digital Economy active.";
