@@ -2,15 +2,13 @@
     Author: Theane using gemini
     Function: Blufor Preset - CUP ACR (Army of the Czech Republic Desert)
     Description: Master Template for CTI32 Operation Iron Mantle.
+    Note: Physical crates removed in favor of a 100% digital supply system.
 
     Required Mods:
     - CUP Weapons: https://steamcommunity.com/sharedfiles/filedetails/?id=497660133
     - CUP Units: https://steamcommunity.com/sharedfiles/filedetails/?id=497661914
     - CUP Vehicles: https://steamcommunity.com/sharedfiles/filedetails/?id=541888371
     
-    Optional Mods:
-    - Qinetix's Titus: https://steamcommunity.com/sharedfiles/filedetails/?id=2317371587
-
     Rules: 
     1. All names are fetched dynamically via displayName.
     2. Mandatory Mobile Respawn Truck first in Light Vehicles for 100 S.
@@ -25,10 +23,8 @@ CTI32_Respawn_Truck = "CUP_B_T810_Reammo_CZ_DES";                 // Mobile Resp
 CTI32_Crewman = "CUP_B_CZ_Crew_DES";                              // Default crew for armored vehicles
 CTI32_Pilot = "CUP_B_CZ_Pilot_DES";                               // Default pilot for helis and jets
 
-// --- 2. LOGISTICS & CRATES ---
-CTI32_Supply_Crate = "CargoNet_01_box_F";                         // Reward crate for Supply side ops
-CTI32_Ammo_Crate = "B_CargoNet_01_ammo_F";                        // Reward crate for Ammo objectives
-CTI32_Fuel_Crate = "CargoNet_01_barrels_F";                       // Reward crate for Fuel objectives
+// --- 2. LOGISTICS & ECONOMY ---
+// All Side Ops rewards (Supply, Ammo, Fuel) are handled digitally. No physical crates required.
 
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
@@ -164,10 +160,9 @@ CTI32_Unlock_Intel = [
 // --- 6. SYNC & BROADCAST ---
 { publicVariable _x; } forEach [
     "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
-    "CTI32_Supply_Crate", "CTI32_Ammo_Crate", "CTI32_Fuel_Crate",
     "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
     "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
     "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
 ];
 
-diag_log "[CTI32] Preset: CUP ACR Desert (Master) loaded successfully.";
+diag_log "[CTI32] Preset: CUP ACR Desert (Master) loaded. Digital Economy active.";
