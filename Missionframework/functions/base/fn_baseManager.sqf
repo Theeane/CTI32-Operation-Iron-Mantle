@@ -1,7 +1,7 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Description: Central controller for FOB limits, registry, and state. 
-    Handles max FOB logic based on lobby parameters (3-table: 3, 6, 9, 12, 15).
+    Description: Central logistical hub. Manages FOB limits (3-table), 
+    dynamic naming for MOB/FOBs, and registry for redeployment.
     Language: English
 */
 
@@ -12,57 +12,77 @@ params [
 
 if (!isServer) exitWith {};
 
-// Initialize the global FOB registry if it doesn't exist
+// 1. INITIALIZE GLOBAL NAMES & REGISTRY
 if (isNil "KPIN_FOB_Registry") then {
-    KPIN_FOB_Registry = []; // Stores [markerName, object]
+    KPIN_FOB_Registry = []; // Format: [[marker, object, displayName]]
     publicVariable "KPIN_FOB_Registry";
 };
 
+// Default MOB Name (Can be overridden in init.sqf or stringtable)
+private _mobName = missionNamespace getVariable ["KPIN_MOB_Name", "Main Operating Base"];
+
 switch (toUpper _mode) do {
 
-    // --- CHECK IF NEW DEPLOYMENT IS ALLOWED ---
+    // --- CHECK LOGISTICAL LIMIT (3-6-9-12-15) ---
     case "CAN_DEPLOY": {
-        private _maxFOBs = missionNamespace getVariable ["KPIN_Param_MaxFOBs", 3]; // Default to 3
+        private _maxFOBs = missionNamespace getVariable ["KPIN_Param_MaxFOBs", 3];
         private _currentCount = count KPIN_FOB_Registry;
         
         if (_currentCount < _maxFOBs) then {
-            true // Space available
+            true 
         } else {
-            [format["Deployment Denied: Max FOB limit reached (%1/%2).", _currentCount, _maxFOBs]] remoteExec ["systemChat", remoteExecutedOwner];
-            false // Limit reached
+            [format["Logistical Limit Reached: %1/%2 FOBs active.", _currentCount, _maxFOBs]] remoteExec ["systemChat", remoteExecutedOwner];
+            false 
         };
     };
 
-    // --- REGISTER A NEW FOB ---
+    // --- REGISTER NEW FOB WITH DYNAMIC NAME ---
     case "ADD": {
         _data params ["_marker", "_object"];
-        KPIN_FOB_Registry pushBack [_marker, _object];
+        
+        // Determine the next available FOB ID for naming
+        private _fobID = (count KPIN_FOB_Registry) + 1;
+        private _nameVar = format["KPIN_FOB_%1_Name", _fobID];
+        private _displayName = missionNamespace getVariable [_nameVar, format["FOB %1", _fobID]];
+        
+        // Store it
+        KPIN_FOB_Registry pushBack [_marker, _object, _displayName];
         publicVariable "KPIN_FOB_Registry";
         
-        // Also sync with the zone system for economy/AI
+        // Update marker text to match the new dynamic name
+        _marker setMarkerText _displayName;
+        
+        // Sync with active zones
         KPIN_ActiveZones pushBack [_marker, 0];
         publicVariable "KPIN_ActiveZones";
-        
-        diag_log format ["[KPIN] FOB Registered: %1 at %2", _marker, mapGridPosition _object];
+
+        diag_log format ["[KPIN] Logistics: %1 registered.", _displayName];
     };
 
-    // --- REMOVE A FOB (REPACK OR DESTROYED) ---
+    // --- REMOVE FOB (REPACK OR DESTROYED) ---
     case "REMOVE": {
-        private _markerToRemove = _data; // Expects marker name string
+        private _markerToRemove = _data;
         
-        // Clean from registry
         KPIN_FOB_Registry = KPIN_FOB_Registry select { (_x # 0) != _markerToRemove };
         publicVariable "KPIN_FOB_Registry";
         
-        // Clean from active zones
         KPIN_ActiveZones = KPIN_ActiveZones select { (_x # 0) != _markerToRemove };
         publicVariable "KPIN_ActiveZones";
 
-        diag_log format ["[KPIN] FOB Removed: %1. Slot cleared.", _markerToRemove];
+        diag_log format ["[KPIN] Logistics: FOB %1 removed from registry.", _markerToRemove];
     };
 
-    // --- GET CURRENT LIST (FOR REDEPLOY MENU) ---
-    case "GET_ACTIVE": {
-        KPIN_FOB_Registry // Returns the array of active FOBs
+    // --- GET LIST FOR REDEPLOY MENU (MOB + ALL FOBs) ---
+    case "GET_REDEPLOY_LIST": {
+        // We start with the MOB as the first option
+        private _list = [[getPosATL KPIN_MainBase, _mobName]];
+        
+        // Add all active FOBs
+        {
+            _x params ["_mkr", "_obj", "_name"];
+            _list pushBack [getPosATL _obj, _name];
+        } forEach KPIN_FOB_Registry;
+
+        _list // Return the combined list
     };
 };
