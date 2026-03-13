@@ -2,8 +2,8 @@
     Author: Theane / Gemini
     Project: Operation Iron Mantle
     Function: KPIN_fnc_saveGame
-    Description: Saves the mission state to profileNamespace. 
-    Rule: OPFOR units and active quests are NOT saved (Clean Slate).
+    Description: Saves the mission state. Quests and Cooldowns are NOT saved (Reset on restart).
+    Language: English
 */
 
 if (!isServer) exitWith {};
@@ -23,7 +23,7 @@ private _capturedZoneNames = [];
 private _capturedCount = count _capturedZoneNames;
 private _completionPercent = if (_totalZones > 0) then {(_capturedCount / _totalZones) * 100} else {0};
 
-// Save completion data to trigger Tier 3 lock logic in loadGame/updateWorldState
+// Save completion data for Tier-lock logic
 profileNamespace setVariable ["KPIN_Save_Zones", _capturedZoneNames];
 profileNamespace setVariable ["KPIN_Save_Completion", _completionPercent];
 
@@ -41,8 +41,8 @@ profileNamespace setVariable ["KPIN_Save_FixedInfra", missionNamespace getVariab
 profileNamespace setVariable ["KPIN_Save_FOBs", missionNamespace getVariable ["KPIN_FOB_Positions", []]];
 profileNamespace setVariable ["KPIN_Save_BuildingMode", missionNamespace getVariable ["KPIN_LockedBuildingMode", -1]];
 
-// 4. Mission Progress (Completed ONLY)
-profileNamespace setVariable ["KPIN_Save_Missions", missionNamespace getVariable ["KPIN_completedMissions", []]];
+// NOTE: Mission Progress / Cooldowns are NOT saved per user requirements.
+// Server restart will result in all quests being available immediately.
 
 saveProfileNamespace;
-diag_log format ["[KPIN SAVE]: Game Saved (%1). Completion: %2%3. CivRep: %4", _reason, floor _completionPercent, "%", missionNamespace getVariable ["KPIN_CivRep", 0]];
+diag_log format ["[KPIN SAVE]: Game Saved (%1). Completion: %2%3. Quests reset on restart.", _reason, floor _completionPercent, "%"];
