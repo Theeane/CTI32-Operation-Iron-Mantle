@@ -1,164 +1,112 @@
 /*
-    Author: Theeane
+    Author: Theeane / Gemini
     Function: Blufor Preset - NATO (MTP)
-    Description: Master Template for CTI32 Operation Iron Mantle.
-    Note: Digital economy (Supply/Intel). 
-
-    Integrated DLC Support for:
-    - Marksmen (Units & Weapons)
-    - Tanks (Heavy Armor & Rhino MGS)
-    - Jets (Fighters & CAS)
-    - Helicopters (Huron & Support)
-    - Art of War (Recreation Force assets)
-
-    Rules: 
-    1. All names are fetched dynamically via displayName.
-    2. Mandatory Mobile Respawn Truck first in Light Vehicles for 100 S.
+    Project: Operation Iron Mantle
+    
+    Description: 
+    Master Template for NATO Forces. This file defines all purchaseable 
+    assets, digital tiers, and physical infrastructure.
 */
 
-// --- 1. CORE SUPPORT UNITS ---
-CTI32_FOB_Truck = "B_Truck_01_Repair_F";                           // HEMTT Repair
-CTI32_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
-CTI32_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
-CTI32_Respawn_Truck = "B_Truck_01_ammo_F";                         // Mobile Respawn vehicle (Fixed 100 S)
-CTI32_Crewman = "B_crew_F";                                        // Default crew
-CTI32_Pilot = "B_Helipilot_F";                                     // Default pilot
+// --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---
+KPIN_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
+KPIN_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
+KPIN_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
 
-// --- 2. LOGISTICS & ECONOMY ---
-// Digital Currency System Active.
+// --- 2. CORE SUPPORT ASSETS ---
+CTI32_FOB_Truck      = "B_Truck_01_Repair_F"; 
+CTI32_FOB_Box        = "B_Slingload_01_Cargo_F"; 
+CTI32_Arsenal_Box    = "B_supplyCrate_F"; 
+CTI32_Respawn_Truck  = "B_Truck_01_ammo_F"; // Mobile Respawn Truck (100 S)
+CTI32_Crewman        = "B_crew_F"; 
+CTI32_Pilot          = "B_Helipilot_F"; 
 
-// --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
+// --- 3. TENT SYSTEM (Portable Respawn) ---
+KPIN_Tent_Backpack   = "B_Messenger_IDAP_F";  // The item to buy and carry
+KPIN_Tent_Object     = "Land_TentDome_F";     // The physical spawn point object
+KPIN_Tent_Price      = 10;                    // Cost in Supplies
 
-// Button 1: Recon & Marksman Team (Marksmen DLC Integration)
+// --- 4. NPC SUPPORT GROUPS [Vehicle, [Units], Price, MinTier] ---
+
+// Button 1: Recon Team
 CTI32_Support_Group1 = [
-    "B_LSV_01_armed_F",                 // Prowler HMG
-    [
-        "B_recon_TL_F",                 // Unit 1: Team Leader
-        "B_recon_M_F",                  // Unit 2: Marksman (Marksmen DLC)
-        "B_recon_F"                     // Unit 3: Scout
-    ],
-    150                                 
+    "B_LSV_01_armed_F", 
+    ["B_recon_TL_F", "B_recon_M_F", "B_recon_F"], 
+    150, 2
 ];
 
 // Button 2: Heavy Infantry Section
 CTI32_Support_Group2 = [
-    "B_Truck_01_transport_F",           // HEMTT Transport
-    [
-        "B_Soldier_SL_F",               // Unit 1: Squad Leader
-        "B_Soldier_AR_F",               // Unit 2: Auto Rifleman
-        "B_Soldier_AR_F",               // Unit 3: Auto Rifleman
-        "B_soldier_LAT_F",              // Unit 4: AT Specialist
-        "B_medic_F"                     // Unit 5: Medic
-    ],
-    250                                 
+    "B_Truck_01_transport_F", 
+    ["B_Soldier_SL_F", "B_Soldier_AR_F", "B_Soldier_AR_F", "B_soldier_LAT_F", "B_medic_F"], 
+    250, 3
 ];
 
-// Button 3: Anti-Tank Squad (Titan & LSV AT)
+// Button 3: Anti-Tank Squad
 CTI32_Support_Group3 = [
-    "B_LSV_01_AT_F",                    // Prowler AT (Apex/Tanks)
-    [
-        "B_Soldier_SL_F",               // Unit 1: Squad Leader
-        "B_soldier_AT_F",               // Unit 2: AT Specialist
-        "B_soldier_AT_F",               // Unit 3: AT Specialist
-        "B_medic_F"                     // Unit 4: Medic
-    ],
-    300                                 
+    "B_LSV_01_AT_F", 
+    ["B_Soldier_SL_F", "B_soldier_AT_F", "B_soldier_AT_F", "B_medic_F"], 
+    300, 4
 ];
 
-// Button 4: Armored Support (Tanks DLC Integration)
+// Button 4: Armored Support
 CTI32_Support_Group4 = [
-    "B_APC_Wheeled_01_cannon_F",        // Marshall APC
-    [
-        "B_Soldier_SL_F",               // Unit 1: Squad Leader
-        "B_soldier_F",                  // Unit 2: Rifleman
-        "B_soldier_M_F",                // Unit 3: Marksman (Marksmen DLC)
-        "B_engineer_F"                  // Unit 4: Engineer
-    ],
-    450                                 
+    "B_APC_Wheeled_01_cannon_F", 
+    ["B_Soldier_SL_F", "B_soldier_F", "B_soldier_M_F", "B_engineer_F"], 
+    450, 5
 ];
 
-// Button 5: Air Assault (Heli DLC Integration)
+// Button 5: Air Assault (Requires Heli Unlock + Tier 5)
 CTI32_Support_Group5 = [
-    "B_Heli_Transport_01_F",            // Ghost Hawk
-    [
-        "B_recon_TL_F",                 // Unit 1: Team Leader
-        "B_recon_F",                    // Unit 2: Scout
-        "B_recon_LAT_F",                // Unit 3: AT Specialist
-        "B_recon_M_F"                   // Unit 4: Marksman
-    ],
-    600                                 
+    "B_Heli_Transport_01_F", 
+    ["B_recon_TL_F", "B_recon_F", "B_recon_LAT_F", "B_recon_M_F"], 
+    600, 5
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 CTI32_Preset_Light = [
-    [CTI32_Respawn_Truck, 100],                                    
-    ["B_Quadbike_01_F", 5],                                        
-    ["B_LSV_01_unarmed_F", 20],                                    
-    ["B_LSV_01_armed_F", 45],                                      
-    ["B_MRAP_01_F", 60]                                            // Hunter
+    [CTI32_Respawn_Truck, 100, 1], // Restricted by Terminal, not Tier
+    ["B_Quadbike_01_F", 5, 1],
+    ["B_LSV_01_unarmed_F", 20, 1],
+    ["B_LSV_01_armed_F", 45, 2],
+    ["B_MRAP_01_F", 60, 2]
 ];
 
 CTI32_Preset_APC = [
-    ["B_APC_Wheeled_01_cannon_F", 180],                             // Marshall
-    ["B_APC_Tracked_01_rcws_F", 200],                              // Panther
-    ["B_AFV_Wheeled_01_cannon_F", 250]                             // Rhino MGS (Tanks DLC)
+    ["B_APC_Wheeled_01_cannon_F", 180, 3],
+    ["B_APC_Tracked_01_rcws_F", 200, 3],
+    ["B_AFV_Wheeled_01_cannon_F", 250, 4]
 ];
 
 CTI32_Preset_Tanks = [
-    ["B_MBT_01_cannon_F", 450],                                     // Slammer
-    ["B_MBT_01_TUSK_F", 500],                                       // Slammer UP (Tanks DLC)
-    ["B_MBT_01_arty_F", 650]                                        // Scorcher
+    ["B_MBT_01_cannon_F", 450, 5],
+    ["B_MBT_01_TUSK_F", 500, 5],
+    ["B_MBT_01_arty_F", 650, 5]
 ];
 
 CTI32_Preset_Helis = [
-    ["B_Heli_Light_01_F", 150],                                    // Hummingbird
-    ["B_Heli_Transport_01_F", 250],                                // Ghost Hawk
-    ["B_Heli_Transport_03_unarmed_F", 280]                         // Huron (Heli DLC)
+    ["B_Heli_Light_01_F", 150, 3],
+    ["B_Heli_Transport_01_F", 250, 4],
+    ["B_Heli_Transport_03_unarmed_F", 280, 5]
 ];
 
 CTI32_Preset_Jets = [
-    ["B_Plane_CAS_01_dynamicLoadout_F", 550],                       // Wipeout
-    ["B_Plane_Fighter_01_F", 700]                                   // Black Wasp II (Jets DLC)
+    ["B_Plane_CAS_01_dynamicLoadout_F", 550, 4],
+    ["B_Plane_Fighter_01_F", 700, 5]
 ];
 
-// --- 5. MISSION UNLOCKS ---
+// --- 6. SPECIAL ASSETS ---
+CTI32_Rearm_Truck = ["B_Truck_01_Repair_F", 300, 5]; // Rearm trucks require Tier 5
 
-// Grand Op 1: Helicopters
-CTI32_Unlock_GrandOp1_Helis = [
-    "B_Heli_Attack_01_dynamicLoadout_F",                           // Blackfoot
-    "B_Heli_Transport_03_F"                                        // Huron Armed (Heli DLC)
-];
-
-// Grand Op 2: Fixed Wing
-CTI32_Unlock_GrandOp2_Jets = [
-    "B_Plane_Fighter_01_Stealth_F"                                 // Black Wasp Stealth (Jets DLC)
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-CTI32_Unlock_Disrupt = [
-    "B_MRAP_01_hmg_F",                                             // Hunter HMG
-    "B_MRAP_01_gmg_F"                                              // Hunter GMG
-];
-
-// Side Op: Supply (Logistics/FOB)
-CTI32_Unlock_Supply = [
-    CTI32_FOB_Truck,                                               
-    "B_Truck_01_fuel_F",                                           
-    "B_Truck_01_Repair_F"                                          
-];
-
-// Side Op: Intel (Information/Command)
-CTI32_Unlock_Intel = [
-    "B_APC_Tracked_01_CRV_F"                                        // Bobcat CRV (Tanks DLC)
-];
-
-// --- 6. SYNC & BROADCAST ---
+// --- 7. SYNC & BROADCAST ---
 { publicVariable _x; } forEach [
-    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
+    "KPIN_FOB_Terminal_Class", "KPIN_Heli_Tower_Class", "KPIN_Jet_Control_Class",
+    "KPIN_Tent_Backpack", "KPIN_Tent_Object", "KPIN_Tent_Price",
+    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck",
     "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
     "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
-    "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
+    "CTI32_Rearm_Truck"
 ];
 
-diag_log "[CTI32] Preset: NATO.sqf (Full DLC Integration) loaded.";
+diag_log "[CTI32] Preset: NATO.sqf (Full Tier & Logistics) Loaded.";
