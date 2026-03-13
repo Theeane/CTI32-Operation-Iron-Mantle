@@ -1,71 +1,57 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Function: KPIN_fnc_initCommandPC
-    Description: Initializes the Command Terminal. Disables strategic functions 
-                 during attacks, except for Intel hand-ins.
+    Folder: functions/base
+    Description: Initializes the Command Laptop. Handles Menu, Upgrades, and Lockdown.
     Language: English
 */
 
 params [["_laptop", objNull, [objNull]]];
 
-if (isNull _laptop) exitWith {
-    diag_log "[KPIN ERROR]: initCommandPC called with null object.";
-};
+if (isNull _laptop) exitWith {};
 
-// Condition to check if the terminal is at the MOB (Safe Zone) 
-// or if it's a FOB and currently safe (no enemies within 100m)
-private _conditionSafe = "
-    private _isMOB = _target getVariable ['KPIN_isMOB', false];
-    private _isSafe = (count (_target nearEntities [['Man', 'Car', 'Tank'], 100] select {side _x == east || side _x == independent})) == 0;
-    _isMOB || _isSafe
-";
+// --- 1. INITIAL SETUP ---
+_laptop allowDamage false; // Osårbar tills attack-scriptet slår om den
 
-// 1. ACCESS BUY MENU (Purchase Units & Vehicles)
+// --- 2. COMMAND MENU (The main interaction) ---
+// Condition: Endast tillgänglig när basen INTE är under attack
+private _condPeace = "!(missionNamespace getVariable ['KPIN_isUnderAttack', false])";
+
 _laptop addAction [
-    "<t color='#00FF00'>[ ACCESS BUY MENU ]</t>", 
+    "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>", 
     {
-        [] spawn KPIN_fnc_openBuyMenu;
+        // Här öppnar vi din huvudmeny (t.ex. fn_openBuyMenu.sqf eller Mission Menu)
+        params ["_target", "_caller"];
+        [_target, _caller] spawn KPIN_fnc_openBuyMenu; 
     },
-    nil, 6, true, true, "", _conditionSafe, 5
+    nil, 6, true, true, "", _condPeace
 ];
 
-// 2. LOGISTICS MAP (FOB & Base Management)
+// --- 3. INTEL UPLOAD (Always available) ---
+// Condition: Spelaren bär på Intel (Digital Currency/Temp Intel)
+private _condIntel = "player getVariable ['KPIN_carryingIntel', false]";
+
 _laptop addAction [
-    "<t color='#FFFF00'>[ LOGISTICS MAP ]</t>", 
+    "<t color='#00FFFF'>[ UPLOAD SECURED INTEL ]</t>", 
     {
-        [_this select 0] spawn KPIN_fnc_openLogisticsMap;
+        params ["_target", "_caller"];
+        [_caller] call KPIN_fnc_depositIntel; // Hanterar digital valuta-överföring
+        hint "Intel upload complete. Digital currency added to HQ.";
     },
-    nil, 5, true, true, "", _conditionSafe, 5
+    nil, 10, true, true, "", _condIntel
 ];
 
-// 3. OPERATIONS MAP (War Room / Grand Strategy)
+// --- 4. LOCKDOWN NOTIFICATION ---
+// Condition: Visas bara när basen ÄR under attack
+private _condAttack = "missionNamespace getVariable ['KPIN_isUnderAttack', false]";
+
 _laptop addAction [
-    "<t color='#FF0000'>[ OPERATIONS MAP ]</t>", 
+    "<t color='#FF0000'>[ SYSTEM LOCKDOWN - UNDER ATTACK ]</t>", 
     {
-        [_this select 0] spawn KPIN_fnc_openOpsMap;
+        hint "Critical error: Command functions disabled during active engagement. Defend the perimeter!";
     },
-    nil, 4, true, true, "", _conditionSafe, 5
+    nil, 6, true, true, "", _condAttack
 ];
 
-// 4. INTEL HAND-IN (Always available, even under attack)
-_laptop addAction [
-    "<t color='#00FFFF'>[ DEPOSIT INTEL ]</t>", 
-    {
-        [] call KPIN_fnc_depositCarriedIntel;
-    },
-    nil, 10, true, true, "", "true", 5
-];
-
-// 5. PERSISTENCE (Manual Save Option for Admins)
-_laptop addAction [
-    "<t color='#AAAAAA'>[ FORCE WORLD SAVE ]</t>", 
-    {
-        ["Manual Terminal Save"] remoteExec ["KPIN_fnc_saveGame", 2];
-        hint "World State Saved to Profile.";
-    },
-    nil, 1, true, true, "", "serverCommandAvailable '#kick'", 5
-];
-
-_laptop setVariable ["KPIN_isCommandPC", true, true];
-
-diag_log "[KPIN] Logistics: Command PC Initialized. Proximity safety checks active for FOBs.";
+// --- 5. VISUALS ---
+// Kan lägga till en liten ljuskälla eller skärm-textur här om vi vill senare.
+diag_log "[KPIN] Command PC Initialized.";
