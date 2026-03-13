@@ -1,7 +1,8 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Description: Central logistical hub. Manages FOB limits (3-table), 
-    dynamic naming for MOB/FOBs, and registry for redeployment.
+    Function: KPIN_fnc_baseManager
+    Description: Central logistical hub. Manages FOB limits, dynamic naming, 
+                 and registry for redeployment and persistence.
     Language: English
 */
 
@@ -18,12 +19,12 @@ if (isNil "KPIN_FOB_Registry") then {
     publicVariable "KPIN_FOB_Registry";
 };
 
-// Default MOB Name (Can be overridden in init.sqf or stringtable)
+// Default MOB Name (Main Base)
 private _mobName = missionNamespace getVariable ["KPIN_MOB_Name", "Main Operating Base"];
 
 switch (toUpper _mode) do {
 
-    // --- CHECK LOGISTICAL LIMIT (3-6-9-12-15) ---
+    // --- CHECK LOGISTICAL LIMIT ---
     case "CAN_DEPLOY": {
         private _maxFOBs = missionNamespace getVariable ["KPIN_Param_MaxFOBs", 3];
         private _currentCount = count KPIN_FOB_Registry;
@@ -45,44 +46,63 @@ switch (toUpper _mode) do {
         private _nameVar = format["KPIN_FOB_%1_Name", _fobID];
         private _displayName = missionNamespace getVariable [_nameVar, format["FOB %1", _fobID]];
         
-        // Store it
+        // Store in local registry for active session
         KPIN_FOB_Registry pushBack [_marker, _object, _displayName];
         publicVariable "KPIN_FOB_Registry";
         
-        // Update marker text to match the new dynamic name
+        // Update persistent position list for fn_saveGame
+        private _fobPosList = missionNamespace getVariable ["KPIN_FOB_Positions", []];
+        _fobPosList pushBack [getPosASL _object, _displayName, typeOf _object];
+        missionNamespace setVariable ["KPIN_FOB_Positions", _fobPosList, true];
+        
+        // Update marker text
         _marker setMarkerText _displayName;
         
-        // Sync with active zones
-        KPIN_ActiveZones pushBack [_marker, 0];
-        publicVariable "KPIN_ActiveZones";
+        // Trigger save buffer to ensure the new FOB is recorded
+        call KPIN_fnc_requestDelayedSave;
 
-        diag_log format ["[KPIN] Logistics: %1 registered.", _displayName];
+        diag_log format ["[KPIN] Logistics: %1 registered at %2.", _displayName, getPosATL _object];
     };
 
     // --- REMOVE FOB (REPACK OR DESTROYED) ---
     case "REMOVE": {
         private _markerToRemove = _data;
+        private _objToRemove = objNull;
+
+        // Find object associated with marker to update persistence
+        {
+            if ((_x # 0) == _markerToRemove) exitWith { _objToRemove = (_x # 1); };
+        } forEach KPIN_FOB_Registry;
         
+        // Cleanup active registry
         KPIN_FOB_Registry = KPIN_FOB_Registry select { (_x # 0) != _markerToRemove };
         publicVariable "KPIN_FOB_Registry";
         
-        KPIN_ActiveZones = KPIN_ActiveZones select { (_x # 0) != _markerToRemove };
-        publicVariable "KPIN_ActiveZones";
+        // Cleanup persistent position list
+        if (!isNull _objToRemove) then {
+            private _fobPosList = missionNamespace getVariable ["KPIN_FOB_Positions", []];
+            private _pos = getPosASL _objToRemove;
+            _fobPosList = _fobPosList select { (_x # 0) distance _pos > 5 };
+            missionNamespace setVariable ["KPIN_FOB_Positions", _fobPosList, true];
+        };
 
+        call KPIN_fnc_requestDelayedSave;
         diag_log format ["[KPIN] Logistics: FOB %1 removed from registry.", _markerToRemove];
     };
 
     // --- GET LIST FOR REDEPLOY MENU (MOB + ALL FOBs) ---
     case "GET_REDEPLOY_LIST": {
-        // We start with the MOB as the first option
-        private _list = [[getPosATL KPIN_MainBase, _mobName]];
+        // Start with MOB
+        private _list = [[getPosATL (missionNamespace getVariable ["KPIN_MainBase", objNull]), _mobName]];
         
         // Add all active FOBs
         {
             _x params ["_mkr", "_obj", "_name"];
-            _list pushBack [getPosATL _obj, _name];
+            if (!isNull _obj) then {
+                _list pushBack [getPosATL _obj, _name];
+            };
         } forEach KPIN_FOB_Registry;
 
-        _list // Return the combined list
+        _list 
     };
 };
