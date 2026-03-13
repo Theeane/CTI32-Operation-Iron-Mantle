@@ -1,14 +1,15 @@
 /*
-    Author: Theane using Gemini
+    Author: Theane / Gemini
     Project: Operation Iron Mantle
     Function: KPIN_fnc_loadGame
     Description: Restores the mission state and locks parameters.
+    Language: English
 */
 
 if (!isServer) exitWith {};
 
 // 1. Restore Economy & Reputation
-// CivRep defaultar till 0 (Okänd/Främling). Spelaren måste förtjäna tillit.
+// CivRep defaults to 0 (Unknown). Players must earn trust through actions.
 missionNamespace setVariable ["KPIN_Supplies", profileNamespace getVariable ["KPIN_Save_Supplies", 100], true];
 missionNamespace setVariable ["KPIN_Intel", profileNamespace getVariable ["KPIN_Save_Intel", 0], true];
 missionNamespace setVariable ["KPIN_CivRep", profileNamespace getVariable ["KPIN_Save_CivRep", 0], true]; 
@@ -21,7 +22,7 @@ missionNamespace setVariable ["KPIN_FOB_Positions", profileNamespace getVariable
 missionNamespace setVariable ["KPIN_FixedInfrastructure", profileNamespace getVariable ["KPIN_Save_FixedInfra", []], true];
 missionNamespace setVariable ["KPIN_completedMissions", profileNamespace getVariable ["KPIN_Save_Missions", []], true];
 
-// Restore Tier with safety check
+// Restore Base Tier with safety check
 private _savedTier = profileNamespace getVariable ["KPIN_Save_Tier", 1];
 missionNamespace setVariable ["KPIN_CurrentTier", _savedTier, true];
 
@@ -35,7 +36,7 @@ if (_savedMode == -1) then {
 };
 
 // 4. Trigger World State Update
-// Räknar ut OPFOR Tier och Rebel Tier baserat på de nyss laddade värdena.
+// Calculates OPFOR Tier and Rebel Tier based on the restored values.
 [] spawn KPIN_fnc_updateWorldState; 
 
-diag_log "[KPIN LOAD]: Campaign state restored. CivRep starting at 0 (Unknown).";
+diag_log "[KPIN LOAD]: Campaign state fully restored. CivRep starting at 0 (Unknown).";
