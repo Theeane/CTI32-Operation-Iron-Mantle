@@ -1,115 +1,110 @@
 /*
-    Author: Theane using Gemini (AGS Project)
-    Description: Advanced CBA-integrated Persistence System.
-    Handles saving/loading of Zones (including Hidden), Economy, and Mission Progress.
-    Language: English
+    Author: Theane using Gemini
+    Project: Operation Iron Mantle
+    Description: Core KPIN Persistence System.
+    Handles: Zones, Digital Economy, CivRep, and Fixed Infrastructure.
 */
 
 if (!isServer) exitWith {};
 
 /**
  * MAIN SAVE FUNCTION
- * Can be called manually: [] call AGS_fnc_saveGame;
- * Use this when: 
- * - A zone is captured (including Hidden Zones)
- * - A mission is completed
- * - Large amounts of Intel/Supplies are gained
  */
-AGS_fnc_saveGame = {
+KPIN_fnc_saveGame = {
     params [["_reason", "Auto-Save"]];
 
-    // 1. Save Captured Zones (Normal & Hidden)
-    // We filter all zones that have been marked as captured
-    private _allZones = missionNamespace getVariable ["AGS_all_mission_zones", []];
+    // 1. Save Captured Zones
+    private _allZones = missionNamespace getVariable ["KPIN_all_mission_zones", []];
     private _capturedZoneNames = [];
     
     {
-        if (_x getVariable ["AGS_isCaptured", false]) then {
+        if (_x getVariable ["KPIN_isCaptured", false]) then {
             _capturedZoneNames pushBack (text _x); 
         };
     } forEach _allZones;
     
-    profileNamespace setVariable ["AGS_Save_Zones", _capturedZoneNames];
+    profileNamespace setVariable ["KPIN_Save_Zones", _capturedZoneNames];
 
-    // 2. Save Economy (Supplies & Intel)
-    private _supplies = missionNamespace getVariable ["AGS_res_supplies", 0];
-    private _intel = missionNamespace getVariable ["AGS_res_intel", 0];
-    
-    profileNamespace setVariable ["AGS_Save_Supplies", _supplies];
-    profileNamespace setVariable ["AGS_Save_Intel", _intel];
+    // 2. Save Economy & Reputation (Digital Currency & CivRep)
+    profileNamespace setVariable ["KPIN_Save_Supplies", missionNamespace getVariable ["KPIN_Supplies", 100]];
+    profileNamespace setVariable ["KPIN_Save_Intel", missionNamespace getVariable ["KPIN_Intel", 0]];
+    profileNamespace setVariable ["KPIN_Save_CivRep", missionNamespace getVariable ["KPIN_CivRep", 0]];
+    profileNamespace setVariable ["KPIN_Save_RepPenalties", missionNamespace getVariable ["KPIN_RepPenaltyCount", 0]];
 
-    // 3. Save Mission Progress (Optional: Store completed mission IDs)
-    private _completedMissions = missionNamespace getVariable ["AGS_completedMissions", []];
-    profileNamespace setVariable ["AGS_Save_Missions", _completedMissions];
+    // 3. Save Fixed Infrastructure (Roadblocks & HQ)
+    private _infrastructure = missionNamespace getVariable ["KPIN_FixedInfrastructure", []];
+    profileNamespace setVariable ["KPIN_Save_Infrastructure", _infrastructure];
 
-    // Commit to disk (CBA/Arma standard)
+    // 4. Save Mission Progress
+    private _completedMissions = missionNamespace getVariable ["KPIN_completedMissions", []];
+    profileNamespace setVariable ["KPIN_Save_Missions", _completedMissions];
+
     saveProfileNamespace;
     
-    diag_log format ["AGS Persistence: Game Saved. Reason: %1. Zones: %2. Supplies: %3", _reason, count _capturedZoneNames, _supplies];
+    diag_log format ["[KPIN PERSISTENCE]: Saved. Reason: %1. Zones: %2. Intel: %3", _reason, count _capturedZoneNames, missionNamespace getVariable ["KPIN_Intel", 0]];
 };
 
 /**
  * LOAD FUNCTION
- * Should be called during init, AFTER factions and zones are initialized.
  */
-AGS_fnc_loadGame = {
-    // 1. Load Economy Resources
-    private _savedSupplies = profileNamespace getVariable ["AGS_Save_Supplies", 100];
-    private _savedIntel = profileNamespace getVariable ["AGS_Save_Intel", 0];
-    
-    missionNamespace setVariable ["AGS_res_supplies", _savedSupplies, true];
-    missionNamespace setVariable ["AGS_res_intel", _savedIntel, true];
+KPIN_fnc_loadGame = {
+    // 1. Load Economy & Reputation
+    missionNamespace setVariable ["KPIN_Supplies", profileNamespace getVariable ["KPIN_Save_Supplies", 100], true];
+    missionNamespace setVariable ["KPIN_Intel", profileNamespace getVariable ["KPIN_Save_Intel", 0], true];
+    missionNamespace setVariable ["KPIN_CivRep", profileNamespace getVariable ["KPIN_Save_CivRep", 0], true];
+    missionNamespace setVariable ["KPIN_RepPenaltyCount", profileNamespace getVariable ["KPIN_Save_RepPenalties", 0], true];
 
-    // 2. Load and Restore Zones
-    private _savedCapturedZones = profileNamespace getVariable ["AGS_Save_Zones", []];
-    private _allZones = missionNamespace getVariable ["AGS_all_mission_zones", []];
+    // 2. Restore Zones
+    private _savedCapturedZones = profileNamespace getVariable ["KPIN_Save_Zones", []];
+    private _allZones = missionNamespace getVariable ["KPIN_all_mission_zones", []];
     
     {
         if (text _x in _savedCapturedZones) then {
-            _x setVariable ["AGS_isCaptured", true, true];
-            // Visual feedback: Update marker to blue
+            _x setVariable ["KPIN_isCaptured", true, true];
             _x setMarkerColor "ColorBLUFOR";
-            _x setMarkerAlpha 1; // Ensure hidden zones become visible if captured
+            _x setMarkerAlpha 1;
         };
     } forEach _allZones;
 
-    // 3. Load Completed Missions
-    private _savedMissions = profileNamespace getVariable ["AGS_Save_Missions", []];
-    missionNamespace setVariable ["AGS_completedMissions", _savedMissions, true];
+    // 3. Restore Fixed Infrastructure
+    private _savedInfra = profileNamespace getVariable ["KPIN_Save_Infrastructure", []];
+    missionNamespace setVariable ["KPIN_FixedInfrastructure", _savedInfra, true];
 
-    diag_log "AGS Persistence: World State Restored from Profile.";
+    // 4. Load Completed Missions
+    private _savedMissions = profileNamespace getVariable ["KPIN_Save_Missions", []];
+    missionNamespace setVariable ["KPIN_completedMissions", _savedMissions, true];
+
+    diag_log "[KPIN PERSISTENCE]: World State Restored.";
 };
 
 // --- AUTOMATIC TRIGGERS ---
 
-// A. Auto-save every 10 minutes using CBA PerFrameHandler
+// Auto-save var 10:e minut
 [
-    { ["Scheduled Auto-Save"] call AGS_fnc_saveGame; }, 
+    { ["Scheduled Auto-Save"] call KPIN_fnc_saveGame; }, 
     600
 ] call CBA_fnc_addPerFrameHandler;
 
-// B. Event-based saving (Example: Save when a mission is marked complete)
-["AGS_missionCompleted", {
+// Event-baserad sparning
+["KPIN_missionCompleted", {
     params ["_missionID"];
-    private _list = missionNamespace getVariable ["AGS_completedMissions", []];
+    private _list = missionNamespace getVariable ["KPIN_completedMissions", []];
     _list pushBackUnique _missionID;
-    missionNamespace setVariable ["AGS_completedMissions", _list, true];
-    
-    ["Mission Completed: " + _missionID] call AGS_fnc_saveGame;
+    missionNamespace setVariable ["KPIN_completedMissions", _list, true];
+    ["Mission Completed: " + _missionID] call KPIN_fnc_saveGame;
 }] call CBA_fnc_addEventHandler;
 
-// C. Resource Update Saving (Save when Intel/Supplies change significantly)
-// We add a small delay to avoid "save-spamming" if many items are picked up at once
-AGS_fnc_requestDelayedSave = {
-    if (missionNamespace getVariable ["AGS_savePending", false]) exitWith {};
-    missionNamespace setVariable ["AGS_savePending", true];
+// Delayed Save för resurser (för att undvika spam)
+KPIN_fnc_requestDelayedSave = {
+    if (missionNamespace getVariable ["KPIN_savePending", false]) exitWith {};
+    missionNamespace setVariable ["KPIN_savePending", true];
     
     [
         { 
-            ["Resource Update"] call AGS_fnc_saveGame; 
-            missionNamespace setVariable ["AGS_savePending", false];
+            ["Resource Update"] call KPIN_fnc_saveGame; 
+            missionNamespace setVariable ["KPIN_savePending", false];
         }, 
         [], 
-        5 // 5 second delay before saving
+        5 
     ] call CBA_fnc_waitAndExecute;
 };
