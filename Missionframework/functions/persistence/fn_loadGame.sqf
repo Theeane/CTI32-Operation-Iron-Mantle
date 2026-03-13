@@ -8,10 +8,10 @@
 if (!isServer) exitWith {};
 
 // 1. Restore Economy & Reputation
-// Notera: CivRep defaultar till 50 (Neutral/Start)
+// CivRep defaultar till 0 (Okänd/Främling). Spelaren måste förtjäna tillit.
 missionNamespace setVariable ["KPIN_Supplies", profileNamespace getVariable ["KPIN_Save_Supplies", 100], true];
 missionNamespace setVariable ["KPIN_Intel", profileNamespace getVariable ["KPIN_Save_Intel", 0], true];
-missionNamespace setVariable ["KPIN_CivRep", profileNamespace getVariable ["KPIN_Save_CivRep", 50], true]; 
+missionNamespace setVariable ["KPIN_CivRep", profileNamespace getVariable ["KPIN_Save_CivRep", 0], true]; 
 missionNamespace setVariable ["KPIN_RepPenaltyCount", profileNamespace getVariable ["KPIN_Save_RepPenalties", 0], true];
 
 // 2. Restore World State & Infrastructure
@@ -21,7 +21,7 @@ missionNamespace setVariable ["KPIN_FOB_Positions", profileNamespace getVariable
 missionNamespace setVariable ["KPIN_FixedInfrastructure", profileNamespace getVariable ["KPIN_Save_FixedInfra", []], true];
 missionNamespace setVariable ["KPIN_completedMissions", profileNamespace getVariable ["KPIN_Save_Missions", []], true];
 
-// Restore Tier with a safety check
+// Restore Tier with safety check
 private _savedTier = profileNamespace getVariable ["KPIN_Save_Tier", 1];
 missionNamespace setVariable ["KPIN_CurrentTier", _savedTier, true];
 
@@ -35,7 +35,7 @@ if (_savedMode == -1) then {
 };
 
 // 4. Trigger World State Update
-// Detta säkerställer att alla globala variabler (som OPFOR Tier) räknas ut direkt vid start
+// Räknar ut OPFOR Tier och Rebel Tier baserat på de nyss laddade värdena.
 [] spawn KPIN_fnc_updateWorldState; 
 
-diag_log "[KPIN LOAD]: Campaign state fully restored. CivRep at " + str(missionNamespace getVariable "KPIN_CivRep");
+diag_log "[KPIN LOAD]: Campaign state restored. CivRep starting at 0 (Unknown).";
