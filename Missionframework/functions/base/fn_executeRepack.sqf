@@ -1,17 +1,22 @@
-/* Author: Theeane
-    Description: Internal helper to swap FOB object for a transport vehicle/box.
+/* Author: Theane
+    Project: Operation Iron Mantle
+    Description: Internal helper to swap FOB object for a transport vehicle/box (Repack).
+    Language: English
 */
+
+if (!isServer) exitWith {};
+
 params ["_target", "_className"];
 
 private _pos = getPosATL _target;
 private _dir = getDir _target;
 
-// 1. Remove Marker & Economy Link
-private _marker = _target getVariable ["GVAR_FOB_Marker", ""];
+private _marker = _target getVariable ["KPIN_FOB_Marker", ""];
 if (_marker != "") then {
     deleteMarker _marker;
-    GVAR_ActiveZones = GVAR_ActiveZones select { (_x # 0) != _marker };
-    publicVariable "GVAR_ActiveZones";
+    
+    KPIN_ActiveZones = KPIN_ActiveZones select { (_x # 0) != _marker };
+    publicVariable "KPIN_ActiveZones";
 };
 
 // 2. Swap Objects
@@ -21,6 +26,8 @@ _newObject setDir _dir;
 _newObject setPosATL _pos;
 
 // 3. Re-initialize deployment logic on the new object
-[_newObject] call CTI_fnc_initFOB;
+// Changed CTI_ to KPIN_
+[_newObject] call KPIN_fnc_initFOB;
 
+// Standard notification for all players
 ["TaskSucceeded", ["", "FOB Repacked for transport."]] remoteExec ["BIS_fnc_showNotification", allPlayers];
