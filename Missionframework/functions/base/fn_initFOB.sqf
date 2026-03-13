@@ -1,8 +1,6 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Description: Initializes the holdAction on the truck/container. 
-                 On completion, spawns the full FOB asset kit (Table, Laptop, Siren, Locker).
-    Language: English
+    Description: Deploys FOB with Ghost-Roof logic and 10s cleanup.
 */
 
 params [["_truck", objNull, [objNull]]];
@@ -22,7 +20,7 @@ if (isNull _truck) exitWith { diag_log "[KPIN ERROR] initFOB called with null ob
         private _pos = getPosATL _target;
         private _dir = getDir _target;
 
-        // 1. DATA & FAILSAFES (Fetch assets from preset or fallback to vanilla)
+        // 1. DATA
         private _assetRoof     = missionNamespace getVariable ["KPIN_FOB_Asset_Roof", ""];
         private _assetTable    = missionNamespace getVariable ["KPIN_FOB_Asset_Table", "Land_CampingTable_small_F"];
         private _assetTerminal = missionNamespace getVariable ["KPIN_FOB_Asset_Terminal", "Land_Laptop_unfolded_F"];
@@ -32,62 +30,78 @@ if (isNull _truck) exitWith { diag_log "[KPIN ERROR] initFOB called with null ob
 
         deleteVehicle _target;
 
-        // 2. SPAWN CORE (Roof & Table)
-        if (_assetRoof != "") then {
-            private _roof = createVehicle [_assetRoof, _pos, [], 0, "CAN_COLLIDE"];
-            _roof setDir _dir; _roof setPosATL _pos;
-            _roof allowDamage false;
-        };
-
+        // 2. SPAWN CORE (Table is the physical anchor)
         private _table = createVehicle [_assetTable, _pos, [], 0, "CAN_COLLIDE"];
         _table setDir _dir; _table setPosATL _pos;
-        _table allowDamage false;
+        _table allowDamage false; // Vi styr damage via laptopen sen
 
-        // 3. SPAWN COMMAND PC (The Brain)
+        // 3. SPAWN ROOF (Ghost Mode)
+        private _roofObj = objNull;
+        if (_assetRoof != "") then {
+            _roofObj = createVehicle [_assetRoof, _pos, [], 0, "CAN_COLLIDE"];
+            _roofObj setDir _dir; _roofObj setPosATL _pos;
+            _roofObj enableSimulationGlobal false; // Kulor går igenom
+            _roofObj allowDamage false;
+        };
+
+        // 4. SPAWN COMMAND PC (The Brain)
         private _laptop = createVehicle [_assetTerminal, [0,0,0], [], 0, "CAN_COLLIDE"];
         _laptop attachTo [_table, [0, 0, 0.6]];
         _laptop setVariable ["KPIN_isCommandPC", true, true];
-        _laptop allowDamage false; // Default safe
+        _laptop allowDamage false; 
         [_laptop] remoteExec ["KPIN_fnc_initCommandPC", 0, true];
 
-        // 4. SPAWN OPTIONAL LAMP
-        if (_assetLamp != "") then {
-            private _lamp = createVehicle [_assetLamp, [0,0,0], [], 0, "CAN_COLLIDE"];
-            _lamp attachTo [_table, [-0.4, 0, 0.6]];
-            _lamp allowDamage false;
-        };
-
-        // 5. SPAWN SIREN & LOCKER (The Tactical Hub)
+        // 5. SPAWN GHOST SIREN
         private _sirenPos = [_pos, 8, _dir + 45] call BIS_fnc_relPos;
         private _siren = createVehicle [_assetSiren, _sirenPos, [], 0, "NONE"];
         _siren setDir (_dir + 180);
+        _siren enableSimulationGlobal false; // Ghost mode
         _siren allowDamage false;
 
+        // 6. SPAWN PHYSICAL LOCKER
         private _lockerPos = [_pos, 4, _dir - 110] call BIS_fnc_relPos;
         private _locker = createVehicle [_assetLocker, _lockerPos, [], 0, "NONE"];
         _locker setDir (_dir + 70);
-        _locker allowDamage false;
+        _locker allowDamage false; // Only destroyed if laptop dies
         [_locker] remoteExec ["KPIN_fnc_initFOBInventory", 0, true];
 
-        // Link locker to laptop for easy access during attacks
-        _laptop setVariable ["KPIN_AttachedLocker", _locker, true];
+        // --- LINK EVERYTHING TO THE BRAIN (Laptop) ---
+        _laptop setVariable ["KPIN_AttachedTable", _table, true];
+        _laptop setVariable ["KPIN_AttachedRoof", _roofObj, true];
         _laptop setVariable ["KPIN_AttachedSiren", _siren, true];
+        _laptop setVariable ["KPIN_AttachedLocker", _locker, true];
 
-        // 6. NAMING & MARKER
+        // 7. NAMING & MARKER (Samma som din kod)
         private _currentFOBs = ["GET_ACTIVE"] call KPIN_fnc_baseManager;
         private _fobIndex = (count _currentFOBs) + 1;
         private _displayName = format ["FOB %1", _fobIndex];
-
         private _markerName = format["fob_marker_%1", round(random 99999)];
         private _mkr = createMarker [_markerName, _pos];
         _mkr setMarkerType "b_hq";
         _mkr setMarkerText _displayName;
         _mkr setMarkerColor "ColorBLUFOR";
 
-        // 7. REGISTRY
         _laptop setVariable ["KPIN_FOB_Marker", _markerName, true];
         _laptop setVariable ["KPIN_isUnderAttack", false, true];
         ["ADD", [_markerName, _laptop]] call KPIN_fnc_baseManager;
+
+        // 8. UNIVERSAL CLEANUP TRIGGER (On Table or Laptop)
+        _laptop addEventHandler ["Killed", {
+            params ["_unit"];
+            [_unit] spawn {
+                params ["_laptop"];
+                // Radera alla Ghost-objekt omedelbart
+                deleteVehicle (_laptop getVariable ["KPIN_AttachedRoof", objNull]);
+                deleteVehicle (_laptop getVariable ["KPIN_AttachedSiren", objNull]);
+                deleteVehicle (_laptop getVariable ["KPIN_AttachedLocker", objNull]);
+                deleteVehicle (_laptop getVariable ["KPIN_AttachedTable", objNull]);
+                
+                deleteMarker (_laptop getVariable ["KPIN_FOB_Marker", ""]);
+                
+                sleep 10; // 10s cleanup på själva laptopen
+                deleteVehicle _laptop;
+            };
+        }];
 
         ["TaskSucceeded", ["", format["%1 Deployed and Active.", _displayName]]] remoteExec ["BIS_fnc_showNotification", 0];
     },
