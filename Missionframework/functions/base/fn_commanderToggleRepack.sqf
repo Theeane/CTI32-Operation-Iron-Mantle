@@ -1,6 +1,6 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Function: KPIN_fnc_commanderToggleRepack
+    Folder: functions/base
     Description: Toggles the repack authorization for a specific FOB object.
     Language: English
 */
@@ -12,9 +12,16 @@ params [
 
 if (isNull _fob) exitWith { diag_log "[KPIN ERROR]: Attempted to toggle repack on a null object."; };
 
-// Set the repack variable globally
+// 1. Safety Check: Cannot authorize repack if the base is currently under attack
+private _isUnderAttack = _fob getVariable ["KPIN_isUnderAttack", false];
+if (_status && _isUnderAttack) exitWith {
+    ["TaskFailed", ["", "Cannot authorize repack while under attack!"]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
+};
+
+// 2. Set the repack variable globally
 _fob setVariable ["KPIN_FOB_CanRepack", _status, true];
 
+// 3. Feedback and Logging
 private _msg = if (_status) then {"AUTHORIZED"} else {"LOCKED"};
 private _location = mapGridPosition _fob;
 
