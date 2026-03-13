@@ -1,34 +1,32 @@
 /* Author: Theane / Gemini
     Project: Operation Iron Mantle
-    Description: Handles Base Tier progression. Deducts supplies and unlocks advanced assets.
+    Description: Handles Base Tier progression using Digital Currency (S).
     Language: English
 */
 
 if (!isServer) exitWith {};
 
 private _currentTier = missionNamespace getVariable ["KPIN_CurrentTier", 1];
-private _supplies = missionNamespace getVariable ["KPIN_Supplies", 0];
+private _currency = missionNamespace getVariable ["KPIN_Currency", 0]; // Ändrat till Currency (S)
 
-// Define costs for each tier upgrade
-// Tier 1 -> 2: 1500 Supplies
-// Tier 2 -> 3: 3500 Supplies
+// Tier costs (Digital Currency S)
 private _upgradeCosts = [0, 1500, 3500]; 
 private _nextTier = _currentTier + 1;
 
-// 1. Check if we are already at max level
+// 1. Check if max level
 if (_currentTier >= 3) exitWith {
     ["TaskFailed", ["", "Base is already at Maximum Tier (3)."]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
 };
 
-// 2. Check if we can afford the upgrade
-private _cost = _upgradeCosts select _currentTier; // index 1 for tier 2, index 2 for tier 3
-if (_supplies < _cost) exitWith {
-    [format["Insufficient Supplies! Need %1 for Tier %2.", _cost, _nextTier]] remoteExec ["systemChat", remoteExecutedOwner];
+// 2. Check affordability
+private _cost = _upgradeCosts select _currentTier;
+if (_currency < _cost) exitWith {
+    [format["Insufficient S-Currency! Need %1 for Tier %2.", _cost, _nextTier]] remoteExec ["systemChat", remoteExecutedOwner];
 };
 
-// 3. Process the upgrade
-_supplies = _supplies - _cost;
-missionNamespace setVariable ["KPIN_Supplies", _supplies, true];
+// 3. Process upgrade
+_currency = _currency - _cost;
+missionNamespace setVariable ["KPIN_Currency", _currency, true];
 missionNamespace setVariable ["KPIN_CurrentTier", _nextTier, true];
 
 // 4. Persistence & Global Announcement
@@ -39,9 +37,15 @@ if (!isNil "KPIN_fnc_requestDelayedSave") then { [] call KPIN_fnc_requestDelayed
     ["", format["Base Upgraded to Tier %1! New assets unlocked.", _nextTier]]
 ] remoteExec ["BIS_fnc_showNotification", allPlayers];
 
-// 5. Refresh UI for everyone looking at the Command Map
+// 5. Unlock Tier-specific Mobile Assets automatically?
+// Om vi vill att Tier 3 ska låsa upp vissa fordon direkt:
+if (_nextTier == 3) then {
+    // Här kan vi sätta flaggor för t.ex. tyngre fordon om de inte köps separat
+};
+
+// 6. Refresh UI
 if (!isNil "KPIN_fnc_updateBuyCategory") then { 
     [] remoteExec ["KPIN_fnc_updateBuyCategory", allPlayers]; 
 };
 
-diag_log format ["[KPIN] Economy: Base upgraded to Tier %1. Cost: %2 supplies.", _nextTier, _cost];
+diag_log format ["[KPIN] Economy: Base upgraded to Tier %1. Cost: %2 S.", _nextTier, _cost];
