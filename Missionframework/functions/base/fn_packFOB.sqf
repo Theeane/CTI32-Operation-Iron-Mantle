@@ -1,25 +1,27 @@
-/* Author: Theeane
-    Description: 
-    Handles the packing up of a deployed FOB into two different modes:
-    1. Truck (for driving)
-    2. Box (for helicopter transport)
+/* Author: Theane
+    Project: Operation Iron Mantle
+    Description: Handles the packing up of a deployed FOB into Truck or Box mode.
+    Language: English
 */
 
 params ["_fobObject"];
 
-// --- OPTION 1: Pack into Truck ---
+// Condition check: Distance, speed, and COMMANDER AUTHORIZATION
+private _condition = "_this distance _target < 10 && (_target getVariable ['KPIN_FOB_CanRepack', false])";
+
+// --- OPTION 1: Pack into Truck (Drive) ---
 [
     _fobObject,
     "Pack into Truck (Drive)",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_unload_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_unload_ca.paa",
-    "_this distance _target < 10",
+    _condition, // Now includes authorization check
     "_caller distance _target < 10",
     { player playActionNow "GestureHi"; },
     {},
     {
         params ["_target", "_caller"];
-        [_target, GVAR_FOB_Truck] call CTI_fnc_executeRepack; // Spawns the truck
+        [_target, KPIN_FOB_Truck] call KPIN_fnc_executeRepack; 
     },
     {}, [], 15, 0, true, false
 ] call BIS_fnc_holdActionAdd;
@@ -30,13 +32,13 @@ params ["_fobObject"];
     "Pack into Container (Slingload)",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_box_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_box_ca.paa",
-    "_this distance _target < 10",
+    _condition, // Now includes authorization check
     "_caller distance _target < 10",
     { player playActionNow "GestureHi"; },
     {},
     {
         params ["_target", "_caller"];
-        [_target, GVAR_FOB_Box_Transport] call CTI_fnc_executeRepack; // Spawns a liftable crate
+        [_target, KPIN_FOB_Box_Transport] call KPIN_fnc_executeRepack; 
     },
     {}, [], 10, 0, true, false
 ] call BIS_fnc_holdActionAdd;
