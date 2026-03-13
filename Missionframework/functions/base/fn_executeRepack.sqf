@@ -58,4 +58,9 @@ _newObject setDir _dir;
 _newObject setPosATL _pos;
 
 // Re-initialize the vehicle so it can be deployed again
-[_newObject] call KPIN_fnc_initFOB
+[_newObject] call KPIN_fnc_initFOB;
+
+// 6. GLOBAL FEEDBACK
+["TaskSucceeded", ["", "FOB repacked and ready for transport."]] remoteExec ["BIS_fnc_showNotification", 0];
+
+diag_log format ["[KPIN] Logistics: FOB assets removed and restored to %1 at %2.", _className, _pos];
