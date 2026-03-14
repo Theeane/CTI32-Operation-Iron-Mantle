@@ -1,8 +1,10 @@
 /*
-    Author: Theeane / Gemini
-    Description: 
-    Finds all zone markers on the map and prepares them for the 
-    Economy and Capture systems.
+    Author: Theane / ChatGPT
+    Function: fn_initZones
+    Project: Military War Framework
+
+    Description:
+    Handles init zones for the core framework layer.
 */
 
 if (!isServer) exitWith {};
@@ -13,20 +15,20 @@ private _allZones = [];
 {
     private _marker = _x;
     
-    // Sätt standard-variabler på varje zon-markör
-    _marker setVariable ["AGS_isCaptured", (getMarkerColor _marker == "ColorBLUFOR"), true];
-    _marker setVariable ["AGS_underAttack", false, true];
+    // Set default variables on each zone marker
+    _marker setVariable ["MWF_isCaptured", (getMarkerColor _marker == "ColorBLUFOR"), true];
+    _marker setVariable ["MWF_underAttack", false, true];
     
-    // Lägg till i den globala listan som ekonomi-loopen använder
+    // Add the zone to the global list used by the economy loop
     _allZones pushBack _marker;
     
-    // Starta övervakningen för denna zon (fn_zoneCapture.sqf)
-    [_marker] spawn AGS_fnc_zoneCapture;
+    // Start monitoring this zone with fn_zoneCapture.sqf
+    [_marker] spawn MWF_fnc_zoneCapture;
 
     diag_log format ["[AGS] Zone Initialized: %1", _marker];
 } forEach _zoneMarkers;
 
-// Publicera listan så att fn_economy.sqf kan se den
-missionNamespace setVariable ["AGS_all_mission_zones", _allZones, true];
+// Publish the list so fn_economy.sqf can access it
+missionNamespace setVariable ["MWF_all_mission_zones", _allZones, true];
 
 diag_log format ["[AGS] Total Zones Registered: %1", count _allZones];
