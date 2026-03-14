@@ -33,6 +33,10 @@ if (!isNil "MWF_fnc_initSystems") then {
     [] call MWF_fnc_initSystems;
 };
 
+if (!isNil "MWF_fnc_infrastructureManager") then {
+    ["INIT"] call MWF_fnc_infrastructureManager;
+};
+
 if (!isNil "MWF_fnc_zoneManager") then {
     [] call MWF_fnc_zoneManager;
 };

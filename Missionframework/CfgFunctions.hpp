@@ -91,11 +91,16 @@ class CfgFunctions {
 
         class Threat {
             file = "functions\threat";
+            class buildThreatDirectives {};
+            class buildThreatResponses {};
             class determineGlobalThreat {};
             class determineZoneThreat {};
+            class evaluateBaseThreat {};
             class getThreatSnapshot {};
             class markThreatDirty {};
             class recalculateThreatState {};
+            class registerThreatIncident {};
+            class selectThreatTargets {};
             class threatManager {};
         };
 
