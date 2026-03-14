@@ -53,7 +53,43 @@ _laptop addAction [
     nil, 5, true, true, "", _condPeace
 ];
 
-// --- 5. LOCKDOWN NOTIFICATION ---
+// --- 5. MISSION BOARD ---
+_laptop addAction [
+    "<t color='#66CCFF'>[ OPEN MISSION BOARD ]</t>",
+    {
+        [] spawn MWF_fnc_openMissionBoard;
+    },
+    nil, 7, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 1 ]</t>",
+    {
+        params ["_target", "_caller"];
+        [0, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
+    },
+    nil, 7, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 2 ]</t>",
+    {
+        params ["_target", "_caller"];
+        [1, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
+    },
+    nil, 7, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 3 ]</t>",
+    {
+        params ["_target", "_caller"];
+        [2, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
+    },
+    nil, 7, true, true, "", _condPeace
+];
+
+// --- 6. LOCKDOWN NOTIFICATION ---
 // Visual feedback when the system is disabled due to combat
 private _condAttack = "missionNamespace getVariable ['MWF_isUnderAttack', false]";
 
@@ -65,12 +101,12 @@ _laptop addAction [
     nil, 6, true, true, "", _condAttack, 5
 ];
 
-// --- 6. VISUALS & LOGGING ---
+// --- 7. VISUALS & LOGGING ---
 _laptop setObjectTextureGlobal [0, "A3\Structures_F\Items\Electronics\Data\Laptops_01_screen_CO.paa"];
 diag_log "[KPIN] Command PC Initialized.";
 
 
-// --- 7. FOB REPACK CONTROL ---
+// --- 8. FOB REPACK CONTROL ---
 _laptop addAction [
     "<t color='#ffaa00'>[ AUTHORIZE FOB REPACK ]</t>",
     {
