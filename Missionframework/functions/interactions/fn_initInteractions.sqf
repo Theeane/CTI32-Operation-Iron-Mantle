@@ -1,5 +1,10 @@
-/* Adding the 5-second circular UI interaction 
-    to an informant or object.
+/*
+    Author: Theane / ChatGPT
+    Function: fn_initInteractions
+    Project: Military War Framework
+
+    Description:
+    Handles init interactions for the interactions system.
 */
 
 [
@@ -13,7 +18,7 @@
     {},												// Code executed on every tick
     { 
         // SUCCESS: Code executed when the 5-second circle is full
-        [_target, _caller] spawn CTI_fnc_handleInteractionResult; 
+        [_target, _caller] spawn MWF_fnc_handleInteractionResult; 
     },
     { 
         // INTERRUPTED: Code executed if player lets go or moves away

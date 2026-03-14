@@ -1,8 +1,12 @@
-/* Author: Theeane
-    Description: 
-    Makes an informant-soldier wave at any player nearby, 
-    regardless of their clothing/side.
+/*
+    Author: Theane / ChatGPT
+    Function: fn_signalPlayer
+    Project: Military War Framework
+
+    Description:
+    Handles signal player for the interactions system.
 */
+
 params ["_unit"];
 
 if (!isServer) exitWith {};
