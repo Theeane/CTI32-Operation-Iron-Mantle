@@ -1,16 +1,5 @@
-/*
-    Author: Theane / ChatGPT
-    Function: CfgFunctions Registration
-    Project: Military War Framework
-
-    Description:
-    Registers mission functions used by the framework startup and core gameplay flow.
-*/
-
 class CfgFunctions {
     class MWF {
-        tag = "MWF";
-
         class Core {
             file = "core";
             class buildMode {};
@@ -103,8 +92,16 @@ class CfgFunctions {
         class Zones {
             file = "functions\zones";
             class abandonManager {};
+            class applyZoneSaveData {};
             class despawnZoneAssets {};
+            class generateZonesFromMap {};
+            class getZoneSaveData {};
+            class loadManualZones {};
+            class registerZone {};
+            class setZoneOwner {};
             class spawnZoneAssets {};
+            class syncZoneMarker {};
+            class updateZoneProgression {};
             class zoneHandler {};
         };
 
