@@ -5,12 +5,55 @@
 
     Description:
     Defines mission parameters available in the scenario lobby.
+
+    Notes:
+    - Default faction lists remain the original built-in preset selections.
+    - Custom faction support is handled through Source + Custom Preset params per faction.
+    - Persistent campaign-related params are marked below for easier implementation with CBA saving.
 */
 
 class Params {
+    // -------------------------------------------------------------------------
+    // PERSISTENT FACTION SOURCE SELECTION
+    // These are intended to be saved/locked to campaign progression.
+    // -------------------------------------------------------------------------
+
+    class MWF_Param_BluforSource {
+        title = "BLUFOR Preset Source";
+        values[] = {0, 1};
+        texts[] = {"Default", "Custom"};
+        default = 0;
+    };
+
+    class MWF_Param_OpforSource {
+        title = "OPFOR Preset Source";
+        values[] = {0, 1};
+        texts[] = {"Default", "Custom"};
+        default = 0;
+    };
+
+    class MWF_Param_ResistanceSource {
+        title = "Resistance Preset Source";
+        values[] = {0, 1};
+        texts[] = {"Default", "Custom"};
+        default = 0;
+    };
+
+    class MWF_Param_CivsSource {
+        title = "Civilian Preset Source";
+        values[] = {0, 1};
+        texts[] = {"Default", "Custom"};
+        default = 0;
+    };
+
+    // -------------------------------------------------------------------------
+    // PERSISTENT DEFAULT FACTION PRESETS
+    // These are intended to be saved/locked to campaign progression.
+    // -------------------------------------------------------------------------
+
     class MWF_Param_Blufor {
-        title = "BLUFOR Preset";
-        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 99};
+        title = "BLUFOR Default Preset";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
         texts[] = {
             "NATO",
             "NATO Pacific",
@@ -27,15 +70,14 @@ class Params {
             "RHS USAF Desert",
             "RHS USAF Woodland",
             "SOG MACV",
-            "Western Sahara BLUFOR Desert",
-            "Custom"
+            "Western Sahara BLUFOR Desert"
         };
         default = 0;
     };
 
     class MWF_Param_Opfor {
-        title = "OPFOR Preset";
-        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 99};
+        title = "OPFOR Default Preset";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
         texts[] = {
             "CSAT",
             "CSAT Pacific",
@@ -48,15 +90,14 @@ class Params {
             "Islamic State",
             "RHS AFRF",
             "Takistan Army",
-            "Unsung Vietnam",
-            "Custom"
+            "Unsung Vietnam"
         };
         default = 0;
     };
 
     class MWF_Param_Resistance {
-        title = "Resistance Preset";
-        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 99};
+        title = "Resistance Default Preset";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7};
         texts[] = {
             "AAF",
             "CUP NAPA",
@@ -65,15 +106,14 @@ class Params {
             "RACS",
             "RHS GREF",
             "Syndikat",
-            "Vietnam CIDG",
-            "Custom"
+            "Vietnam CIDG"
         };
         default = 0;
     };
 
     class MWF_Param_Civs {
-        title = "Civilian Preset";
-        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 99};
+        title = "Civilian Default Preset";
+        values[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         texts[] = {
             "Arma 3 Civilians",
             "CUP Chernarus Civilians",
@@ -84,11 +124,93 @@ class Params {
             "Middle Eastern",
             "RDS Civilians",
             "Tanoa Civilians",
-            "Vietnam Unsung",
-            "Custom"
+            "Vietnam Unsung"
         };
         default = 0;
     };
+
+    // -------------------------------------------------------------------------
+    // PERSISTENT CUSTOM FACTION PRESETS
+    // These are intended to be saved/locked to campaign progression.
+    // Custom 1 is the safe fallback/template slot for each faction.
+    // -------------------------------------------------------------------------
+
+    class MWF_Param_CustomBlufor {
+        title = "BLUFOR Custom Preset";
+        values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        texts[] = {
+            "Custom 1",
+            "Custom 2",
+            "Custom 3",
+            "Custom 4",
+            "Custom 5",
+            "Custom 6",
+            "Custom 7",
+            "Custom 8",
+            "Custom 9",
+            "Custom 10"
+        };
+        default = 1;
+    };
+
+    class MWF_Param_CustomOpfor {
+        title = "OPFOR Custom Preset";
+        values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        texts[] = {
+            "Custom 1",
+            "Custom 2",
+            "Custom 3",
+            "Custom 4",
+            "Custom 5",
+            "Custom 6",
+            "Custom 7",
+            "Custom 8",
+            "Custom 9",
+            "Custom 10"
+        };
+        default = 1;
+    };
+
+    class MWF_Param_CustomResistance {
+        title = "Resistance Custom Preset";
+        values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        texts[] = {
+            "Custom 1",
+            "Custom 2",
+            "Custom 3",
+            "Custom 4",
+            "Custom 5",
+            "Custom 6",
+            "Custom 7",
+            "Custom 8",
+            "Custom 9",
+            "Custom 10"
+        };
+        default = 1;
+    };
+
+    class MWF_Param_CustomCivs {
+        title = "Civilian Custom Preset";
+        values[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        texts[] = {
+            "Custom 1",
+            "Custom 2",
+            "Custom 3",
+            "Custom 4",
+            "Custom 5",
+            "Custom 6",
+            "Custom 7",
+            "Custom 8",
+            "Custom 9",
+            "Custom 10"
+        };
+        default = 1;
+    };
+
+    // -------------------------------------------------------------------------
+    // PERSISTENT CAMPAIGN / PROGRESSION PARAMS
+    // These are intended to be saved and re-used after restart.
+    // -------------------------------------------------------------------------
 
     class MWF_Param_StartSupplies {
         title = "Starting Supplies";
@@ -103,6 +225,46 @@ class Params {
         texts[] = {"5 min", "10 min", "15 min", "20 min", "30 min"};
         default = 10;
     };
+
+    class MWF_Param_CivReputation {
+        title = "Starting Civilian Reputation";
+        values[] = {-50, 0, 25, 50};
+        texts[] = {"Hostile", "Neutral", "Friendly", "Respected"};
+        default = 0;
+    };
+
+    class MWF_Param_NotorietyMultiplier {
+        title = "Heat Decay per Tick";
+        values[] = {1, 2, 3, 5};
+        texts[] = {"1", "2", "3", "5"};
+        default = 1;
+    };
+
+    class MWF_Param_BuildingDamageMode {
+        title = "Building Damage Mode";
+        values[] = {0, 1};
+        texts[] = {"Persistent", "Reset on Restart"};
+        default = 0;
+    };
+
+    class MWF_Param_IncomeMultiplier {
+        title = "Income Multiplier";
+        values[] = {1, 2, 3, 4, 5};
+        texts[] = {"1x", "2x", "3x", "4x", "5x"};
+        default = 1;
+    };
+
+    class MWF_Param_MaxFOBs {
+        title = "Maximum FOBs";
+        values[] = {1, 2, 3, 4, 5, 6, 8, 10};
+        texts[] = {"1", "2", "3", "4", "5", "6", "8", "10"};
+        default = 3;
+    };
+
+    // -------------------------------------------------------------------------
+    // NON-PERSISTENT / FREELY CHANGEABLE PER RESTART
+    // Everything below is intended to remain selectable on each server start.
+    // -------------------------------------------------------------------------
 
     class MWF_Param_TimeMultiplier {
         title = "Time Acceleration";
@@ -125,32 +287,11 @@ class Params {
         default = 100;
     };
 
-    class MWF_Param_CivReputation {
-        title = "Starting Civilian Reputation";
-        values[] = {-50, 0, 25, 50};
-        texts[] = {"Hostile", "Neutral", "Friendly", "Respected"};
-        default = 0;
-    };
-
-    class MWF_Param_NotorietyMultiplier {
-        title = "Heat Decay per Tick";
-        values[] = {1, 2, 3, 5};
-        texts[] = {"1", "2", "3", "5"};
-        default = 1;
-    };
-
     class MWF_Param_SaveInterval {
         title = "Auto Save Interval";
         values[] = {5, 10, 15, 30, 60};
         texts[] = {"5 min", "10 min", "15 min", "30 min", "60 min"};
         default = 15;
-    };
-
-    class MWF_Param_BuildingDamageMode {
-        title = "Building Damage Mode";
-        values[] = {0, 1};
-        texts[] = {"Persistent", "Reset on Restart"};
-        default = 0;
     };
 
     class MWF_Param_WipeSave {
