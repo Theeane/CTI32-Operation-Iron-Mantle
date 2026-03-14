@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Triggers a restricted Zeus session to place the FOB composition.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_setupFOBAction
+    Project: Military War Framework
+
+    Description:
+    Handles setup f o b action for the core framework layer.
 */
 
 params ["_container"];
@@ -28,7 +31,7 @@ params ["_container"];
         
         // Give the curator the ability to place the composition
         // (This part requires a helper script to 'attach' the composition to the cursor)
-        [_curator, _pos] remoteExec ["AGS_fnc_startFOBPlacement", _caller];
+        [_curator, _pos] remoteExec ["MWF_fnc_startFOBPlacement", _caller];
 
         systemChat "Deployment Interface Active. Place the FOB Composition.";
     },
