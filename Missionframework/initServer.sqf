@@ -1,76 +1,26 @@
-/*
-    Author: Theane / ChatGPT
-    File: initServer.sqf
-    Project: Military War Framework
+sqf
+// Author: Theane / ChatGPT
+// Project: Mission War Framework
 
-    Description:
-    Server bootstrap for the framework.
-    Initializes persistence, global state, preset resolution, builds the zone registry,
-    and starts runtime managers in a stable order.
-*/
+// Server-side initialization
+hint "Mission War Framework: Server initialization started.";
 
-if (!isServer) exitWith {};
+// Define current era and default uniform
+MWF_Current_Era = "Vietnam"; // Example: "Vietnam" or "Modern"
+MWF_Default_Uniform = "U_B_CombatUniform_mcam"; // Example: Default uniform
 
-diag_log "[MWF] initServer.sqf started.";
+// Load the blacklist lists
+preprocessFileLineNumbers "preset/blacklist/global_blacklist.sqf";
+preprocessFileLineNumbers "preset/blacklist/modern_removed.sqf";
 
-enableSaving [false, false];
+// Initialize the blacklist manager
+[] execVM "preset/blacklist/blacklist_manager.sqf";
+MWF_fnc_blacklistManager; // Call the function to set the undercover blacklist
 
-missionNamespace setVariable ["MWF_ServerInitialized", false, true];
-missionNamespace setVariable ["MWF_PersistenceLoaded", false, true];
-missionNamespace setVariable ["MWF_AllSystemsInitialized", false, true];
+// Define the base radius for arsenal and build mode
+MWF_Base_Radius = 500; // Example radius value (meters)
 
-if (!isNil "MWF_fnc_loadGame") then {
-    [] call MWF_fnc_loadGame;
-};
-missionNamespace setVariable ["MWF_PersistenceLoaded", true, true];
+// Make MWF_Undercover_Blacklist available to all clients
+publicVariable "MWF_Undercover_Blacklist";
 
-[] call MWF_fnc_initGlobals;
-
-if (!isNil "MWF_fnc_presetManager") then {
-    [] call MWF_fnc_presetManager;
-};
-
-if (!isNil "MWF_fnc_initPersistence") then {
-    [] call MWF_fnc_initPersistence;
-};
-
-if (!isNil "MWF_fnc_initSystems") then {
-    [] call MWF_fnc_initSystems;
-};
-
-if (!isNil "MWF_fnc_restoreFOBs") then {
-    [] call MWF_fnc_restoreFOBs;
-};
-
-if (!isNil "MWF_fnc_infrastructureManager") then {
-    ["INIT"] call MWF_fnc_infrastructureManager;
-};
-
-if (!isNil "MWF_fnc_zoneManager") then {
-    [] call MWF_fnc_zoneManager;
-};
-
-if (!isNil "MWF_fnc_worldManager") then {
-    [] call MWF_fnc_worldManager;
-};
-
-if (!isNil "MWF_fnc_threatManager") then {
-    [] call MWF_fnc_threatManager;
-};
-
-if (!isNil "MWF_fnc_initMissionSystem") then {
-    [] call MWF_fnc_initMissionSystem;
-};
-
-if (!isNil "MWF_fnc_zoneHandler") then {
-    [] spawn MWF_fnc_zoneHandler;
-};
-
-if (!isNil "MWF_fnc_economy") then {
-    [] spawn MWF_fnc_economy;
-};
-
-missionNamespace setVariable ["MWF_AllSystemsInitialized", true, true];
-missionNamespace setVariable ["MWF_ServerInitialized", true, true];
-
-diag_log "[MWF] initServer.sqf completed.";
+// Example of further server-side logic can be added below.
