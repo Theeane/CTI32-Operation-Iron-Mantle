@@ -1,10 +1,13 @@
-/* PRESET: AAF (Armed Forces of Altis)
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
-    Description: Professional Resistance faction scaling from Tier 1 to 5.
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - AAF
+    Project: Military War Framework
+
+    Description:
+    Defines the resistance preset configuration for AAF.
 */
 
-GVAR_RES_Preset = createHashMapFromArray [
+MWF_RES_Preset = createHashMapFromArray [
     // --- INFANTRY POOLS (Military Standard) ---
     ["Infantry_T1", [
         "I_soldier_F",                      // Rifleman (Light)

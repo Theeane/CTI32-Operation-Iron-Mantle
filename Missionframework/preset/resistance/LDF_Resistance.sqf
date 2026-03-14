@@ -1,10 +1,13 @@
-/* PRESET: LDF (Livonian Defense Force)
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
-    Description: Professional Forest Resistance faction scaling from Tier 1 to 5.
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - LDF_Resistance
+    Project: Military War Framework
+
+    Description:
+    Defines the resistance preset configuration for LDF Resistance.
 */
 
-GVAR_RES_Preset = createHashMapFromArray [
+MWF_RES_Preset = createHashMapFromArray [
     // --- INFANTRY POOLS (Forest Warfare Standard) ---
     ["Infantry_T1", [
         "I_E_Soldier_F",                    // Rifleman

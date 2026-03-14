@@ -1,10 +1,13 @@
-/* PRESET: Syndikat (Apex Guerrilla)
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
-    Description: Guerrilla Resistance faction scaling from Tier 1 to 5.
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Syndikat
+    Project: Military War Framework
+
+    Description:
+    Defines the resistance preset configuration for Syndikat.
 */
 
-GVAR_RES_Preset = createHashMapFromArray [
+MWF_RES_Preset = createHashMapFromArray [
     // --- INFANTRY POOLS (Guerrilla Standard) ---
     ["Infantry_T1", [
         "I_C_Soldier_Bandit_01_F",          // Bandit (Rifle)

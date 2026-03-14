@@ -1,9 +1,13 @@
-/* PRESET: CUP NAPA (National Party)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_NAPA
+    Project: Military War Framework
+
+    Description:
+    Defines the resistance preset configuration for CUP NAPA.
 */
 
-GVAR_RES_Preset = createHashMapFromArray [
+MWF_RES_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
         "CUP_I_GUE_Soldier_AKS74",           // Rifleman

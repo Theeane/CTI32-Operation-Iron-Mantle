@@ -1,9 +1,13 @@
-/* PRESET: Middle Eastern Resistance
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Middle_Eastern
+    Project: Military War Framework
+
+    Description:
+    Defines the resistance preset configuration for Middle Eastern.
 */
 
-GVAR_RES_Preset = createHashMapFromArray [
+MWF_RES_Preset = createHashMapFromArray [
     ["Infantry_T1", [
         "LOP_AM_Infantry_Rifleman",          // Rifleman
         "LOP_AM_Infantry_Rifleman_2",        // Rifleman (AKM)
