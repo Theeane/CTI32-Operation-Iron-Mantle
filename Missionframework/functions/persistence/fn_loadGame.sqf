@@ -1,42 +1,54 @@
 /*
-    Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Function: KPIN_fnc_loadGame
-    Description: Restores the mission state and locks parameters.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_loadGame
+    Project: Military War Framework
+
+    Description:
+    Restores the saved campaign state and synchronizes current MWF runtime variables.
 */
 
 if (!isServer) exitWith {};
 
-// 1. Restore Economy & Reputation
-// CivRep defaults to 0 (Unknown). Players must earn trust through actions.
-missionNamespace setVariable ["KPIN_Supplies", profileNamespace getVariable ["KPIN_Save_Supplies", 100], true];
-missionNamespace setVariable ["KPIN_Intel", profileNamespace getVariable ["KPIN_Save_Intel", 0], true];
-missionNamespace setVariable ["KPIN_CivRep", profileNamespace getVariable ["KPIN_Save_CivRep", 0], true]; 
-missionNamespace setVariable ["KPIN_RepPenaltyCount", profileNamespace getVariable ["KPIN_Save_RepPenalties", 0], true];
+private _supplies = profileNamespace getVariable ["MWF_Save_Supplies", missionNamespace getVariable ["MWF_Economy_Supplies", 200]];
+private _intel = profileNamespace getVariable ["MWF_Save_Intel", missionNamespace getVariable ["MWF_res_intel", 0]];
+private _civRep = profileNamespace getVariable ["MWF_Save_CivRep", missionNamespace getVariable ["MWF_CivRep", 0]];
+private _notoriety = profileNamespace getVariable ["MWF_Save_Notoriety", missionNamespace getVariable ["MWF_res_notoriety", 0]];
 
-// 2. Restore World State & Infrastructure
-missionNamespace setVariable ["KPIN_DestroyedHQs", profileNamespace getVariable ["KPIN_Save_DestroyedHQs", 0], true];
-missionNamespace setVariable ["KPIN_DestroyedRoadblocks", profileNamespace getVariable ["KPIN_Save_DestroyedRoadblocks", 0], true];
-missionNamespace setVariable ["KPIN_FOB_Positions", profileNamespace getVariable ["KPIN_Save_FOBs", []], true];
-missionNamespace setVariable ["KPIN_FixedInfrastructure", profileNamespace getVariable ["KPIN_Save_FixedInfra", []], true];
-missionNamespace setVariable ["KPIN_completedMissions", profileNamespace getVariable ["KPIN_Save_Missions", []], true];
+missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
+missionNamespace setVariable ["MWF_res_intel", _intel, true];
+missionNamespace setVariable ["MWF_CivRep", _civRep, true];
+missionNamespace setVariable ["MWF_res_notoriety", _notoriety, true];
+missionNamespace setVariable ["MWF_Supplies", _supplies, true];
+missionNamespace setVariable ["MWF_Intel", _intel, true];
+missionNamespace setVariable ["MWF_RepPenaltyCount", profileNamespace getVariable ["MWF_Save_RepPenalties", 0], true];
 
-// Restore Base Tier with safety check
-private _savedTier = profileNamespace getVariable ["KPIN_Save_Tier", 1];
-missionNamespace setVariable ["KPIN_CurrentTier", _savedTier, true];
+missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
+missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];
+missionNamespace setVariable ["MWF_FOB_Positions", profileNamespace getVariable ["MWF_Save_FOBs", []], true];
+missionNamespace setVariable ["MWF_FixedInfrastructure", profileNamespace getVariable ["MWF_Save_FixedInfra", []], true];
+missionNamespace setVariable ["MWF_completedMissions", profileNamespace getVariable ["MWF_Save_Missions", []], true];
+missionNamespace setVariable ["MWF_CurrentTier", profileNamespace getVariable ["MWF_Save_Tier", 1], true];
 
-// 3. Lobby Parameter Lock
-private _savedMode = profileNamespace getVariable ["KPIN_Save_BuildingMode", -1];
-if (_savedMode == -1) then {
-    private _lobbyParam = ["BuildingDamageMode", 0] call BIS_fnc_getParamValue;
-    missionNamespace setVariable ["KPIN_LockedBuildingMode", _lobbyParam, true];
+private _savedBuildingMode = profileNamespace getVariable ["MWF_Save_BuildingMode", -1];
+if (_savedBuildingMode == -1) then {
+    missionNamespace setVariable ["MWF_LockedBuildingMode", ["MWF_Param_BuildingDamageMode", 0] call BIS_fnc_getParamValue, true];
 } else {
-    missionNamespace setVariable ["KPIN_LockedBuildingMode", _savedMode, true];
+    missionNamespace setVariable ["MWF_LockedBuildingMode", _savedBuildingMode, true];
 };
 
-// 4. Trigger World State Update
-// Calculates OPFOR Tier and Rebel Tier based on the restored values.
-[] spawn KPIN_fnc_updateWorldState; 
+private _savedZones = profileNamespace getVariable ["MWF_Save_Zones", []];
+{
+    private _zone = _x;
+    private _zoneId = _zone getVariable ["MWF_zoneID", ""];
+    private _zoneName = _zone getVariable ["MWF_zoneName", ""];
 
-diag_log "[KPIN LOAD]: Campaign state fully restored. CivRep starting at 0 (Unknown).";
+    if ((_zoneId in _savedZones) || (_zoneName in _savedZones)) then {
+        _zone setVariable ["MWF_isCaptured", true, true];
+        private _marker = _zone getVariable ["MWF_zoneMarker", ""];
+        if (_marker != "") then {
+            _marker setMarkerColor "ColorBLUFOR";
+        };
+    };
+} forEach (missionNamespace getVariable ["MWF_all_mission_zones", []]);
+
+diag_log format ["[MWF] Campaign state restored. Saved zones: %1.", count _savedZones];

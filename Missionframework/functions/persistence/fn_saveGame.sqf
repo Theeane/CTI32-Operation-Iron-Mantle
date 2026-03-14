@@ -1,48 +1,53 @@
 /*
-    Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Function: KPIN_fnc_saveGame
-    Description: Saves the mission state. Quests and Cooldowns are NOT saved (Reset on restart).
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_saveGame
+    Project: Military War Framework
+
+    Description:
+    Saves current campaign state using a single MWF persistence schema.
 */
 
 if (!isServer) exitWith {};
-params [["_reason", "Auto-Save"]];
+params [["_reason", "Auto Save"]];
 
-// 1. Map Completion Logic
-private _allZones = missionNamespace getVariable ["KPIN_all_mission_zones", []];
-private _totalZones = count _allZones;
-private _capturedZoneNames = [];
+private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
+private _savedZoneIds = [];
 
 {
-    if (_x getVariable ["KPIN_isCaptured", false]) then {
-        _capturedZoneNames pushBack (_x getVariable ["KPIN_zoneID", text _x]); 
+    if (_x getVariable ["MWF_isCaptured", false]) then {
+        private _zoneId = _x getVariable ["MWF_zoneID", _x getVariable ["MWF_zoneName", ""]];
+        if (_zoneId != "") then {
+            _savedZoneIds pushBackUnique _zoneId;
+        };
     };
 } forEach _allZones;
 
-private _capturedCount = count _capturedZoneNames;
-private _completionPercent = if (_totalZones > 0) then {(_capturedCount / _totalZones) * 100} else {0};
+private _totalZones = count _allZones;
+private _capturedCount = count _savedZoneIds;
+private _completionPercent = if (_totalZones > 0) then { (_capturedCount / _totalZones) * 100 } else { 0 };
 
-// Save completion data for Tier-lock logic
-profileNamespace setVariable ["KPIN_Save_Zones", _capturedZoneNames];
-profileNamespace setVariable ["KPIN_Save_Completion", _completionPercent];
+private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 200]];
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
-// 2. Economy & Reputation (Digital Currency)
-profileNamespace setVariable ["KPIN_Save_Supplies", missionNamespace getVariable ["KPIN_Supplies", 100]];
-profileNamespace setVariable ["KPIN_Save_Intel", missionNamespace getVariable ["KPIN_Intel", 0]];
-profileNamespace setVariable ["KPIN_Save_CivRep", missionNamespace getVariable ["KPIN_CivRep", 0]];
-profileNamespace setVariable ["KPIN_Save_RepPenalties", missionNamespace getVariable ["KPIN_RepPenaltyCount", 0]];
+missionNamespace setVariable ["MWF_Supplies", _supplies, true];
+missionNamespace setVariable ["MWF_Intel", _intel, true];
 
-// 3. World State & Infrastructure
-profileNamespace setVariable ["KPIN_Save_DestroyedHQs", missionNamespace getVariable ["KPIN_DestroyedHQs", 0]];
-profileNamespace setVariable ["KPIN_Save_DestroyedRoadblocks", missionNamespace getVariable ["KPIN_DestroyedRoadblocks", 0]];
-profileNamespace setVariable ["KPIN_Save_Tier", missionNamespace getVariable ["KPIN_CurrentTier", 1]];
-profileNamespace setVariable ["KPIN_Save_FixedInfra", missionNamespace getVariable ["KPIN_FixedInfrastructure", []]];
-profileNamespace setVariable ["KPIN_Save_FOBs", missionNamespace getVariable ["KPIN_FOB_Positions", []]];
-profileNamespace setVariable ["KPIN_Save_BuildingMode", missionNamespace getVariable ["KPIN_LockedBuildingMode", -1]];
-
-// NOTE: Mission Progress / Cooldowns are NOT saved per user requirements.
-// Server restart will result in all quests being available immediately.
+profileNamespace setVariable ["MWF_Save_Zones", _savedZoneIds];
+profileNamespace setVariable ["MWF_Save_Completion", _completionPercent];
+profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
+profileNamespace setVariable ["MWF_Save_Intel", _intel];
+profileNamespace setVariable ["MWF_Save_CivRep", _civRep];
+profileNamespace setVariable ["MWF_Save_Notoriety", _notoriety];
+profileNamespace setVariable ["MWF_Save_RepPenalties", missionNamespace getVariable ["MWF_RepPenaltyCount", 0]];
+profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVariable ["MWF_DestroyedHQs", []]];
+profileNamespace setVariable ["MWF_Save_DestroyedRoadblocks", missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]];
+profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
+profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariable ["MWF_FixedInfrastructure", []]];
+profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
+profileNamespace setVariable ["MWF_Save_BuildingMode", missionNamespace getVariable ["MWF_LockedBuildingMode", -1]];
+profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 
 saveProfileNamespace;
-diag_log format ["[KPIN SAVE]: Game Saved (%1). Completion: %2%3. Quests reset on restart.", _reason, floor _completionPercent, "%"];
+diag_log format ["[MWF] Game saved (%1). Completion: %2%3.", _reason, floor _completionPercent, "%"];

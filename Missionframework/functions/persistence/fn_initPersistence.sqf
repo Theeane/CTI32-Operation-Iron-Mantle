@@ -1,33 +1,37 @@
 /*
-    Author: Theane using Gemini
-    Project: Operation Iron Mantle
-    Function: KPIN_fnc_initPersistence
-    Description: Initializes the persistence engine, auto-save loops, and delayed save logic.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_initPersistence
+    Project: Military War Framework
+
+    Description:
+    Starts the persistence loop and provides a delayed save helper for bursty resource updates.
 */
 
 if (!isServer) exitWith {};
 
-// 1. Start the 10-minute auto-save loop via CBA
+private _intervalSeconds = (["MWF_Param_SaveInterval", 15] call BIS_fnc_getParamValue) * 60;
+
 [
-    { ["Scheduled Auto-Save"] call KPIN_fnc_saveGame; }, 
-    600
+    {
+        ["Scheduled Auto Save"] call MWF_fnc_saveGame;
+    },
+    _intervalSeconds
 ] call CBA_fnc_addPerFrameHandler;
 
-// 2. Define the Delayed Save function
-// This prevents the server from saving multiple times per second during heavy resource pickup
-KPIN_fnc_requestDelayedSave = {
-    if (missionNamespace getVariable ["KPIN_savePending", false]) exitWith {};
-    missionNamespace setVariable ["KPIN_savePending", true];
-    
+MWF_fnc_requestDelayedSave = {
+    if (!isServer) exitWith {};
+    if (missionNamespace getVariable ["MWF_savePending", false]) exitWith {};
+
+    missionNamespace setVariable ["MWF_savePending", true];
+
     [
-        { 
-            ["Resource Update"] call KPIN_fnc_saveGame; 
-            missionNamespace setVariable ["KPIN_savePending", false];
-        }, 
-        [], 
-        5 // 5-second buffer
+        {
+            ["Resource Update"] call MWF_fnc_saveGame;
+            missionNamespace setVariable ["MWF_savePending", false];
+        },
+        [],
+        5
     ] call CBA_fnc_waitAndExecute;
 };
 
-diag_log "[KPIN PERSISTENCE]: Persistence engine and auto-save loop initialized.";
+diag_log format ["[MWF] Persistence initialized. Auto save interval: %1 seconds.", _intervalSeconds];

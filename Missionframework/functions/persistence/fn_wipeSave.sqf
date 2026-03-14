@@ -1,28 +1,29 @@
 /*
-    Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Function: KPIN_fnc_wipeSave
-    Description: Clears all persistent data related to the campaign from profileNamespace.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_wipeSave
+    Project: Military War Framework
+
+    Description:
+    Handles wipe save for the persistence system.
 */
 
 if (!isServer) exitWith {};
 
 // Define all keys used in persistence to ensure a total wipe
 private _keys = [
-    "KPIN_Save_Zones",
-    "KPIN_Save_Completion",      // Added to reset the Tier-lock logic
-    "KPIN_Save_Supplies",
-    "KPIN_Save_Intel",
-    "KPIN_Save_CivRep",
-    "KPIN_Save_RepPenalties",
-    "KPIN_Save_DestroyedHQs",
-    "KPIN_Save_DestroyedRoadblocks",
-    "KPIN_Save_FixedInfra",
-    "KPIN_Save_BuildingMode",
-    "KPIN_Save_FOBs",
-    "KPIN_Save_Tier",
-    "KPIN_Save_Missions"
+    "MWF_Save_Zones",
+    "MWF_Save_Completion",      // Added to reset the Tier-lock logic
+    "MWF_Save_Supplies",
+    "MWF_Save_Intel",
+    "MWF_Save_CivRep",
+    "MWF_Save_RepPenalties",
+    "MWF_Save_DestroyedHQs",
+    "MWF_Save_DestroyedRoadblocks",
+    "MWF_Save_FixedInfra",
+    "MWF_Save_BuildingMode",
+    "MWF_Save_FOBs",
+    "MWF_Save_Tier",
+    "MWF_Save_Missions"
 ];
 
 // Set all keys to nil to wipe them from profileNamespace
