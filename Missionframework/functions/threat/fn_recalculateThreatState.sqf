@@ -6,9 +6,19 @@
     Description:
     Builds a dedicated threat layer from stable world progression outputs.
     Keeps enemy pressure separate from temporary zone capture logic.
+
+    Notes:
+    - Uses a lightweight mutex to avoid overlapping recalculations.
+    - Avoids broadcasting complex structures on objects or mission namespace.
+    - Only updates public object variables when values actually changed.
 */
 
 if (!isServer) exitWith {createHashMap};
+if (missionNamespace getVariable ["MWF_ThreatRecalcRunning", false]) exitWith {
+    missionNamespace getVariable ["MWF_ThreatSnapshot", createHashMap]
+};
+
+missionNamespace setVariable ["MWF_ThreatRecalcRunning", true, false];
 
 private _zones = missionNamespace getVariable ["MWF_all_mission_zones", []];
 private _validZones = _zones select { !isNull _x };
@@ -37,6 +47,7 @@ private _globalThreatState = _globalThreat param [1, "low"];
 private _pressureScore = _globalThreat param [2, 0];
 
 private _zoneThreatIndex = createHashMap;
+private _zoneThreatSummary = [];
 private _highThreatZoneIds = [];
 private _criticalThreatZoneIds = [];
 
@@ -52,14 +63,24 @@ private _criticalThreatZoneIds = [];
     private _zoneId = _zoneThreat getOrDefault ["zoneId", ""];
     private _zoneThreatLevel = _zoneThreat getOrDefault ["threatLevel", 0];
     private _zoneThreatState = _zoneThreat getOrDefault ["threatState", "low"];
+    private _responseProfile = _zoneThreat getOrDefault ["responseProfile", "monitor"];
 
     if (_zoneId != "") then {
         _zoneThreatIndex set [_zoneId, _zoneThreat];
+        _zoneThreatSummary pushBack [_zoneId, _zoneThreatLevel, _zoneThreatState, _responseProfile];
     };
 
-    _zone setVariable ["MWF_zoneThreatLevel", _zoneThreatLevel, true];
-    _zone setVariable ["MWF_zoneThreatState", _zoneThreatState, true];
-    _zone setVariable ["MWF_zoneThreatProfile", _zoneThreat, true];
+    if ((_zone getVariable ["MWF_zoneThreatLevel", -1]) != _zoneThreatLevel) then {
+        _zone setVariable ["MWF_zoneThreatLevel", _zoneThreatLevel, true];
+    };
+
+    if ((_zone getVariable ["MWF_zoneThreatState", ""]) != _zoneThreatState) then {
+        _zone setVariable ["MWF_zoneThreatState", _zoneThreatState, true];
+    };
+
+    if ((_zone getVariable ["MWF_zoneResponseProfile", ""]) != _responseProfile) then {
+        _zone setVariable ["MWF_zoneResponseProfile", _responseProfile, true];
+    };
 
     if (_zoneThreatLevel >= 3 && _zoneId != "") then {
         _highThreatZoneIds pushBackUnique _zoneId;
@@ -73,19 +94,34 @@ private _criticalThreatZoneIds = [];
 private _previousThreatLevel = missionNamespace getVariable ["MWF_GlobalThreatLevel", -1];
 private _previousThreatState = missionNamespace getVariable ["MWF_GlobalThreatState", ""];
 private _previousPressure = missionNamespace getVariable ["MWF_ThreatPressureScore", -1];
+private _previousHighThreat = missionNamespace getVariable ["MWF_HighThreatZoneIDs", []];
+private _stateChanged = (
+    _previousThreatLevel != _globalThreatLevel ||
+    _previousThreatState != _globalThreatState ||
+    {abs (_previousPressure - _pressureScore) >= 0.01} ||
+    {!(_previousHighThreat isEqualTo _highThreatZoneIds)}
+);
 
 missionNamespace setVariable ["MWF_GlobalThreatLevel", _globalThreatLevel, true];
 missionNamespace setVariable ["MWF_GlobalThreatState", _globalThreatState, true];
 missionNamespace setVariable ["MWF_ThreatPressureScore", _pressureScore, true];
-missionNamespace setVariable ["MWF_ZoneThreatIndex", _zoneThreatIndex, true];
 missionNamespace setVariable ["MWF_HighThreatZoneIDs", _highThreatZoneIds, true];
 missionNamespace setVariable ["MWF_CriticalThreatZoneIDs", _criticalThreatZoneIds, true];
-missionNamespace setVariable ["MWF_ThreatStateVersion", 1, true];
+missionNamespace setVariable ["MWF_ZoneThreatSummary", _zoneThreatSummary, true];
+
+missionNamespace setVariable ["MWF_ZoneThreatIndex", _zoneThreatIndex, false];
+missionNamespace setVariable ["MWF_ThreatLastRecalcAt", diag_tickTime, false];
+missionNamespace setVariable ["MWF_ThreatStateDirty", false, false];
+
+if (_stateChanged) then {
+    private _version = (missionNamespace getVariable ["MWF_ThreatStateVersion", 0]) + 1;
+    missionNamespace setVariable ["MWF_ThreatStateVersion", _version, true];
+};
 
 private _snapshot = [] call MWF_fnc_getThreatSnapshot;
-missionNamespace setVariable ["MWF_ThreatSnapshot", _snapshot, true];
+missionNamespace setVariable ["MWF_ThreatSnapshot", _snapshot, false];
 
-if (_previousThreatLevel != _globalThreatLevel || _previousThreatState != _globalThreatState || {abs (_previousPressure - _pressureScore) >= 0.01}) then {
+if (_stateChanged) then {
     diag_log format [
         "[MWF Threat] Recalculated | Level: %1 | State: %2 | Pressure: %3 | High Threat Zones: %4",
         _globalThreatLevel,
@@ -95,4 +131,5 @@ if (_previousThreatLevel != _globalThreatLevel || _previousThreatState != _globa
     ];
 };
 
+missionNamespace setVariable ["MWF_ThreatRecalcRunning", false, false];
 _snapshot

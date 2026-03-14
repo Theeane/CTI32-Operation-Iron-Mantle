@@ -86,7 +86,7 @@ switch (true) do {
     };
 };
 
-private _profile = createHashMapFromArray [
+createHashMapFromArray [
     ["zoneId", _zoneId],
     ["zoneType", _zoneType],
     ["isCaptured", _isCaptured],
@@ -98,6 +98,4 @@ private _profile = createHashMapFromArray [
     ["threatState", _zoneThreatState],
     ["pressureScore", _zoneScore],
     ["responseProfile", _responseProfile]
-];
-
-_profile
+]

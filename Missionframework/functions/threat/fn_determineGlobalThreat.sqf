@@ -18,6 +18,14 @@ params [
     ["_capturedMilitary", 0, [0]]
 ];
 
+_worldTier = _worldTier max 0;
+_mapControl = (_mapControl max 0) min 100;
+_contestedZones = _contestedZones max 0;
+_underAttackZones = _underAttackZones max 0;
+_capturedCapitals = _capturedCapitals max 0;
+_capturedFactories = _capturedFactories max 0;
+_capturedMilitary = _capturedMilitary max 0;
+
 private _pressureScore = 0;
 _pressureScore = _pressureScore + (_worldTier * 15);
 _pressureScore = _pressureScore + (_mapControl * 0.45);
