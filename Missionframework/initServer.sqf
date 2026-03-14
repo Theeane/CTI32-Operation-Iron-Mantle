@@ -37,6 +37,10 @@ if (!isNil "MWF_fnc_zoneManager") then {
     [] call MWF_fnc_zoneManager;
 };
 
+if (!isNil "MWF_fnc_worldManager") then {
+    [] call MWF_fnc_worldManager;
+};
+
 if (!isNil "MWF_fnc_zoneHandler") then {
     [] spawn MWF_fnc_zoneHandler;
 };

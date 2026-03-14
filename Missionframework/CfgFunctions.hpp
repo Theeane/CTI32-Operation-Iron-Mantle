@@ -89,6 +89,16 @@ class CfgFunctions {
             class updateResourceUI {};
         };
 
+
+        class World {
+            file = "functions\world";
+            class determineProgressionState {};
+            class determineWorldTier {};
+            class getWorldSnapshot {};
+            class recalculateWorldState {};
+            class worldManager {};
+        };
+
         class Zones {
             file = "functions\zones";
             class abandonManager {};
