@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Registers mission functions that are currently used by the framework startup and core gameplay flow.
+    Registers mission functions used by the framework startup and core gameplay flow.
 */
 
 class CfgFunctions {

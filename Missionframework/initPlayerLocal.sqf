@@ -1,33 +1,43 @@
 /*
     Author: Theane / ChatGPT
-    Function: initPlayerLocal
+    File: initPlayerLocal.sqf
     Project: Military War Framework
 
     Description:
-    Initializes player-local UI and command-terminal interactions.
+    Initializes player-local UI and command terminal interactions after the player and mission runtime are ready.
 */
 
 if (!hasInterface) exitWith {};
 
 [] spawn {
-    waitUntil { !isNull player && { time > 0 } };
+    waitUntil {
+        !isNull player &&
+        { time > 0 } &&
+        { missionNamespace getVariable ["MWF_ServerInitialized", false] }
+    };
 
-    [] call MWF_fnc_initUI;
+    if (!isNil "MWF_fnc_initUI") then {
+        [] call MWF_fnc_initUI;
+    };
 
     private _terminals = [];
+
     {
-        if (!isNull _x) then {
-            _terminals pushBackUnique _x;
+        private _terminal = missionNamespace getVariable [_x, objNull];
+        if (!isNull _terminal) then {
+            _terminals pushBackUnique _terminal;
         };
     } forEach [
-        missionNamespace getVariable ["MWF_HQ_Terminal", objNull],
-        missionNamespace getVariable ["MWF_MOB_Terminal", objNull],
-        missionNamespace getVariable ["MWF_CommandTerminal", objNull]
+        "MWF_HQ_Terminal",
+        "MWF_MOB_Terminal",
+        "MWF_CommandTerminal"
     ];
 
     {
         [_x] call MWF_fnc_setupInteractions;
-    } forEach (_terminals select { !isNull _x });
+    } forEach _terminals;
+
+    [] spawn MWF_fnc_updateResourceUI;
 
     diag_log format ["[MWF] Client initialization complete for %1.", profileName];
 };
