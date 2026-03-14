@@ -1,10 +1,14 @@
-/* PRESET: Eastern European Civilians
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Eastern_European
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Eastern European.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "RDS_Assistant",                    // RDS Assistant
     "RDS_Doctor",                       // RDS Doctor
     "RDS_Policeman",                    // RDS Policeman
@@ -18,7 +22,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "RDS_Gaz24_Civ_03",                  // Gaz-24
     "RDS_Golf4_Civ_01",                  // Golf IV
     "RDS_S1203_Civ_01",                  // Skoda Van

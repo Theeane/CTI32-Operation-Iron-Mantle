@@ -1,10 +1,14 @@
-/* PRESET: Tanoa Civilians (Apex)
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Tanoa_Civ
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Tanoa Civ.
 */
 
 // --- Civilian Units (Pacific/Tanoan variants) ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "C_man_p_beggar_F_af_tanoan", 
     "C_man_1_F_af_tanoan",
     "C_man_2_F_af_tanoan", 
@@ -14,7 +18,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles (Tanoa appropriate) ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_Offroad_02_unarmed_F",           // MB 4WD (Apex)
     "C_Offroad_01_F", 
     "C_Hatchback_01_F",

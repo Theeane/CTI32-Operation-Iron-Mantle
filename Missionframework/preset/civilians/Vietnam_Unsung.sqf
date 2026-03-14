@@ -1,10 +1,14 @@
-/* PRESET: Vietnam Civilians (Unsung)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Vietnam_Unsung
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Vietnam Unsung.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "uns_civilian1",                    // Vietnamese Civilian 01
     "uns_civilian2",                    // Vietnamese Civilian 02
     "uns_civilian3",                    // Vietnamese Civilian 03
@@ -14,7 +18,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_Truck_02_transport_F",            // Zamak Transport
     "C_Truck_02_covered_F",              // Zamak (Covered)
     "C_Truck_02_fuel_F"                  // Fuel Truck

@@ -1,10 +1,14 @@
-/* PRESET: Arma 3 Vanilla Civilians
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Arma3_Civ
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Arma3 Civ.
 */
 
 // --- Civilian Units (Mix of casual and workers) ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "C_man_1", 
     "C_man_polo_1_F", 
     "C_man_polo_2_F", 
@@ -17,7 +21,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles (Standard cars and vans) ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_Offroad_01_F",                   // Offroad
     "C_Hatchback_01_F",                 // Hatchback
     "C_Hatchback_01_sport_F",           // Hatchback (Sport)

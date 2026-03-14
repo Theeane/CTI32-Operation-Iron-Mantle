@@ -1,10 +1,14 @@
-/* PRESET: Chernarus Civilians (CUP)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_ChernoCivs
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for CUP ChernoCivs.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "CUP_C_C_Assistant_01",             // Assistant
     "CUP_C_C_Citizen_01",               // Citizen 01
     "CUP_C_C_Citizen_04",               // Citizen 04
@@ -18,7 +22,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "CUP_C_Skoda_White_CIV",             // Skoda (White)
     "CUP_C_Datsun_Plain",                // Datsun
     "CUP_C_Golf4_white_Civ",             // Golf IV

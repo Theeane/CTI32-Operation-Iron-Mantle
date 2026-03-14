@@ -1,10 +1,14 @@
-/* PRESET: Global Mobilization Civilians
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Global_Mobilization
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Global Mobilization.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "gm_gc_civ_man_01_80_blk",          // East German Male (Black)
     "gm_gc_civ_man_02_80_brn",          // East German Male (Brown)
     "gm_ge_pol_officer_80_grn",         // West German Police
@@ -14,7 +18,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "gm_ge_civ_typ1200_wht",             // VW Beetle (White)
     "gm_ge_civ_u1300l",                  // Unimog
     "gm_ge_pol_typ1200_grn",             // Police Beetle

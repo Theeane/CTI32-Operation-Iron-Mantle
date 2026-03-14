@@ -1,10 +1,14 @@
-/* PRESET: RDS Civilians
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - RDSCiv
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for RDSCiv.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "RDS_Assistant",                    // Assistant
     "RDS_Doctor",                       // Doctor
     "RDS_Policeman",                    // Policeman
@@ -16,7 +20,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "RDS_Gaz24_Civ_03",                  // Gaz-24
     "RDS_Golf4_Civ_01",                  // Golf IV
     "RDS_S1203_Civ_01",                  // Skoda Van

@@ -1,10 +1,14 @@
-/* PRESET: Takistan Civilians (CUP)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_TakiCivs
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for CUP TakiCivs.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "CUP_C_TK_Man_04",                  // Takistani Male 04
     "CUP_C_TK_Man_04_Jack",             // Takistani Male 04 (Jacket)
     "CUP_C_TK_Man_04_Waist",            // Takistani Male 04 (Waist)
@@ -18,7 +22,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "CUP_C_TT650_TK_CIV",                // Motorcycle
     "CUP_C_S1203_CIV",                   // Skoda Van
     "CUP_C_Lada_TK_CIV",                 // Lada

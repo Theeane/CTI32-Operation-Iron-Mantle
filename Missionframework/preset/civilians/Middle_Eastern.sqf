@@ -1,10 +1,14 @@
-/* PRESET: Middle Eastern Civilians
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Middle_Eastern
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Middle Eastern.
 */
 
 // --- Civilian Units ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "CUP_C_TK_Man_04",                  // Takistani Male 04
     "CUP_C_TK_Man_04_Jack",             // Takistani Male 04 (Jacket)
     "CUP_C_TK_Man_07",                  // Takistani Male 07
@@ -19,7 +23,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_IDAP_Offroad_02_unarmed_F",       // MB 4WD (IDAP)
     "CUP_C_TT650_TK_CIV",                // Motorcycle
     "CUP_C_S1203_CIV",                   // Skoda Van

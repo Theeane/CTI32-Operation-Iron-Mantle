@@ -1,10 +1,14 @@
-/* PRESET: Contact Civilians (Livonia)
-    Author: Theane using Gemini
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Contact_Civ
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Contact Civ.
 */
 
 // --- Civilian Units (Livonian/Eastern European variants) ---
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "C_man_1_1_F_euro", 
     "C_man_1_2_F_euro", 
     "C_man_1_3_F_euro", 
@@ -15,7 +19,7 @@ GVAR_CIV_Units = [
 ];
 
 // --- Civilian Vehicles (Tougher vehicles for forest terrain) ---
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_Offroad_01_comms_F",              // Rural Comms Truck
     "C_Offroad_02_unarmed_F",            // MB 4WD
     "C_Tractor_01_F",                    // Tractor (Contact DLC)

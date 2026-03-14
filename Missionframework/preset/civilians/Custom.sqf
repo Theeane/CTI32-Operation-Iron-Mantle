@@ -1,13 +1,15 @@
-/* PRESET: Custom Civilian Template
-    Author: Theane using Gemini
-    Description: Use this file to create your own custom faction. 
-    Replace the classnames below with your desired units.
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Custom
+    Project: Military War Framework
+
+    Description:
+    Defines the civilians preset configuration for Custom.
 */
 
 // --- Civilian Units ---
 // Add classnames for people here (e.g., workers, doctors, casuals)
-GVAR_CIV_Units = [
+MWF_CIV_Units = [
     "C_man_1",                          // Default Civilian
     "C_man_polo_1_F",                   // Polo Shirt
     "C_man_polo_2_F",                   // Polo Shirt (Alternative)
@@ -22,7 +24,7 @@ GVAR_CIV_Units = [
 
 // --- Civilian Vehicles ---
 // Add classnames for cars, trucks, and vans here
-GVAR_CIV_Vehicles = [
+MWF_CIV_Vehicles = [
     "C_Offroad_01_F",                   // Offroad
     "C_Hatchback_01_F",                 // Hatchback
     "C_Hatchback_01_sport_F",           // Hatchback (Sport)
