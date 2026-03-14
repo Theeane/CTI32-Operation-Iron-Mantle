@@ -4,52 +4,68 @@
     Project: Military War Framework
 
     Description:
-    Handles build mode for the core framework layer.
+    Handles local build placement preview and commits the purchase through the shared economy system.
 */
 
-params ["_className", "_price"];
+params [
+    ["_className", "", [""]],
+    ["_price", 0, [0]]
+];
 
-// 1. Check if the player has enough supplies
-private _currentSupplies = missionNamespace getVariable ["MWF_res_supplies", 0];
-if (_currentSupplies < _price) exitWith { 
-    hint parseText "<t color='#ff0000'>Not enough Supplies!</t>"; 
+if (!hasInterface) exitWith {};
+if (_className isEqualTo "") exitWith {};
+
+private _currentSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+if (_currentSupplies < _price) exitWith {
+    hint parseText "<t color='#ff0000'>Not enough Supplies!</t>";
 };
 
-// 2. Create the "Ghost" object (local to the player)
-private _ghost = _className createVehicleLocal [0,0,0];
+private _ghost = _className createVehicleLocal [0, 0, 0];
 _ghost setAllowDamage false;
-_ghost setAlpha 0.6; // Make it semi-transparent
+_ghost enableSimulation false;
+_ghost setVectorUp surfaceNormal getPosATL player;
+_ghost setAlpha 0.6;
 
 private _confirmed = false;
-private _abort = false;
+private _aborted = false;
+private _rotation = getDir player;
 
 hint "Use [LMB] to Place, [RMB] to Cancel, [Q/E] to Rotate.";
 
-// 3. Placement Loop
-while {!_confirmed && !_abort && alive player} do {
-    private _pos = player modelToWorld [0, 5, 0]; // Place 5m in front of player
-    _ghost setPos _pos;
-    _ghost setDir (getDir player);
+while {!_confirmed && !_aborted && alive player} do {
+    private _pos = player modelToWorld [0, 5, 0];
+    _ghost setPosATL _pos;
+    _ghost setDir _rotation;
 
-    // Check for placement confirmation (Example using action keys)
-    if (inputAction "DefaultAction" > 0) then { _confirmed = true; }; // Left Click
-    if (inputAction "ReloadMagazine" > 0) then { _abort = true; };   // Right Click (Map to your preference)
-    
+    if (inputAction "TurnLeft" > 0) then {
+        _rotation = _rotation - 2;
+    };
+    if (inputAction "TurnRight" > 0) then {
+        _rotation = _rotation + 2;
+    };
+
+    if (inputAction "DefaultAction" > 0) then {
+        _confirmed = true;
+    };
+    if (inputAction "ReloadMagazine" > 0) then {
+        _aborted = true;
+    };
+
     uiSleep 0.01;
 };
 
-// 4. Finalize Placement
+private _finalPos = getPosATL _ghost;
+private _finalDir = getDir _ghost;
+
 deleteVehicle _ghost;
 
 if (_confirmed) then {
-    // Deduct cost
     [(_price * -1), "SUPPLIES"] call MWF_fnc_addResource;
-    
-    // Spawn the real object (Global)
-    private _finalPos = player modelToWorld [0, 5, 0];
-    private _realObject = _className createVehicle _finalPos;
-    
-    // Add the "Unpack FOB" action if it's the FOB Container
+
+    private _realObject = createVehicle [_className, _finalPos, [], 0, "CAN_COLLIDE"];
+    _realObject setDir _finalDir;
+    _realObject setPosATL _finalPos;
+
     if (_className == "B_Slingload_01_Cargo_F") then {
         [_realObject] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
     };
