@@ -1,13 +1,15 @@
 /*
-    Author: Theane using gemini
-    Function: Dynamic Unit & Zone Cleanup
-    Description: Monitors Unit Cap. Deletes furthest units and resets their 
-    parent zone's spawn status to allow future respawning.
+    Author: Theane / ChatGPT
+    Function: cleanup_system
+    Project: Military War Framework
+
+    Description:
+    Handles the cleanup system system.
 */
 
 if (!isServer) exitWith {};
 
-private _unitCap = missionNamespace getVariable ["CTI32_UnitCap", 140];
+private _unitCap = missionNamespace getVariable ["MWF_UnitCap", 140];
 
 diag_log format ["[CTI32 CLEANUP] Dynamic Monitor active. Cap: %1", _unitCap];
 
@@ -36,21 +38,21 @@ while {true} do {
             if (_deletedCount >= _amountToDelete) exitWith {};
 
             // RULE: Never delete units belonging to the Final Mission
-            private _isPersistent = _x getVariable ["CTI32_IsPersistent", false];
+            private _isPersistent = _x getVariable ["MWF_IsPersistent", false];
             
             if (!_isPersistent) then {
                 // Get the parent zone reference before deleting
-                private _parentZoneID = _x getVariable ["CTI32_ParentZoneID", -1];
-                private _zoneType = _x getVariable ["CTI32_ZoneType", ""]; // "RB" or "HQ"
+                private _parentZoneID = _x getVariable ["MWF_ParentZoneID", -1];
+                private _zoneType = _x getVariable ["MWF_ZoneType", ""]; // "RB" or "HQ"
 
                 // Reset the spawn flag in the global arrays so it can respawn later
                 if (_parentZoneID != -1) then {
                     switch (_zoneType) do {
                         case "RB": {
-                            { if (_x select 4 == _parentZoneID) exitWith { _x set [3, false]; }; } forEach CTI32_ActiveRoadblocks;
+                            { if (_x select 4 == _parentZoneID) exitWith { _x set [3, false]; }; } forEach MWF_ActiveRoadblocks;
                         };
                         case "HQ": {
-                            { if (_x select 4 == _parentZoneID) exitWith { _x set [3, false]; }; } forEach CTI32_ActiveHQ;
+                            { if (_x select 4 == _parentZoneID) exitWith { _x set [3, false]; }; } forEach MWF_ActiveHQ;
                         };
                     };
                 };
