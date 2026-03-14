@@ -1,10 +1,10 @@
 /*
-    Author: Theeane / Gemini (AGS Project)
-    Logic: Garrison Baseline Capture System with Economy Integration.
-    - RED: Initial enemy strength > 50%.
-    - YELLOW: Enemy strength dropped below 50% or Contested.
-    - BLUE: 100% Captured (Income Active).
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_zoneCapture
+    Project: Military War Framework
+
+    Description:
+    Handles zone capture for the core framework layer.
 */
 
 if (!isServer) exitWith {};
@@ -25,12 +25,12 @@ private _size = (getMarkerSize _marker) select 0;
     while {true} do {
         uiSleep 5;
 
-        private _isCaptured = _marker getVariable ["AGS_isCaptured", false];
+        private _isCaptured = _marker getVariable ["MWF_isCaptured", false];
         private _currentOpfor = allUnits select { 
             side _x == east && 
             _x distance _pos < _size && 
             alive _x && 
-            !(_x getVariable ["AGS_isQRF", false]) 
+            !(_x getVariable ["MWF_isQRF", false]) 
         };
         
         private _currentCount = count _currentOpfor;
@@ -49,48 +49,48 @@ private _size = (getMarkerSize _marker) select 0;
 
             // PHASE 2: YELLOW -> BLUE (Fully Liberated)
             if (_currentCount == 0) then {
-                _marker setVariable ["AGS_isCaptured", true, true];
-                _marker setVariable ["AGS_lastCapTime", serverTime, true]; 
+                _marker setVariable ["MWF_isCaptured", true, true];
+                _marker setVariable ["MWF_lastCapTime", serverTime, true]; 
                 _marker setMarkerColor "ColorBLUFOR";
                 
                 // --- NEW: ECONOMY INTEGRATION ---
                 // Give immediate reward for liberation
-                [100, "SUPPLIES"] call AGS_fnc_addResource; 
-                [5, "INTEL"] call AGS_fnc_addResource;
+                [100, "SUPPLIES"] call MWF_fnc_addResource; 
+                [5, "INTEL"] call MWF_fnc_addResource;
 
                 [format ["%1 has been liberated! +100 Supplies bonus received.", (markerText _marker)]] remoteExec ["systemChat", 0];
                 
-                if (!isNil "AGS_fnc_saveGame") then { [] call AGS_fnc_saveGame; };
+                if (!isNil "MWF_fnc_saveGame") then { [] call MWF_fnc_saveGame; };
             };
         };
 
         // --- COUNTER-ATTACK LOGIC (10 min grace, 20 min timer) ---
         if (_isCaptured) then {
-            private _lastCap = _marker getVariable ["AGS_lastCapTime", 0];
+            private _lastCap = _marker getVariable ["MWF_lastCapTime", 0];
             
             if (serverTime > (_lastCap + 600)) then {
                 private _totalOpfor = { side _x == east && _x distance _pos < _size && alive _x } count allUnits;
                 
                 if (_totalOpfor > _bluforPresent && _totalOpfor > 0) then {
                     // Start retake attempt
-                    if !(_marker getVariable ["AGS_underAttack", false]) then {
-                        _marker setVariable ["AGS_underAttack", true, true]; // THIS PAUSES PASSIVE INCOME
-                        _marker setVariable ["AGS_attackTimer", serverTime + 1200, true];
+                    if !(_marker getVariable ["MWF_underAttack", false]) then {
+                        _marker setVariable ["MWF_underAttack", true, true]; // THIS PAUSES PASSIVE INCOME
+                        _marker setVariable ["MWF_attackTimer", serverTime + 1200, true];
                         _marker setMarkerColor "ColorYellow";
                         [format ["RE-TAKE ATTEMPT: Supply lines to %1 are interrupted!", (markerText _marker)]] remoteExec ["systemChat", 0];
                     };
 
                     // Check if time ran out (Zone lost)
-                    if (serverTime > (_marker getVariable ["AGS_attackTimer", 0])) then {
-                        _marker setVariable ["AGS_isCaptured", false, true];
-                        _marker setVariable ["AGS_underAttack", false, true];
+                    if (serverTime > (_marker getVariable ["MWF_attackTimer", 0])) then {
+                        _marker setVariable ["MWF_isCaptured", false, true];
+                        _marker setVariable ["MWF_underAttack", false, true];
                         _marker setMarkerColor "ColorOPFOR";
-                        if (!isNil "AGS_fnc_saveGame") then { [] call AGS_fnc_saveGame; };
+                        if (!isNil "MWF_fnc_saveGame") then { [] call MWF_fnc_saveGame; };
                     };
                 } else {
                     // Attack repelled
-                    if (_marker getVariable ["AGS_underAttack", false] && _totalOpfor == 0) then {
-                        _marker setVariable ["AGS_underAttack", false, true]; // INCOME RESTORED
+                    if (_marker getVariable ["MWF_underAttack", false] && _totalOpfor == 0) then {
+                        _marker setVariable ["MWF_underAttack", false, true]; // INCOME RESTORED
                         _marker setMarkerColor "ColorBLUFOR";
                         [format ["Attack on %1 repelled. Supply lines restored.", (markerText _marker)]] remoteExec ["systemChat", 0];
                     };

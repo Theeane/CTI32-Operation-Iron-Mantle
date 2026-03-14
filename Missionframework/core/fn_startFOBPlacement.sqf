@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Handles the 3D Ghost Preview for a full FOB composition.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_startFOBPlacement
+    Project: Military War Framework
+
+    Description:
+    Handles start f o b placement for the core framework layer.
 */
 
 params ["_pos"];
@@ -63,10 +66,10 @@ if (_confirmed) then {
     private _finalCenter = screenToWorld [0.5, 0.5];
     
     // Spawn real objects on the server
-    [_finalCenter, _currentDir] remoteExec ["AGS_fnc_spawnFOBComposition", 2];
+    [_finalCenter, _currentDir] remoteExec ["MWF_fnc_spawnFOBComposition", 2];
     
     // Unlock Build Mode Globally
-    missionNamespace setVariable ["AGS_system_active", true, true];
+    missionNamespace setVariable ["MWF_system_active", true, true];
     
     hint "FOB Established!";
 } else {

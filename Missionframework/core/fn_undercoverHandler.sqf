@@ -1,32 +1,34 @@
 /*
-    Author: Theane using Gemini (AGS Project)
-    Description: Advanced Undercover Handler - Logic Core.
-    Reads data from: factions/fn_factionConfig.sqf
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_undercoverHandler
+    Project: Military War Framework
+
+    Description:
+    Handles undercover handler for the core framework layer.
 */
 
 if (!hasInterface) exitWith {};
 
 // --- WAIT FOR FACTION DATA ---
-waitUntil { !isNil "AGS_cfg_civUniforms" };
+waitUntil { !isNil "MWF_cfg_civUniforms" };
 
 // Initialize UI
-cutRsc ["AGS_Undercover_Eye", "PLAIN"];
+cutRsc ["MWF_Undercover_Eye", "PLAIN"];
 
 [] spawn {
-    private _ctrl = uiNamespace getVariable ["AGS_ctrl_eye", controlNull];
+    private _ctrl = uiNamespace getVariable ["MWF_ctrl_eye", controlNull];
     
     while {alive player} do {
         uiSleep 2;
-        if (isNull _ctrl) then { _ctrl = uiNamespace getVariable ["AGS_ctrl_eye", controlNull]; };
+        if (isNull _ctrl) then { _ctrl = uiNamespace getVariable ["MWF_ctrl_eye", controlNull]; };
 
         // Fetch latest faction data from missionNamespace
-        private _civUniforms   = missionNamespace getVariable "AGS_cfg_civUniforms";
-        private _enemyUniforms = missionNamespace getVariable "AGS_cfg_enemyUniforms";
-        private _enemyVests    = missionNamespace getVariable "AGS_cfg_enemyVests";
-        private _enemyHeadgear = missionNamespace getVariable "AGS_cfg_enemyHeadgear";
-        private _contraband    = missionNamespace getVariable "AGS_cfg_contrabandItems";
-        private _contrabandCat = missionNamespace getVariable "AGS_cfg_contrabandCategories";
+        private _civUniforms   = missionNamespace getVariable "MWF_cfg_civUniforms";
+        private _enemyUniforms = missionNamespace getVariable "MWF_cfg_enemyUniforms";
+        private _enemyVests    = missionNamespace getVariable "MWF_cfg_enemyVests";
+        private _enemyHeadgear = missionNamespace getVariable "MWF_cfg_enemyHeadgear";
+        private _contraband    = missionNamespace getVariable "MWF_cfg_contrabandItems";
+        private _contrabandCat = missionNamespace getVariable "MWF_cfg_contrabandCategories";
 
         private _isUndercover = true;
         private _isSuspicious = false;
@@ -66,8 +68,8 @@ cutRsc ["AGS_Undercover_Eye", "PLAIN"];
             private _suspFactor = if (_hasEnemyVest && _hasEnemyHelmet) then {1} else {4};
             private _staringUnits = allUnits select {side _x == east && _x distance player < 15};
             if (count _staringUnits > 0) then {
-                private _susp = player getVariable ["AGS_suspicionLevel", 0];
-                player setVariable ["AGS_suspicionLevel", _susp + _suspFactor];
+                private _susp = player getVariable ["MWF_suspicionLevel", 0];
+                player setVariable ["MWF_suspicionLevel", _susp + _suspFactor];
                 if (_susp > 15) then { _isUndercover = false; };
             };
         } 
@@ -81,7 +83,7 @@ cutRsc ["AGS_Undercover_Eye", "PLAIN"];
                     if (currentWeapon player != "" && {currentWeapon player != binocular}) then { _isUndercover = false; };
                     
                     private _pos = getPos player;
-                    private _zones = missionNamespace getVariable ["AGS_all_mission_zones", []] select {!(_x getVariable ["AGS_isCaptured", false])};
+                    private _zones = missionNamespace getVariable ["MWF_all_mission_zones", []] select {!(_x getVariable ["MWF_isCaptured", false])};
                     {
                         if (_pos distance _x < 150) exitWith {
                             _isSuspicious = true;
@@ -114,9 +116,9 @@ cutRsc ["AGS_Undercover_Eye", "PLAIN"];
             private _checkguards = allUnits select {side _x == east && _x distance player < 25};
             if (count _checkguards > 0) then {
                 if (speed player < 2) then {
-                    private _insTime = (player getVariable ["AGS_inspectTimer", 0]) + 1;
-                    player setVariable ["AGS_inspectTimer", _insTime];
-                    if (_insTime > 5) then { player setVariable ["AGS_suspicionLevel", -15]; player setVariable ["AGS_inspectTimer", 0]; };
+                    private _insTime = (player getVariable ["MWF_inspectTimer", 0]) + 1;
+                    player setVariable ["MWF_inspectTimer", _insTime];
+                    if (_insTime > 5) then { player setVariable ["MWF_suspicionLevel", -15]; player setVariable ["MWF_inspectTimer", 0]; };
                 };
             };
         };
@@ -128,7 +130,7 @@ cutRsc ["AGS_Undercover_Eye", "PLAIN"];
         } else {
             if (captive player) then { [player, false] remoteExec ["setCaptive", 0]; };
             _eyeIcon = "media\icons\eye_red.paa";
-            player setVariable ["AGS_suspicionLevel", 0];
+            player setVariable ["MWF_suspicionLevel", 0];
         };
 
         if (!isNull _ctrl) then { _ctrl ctrlSetText _eyeIcon; };
@@ -138,8 +140,8 @@ cutRsc ["AGS_Undercover_Eye", "PLAIN"];
 // --- EVENT HANDLERS ---
 player addEventHandler ["Fired", {
     params ["_unit"];
-    _unit setVariable ["AGS_firedRecently", true, true];
-    [_unit] spawn { uiSleep 45; (_this select 0) setVariable ["AGS_firedRecently", false, true]; };
+    _unit setVariable ["MWF_firedRecently", true, true];
+    [_unit] spawn { uiSleep 45; (_this select 0) setVariable ["MWF_firedRecently", false, true]; };
 }];
 
 player addEventHandler ["HandleDamage", {
@@ -149,7 +151,7 @@ player addEventHandler ["HandleDamage", {
         if (count _witnesses > 0) then {
             private _investigator = [_witnesses, _unit] call BIS_fnc_nearestPosition;
             _investigator doMove (getPos _unit);
-            player setVariable ["AGS_suspicionLevel", 10]; 
+            player setVariable ["MWF_suspicionLevel", 10]; 
         };
     };
     _damage

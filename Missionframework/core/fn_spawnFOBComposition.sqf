@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Spawns the physical FOB composition and initializes the FOB terminal.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_spawnFOBComposition
+    Project: Military War Framework
+
+    Description:
+    Handles spawn f o b composition for the core framework layer.
 */
 
 if (!isServer) exitWith {};
@@ -29,17 +32,17 @@ private _compositionData = [
     
     // CRITICAL: If this is the HQ building, initialize the FOB Terminal actions
     if (_type == "Land_Cargo_HQ_V1_F") then {
-        [_obj] remoteExec ["AGS_fnc_setupFOBInteractions", 0, true];
+        [_obj] remoteExec ["MWF_fnc_setupFOBInteractions", 0, true];
     };
     
 } forEach _compositionData;
 
 // Register the new FOB position globally
-private _fobs = missionNamespace getVariable ["AGS_active_fobs", []];
+private _fobs = missionNamespace getVariable ["MWF_active_fobs", []];
 _fobs pushBack _pos;
-missionNamespace setVariable ["AGS_active_fobs", _fobs, true];
+missionNamespace setVariable ["MWF_active_fobs", _fobs, true];
 
 // Progress to the next Mission Stage (Supply Run)
-[2] remoteExec ["AGS_fnc_generateInitialMission", 2];
+[2] remoteExec ["MWF_fnc_generateInitialMission", 2];
 
 ["STRATEGIC: FOB Established. Logistics network is now active."] remoteExec ["systemChat", 0];

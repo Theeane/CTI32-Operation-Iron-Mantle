@@ -1,8 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Ghost placement for vehicles and containers. 
-                 Follows the player until confirmed via action menu.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_startBuildPlacement
+    Project: Military War Framework
+
+    Description:
+    Handles start build placement for the core framework layer.
 */
 
 params ["_className", "_price"];
@@ -51,7 +53,7 @@ if (_confirmed) then {
     private _finalDir = getDir player + _rotation;
 
     // Call server to spawn the real vehicle and deduct supplies
-    [_className, _finalPos, _finalDir, _price] remoteExec ["AGS_fnc_finalizeBuild", 2];
+    [_className, _finalPos, _finalDir, _price] remoteExec ["MWF_fnc_finalizeBuild", 2];
     
     hint "Construction Complete.";
 } else {
