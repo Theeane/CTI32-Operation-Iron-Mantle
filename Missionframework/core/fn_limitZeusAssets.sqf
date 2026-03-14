@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Filters Zeus content to hide all unit factions and show only static objects.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_limitZeusAssets
+    Project: Military War Framework
+
+    Description:
+    Handles limit zeus assets for the core framework layer.
 */
 
 params ["_curator"];
