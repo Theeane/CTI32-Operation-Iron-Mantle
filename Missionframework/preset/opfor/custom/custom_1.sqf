@@ -1,58 +1,43 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - Custom 1 Safe Fallback
+    Function: Preset - Custom 1 (Safe Fallback)
     Project: Military War Framework
 
     Description:
-    Defines the OPFOR custom safe fallback preset (Custom 1).
-    Based on CSAT to guarantee a valid fallback for custom mode.
+    Defines the opfor preset configuration for OPFOR Custom 1 safe fallback.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
-    // --- INFANTRY Tiers ---
+    // --- INFANTRY Tiers (Replace with your mod classes) ---
     ["Infantry_T1", [
-        "O_Soldier_F",                      // Rifleman
-        "O_Soldier_LAT_F",                  // Rifleman (LAT)
-        "O_Medic_F"                         // Medic
+        "O_Soldier_F",                      // Entry Level Rifleman
+        "O_Medic_F"                         // Entry Level Medic
     ]],
     ["Infantry_T2", [
         "O_Soldier_GL_F",                   // Grenadier
-        "O_Soldier_AR_F",                   // Autorifleman
-        "O_Soldier_TL_F"                    // Team Leader
+        "O_Soldier_AR_F"                    // Light Machinegunner
     ]],
     ["Infantry_T3", [
         "O_Soldier_AT_F",                   // AT Specialist
-        "O_Soldier_MG_F",                   // Heavy Gunner
         "O_Soldier_SL_F"                    // Squad Leader
     ]],
     ["Infantry_T4", [
-        "O_marksman_F",                     // Marksman
-        "O_Soldier_AA_F",                   // AA Specialist
-        "O_engineer_F"                      // Engineer
+        "O_marksman_F",                     // Designated Marksman
+        "O_engineer_F"                      // Combat Engineer
     ]],
     ["Infantry_T5", [
-        "O_Sharpshooter_F",                 // Sharpshooter
-        "O_HeavyUnit_01_F",                 // Urban Entity (Heavy)
-        "O_Officer_F"                       // Officer
+        "O_Sharpshooter_F",                 // Sniper / Special Forces
+        "O_Officer_F"                       // High Ranking Officer
     ]],
 
-    // --- VEHICLE Tiers ---
-    ["Vehicles_T1", [
-        "O_Truck_02_transport_F",           // Zamak Transport
-        "O_LSV_02_unarmed_F"                // Qilin (Unarmed)
-    ]],
-    ["Vehicles_T2", [
-        "O_LSV_02_armed_F",                 // Qilin (Minigun)
-        "O_MRAP_02_hmg_F"                   // Ifrit (HMG)
-    ]],
-    ["Vehicles_T3", [
-        "O_APC_Wheeled_02_rcws_v2_F",        // Marid
-        "O_APC_Tracked_02_cannon_F"         // BTR-K Kamysh
-    ]],
-    ["Vehicles_T4", [
-        "O_MBT_02_cannon_F",                // T-100 Varsuk
-        "O_APC_Tracked_02_AA_F"             // Tigris (AA)
-    ]],
-    ["Vehicles_T5", [
-        "O_MBT_04_cannon_F",                // T-140 Angara
-        "O_Heli_Attack_02_dynamicLoadout_F
+    // --- VEHICLE Tiers (Replace with your mod classes) ---
+    ["Vehicles_T1", ["O_Truck_02_transport_F"]],      // Light Transport
+    ["Vehicles_T2", ["O_MRAP_02_hmg_F"]],             // Armed Recon
+    ["Vehicles_T3", ["O_APC_Wheeled_02_rcws_v2_F"]],  // Infantry Fighting Vehicle
+    ["Vehicles_T4", ["O_MBT_02_cannon_F"]],           // Main Battle Tank
+    ["Vehicles_T5", ["O_Heli_Attack_02_dynamicLoadout_F"]], // Heavy Air Support
+
+    // --- Core Units ---
+    ["Leader", "O_Officer_F"],
+    ["Pilot", "O_helipilot_F"]
+];

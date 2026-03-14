@@ -1,11 +1,10 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - Custom 1 Safe Fallback
+    Function: Preset - Custom 1 (Safe Fallback)
     Project: Military War Framework
 
     Description:
-    Defines the Resistance custom safe fallback preset (Custom 1).
-    Based on AAF to guarantee a valid fallback for custom mode.
+    Defines the resistance preset configuration for Resistance Custom 1 safe fallback.
 */
 
 MWF_RES_Preset = createHashMapFromArray [

@@ -1,11 +1,10 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - Custom 1 Safe Fallback
+    Function: Preset - Custom 1 (Safe Fallback)
     Project: Military War Framework
 
     Description:
-    Defines the BLUFOR custom safe fallback preset (Custom 1).
-    Based on NATO to guarantee a valid fallback for custom mode.
+    Defines the blufor preset configuration for BLUFOR Custom 1 safe fallback.
 */
 
 // --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---

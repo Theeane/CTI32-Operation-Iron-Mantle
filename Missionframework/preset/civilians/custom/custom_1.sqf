@@ -1,11 +1,10 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - Custom 1 Safe Fallback
+    Function: Preset - Custom 1 (Safe Fallback)
     Project: Military War Framework
 
     Description:
-    Defines the Civilian custom safe fallback preset (Custom 1).
-    Based on Arma 3 Civilians to guarantee a valid fallback for custom mode.
+    Defines the civilians preset configuration for Civilian Custom 1 safe fallback.
 */
 
 // --- Civilian Units (Mix of casual and workers) ---
