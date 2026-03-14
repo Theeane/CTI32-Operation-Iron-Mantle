@@ -1,59 +1,115 @@
 /*
-    Author: Theeane / Gemini
-    Description: Function definitions for the AGS Mission Framework.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: CfgFunctions Registration
+    Project: Military War Framework
+
+    Description:
+    Registers mission functions that are currently used by the framework startup and core gameplay flow.
 */
 
 class CfgFunctions {
-    class AGS {
-        tag = "AGS";
+    class MWF {
+        tag = "MWF";
 
         class Core {
-            file = "Missionframework\core";
+            file = "core";
+            class buildMode {};
+            class economy {};
+            class finalizeBuild {};
             class initGlobals {};
             class initSystems {};
-            class initZones {};          // NY: Startar upp zonerna vid mission start
-            class economy {};            // UPPDATERAD: Hanterar inkomst & synk med butik
-            class scanZones {};
-            class zoneCapture {};        // UPPDATERAD: Ger bonus vid capture
-            class zoneManager {};
-            class persistence {};
-            class undercoverHandler {};
-            class setupInteractions {};
+            class initZones {};
             class limitZeusAssets {};
+            class openBaseArchitect {};
+            class openBuildZeus {};
+            class scanZones {};
+            class setupFOBAction {};
+            class setupFOBInteractions {};
+            class setupInteractions {};
+            class spawnFOBComposition {};
+            class startBuildPlacement {};
+            class startFOBPlacement {};
+            class undercoverHandler {};
+            class zoneCapture {};
+            class zoneManager {};
         };
 
-        // --- BASE, BUILDING & LOGISTICS ---
         class Base {
-            file = "Missionframework\functions\base";
-            class initFOB {};
-            class packFOB {};
-            class executeRepack {};
+            file = "functions\base";
+            class baseManager {};
             class commanderToggleRepack {};
-            class initCommandPC {};      // UPPDATERAD: Inkluderar nu Buy Menu & Strategic Maps
-            class updateBuyCategory {};  // NY: Logik för att fylla listan i butiken
-            class initiatePurchase {};   // NY: Köp-knappen med Spawn Pad-logik
-            class setupFOBAction {};
-            class spawnFOBComposition {};
-            class startFOBPlacement {};
-            class startBuildPlacement {};
-            class finalizeBuild {};
-            class openBaseArchitect {};
-            class buildMode {};
+            class depositIntel {};
+            class executeRepack {};
+            class initCommandPC {};
+            class initFOB {};
+            class initMobileRespawn {};
+            class initiatePurchase {};
+            class openBuyMenu {};
+            class packFOB {};
+            class updateBuyCategory {};
+            class upgradeBaseTier {};
+        };
+
+        class Economy {
+            file = "functions\economy";
+            class buyIntel {};
+            class civilianIntel {};
+            class economyManager {};
+            class initActions {};
+            class searchBody {};
+            class undercoverTalk {};
+        };
+
+        class Infrastructure {
+            file = "functions\infrastructure";
+            class fobManager {};
+            class infrastructureManager {};
+            class intelManager {};
+            class spawnManager {};
+        };
+
+        class Interactions {
+            file = "functions\interactions";
+            class initInformant {};
+            class initInteractions {};
+            class signalPlayer {};
+        };
+
+        class Persistence {
+            file = "functions\persistence";
+            class initPersistence {};
+            class loadGame {};
+            class saveGame {};
+            class wipeSave {};
+        };
+
+        class Rebel {
+            file = "functions\rebel";
+            class rebelManager {};
+        };
+
+        class Reputation {
+            file = "functions\reputation";
+            class cityMonitor {};
+            class civRep {};
         };
 
         class UI {
-            file = "Missionframework\ui";
+            file = "ui";
             class initUI {};
-            class updateResourceUI {};   // NY: Loopen som uppdaterar din HUD/Resource Bar
-            class openBuildMenu {};
-            class openBuyMenu {};        // NY: Öppnar din nya gråa butiks-meny
-            class openCommandMap {};
-            class openOpsMap {};         // NY: För din strategiska karta
+            class updateResourceUI {};
+        };
+
+        class Zones {
+            file = "functions\zones";
+            class abandonManager {};
+            class despawnZoneAssets {};
+            class spawnZoneAssets {};
+            class zoneHandler {};
         };
 
         class Missions {
-            file = "Missionframework\missions";
+            file = "missions";
             class generateInitialMission {};
         };
     };
