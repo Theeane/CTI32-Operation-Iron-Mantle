@@ -88,7 +88,14 @@ class CfgFunctions {
             class initUI {};
             class updateResourceUI {};
         };
-
+        class Threat {
+            file = "functions\threat";
+            class determineGlobalThreat {};
+            class determineZoneThreat {};
+            class getThreatSnapshot {};
+            class recalculateThreatState {};
+            class threatManager {};
+        };
 
         class World {
             file = "functions\world";
