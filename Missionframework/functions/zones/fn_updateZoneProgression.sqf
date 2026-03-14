@@ -42,3 +42,7 @@ missionNamespace setVariable ["MWF_CapturedCapitalCount", _capturedCapitals, tru
 missionNamespace setVariable ["MWF_CapturedFactoryCount", _capturedFactories, true];
 missionNamespace setVariable ["MWF_CapturedMilitaryCount", _capturedMilitary, true];
 missionNamespace setVariable ["MWF_MapControlPercent", _mapControl, true];
+
+if (!isNil "MWF_fnc_recalculateWorldState") then {
+    [] call MWF_fnc_recalculateWorldState;
+};
