@@ -1,54 +1,45 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_setupFOBInteractions
+    Function: fn_setupFOBAction
     Project: Military War Framework
 
     Description:
-    Handles setup f o b interactions for the core framework layer.
+    Adds the FOB deployment hold action to the FOB container and routes deployment into the current placement flow.
 */
 
-params ["_terminal"];
+params [["_container", objNull, [objNull]]];
 
-// 1. Open Base Architect (Zeus Mode - Free building for decor/walls)
-_terminal addAction [
-    "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect</t>", 
+if (isNull _container) exitWith {};
+if (_container getVariable ["MWF_FOB_DeployActionAdded", false]) exitWith {};
+
+[
+    _container,
+    "Initiate FOB Deployment",
+    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
+    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
+    "_this distance _target < 5 && speed _target < 1",
+    "_caller distance _target < 5",
     {
-        [] spawn MWF_fnc_openBaseArchitect;
+        systemChat "Calibrating deployment site...";
+    },
+    {},
+    {
+        params ["_target", "_caller"];
+
+        private _pos = getPosATL _target;
+        deleteVehicle _target;
+
+        [_pos] remoteExec ["MWF_fnc_startFOBPlacement", _caller];
+        systemChat "Deployment Interface Active. Place the FOB composition.";
+    },
+    {
+        systemChat "Deployment cancelled.";
     },
     [],
-    10, 
-    true, 
-    true, 
-    "", 
-    "_this distance _target < 3"
-];
+    10,
+    0,
+    true,
+    false
+] call BIS_fnc_holdActionAdd;
 
-// 2. Open Logistics Menu (Ghost Mode - Vehicles/Crates that cost Supplies)
-_terminal addAction [
-    "<t color='#00ff00' size='1.2'>[ FOB ] Open Logistics Menu</t>", 
-    {
-        // Placeholder for the Menu UI we are building
-        [] spawn MWF_fnc_openBuildMenu; 
-    },
-    [],
-    9, 
-    true, 
-    true, 
-    "", 
-    "_this distance _target < 3"
-];
-
-// 3. Status Check (Optional)
-_terminal addAction [
-    "<t color='#ffffff'>Check Resource Levels</t>", 
-    {
-        private _supplies = missionNamespace getVariable ["MWF_res_supplies", 0];
-        hint format ["Current FOB Logistics:\nSupplies: %1", _supplies];
-    },
-    [],
-    1, 
-    false, 
-    true, 
-    "", 
-    "_this distance _target < 3"
-];
+_container setVariable ["MWF_FOB_DeployActionAdded", true, true];
