@@ -4,8 +4,12 @@
     Project: Military War Framework
 
     Description:
-    Returns a stable snapshot array of strategic world-state values for future systems.
+    Returns a stable snapshot of strategic world-state values for future systems.
+    Complex structures are rebuilt locally to avoid unsafe network serialization.
 */
+
+private _milestonesArray = + (missionNamespace getVariable ["MWF_ProgressionMilestonesArray", []]);
+private _milestones = createHashMapFromArray _milestonesArray;
 
 private _snapshot = createHashMapFromArray [
     ["zoneCountTotal", missionNamespace getVariable ["MWF_WorldZoneCountTotal", 0]],
@@ -20,7 +24,7 @@ private _snapshot = createHashMapFromArray [
     ["progressionState", missionNamespace getVariable ["MWF_ProgressionState", "opening"]],
     ["contestedZoneCount", missionNamespace getVariable ["MWF_ContestedZoneCount", 0]],
     ["underAttackZoneCount", missionNamespace getVariable ["MWF_UnderAttackZoneCount", 0]],
-    ["milestones", + (missionNamespace getVariable ["MWF_ProgressionMilestones", createHashMap])]
+    ["milestones", _milestones]
 ];
 
 _snapshot

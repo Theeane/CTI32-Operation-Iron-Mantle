@@ -6,9 +6,19 @@
     Description:
     Aggregates authoritative zone data into future-safe world progression values.
     Designed as the layer above zones for threat, missions, and economy hooks.
+
+    Notes:
+    - Uses a lightweight mutex to avoid overlapping recalculations.
+    - Public variables are limited to simple Arma-safe values.
+    - Complex snapshots stay server-local and are rebuilt on demand.
 */
 
 if (!isServer) exitWith {createHashMap};
+if (missionNamespace getVariable ["MWF_WorldRecalcRunning", false]) exitWith {
+    missionNamespace getVariable ["MWF_WorldSnapshot", createHashMap]
+};
+
+missionNamespace setVariable ["MWF_WorldRecalcRunning", true, false];
 
 private _zones = missionNamespace getVariable ["MWF_all_mission_zones", []];
 private _validZones = _zones select { !isNull _x };
@@ -25,6 +35,7 @@ private _underAttackZones = 0;
 {
     private _zone = _x;
     private _zoneType = toLower (_zone getVariable ["MWF_zoneType", "town"]);
+    private _zoneId = toLower (_zone getVariable ["MWF_zoneID", ""]);
 
     if (_zone getVariable ["MWF_contested", false]) then {
         _contestedZones = _contestedZones + 1;
@@ -36,7 +47,10 @@ private _underAttackZones = 0;
 
     if (_zone getVariable ["MWF_isCaptured", false]) then {
         _capturedZones pushBack _zone;
-        _capturedZoneIds pushBackUnique (toLower (_zone getVariable ["MWF_zoneID", ""]));
+
+        if (_zoneId != "") then {
+            _capturedZoneIds pushBackUnique _zoneId;
+        };
 
         switch (_zoneType) do {
             case "capital": { _capturedCapitals = _capturedCapitals + 1; };
@@ -67,7 +81,7 @@ private _progressionState = [
     _underAttackZones
 ] call MWF_fnc_determineProgressionState;
 
-private _milestones = createHashMapFromArray [
+private _milestonesArray = [
     ["hasFoothold", _capturedCount >= 1],
     ["hasSupplyNetwork", _capturedTowns >= 3 || _capturedFactories >= 1],
     ["hasStrategicIndustry", _capturedFactories >= 1],
@@ -76,10 +90,18 @@ private _milestones = createHashMapFromArray [
     ["mapHalfControlled", _mapControl >= 50],
     ["campaignNearVictory", _mapControl >= 80 || _capturedCapitals >= 1]
 ];
+private _milestones = createHashMapFromArray _milestonesArray;
 
 private _previousTier = missionNamespace getVariable ["MWF_WorldTier", -1];
 private _previousState = missionNamespace getVariable ["MWF_ProgressionState", ""];
 private _previousMapControl = missionNamespace getVariable ["MWF_MapControlPercent", -1];
+private _previousCapturedIds = missionNamespace getVariable ["MWF_CapturedZoneIDs", []];
+private _stateChanged = (
+    _previousTier != _worldTier ||
+    _previousState != _progressionState ||
+    {abs (_previousMapControl - _mapControl) >= 0.01} ||
+    {!(_previousCapturedIds isEqualTo _capturedZoneIds)}
+);
 
 missionNamespace setVariable ["MWF_captured_zones_list", _capturedZones, true];
 missionNamespace setVariable ["MWF_CapturedZoneIDs", _capturedZoneIds, true];
@@ -94,17 +116,22 @@ missionNamespace setVariable ["MWF_ContestedZoneCount", _contestedZones, true];
 missionNamespace setVariable ["MWF_UnderAttackZoneCount", _underAttackZones, true];
 missionNamespace setVariable ["MWF_WorldTier", _worldTier, true];
 missionNamespace setVariable ["MWF_ProgressionState", _progressionState, true];
-missionNamespace setVariable ["MWF_ProgressionMilestones", _milestones, true];
-missionNamespace setVariable ["MWF_WorldStateVersion", 1, true];
+missionNamespace setVariable ["MWF_ProgressionMilestonesArray", _milestonesArray, true];
 
-private _snapshot = [] call MWF_fnc_getWorldSnapshot;
-missionNamespace setVariable ["MWF_WorldSnapshot", _snapshot, true];
+missionNamespace setVariable ["MWF_ProgressionMilestones", _milestones, false];
+missionNamespace setVariable ["MWF_WorldLastRecalcAt", diag_tickTime, false];
+missionNamespace setVariable ["MWF_WorldStateDirty", false, false];
 
-if (!isNil "MWF_fnc_recalculateThreatState") then {
-    [] call MWF_fnc_recalculateThreatState;
+if (_stateChanged) then {
+    private _version = (missionNamespace getVariable ["MWF_WorldStateVersion", 0]) + 1;
+    missionNamespace setVariable ["MWF_WorldStateVersion", _version, true];
 };
 
-if (_previousTier != _worldTier || _previousState != _progressionState || {abs (_previousMapControl - _mapControl) >= 0.01}) then {
+private _snapshot = [] call MWF_fnc_getWorldSnapshot;
+missionNamespace setVariable ["MWF_WorldSnapshot", _snapshot, false];
+missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
+
+if (_stateChanged) then {
     diag_log format [
         "[MWF World] Recalculated | Zones: %1/%2 | Control: %3%% | Tier: %4 | State: %5",
         _capturedCount,
@@ -115,4 +142,5 @@ if (_previousTier != _worldTier || _previousState != _progressionState || {abs (
     ];
 };
 
+missionNamespace setVariable ["MWF_WorldRecalcRunning", false, false];
 _snapshot

@@ -7,8 +7,6 @@
     Converts strategic control metrics into a readable campaign phase label.
 */
 
-if (!isServer) exitWith {"opening"};
-
 params [
     ["_mapControl", 0, [0]],
     ["_capturedCount", 0, [0]],
@@ -16,6 +14,12 @@ params [
     ["_contestedCount", 0, [0]],
     ["_underAttackCount", 0, [0]]
 ];
+
+_mapControl = (_mapControl max 0) min 100;
+_capturedCount = _capturedCount max 0;
+_capitalCount = _capitalCount max 0;
+_contestedCount = _contestedCount max 0;
+_underAttackCount = _underAttackCount max 0;
 
 private _state = "opening";
 

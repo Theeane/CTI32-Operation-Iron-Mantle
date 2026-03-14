@@ -5,11 +5,9 @@
 
     Description:
     Converts strategic world-control metrics into a stable campaign world tier.
-    This tier is separate from base purchase tier and is intended for world, threat,
-    and mission systems.
+    This tier is separate from base purchase tier and is intended for world,
+    threat, and mission systems.
 */
-
-if (!isServer) exitWith {1};
 
 params [
     ["_mapControl", 0, [0]],
@@ -18,6 +16,12 @@ params [
     ["_factoryCount", 0, [0]],
     ["_militaryCount", 0, [0]]
 ];
+
+_mapControl = (_mapControl max 0) min 100;
+_capturedCount = _capturedCount max 0;
+_capitalCount = _capitalCount max 0;
+_factoryCount = _factoryCount max 0;
+_militaryCount = _militaryCount max 0;
 
 private _tier = 1;
 
