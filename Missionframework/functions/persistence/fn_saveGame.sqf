@@ -21,6 +21,7 @@ private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missio
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
@@ -47,7 +48,7 @@ profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVari
 profileNamespace setVariable ["MWF_Save_SupplyTimer", missionNamespace getVariable ["MWF_Locked_SupplyTimer", 10]];
 profileNamespace setVariable ["MWF_Save_CivReputation", missionNamespace getVariable ["MWF_Locked_CivReputation", 0]];
 profileNamespace setVariable ["MWF_Save_NotorietyMultiplier", missionNamespace getVariable ["MWF_Locked_NotorietyMultiplier", 1]];
-profileNamespace setVariable ["MWF_Save_BuildingMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
+profileNamespace setVariable ["MWF_Save_BuildingMode", _buildingMode];
 profileNamespace setVariable ["MWF_Save_IncomeMultiplier", missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", 1]];
 profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable ["MWF_Locked_MaxFOBs", 5]];
 

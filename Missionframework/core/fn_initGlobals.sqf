@@ -40,6 +40,11 @@ private _incomeMultiplier = missionNamespace getVariable [
     ["MWF_Param_IncomeMultiplier", 1] call BIS_fnc_getParamValue
 ];
 
+private _buildingMode = missionNamespace getVariable [
+    "MWF_Locked_BuildingDamageMode",
+    missionNamespace getVariable ["MWF_LockedBuildingMode", ["MWF_Param_BuildingDamageMode", 0] call BIS_fnc_getParamValue]
+];
+
 if (isNil { missionNamespace getVariable "MWF_Economy_Supplies" }) then {
     missionNamespace setVariable ["MWF_Economy_Supplies", _startSupplies, true];
 };
@@ -79,5 +84,7 @@ missionNamespace setVariable ["MWF_Economy_SupplyInterval", _supplyTimer, true];
 missionNamespace setVariable ["MWF_Economy_HeatMult", _heatMult, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _maxFOBs, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
+missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
+missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
 
 diag_log "[MWF] Global state initialized.";

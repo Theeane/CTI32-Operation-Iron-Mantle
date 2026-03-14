@@ -16,6 +16,7 @@ missionNamespace setVariable ["MWF_HasCampaignSave", _hasCampaignSave, true];
 
 private _getPersistentValue = {
     params ["_saveKey", "_paramName", "_defaultValue", "_missionVar"];
+
     private _value = if (_hasCampaignSave) then {
         profileNamespace getVariable [_saveKey, _defaultValue]
     } else {
@@ -32,15 +33,18 @@ private _lockedStartSupplies = ["MWF_Save_StartSupplies", "MWF_Param_StartSuppli
 private _lockedSupplyTimer = ["MWF_Save_SupplyTimer", "MWF_Param_SupplyTimer", 10, "MWF_Locked_SupplyTimer"] call _getPersistentValue;
 private _lockedCivRep = ["MWF_Save_CivReputation", "MWF_Param_CivReputation", 0, "MWF_Locked_CivReputation"] call _getPersistentValue;
 private _lockedNotorietyMult = ["MWF_Save_NotorietyMultiplier", "MWF_Param_NotorietyMultiplier", 1, "MWF_Locked_NotorietyMultiplier"] call _getPersistentValue;
-private _lockedBuildingMode = ["MWF_Save_BuildingMode", "MWF_Param_BuildingDamageMode", 0, "MWF_LockedBuildingMode"] call _getPersistentValue;
+private _lockedBuildingMode = ["MWF_Save_BuildingMode", "MWF_Param_BuildingDamageMode", 0, "MWF_Locked_BuildingDamageMode"] call _getPersistentValue;
 private _lockedIncomeMultiplier = ["MWF_Save_IncomeMultiplier", "MWF_Param_IncomeMultiplier", 1, "MWF_Locked_IncomeMultiplier"] call _getPersistentValue;
 private _lockedMaxFOBs = ["MWF_Save_MaxFOBs", "MWF_Param_MaxFOBs", 5, "MWF_Locked_MaxFOBs"] call _getPersistentValue;
 
+/* Backward-compatible alias used by existing systems */
+missionNamespace setVariable ["MWF_LockedBuildingMode", _lockedBuildingMode, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _lockedMaxFOBs, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _lockedIncomeMultiplier, true];
 
 private _loadFactionLock = {
     params ["_prefix", "_sourceParam", "_defaultParam", "_customParam", "_defaultChoice"];
+
     private _source = if (_hasCampaignSave) then {
         profileNamespace getVariable [format ["MWF_Save_%1Source", _prefix], -1]
     } else {

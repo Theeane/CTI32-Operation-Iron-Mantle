@@ -6,8 +6,8 @@
     Description:
     Resolves default vs custom faction presets for BLUFOR, OPFOR, RESISTANCE and CIVILIANS.
     This function owns the faction fallback logic, loads the resolved preset files, stores a
-    campaign-safe preset registry in missionNamespace, and immediately persists locked faction
-    choices so they survive server restarts.
+    campaign-safe preset registry in missionNamespace, and persists locked faction choices so they
+    survive server restarts.
 
     Rules:
     - Default presets remain the current project defaults.
@@ -22,6 +22,7 @@ private _factionMap = createHashMap;
 
 private _persistKeys = {
     params ["_prefix"];
+
     profileNamespace setVariable [format ["MWF_Save_%1Source", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Source", _prefix], 0]];
     profileNamespace setVariable [format ["MWF_Save_%1Choice", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Choice", _prefix], 0]];
     profileNamespace setVariable [format ["MWF_Save_%1ResolvedChoice", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1ResolvedChoice", _prefix], 0]];
@@ -289,7 +290,6 @@ _factionMap set ["CIVILIANS", [
 ] call _resolveSide];
 
 missionNamespace setVariable ["MWF_FactionPresets", _factionMap, true];
-profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
 diag_log "[MWF] Preset manager initialized.";
