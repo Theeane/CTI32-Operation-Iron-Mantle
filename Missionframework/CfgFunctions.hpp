@@ -27,6 +27,7 @@ class CfgFunctions {
             file = "functions\base";
             class baseManager {};
             class commanderToggleRepack {};
+            class deployFOB {};
             class depositIntel {};
             class executeRepack {};
             class initCommandPC {};
@@ -35,6 +36,11 @@ class CfgFunctions {
             class initiatePurchase {};
             class openBuyMenu {};
             class packFOB {};
+            class refreshFOBMarkers {};
+            class registerFOB {};
+            class repackFOB {};
+            class restoreFOBs {};
+            class unregisterFOB {};
             class updateBuyCategory {};
             class upgradeBaseTier {};
         };
@@ -43,7 +49,6 @@ class CfgFunctions {
             file = "functions\economy";
             class buyIntel {};
             class civilianIntel {};
-            class economyManager {};
             class initActions {};
             class searchBody {};
             class undercoverTalk {};
@@ -51,7 +56,6 @@ class CfgFunctions {
 
         class Infrastructure {
             file = "functions\infrastructure";
-            class fobManager {};
             class infrastructureManager {};
             class intelManager {};
             class spawnManager {};
