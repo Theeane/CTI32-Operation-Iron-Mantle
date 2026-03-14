@@ -1,25 +1,19 @@
 /*
-    Author: Theane using gemini
-    Function: Blufor Preset - Western Sahara (DLC)
-    Description: Master Template for CTI32 Operation Iron Mantle.
-    Note: Digital economy active. No Workshop links needed (Vanilla/DLC assets).
+    Author: Theane / ChatGPT
+    Function: Preset - ws_blufor_desert
+    Project: Military War Framework
 
-    Required DLC: 
-    - Western Sahara (Creator DLC)
-
-    Rules: 
-    1. All names are fetched dynamically via displayName.
-    2. Mandatory Mobile Respawn Truck first in Light Vehicles for 100 S.
-    3. English comments and logs only.
+    Description:
+    Defines the blufor preset configuration for ws blufor desert.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
-CTI32_FOB_Truck = "B_D_Truck_01_Repair_F";                         // HEMTT Repair (Desert)
-CTI32_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
-CTI32_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
-CTI32_Respawn_Truck = "B_D_Truck_01_ammo_F";                       // Mobile Respawn vehicle (Fixed 100 S)
-CTI32_Crewman = "B_D_crew_F";                                      // Default crew for armored vehicles
-CTI32_Pilot = "B_D_Helipilot_F";                                   // Default pilot for helis and jets
+MWF_FOB_Truck = "B_D_Truck_01_Repair_F";                         // HEMTT Repair (Desert)
+MWF_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
+MWF_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
+MWF_Respawn_Truck = "B_D_Truck_01_ammo_F";                       // Mobile Respawn vehicle (Fixed 100 S)
+MWF_Crewman = "B_D_crew_F";                                      // Default crew for armored vehicles
+MWF_Pilot = "B_D_Helipilot_F";                                   // Default pilot for helis and jets
 
 // --- 2. LOGISTICS & ECONOMY ---
 // Supply and Intel are digital currencies. 
@@ -27,7 +21,7 @@ CTI32_Pilot = "B_D_Helipilot_F";                                   // Default pi
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
 // Button 1: Recon Team (Zubr Patrol)
-CTI32_Support_Group1 = [
+MWF_Support_Group1 = [
     // Vehicle used
     "B_D_LSV_01_armed_F",               // Prowler HMG (Desert)
     [
@@ -40,7 +34,7 @@ CTI32_Support_Group1 = [
 ];
 
 // Button 2: Infantry Section
-CTI32_Support_Group2 = [
+MWF_Support_Group2 = [
     // Vehicle used
     "B_D_Truck_01_transport_F",         // HEMTT Transport
     [
@@ -55,7 +49,7 @@ CTI32_Support_Group2 = [
 ];
 
 // Button 3: Anti-Tank Squad
-CTI32_Support_Group3 = [
+MWF_Support_Group3 = [
     // Vehicle used
     "B_D_LSV_01_AT_F",                  // Prowler AT
     [
@@ -69,7 +63,7 @@ CTI32_Support_Group3 = [
 ];
 
 // Button 4: Armored Support
-CTI32_Support_Group4 = [
+MWF_Support_Group4 = [
     // Vehicle used
     "B_D_APC_Wheeled_01_cannon_v2_F",   // Marshall APC (Desert)
     [
@@ -83,7 +77,7 @@ CTI32_Support_Group4 = [
 ];
 
 // Button 5: Air Assault
-CTI32_Support_Group5 = [
+MWF_Support_Group5 = [
     // Vehicle used
     "B_Heli_Transport_01_F",            // Ghost Hawk
     [
@@ -98,70 +92,70 @@ CTI32_Support_Group5 = [
 
 // --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
 
-CTI32_Preset_Light = [
-    [CTI32_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
+MWF_Preset_Light = [
+    [MWF_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
     ["B_D_LSV_01_unarmed_F", 20],                                  // Prowler Unarmed
     ["B_D_LSV_01_armed_F", 45],                                    // Prowler HMG
     ["B_D_LSV_01_AT_F", 60],                                       // Prowler AT
     ["B_D_Truck_01_covered_F", 50]                                 // HEMTT Covered
 ];
 
-CTI32_Preset_APC = [
+MWF_Preset_APC = [
     ["B_D_APC_Wheeled_01_cannon_v2_F", 180],                       // Marshall
     ["B_D_APC_Tracked_01_rcws_F", 200]                             // Panther
 ];
 
-CTI32_Preset_Tanks = [
+MWF_Preset_Tanks = [
     ["B_D_MBT_01_cannon_F", 450]                                   // Slammer
 ];
 
-CTI32_Preset_Helis = [
+MWF_Preset_Helis = [
     ["B_Heli_Light_01_F", 150],                                    // Hummingbird
     ["B_Heli_Transport_01_F", 250]                                 // Ghost Hawk
 ];
 
-CTI32_Preset_Jets = [
+MWF_Preset_Jets = [
     ["B_Plane_CAS_01_dynamicLoadout_F", 550]                       // Wipeout
 ];
 
 // --- 5. MISSION UNLOCKS ---
 
 // Grand Op 1: Helicopters
-CTI32_Unlock_GrandOp1_Helis = [
+MWF_Unlock_GrandOp1_Helis = [
     "B_Heli_Attack_01_dynamicLoadout_F",                           // Blackfoot
     "B_Heli_Transport_03_unarmed_F"                                // Huron
 ];
 
 // Grand Op 2: Fixed Wing
-CTI32_Unlock_GrandOp2_Jets = [
+MWF_Unlock_GrandOp2_Jets = [
     "B_Plane_Fighter_01_F",                                        // Black Wasp II
     "B_Plane_Fighter_01_Stealth_F"                                 // Black Wasp Stealth
 ];
 
 // Side Op: Disrupt (Infrastructure/Roadblocks)
-CTI32_Unlock_Disrupt = [
+MWF_Unlock_Disrupt = [
     "B_D_MRAP_01_hmg_F",                                           // Hunter HMG
     "B_D_MRAP_01_gmg_F"                                            // Hunter GMG
 ];
 
 // Side Op: Supply (Logistics/FOB)
-CTI32_Unlock_Supply = [
-    CTI32_FOB_Truck,                                               // FOB Builder Truck
+MWF_Unlock_Supply = [
+    MWF_FOB_Truck,                                               // FOB Builder Truck
     "B_D_Truck_01_fuel_F",                                         // Fuel Truck
     "B_D_Truck_01_Repair_F"                                        // Repair Truck
 ];
 
 // Side Op: Intel (Information/Command)
-CTI32_Unlock_Intel = [
+MWF_Unlock_Intel = [
     "B_D_APC_Tracked_01_CRV_F"                                      // CRV Bobcat
 ];
 
 // --- 6. SYNC & BROADCAST ---
 { publicVariable _x; } forEach [
-    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
-    "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
-    "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
-    "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+    "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
+    "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
+    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
 ];
 
 diag_log "[CTI32] Preset: Western Sahara (DLC) loaded successfully.";

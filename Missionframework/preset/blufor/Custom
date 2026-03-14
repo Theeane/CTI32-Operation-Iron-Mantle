@@ -1,21 +1,19 @@
 /*
-    Author: Theeane
-    Function: Blufor Preset - Custom (Clean Template)
-    Description: Use this file to create your own custom faction. 
-    Note: Digital economy (Supply/Intel). 
+    Author: Theane / ChatGPT
+    Function: Preset - Custom
+    Project: Military War Framework
 
-    Instructions:
-    Replace the classnames in quotes with your desired units/vehicles.
-    Ensure all vehicles and units belong to the BLUFOR side to avoid AI conflicts.
+    Description:
+    Defines the blufor preset configuration for Custom.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
-CTI32_FOB_Truck = "B_Truck_01_Repair_F";                           // Primary FOB construction vehicle
-CTI32_FOB_Box = "B_Slingload_01_Cargo_F";                         // Container for FOB building
-CTI32_Arsenal_Box = "B_supplyCrate_F";                            // Portable arsenal
-CTI32_Respawn_Truck = "B_Truck_01_ammo_F";                         // Mobile Respawn (Fixed 100 S)
-CTI32_Crewman = "B_crew_F";                                        // Default crew for vehicles
-CTI32_Pilot = "B_Helipilot_F";                                     // Default pilot for aircraft
+MWF_FOB_Truck = "B_Truck_01_Repair_F";                           // Primary FOB construction vehicle
+MWF_FOB_Box = "B_Slingload_01_Cargo_F";                         // Container for FOB building
+MWF_Arsenal_Box = "B_supplyCrate_F";                            // Portable arsenal
+MWF_Respawn_Truck = "B_Truck_01_ammo_F";                         // Mobile Respawn (Fixed 100 S)
+MWF_Crewman = "B_crew_F";                                        // Default crew for vehicles
+MWF_Pilot = "B_Helipilot_F";                                     // Default pilot for aircraft
 
 // --- 2. LOGISTICS & ECONOMY ---
 // Digital Currency System Active. No physical crates needed.
@@ -23,7 +21,7 @@ CTI32_Pilot = "B_Helipilot_F";                                     // Default pi
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
 // Button 1: Custom Recon Team
-CTI32_Support_Group1 = [
+MWF_Support_Group1 = [
     "B_LSV_01_armed_F",                 // Recon Vehicle
     [
         "B_recon_TL_F",                 // Unit 1 (Leader)
@@ -34,7 +32,7 @@ CTI32_Support_Group1 = [
 ];
 
 // Button 2: Custom Infantry Section
-CTI32_Support_Group2 = [
+MWF_Support_Group2 = [
     "B_Truck_01_transport_F",           // Transport Vehicle
     [
         "B_Soldier_SL_F",               // Unit 1
@@ -47,7 +45,7 @@ CTI32_Support_Group2 = [
 ];
 
 // Button 3: Custom Anti-Tank Squad
-CTI32_Support_Group3 = [
+MWF_Support_Group3 = [
     "B_LSV_01_AT_F",                    // AT Vehicle
     [
         "B_Soldier_SL_F",               // Leader
@@ -59,7 +57,7 @@ CTI32_Support_Group3 = [
 ];
 
 // Button 4: Custom Armored Support
-CTI32_Support_Group4 = [
+MWF_Support_Group4 = [
     "B_APC_Wheeled_01_cannon_F",        // Armored Vehicle
     [
         "B_Soldier_SL_F",               // Leader
@@ -71,7 +69,7 @@ CTI32_Support_Group4 = [
 ];
 
 // Button 5: Custom Air Assault
-CTI32_Support_Group5 = [
+MWF_Support_Group5 = [
     "B_Heli_Transport_01_F",            // Transport Helicopter
     [
         "B_recon_TL_F",                 // Leader
@@ -84,71 +82,71 @@ CTI32_Support_Group5 = [
 
 // --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
 
-CTI32_Preset_Light = [
-    [CTI32_Respawn_Truck, 100],                                    // DO NOT REMOVE RESPAWN TRUCK
+MWF_Preset_Light = [
+    [MWF_Respawn_Truck, 100],                                    // DO NOT REMOVE RESPAWN TRUCK
     ["B_Quadbike_01_F", 5],                                        
     ["B_LSV_01_unarmed_F", 20],                                    
     ["B_LSV_01_armed_F", 45],                                      
     ["B_Truck_01_covered_F", 50]                                   
 ];
 
-CTI32_Preset_APC = [
+MWF_Preset_APC = [
     ["B_APC_Wheeled_01_cannon_F", 180],                             
     ["B_APC_Tracked_01_rcws_F", 200]                               
 ];
 
-CTI32_Preset_Tanks = [
+MWF_Preset_Tanks = [
     ["B_MBT_01_cannon_F", 450],                                     
     ["B_MBT_01_TUSK_F", 500]                                        
 ];
 
-CTI32_Preset_Helis = [
+MWF_Preset_Helis = [
     ["B_Heli_Light_01_F", 150],                                    
     ["B_Heli_Transport_01_F", 250]                                 
 ];
 
-CTI32_Preset_Jets = [
+MWF_Preset_Jets = [
     ["B_Plane_CAS_01_dynamicLoadout_F", 550]                       
 ];
 
 // --- 5. MISSION UNLOCKS ---
 
 // Grand Op 1: Helicopters
-CTI32_Unlock_GrandOp1_Helis = [
+MWF_Unlock_GrandOp1_Helis = [
     "B_Heli_Attack_01_dynamicLoadout_F",                           
     "B_Heli_Transport_03_F"                                        
 ];
 
 // Grand Op 2: Fixed Wing
-CTI32_Unlock_GrandOp2_Jets = [
+MWF_Unlock_GrandOp2_Jets = [
     "B_Plane_Fighter_01_F",                                        
     "B_Plane_Fighter_01_Stealth_F"                                 
 ];
 
 // Side Op: Disrupt (Infrastructure/Roadblocks)
-CTI32_Unlock_Disrupt = [
+MWF_Unlock_Disrupt = [
     "B_MRAP_01_hmg_F",                                             
     "B_MRAP_01_gmg_F"                                              
 ];
 
 // Side Op: Supply (Logistics/FOB)
-CTI32_Unlock_Supply = [
-    CTI32_FOB_Truck,                                               
+MWF_Unlock_Supply = [
+    MWF_FOB_Truck,                                               
     "B_Truck_01_fuel_F",                                           
     "B_Truck_01_Repair_F"                                          
 ];
 
 // Side Op: Intel (Information/Command)
-CTI32_Unlock_Intel = [
+MWF_Unlock_Intel = [
     "B_APC_Tracked_01_CRV_F"                                        
 ];
 
 // --- 6. SYNC & BROADCAST ---
 { publicVariable _x; } forEach [
-    "CTI32_FOB_Truck", "CTI32_FOB_Box", "CTI32_Arsenal_Box", "CTI32_Respawn_Truck", "CTI32_Crewman", "CTI32_Pilot",
-    "CTI32_Support_Group1", "CTI32_Support_Group2", "CTI32_Support_Group3", "CTI32_Support_Group4", "CTI32_Support_Group5",
-    "CTI32_Preset_Light", "CTI32_Preset_APC", "CTI32_Preset_Tanks", "CTI32_Preset_Helis", "CTI32_Preset_Jets",
-    "CTI32_Unlock_GrandOp1_Helis", "CTI32_Unlock_GrandOp2_Jets", "CTI32_Unlock_Disrupt", "CTI32_Unlock_Supply", "CTI32_Unlock_Intel"
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+    "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
+    "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
+    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
 ];
 
 diag_log "[CTI32] Preset: Custom.sqf template loaded.";
