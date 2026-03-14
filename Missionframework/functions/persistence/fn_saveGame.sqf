@@ -4,53 +4,30 @@
     Project: Military War Framework
 
     Description:
-    Saves current campaign state using a single MWF persistence schema.
+    Saves strategic campaign state with normalized zone progression data.
 */
 
 if (!isServer) exitWith {};
 params [["_reason", "Auto Save", [""]]];
 
-private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
-private _savedZoneIds = [];
-
-{
-    private _zoneRef = _x;
-    private _isMarkerZone = _zoneRef isEqualType "";
-    private _isCaptured = false;
-    private _zoneId = "";
-
-    if (_isMarkerZone) then {
-        private _markerName = _zoneRef;
-        _isCaptured = missionNamespace getVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _markerName], false];
-        _zoneId = _markerName;
-    } else {
-        if (!isNull _zoneRef) then {
-            _isCaptured = _zoneRef getVariable ["MWF_isCaptured", false];
-            _zoneId = _zoneRef getVariable ["MWF_zoneID", _zoneRef getVariable ["MWF_zoneName", ""]];
-        };
-    };
-
-    if (_isCaptured && { _zoneId != "" }) then {
-        _savedZoneIds pushBackUnique _zoneId;
-    };
-} forEach _allZones;
-
-private _totalZones = count _allZones;
-private _capturedCount = count _savedZoneIds;
-private _completionPercent = if (_totalZones > 0) then { (_capturedCount / _totalZones) * 100 } else { 0 };
+private _zoneSaveData = if (!isNil "MWF_fnc_getZoneSaveData") then {
+    [] call MWF_fnc_getZoneSaveData
+} else {
+    []
+};
 
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 200]];
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
-missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_res_intel", _intel, true];
-missionNamespace setVariable ["MWF_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_Intel", _intel, true];
-
-profileNamespace setVariable ["MWF_Save_Zones", _savedZoneIds];
-profileNamespace setVariable ["MWF_Save_Completion", _completionPercent];
+profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
+profileNamespace setVariable ["MWF_Save_CapturedZoneCount", missionNamespace getVariable ["MWF_CapturedZoneCount", 0]];
+profileNamespace setVariable ["MWF_Save_CapturedTownCount", missionNamespace getVariable ["MWF_CapturedTownCount", 0]];
+profileNamespace setVariable ["MWF_Save_CapturedCapitalCount", missionNamespace getVariable ["MWF_CapturedCapitalCount", 0]];
+profileNamespace setVariable ["MWF_Save_CapturedFactoryCount", missionNamespace getVariable ["MWF_CapturedFactoryCount", 0]];
+profileNamespace setVariable ["MWF_Save_CapturedMilitaryCount", missionNamespace getVariable ["MWF_CapturedMilitaryCount", 0]];
+profileNamespace setVariable ["MWF_Save_MapControlPercent", missionNamespace getVariable ["MWF_MapControlPercent", 0]];
 profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
 profileNamespace setVariable ["MWF_Save_CivRep", _civRep];
@@ -65,4 +42,5 @@ profileNamespace setVariable ["MWF_Save_BuildingMode", missionNamespace getVaria
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 
 saveProfileNamespace;
-diag_log format ["[MWF] Game saved (%1). Completion: %2%3.", _reason, floor _completionPercent, "%"];
+
+diag_log format ["[MWF] Game saved (%1). Zones saved: %2.", _reason, count _zoneSaveData];
