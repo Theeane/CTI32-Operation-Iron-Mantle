@@ -30,6 +30,13 @@ missionNamespace setVariable ["MWF_UnderAttackZoneCount", missionNamespace getVa
 missionNamespace setVariable ["MWF_CapturedZoneIDs", missionNamespace getVariable ["MWF_CapturedZoneIDs", []], true];
 missionNamespace setVariable ["MWF_ProgressionMilestones", missionNamespace getVariable ["MWF_ProgressionMilestones", createHashMap], true];
 missionNamespace setVariable ["MWF_WorldSnapshot", missionNamespace getVariable ["MWF_WorldSnapshot", createHashMap], true];
+missionNamespace setVariable ["MWF_GlobalThreatLevel", missionNamespace getVariable ["MWF_GlobalThreatLevel", 0], true];
+missionNamespace setVariable ["MWF_GlobalThreatState", missionNamespace getVariable ["MWF_GlobalThreatState", "low"], true];
+missionNamespace setVariable ["MWF_ThreatPressureScore", missionNamespace getVariable ["MWF_ThreatPressureScore", 0], true];
+missionNamespace setVariable ["MWF_HighThreatZoneIDs", missionNamespace getVariable ["MWF_HighThreatZoneIDs", []], true];
+missionNamespace setVariable ["MWF_CriticalThreatZoneIDs", missionNamespace getVariable ["MWF_CriticalThreatZoneIDs", []], true];
+missionNamespace setVariable ["MWF_ZoneThreatIndex", missionNamespace getVariable ["MWF_ZoneThreatIndex", createHashMap], true];
+missionNamespace setVariable ["MWF_ThreatSnapshot", missionNamespace getVariable ["MWF_ThreatSnapshot", createHashMap], true];
 
 setTimeMultiplier (["MWF_Param_TimeMultiplier", 1] call BIS_fnc_getParamValue);
 
