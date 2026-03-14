@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Opens a restricted 'Base Architect' Zeus mode at the FOB location.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_openBaseArchitect
+    Project: Military War Framework
+
+    Description:
+    Handles open base architect for the core framework layer.
 */
 
 if (!hasInterface) exitWith {};
@@ -17,7 +20,7 @@ private _curator = _group createUnit ["ModuleCurator_F", [0,0,0], [], 0, "NONE"]
 player assignCurator _curator;
 
 // 2. Remote execute the asset filter on the server
-[_curator] remoteExec ["AGS_fnc_limitZeusAssets", 2];
+[_curator] remoteExec ["MWF_fnc_limitZeusAssets", 2];
 
 // 3. Open the Zeus Interface
 openCuratorInterface;
@@ -41,7 +44,7 @@ openCuratorInterface;
         
         // If the player closes Zeus (ESC), delete the temporary module
         if (isNull (findDisplay 312)) exitWith { 
-            [player, _curator] remoteExec ["AGS_fnc_cleanupCurator", 2]; 
+            [player, _curator] remoteExec ["MWF_fnc_cleanupCurator", 2]; 
         };
     };
 };
