@@ -136,7 +136,15 @@ class CfgFunctions {
 
         class Missions {
             file = "missions";
+            class activateMissionBoardSlot {};
+            class buildGrandOperationPlacements {};
+            class buildMissionSessionPlacements {};
+            class discoverMissionTemplates {};
+            class executeMissionTemplate {};
             class generateInitialMission {};
+            class initMissionSystem {};
+            class openMissionBoard {};
+            class refreshMissionBoard {};
         };
     };
 };
