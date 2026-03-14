@@ -1,9 +1,13 @@
-/* PRESET: CUP AFRF Modern (Ratnik/EMR)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_AFRF_Modern
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for CUP AFRF Modern.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
         "CUP_O_RU_Soldier_M_EMR",            // Rifleman

@@ -1,9 +1,13 @@
-/* PRESET: Islamic State (Project OPFOR)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Islamic_State
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for Islamic State.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     ["Infantry_T1", [
         "LOP_SYR_Infantry_Rifleman_2",       // Rifleman (AKM)
         "LOP_SYR_Infantry_Rifleman",         // Rifleman (AK-74)

@@ -1,9 +1,13 @@
-/* PRESET: GM East Germany (NVA)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - GM_East_Germany
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for GM East Germany.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     ["Infantry_T1", [
         "gm_gc_army_rifleman_akp74_80_str",   // Rifleman
         "gm_gc_army_antitank_akp74_rpg7_80_str", // RPG-7

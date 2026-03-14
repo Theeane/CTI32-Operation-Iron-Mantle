@@ -1,9 +1,13 @@
-/* PRESET: CUP CDF (Chernarus)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_CDF
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for CUP CDF.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     ["Infantry_T1", [
         "CUP_B_CDF_Militia_FST",             // Militia
         "CUP_B_CDF_Soldier_FST",             // Rifleman

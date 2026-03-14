@@ -1,9 +1,13 @@
-/* PRESET: RHS AFRF (Russia EMR)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - RHS_AFRF
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for RHS AFRF.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
         "rhs_msv_emr_rifleman",              // Rifleman

@@ -1,9 +1,13 @@
-/* PRESET: Takistan Army (LOP)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Takistan_Army
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for Takistan Army.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     ["Infantry_T1", [
         "LOP_TKA_Infantry_Rifleman",         // Rifleman (Lite)
         "LOP_TKA_Infantry_Rifleman_2",       // Rifleman

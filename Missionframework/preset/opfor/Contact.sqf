@@ -1,9 +1,13 @@
-/* PRESET: Russian Spetsnaz (Contact/Enoch)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - Contact
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for Contact.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
         "O_R_Soldier_unarmed_F",            // Rifleman (Unarmed)

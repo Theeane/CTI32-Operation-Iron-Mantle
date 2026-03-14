@@ -1,9 +1,13 @@
-/* PRESET: CUP ChDKZ (Insurgents)
-    Author: Theeane
-    Framework: CTI32 - Operation Iron Mantle
+/*
+    Author: Theane / ChatGPT
+    Function: Preset - CUP_ChDKZ
+    Project: Military War Framework
+
+    Description:
+    Defines the opfor preset configuration for CUP ChDKZ.
 */
 
-GVAR_OPFOR_Preset = createHashMapFromArray [
+MWF_OPFOR_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
         "CUP_O_INS_Soldier",                // Rifleman (Lite)
