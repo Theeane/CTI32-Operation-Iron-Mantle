@@ -7,8 +7,9 @@
     Initializes and maintains the threat layer above world progression.
 
     Notes:
-    - Waits for world readiness with timeout fallback.
-    - Uses dirty flags to avoid unnecessary recalculation spam.
+    - Waits for the world layer before becoming authoritative.
+    - Uses dirty flags and stale checks instead of constant recalculation.
+    - Prunes old incidents to keep network arrays small and Arma-safe.
 */
 
 if (!isServer) exitWith {};
@@ -20,7 +21,7 @@ missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
 missionNamespace setVariable ["MWF_ThreatLastRecalcAt", -1, false];
 
 [] spawn {
-    private _startupDeadline = diag_tickTime + 150;
+    private _startupDeadline = diag_tickTime + 120;
 
     waitUntil {
         uiSleep 1;
@@ -29,16 +30,27 @@ missionNamespace setVariable ["MWF_ThreatLastRecalcAt", -1, false];
     };
 
     if (!(missionNamespace getVariable ["MWF_WorldSystemReady", false])) then {
-        diag_log "[MWF Threat] Startup timeout waiting for world system. Continuing with current world state.";
+        diag_log "[MWF Threat] Startup timeout waiting for world system. Continuing with current state.";
     };
 
     [] call MWF_fnc_recalculateThreatState;
     missionNamespace setVariable ["MWF_ThreatSystemReady", true, true];
 
     while {true} do {
+        private _incidentLog = + (missionNamespace getVariable ["MWF_ThreatIncidentLog", []]);
+        private _beforeCount = count _incidentLog;
+        private _now = diag_tickTime;
+        _incidentLog = _incidentLog select { (_now - (_x param [0, 0, [0]])) <= 1800 };
+        if ((count _incidentLog) != _beforeCount) then {
+            missionNamespace setVariable ["MWF_ThreatIncidentLog", _incidentLog, true];
+            missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
+        };
+
         private _dirty = missionNamespace getVariable ["MWF_ThreatStateDirty", false];
         private _lastRecalc = missionNamespace getVariable ["MWF_ThreatLastRecalcAt", -1];
-        private _stale = (_lastRecalc < 0) || {(diag_tickTime - _lastRecalc) >= 20};
+        private _qrfInterval = missionNamespace getVariable ["MWF_ThreatQRFInterval", 900];
+        private _staleThreshold = ((_qrfInterval max 240) min 900) / 3;
+        private _stale = (_lastRecalc < 0) || {(diag_tickTime - _lastRecalc) >= _staleThreshold};
 
         if (_dirty || _stale) then {
             [] call MWF_fnc_recalculateThreatState;

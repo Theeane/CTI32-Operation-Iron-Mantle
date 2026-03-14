@@ -59,6 +59,11 @@ private _zoneThreatState = "low";
 private _responseProfile = "monitor";
 
 switch (true) do {
+    case (_zoneScore >= 80): {
+        _zoneThreatLevel = 5;
+        _zoneThreatState = "war";
+        _responseProfile = if (_isCaptured) then {"major_counterattack"} else {"fortified_hub"};
+    };
     case (_zoneScore >= 65): {
         _zoneThreatLevel = 4;
         _zoneThreatState = "critical";
@@ -86,6 +91,12 @@ switch (true) do {
     };
 };
 
+private _priorityScore = _zoneScore;
+if (_isCaptured) then { _priorityScore = _priorityScore + 10; };
+if (_zoneType == "capital") then { _priorityScore = _priorityScore + 15; };
+if (_zoneType == "military") then { _priorityScore = _priorityScore + 8; };
+if (_zoneType == "factory") then { _priorityScore = _priorityScore + 6; };
+
 createHashMapFromArray [
     ["zoneId", _zoneId],
     ["zoneType", _zoneType],
@@ -97,5 +108,6 @@ createHashMapFromArray [
     ["threatLevel", _zoneThreatLevel],
     ["threatState", _zoneThreatState],
     ["pressureScore", _zoneScore],
+    ["priorityScore", _priorityScore],
     ["responseProfile", _responseProfile]
 ]
