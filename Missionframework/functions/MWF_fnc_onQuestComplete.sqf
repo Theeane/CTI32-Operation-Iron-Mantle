@@ -33,18 +33,8 @@ MWF_fnc_onQuestComplete = {
                 _randomReveal = selectRandom ["roadblock", "HQ"];
                 systemChat format ["Disrupt mission: Random reveal - %1", _randomReveal];
             };
-            // Global effects for Disrupt mission (15 minutes)
-            // These are applied globally to the mission and the environment
-            _civRepBonus = 5; // +5% civilian reputation
-            _enemyAggressionBonus = -30; // -30% enemy aggression
-            _zonePatrolBonus = -50; // -50% patrols during zone capture
-            // Add timers for global effects (15 minutes duration)
-            [] spawn {
-                sleep 900; // 15 minutes timer
-                _civRepBonus = 0;
-                _enemyAggressionBonus = 0;
-                _zonePatrolBonus = 0;
-            };
+            // Trigger the global disrupt effects
+            [] spawn {["disrupt"] call MWF_fnc_globalStateManager;};
         };
     };
     
