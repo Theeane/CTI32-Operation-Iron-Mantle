@@ -1,9 +1,10 @@
 /*
-    Author: Theane using gemini
-    Function: KPIN_fnc_intelManager
-    Description: 
-    Handles the probability-based spawning of Intel (Laptops/Officers) and manages 
-    the discovery logic via player optics. Locks discovered base positions for persistence.
+    Author: Theane / ChatGPT
+    Function: fn_intelManager
+    Project: Military War Framework
+
+    Description:
+    Handles intel manager for the infrastructure system.
 */
 
 if (!isServer) exitWith {};
@@ -15,7 +16,7 @@ params [["_mode", "SPAWN_INTEL"], ["_params", []]];
 if (_mode == "SPAWN_INTEL") exitWith {
     _params params ["_basePos", "_type"];
 
-    private _intelPool = missionNamespace getVariable ["KPIN_IntelPool", 0];
+    private _intelPool = missionNamespace getVariable ["MWF_IntelPool", 0];
     
     // Logic: 70% base chance, reduced by 5% for every 10 intel points already held. Minimum 10%.
     private _chance = (70 - (_intelPool / 2)) max 10;
@@ -34,11 +35,11 @@ if (_mode == "SPAWN_INTEL") exitWith {
             _intelObj disableAI "MOVE";
         };
 
-        _intelObj setVariable ["KPIN_isDiscovered", false, true];
-        _intelObj setVariable ["KPIN_parentBasePos", _basePos, true];
+        _intelObj setVariable ["MWF_isDiscovered", false, true];
+        _intelObj setVariable ["MWF_parentBasePos", _basePos, true];
 
         // Start the detection loop for this specific intel object
-        ["DETECTION_LOOP", [_intelObj]] spawn KPIN_fnc_intelManager;
+        ["DETECTION_LOOP", [_intelObj]] spawn MWF_fnc_intelManager;
         
         diag_log format ["[KPIN INTEL]: %1 spawned at %2. Discovery chance was %3 percent.", _intelType, _basePos, _chance];
     };
@@ -49,7 +50,7 @@ if (_mode == "SPAWN_INTEL") exitWith {
 if (_mode == "DETECTION_LOOP") exitWith {
     _params params ["_intelObj"];
 
-    while {alive _intelObj && !(_intelObj getVariable ["KPIN_isDiscovered", false])} do {
+    while {alive _intelObj && !(_intelObj getVariable ["MWF_isDiscovered", false])} do {
         sleep 2;
 
         private _potentialSpotters = allPlayers select {(_x distance _intelObj) < 800};
@@ -63,7 +64,7 @@ if (_mode == "DETECTION_LOOP") exitWith {
                 
                 // If player is looking directly at the intel object
                 if (_target == _intelObj) then {
-                    _intelObj setVariable ["KPIN_isDiscovered", true, true];
+                    _intelObj setVariable ["MWF_isDiscovered", true, true];
                     
                     // 1. Map Notification
                     private _m = createMarker [format ["intel_ping_%1", floor(random 1000)], getPos _intelObj];
@@ -72,13 +73,13 @@ if (_mode == "DETECTION_LOOP") exitWith {
                     _m setMarkerColor "ColorYellow";
 
                     // 2. Lock the base position in the persistent array
-                    private _basePos = _intelObj getVariable ["KPIN_parentBasePos", [0,0,0]];
-                    private _fixed = missionNamespace getVariable ["KPIN_FixedInfrastructure", []];
+                    private _basePos = _intelObj getVariable ["MWF_parentBasePos", [0,0,0]];
+                    private _fixed = missionNamespace getVariable ["MWF_FixedInfrastructure", []];
                     _fixed pushBackUnique _basePos;
-                    missionNamespace setVariable ["KPIN_FixedInfrastructure", _fixed, true];
+                    missionNamespace setVariable ["MWF_FixedInfrastructure", _fixed, true];
 
                     // 3. Save progress immediately
-                    ["SAVE"] call KPIN_fnc_saveManager;
+                    ["SAVE"] call MWF_fnc_saveManager;
 
                     diag_log format ["[KPIN INTEL]: Base at %1 has been discovered and locked by %2.", _basePos, name _player];
                 };

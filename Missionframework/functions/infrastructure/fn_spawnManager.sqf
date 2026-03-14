@@ -1,10 +1,10 @@
 /*
-    Author: Theane using gemini
-    Function: KPIN_fnc_spawnManager
-    Description: 
-    Controls the physical spawning of independent HQs and Roadblocks. 
-    Manages dynamic spawning based on player distance and ensures fixed (discovered) 
-    infrastructure is correctly restored after a world refresh.
+    Author: Theane / ChatGPT
+    Function: fn_spawnManager
+    Project: Military War Framework
+
+    Description:
+    Handles spawn manager for the infrastructure system.
 */
 
 if (!isServer) exitWith {};
@@ -14,7 +14,7 @@ params [["_mode", "REFRESH_FIXED_BASES"]];
 // --- MODE: REFRESH_FIXED_BASES ---
 // Called after "Clean Slate" or server restart to respawn discovered bases
 if (_mode == "REFRESH_FIXED_BASES") exitWith {
-    private _fixedBases = missionNamespace getVariable ["KPIN_FixedInfrastructure", []];
+    private _fixedBases = missionNamespace getVariable ["MWF_FixedInfrastructure", []];
     
     diag_log format ["[KPIN SPAWN]: Refreshing %1 fixed bases...", count _fixedBases];
 
@@ -24,7 +24,7 @@ if (_mode == "REFRESH_FIXED_BASES") exitWith {
         if (count (nearestObjects [_pos, ["House", "Strategic"], 10]) == 0) then {
             // Determine if it was an HQ or Roadblock (Logic could be expanded to save type)
             // For now, we spawn as HQ if near a major road/open area, or use a default
-            ["CREATE_BASE", [_pos, "HQ"]] call KPIN_fnc_spawnManager;
+            ["CREATE_BASE", [_pos, "HQ"]] call MWF_fnc_spawnManager;
         };
     } forEach _fixedBases;
 };
@@ -45,7 +45,7 @@ if (_mode == "CREATE_BASE") exitWith {
 
     // 2. Register with Infrastructure Manager
     // This attaches the "Killed" EH and triggers the Intel-check
-    ["REGISTER", _composition, _type] call KPIN_fnc_infrastructureManager;
+    ["REGISTER", _composition, _type] call MWF_fnc_infrastructureManager;
 
     diag_log format ["[KPIN SPAWN]: %1 created at %2 and registered.", _type, _pos];
     _composition
@@ -59,7 +59,7 @@ if (_mode == "DYNAMIC_CHECK") exitWith {
 
         // Potential positions logic: This would normally pull from a list of predefined 
         // locations on the map that aren't inside zones.
-        private _potentialLocations = missionNamespace getVariable ["KPIN_PotentialBaseSites", []];
+        private _potentialLocations = missionNamespace getVariable ["MWF_PotentialBaseSites", []];
         private _players = allPlayers select {alive _x};
 
         {
@@ -68,11 +68,11 @@ if (_mode == "DYNAMIC_CHECK") exitWith {
             if ({_x distance _sitePos < 1000} count _players > 0) then {
                 // Check if this site has already been destroyed (using save data counters/log)
                 // If OK:
-                ["CREATE_BASE", [_sitePos, "ROADBLOCK"]] call KPIN_fnc_spawnManager;
+                ["CREATE_BASE", [_sitePos, "ROADBLOCK"]] call MWF_fnc_spawnManager;
                 
                 // Remove from potential list for this session so it doesn't double-spawn
                 _potentialLocations = _potentialLocations - [_sitePos];
-                missionNamespace setVariable ["KPIN_PotentialBaseSites", _potentialLocations];
+                missionNamespace setVariable ["MWF_PotentialBaseSites", _potentialLocations];
             };
         } forEach _potentialLocations;
     };
