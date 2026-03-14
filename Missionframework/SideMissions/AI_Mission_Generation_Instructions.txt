@@ -1,0 +1,36 @@
+
+    AI Instructions for Mission Generation (_4–_99):
+
+    1. Mission Categories:
+        - Disrupt
+        - Supply
+        - Intel
+
+    2. Mission Difficulty:
+        - Easy
+        - Medium
+        - Hard
+
+    3. Mission Creation Process:
+        - Templates should be created in the appropriate folder:
+            e.g., 'SideMissions/disrupt/easy/', 'SideMissions/intel/medium/'
+        - Templates should have unique IDs in their naming (e.g., MissionDisrupt_1, MissionIntel_2).
+
+    4. Random Mission Generation:
+        - AI should select one template at random from the selected category/difficulty folder.
+        - _4–_99 missions are allowed, but system should use parameters to define their limits.
+
+    5. Presets:
+        - Use the following presets for enemy units, vehicles, and civilian NPCs:
+            - opfor_preset
+            - civ_preset
+            - rebel_preset
+            - blufor_preset
+        - Presets should not be modified after mission creation (prevents mission corruption).
+        - Vehicle classnames are derived from the respective preset categories, not hardcoded.
+
+    6. Important Rules:
+        - **Do not hardcode classnames or assets!**
+        - Always check for the correct zone placement (missions should be placed randomly based on the zone available).
+        - Always generate a variety of missions in terms of difficulty and category (easy missions should be lower difficulty, but scale appropriately).
+    
