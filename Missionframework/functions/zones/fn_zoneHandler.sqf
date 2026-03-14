@@ -1,7 +1,10 @@
-/* Author: Theeane
-    Description: 
-    Main zone controller. Handles dynamic spawning, area capture logic, 
-    and performance optimization based on player distance.
+/*
+    Author: Theane / ChatGPT
+    Function: fn_zoneHandler
+    Project: Military War Framework
+
+    Description:
+    Handles zone handler for the zones system.
 */
 
 params [
@@ -33,14 +36,14 @@ while {true} do {
 
     // 2. DYNAMIC SPAWN LOGIC
     if (_minDist < _spawnRadius && !_isSpawned && !_isCaptured) then {
-        [_pos, _tier] spawn CTI_fnc_spawnZoneAssets;
+        [_pos, _tier] spawn MWF_fnc_spawnZoneAssets;
         _isSpawned = true;
         diag_log format ["[Iron Mantle] Zone %1 triggered spawn at %2m", _marker, _minDist];
     };
 
     // 3. DYNAMIC DESPAWN LOGIC
     if (_minDist > _despawnRadius && _isSpawned) then {
-        [_pos, _despawnRadius] spawn CTI_fnc_despawnZoneAssets;
+        [_pos, _despawnRadius] spawn MWF_fnc_despawnZoneAssets;
         _isSpawned = false;
         diag_log format ["[Iron Mantle] Zone %1 triggered despawn at %2m", _marker, _minDist];
     };
@@ -64,12 +67,12 @@ while {true} do {
             _marker setMarkerColor "ColorGreen";
             
             // Economy Integration: Register zone for supply income
-            private _tierData = GVAR_Zone_Tier_Settings get _tier;
+            private _tierData = MWF_Zone_Tier_Settings get _tier;
             private _income = _tierData select 0;
             
             // Add to active zones for the Economy Manager to track
-            GVAR_ActiveZones pushBack [_marker, _tier];
-            publicVariable "GVAR_ActiveZones";
+            MWF_ActiveZones pushBack [_marker, _tier];
+            publicVariable "MWF_ActiveZones";
 
             // Global Notification
             [format["STR_MISSION_ZONE_CAPTURED", _marker, _income]] remoteExec ["systemChat", 0];
@@ -77,7 +80,7 @@ while {true} do {
 
             // Cleanup remaining enemy scripts if any
             if (_isSpawned) then {
-                [_pos, _despawnRadius] spawn CTI_fnc_despawnZoneAssets;
+                [_pos, _despawnRadius] spawn MWF_fnc_despawnZoneAssets;
                 _isSpawned = false;
             };
         };

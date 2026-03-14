@@ -1,20 +1,23 @@
-/* Author: Theeane
-    Description: 
-    Spawns units and applies the interaction logic (Stealth, Interaction, Economy).
-    Integrated with GVAR_Army_Infantry and GVAR_Civ_List presets.
+/*
+    Author: Theane / ChatGPT
+    Function: fn_spawnZoneAssets
+    Project: Military War Framework
+
+    Description:
+    Handles spawn zone assets for the zones system.
 */
 
 params ["_zonePos", "_tier"];
 
 // 1. Fetch Tier settings from config
-private _tierData = GVAR_Zone_Tier_Settings get _tier;
+private _tierData = MWF_Zone_Tier_Settings get _tier;
 private _multiplier = _tierData select 2;
 
 // 2. SPAWN ENEMIES (OPFOR)
 private _enemyCount = round (8 * _multiplier); 
 for "_i" from 1 to _enemyCount do {
     private _spawnPos = [_zonePos, 10, 150, 3, 0, 20, 0] call BIS_fnc_findSafePos;
-    private _unitClass = selectRandom GVAR_Army_Infantry; 
+    private _unitClass = selectRandom MWF_Army_Infantry; 
     
     private _group = createGroup east;
     private _unit = _group createUnit [_unitClass, _spawnPos, [], 0, "NONE"];
@@ -30,11 +33,11 @@ for "_i" from 1 to _enemyCount do {
 
     // Chance for the soldier to be an Informant (Intel Trading)
     if (random 100 < 15) then {
-        _unit setVariable ["GVAR_isInformant", true, true];
+        _unit setVariable ["MWF_isInformant", true, true];
     };
 
     // Apply interaction suite (Search Body, Undercover, Hold-Action UI)
-    [_unit] call CTI_fnc_initInteractions; 
+    [_unit] call MWF_fnc_initInteractions; 
     
     [_group, _zonePos, 150] call bis_fnc_taskPatrol;
 };
@@ -42,7 +45,7 @@ for "_i" from 1 to _enemyCount do {
 // 3. SPAWN CIVILIANS
 private _civCount = round (6 * _multiplier);
 for "_i" from 1 to _civCount do {
-    private _civClass = selectRandom GVAR_Civ_List;
+    private _civClass = selectRandom MWF_Civ_List;
     private _spawnPos = [_zonePos, 20, 200, 3, 0, 20, 0] call BIS_fnc_findSafePos;
     
     private _group = createGroup civilian;
@@ -50,11 +53,11 @@ for "_i" from 1 to _civCount do {
 
     // Civilian Informants (Special Quests / Trade)
     if (random 100 < 25) then {
-        _civ setVariable ["GVAR_isInformant", true, true];
+        _civ setVariable ["MWF_isInformant", true, true];
     };
 
     // Apply interaction suite (Talking / 5s UI Circle)
-    [_civ] call CTI_fnc_initInteractions;
+    [_civ] call MWF_fnc_initInteractions;
     
     [_group, _zonePos, 100] call bis_fnc_taskPatrol;
 };

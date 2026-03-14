@@ -1,7 +1,10 @@
-/* Author: Theeane
-    Description: 
-    Cleans up units and vehicles in a zone when players leave the area.
-    Ensures server performance remains stable.
+/*
+    Author: Theane / ChatGPT
+    Function: fn_despawnZoneAssets
+    Project: Military War Framework
+
+    Description:
+    Handles despawn zone assets for the zones system.
 */
 
 params ["_zonePos", "_despawnRadius"];
@@ -14,7 +17,7 @@ private _unitsInArea = allUnits select { _x distance _zonePos < _despawnRadius }
     if (!isPlayer _x) then {
         
         // 3. Check if unit is part of the zone logic (not a player-driven vehicle or squad)
-        private _isPermanent = _x getVariable ["GVAR_isPermanent", false];
+        private _isPermanent = _x getVariable ["MWF_isPermanent", false];
         
         if (!_isPermanent) then {
             private _group = group _x;
