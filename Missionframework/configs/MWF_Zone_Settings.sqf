@@ -1,10 +1,13 @@
-/* Author: Theeane
-    Description: 
-    Central configuration for Zone Tiers. 
-    Defines income, intel bonuses, and enemy scaling.
+/*
+    Author: Theane / ChatGPT
+    Function: MWF_Zone_Settings
+    Project: Military War Framework
+
+    Description:
+    Defines zone configuration values used by the framework.
 */
 
-GVAR_Zone_Tier_Settings = createHashMapFromArray [
+MWF_Zone_Tier_Settings = createHashMapFromArray [
     // Tier | [Supplies Income, Intel Bonus, Enemy Count Multiplier]
     [1, [25, 1, 0.5]],  // Tiny Outpost / Village
     [2, [50, 2, 0.8]],  // Small Town
@@ -14,7 +17,7 @@ GVAR_Zone_Tier_Settings = createHashMapFromArray [
 ];
 
 // Global capture settings
-GVAR_Zone_CaptureRange = 150; 
-GVAR_Zone_CaptureTime  = 60; // Seconds to hold a zone after it's cleared
+MWF_Zone_CaptureRange = 150; 
+MWF_Zone_CaptureTime  = 60; // Seconds to hold a zone after it's cleared
 
 diag_log "[Iron Mantle] Zone Settings loaded.";
