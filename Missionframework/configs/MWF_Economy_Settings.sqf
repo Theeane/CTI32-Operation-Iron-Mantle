@@ -1,15 +1,15 @@
-/* Author: Theeane
-    Description: 
-    Main economy and resource configuration for Operation Iron Mantle.
-    Focuses on Supplies for logistics/vehicles and Intel for missions/civilian info.
-    
-    Note: Infantry recruitment and personal gear are free of charge.
-    All code and comments in English.
+/*
+    Author: Theane / ChatGPT
+    Function: MWF_Economy_Settings
+    Project: Military War Framework
+
+    Description:
+    Defines economy configuration values used by the framework.
 */
 
 // --- 1. INCOME MULTIPLIER (Lobby Parameter) ---
 // 0 = Low (0.5x), 1 = Medium (1.0x), 2 = High (2.0x)
-private _incomeParam = ["GVAR_Param_IncomeMultiplier", 1] call BIS_fnc_getParamValue;
+private _incomeParam = ["MWF_Param_IncomeMultiplier", 1] call BIS_fnc_getParamValue;
 private _incomeMult = 1.0;
 
 switch (_incomeParam) do {
@@ -20,36 +20,36 @@ switch (_incomeParam) do {
 
 // --- 2. STARTING CAPITAL ---
 // Initial resources granted to players at mission start.
-GVAR_Economy_StartSupplies = 200;    // Logistics for vehicles/buildings
-GVAR_Economy_StartIntel    = 0;      // Intelligence for missions/recon
+MWF_Economy_StartSupplies = 200;    // Logistics for vehicles/buildings
+MWF_Economy_StartIntel    = 0;      // Intelligence for missions/recon
 
 // --- 3. INCOME INTERVAL (Timing) ---
 // Frequency of resource distribution in minutes.
 // Param options: 5, 10, 15, 20, 30.
-GVAR_Economy_IncomeInterval = ["GVAR_Param_SupplyTime", 15] call BIS_fnc_getParamValue; 
+MWF_Economy_IncomeInterval = ["MWF_Param_SupplyTime", 15] call BIS_fnc_getParamValue; 
 
 // --- 4. PASSIVE INCOME (Scaled by Multiplier) ---
 // Base resources generated per income tick regardless of territory control.
-GVAR_Economy_PassiveIncome_Supplies = (20 * _incomeMult);  
-GVAR_Economy_PassiveIncome_Intel    = (2 * _incomeMult);  
+MWF_Economy_PassiveIncome_Supplies = (20 * _incomeMult);  
+MWF_Economy_PassiveIncome_Intel    = (2 * _incomeMult);  
 
 // --- 5. ZONE REWARD VALUES (Scaled by Multiplier) ---
 // Resources added to the income tick per controlled sector.
-GVAR_Economy_ZoneBonus_Small = (10 * _incomeMult);   // Radio towers, outposts
-GVAR_Economy_ZoneBonus_Large = (35 * _incomeMult);   // Towns, urban centers
-GVAR_Economy_ZoneBonus_Base  = (75 * _incomeMult);   // Military bases, airports
+MWF_Economy_ZoneBonus_Small = (10 * _incomeMult);   // Radio towers, outposts
+MWF_Economy_ZoneBonus_Large = (35 * _incomeMult);   // Towns, urban centers
+MWF_Economy_ZoneBonus_Base  = (75 * _incomeMult);   // Military bases, airports
 
 // --- 6. INTEL GATHERING VALUES ---
 // Rewards for specific actions on the battlefield.
-GVAR_Economy_Intel_CapturedOfficer = 50;  
-GVAR_Economy_Intel_DataTerminal    = 25;  
-GVAR_Economy_Intel_EnemySoldier    = 1;   
-GVAR_Economy_Intel_CivilianTalk    = 5;   
+MWF_Economy_Intel_CapturedOfficer = 50;  
+MWF_Economy_Intel_DataTerminal    = 25;  
+MWF_Economy_Intel_EnemySoldier    = 1;   
+MWF_Economy_Intel_CivilianTalk    = 5;   
 
 // --- 7. INTEL SCALING LOGIC (Diminishing Returns) ---
 // This function calculates the probability of finding intel/informants 
 // based on current reserves. Higher intel = lower find chance.
-GVAR_Economy_fnc_getIntelChance = {
+MWF_Economy_fnc_getIntelChance = {
     params ["_currentIntel"];
     
     private _baseChance = 100; // Starting chance at 0 Intel
@@ -65,9 +65,9 @@ GVAR_Economy_fnc_getIntelChance = {
 
 // --- 8. VEHICLE PRICING (Tier-Based) ---
 // Final price = BasePrice * TierMultiplier.
-GVAR_Economy_BasePrice_Vehicle = 150; 
+MWF_Economy_BasePrice_Vehicle = 150; 
 
-GVAR_Economy_TierMultipliers = createHashMapFromArray [
+MWF_Economy_TierMultipliers = createHashMapFromArray [
     ["T1", 1.0],   // Logistics / Unarmed
     ["T2", 2.0],   // Light Armed (HMG/GMG)
     ["T3", 4.5],   // IFVs / APCs
@@ -77,13 +77,13 @@ GVAR_Economy_TierMultipliers = createHashMapFromArray [
 
 // --- 9. MOB UPGRADES ---
 // Costs for expanding Mobile Operations Base capabilities.
-GVAR_Economy_Cost_MOB_Repair   = 100;
-GVAR_Economy_Cost_MOB_Rearm    = 150;
-GVAR_Economy_Cost_MOB_Refuel   = 100;
-GVAR_Economy_Cost_MOB_Garage   = 300; 
+MWF_Economy_Cost_MOB_Repair   = 100;
+MWF_Economy_Cost_MOB_Rearm    = 150;
+MWF_Economy_Cost_MOB_Refuel   = 100;
+MWF_Economy_Cost_MOB_Garage   = 300; 
 
 // --- 10. RESOURCE RECOVERY ---
 // Percentage of Supplies returned when recycling assets.
-GVAR_Economy_RefundRate = 0.5;
+MWF_Economy_RefundRate = 0.5;
 
 diag_log format ["[Iron Mantle] Economy Settings Initialized. Mode: %1 (Multiplier: %2x)", _incomeParam, _incomeMult];
