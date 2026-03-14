@@ -1,13 +1,16 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Handles the ghost-preview and placement of construction objects.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_buildMode
+    Project: Military War Framework
+
+    Description:
+    Handles build mode for the core framework layer.
 */
 
 params ["_className", "_price"];
 
 // 1. Check if the player has enough supplies
-private _currentSupplies = missionNamespace getVariable ["AGS_res_supplies", 0];
+private _currentSupplies = missionNamespace getVariable ["MWF_res_supplies", 0];
 if (_currentSupplies < _price) exitWith { 
     hint parseText "<t color='#ff0000'>Not enough Supplies!</t>"; 
 };
@@ -40,7 +43,7 @@ deleteVehicle _ghost;
 
 if (_confirmed) then {
     // Deduct cost
-    [(_price * -1), "SUPPLIES"] call AGS_fnc_addResource;
+    [(_price * -1), "SUPPLIES"] call MWF_fnc_addResource;
     
     // Spawn the real object (Global)
     private _finalPos = player modelToWorld [0, 5, 0];
@@ -48,7 +51,7 @@ if (_confirmed) then {
     
     // Add the "Unpack FOB" action if it's the FOB Container
     if (_className == "B_Slingload_01_Cargo_F") then {
-        [_realObject] remoteExec ["AGS_fnc_setupFOBAction", 0, true];
+        [_realObject] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
     };
 
     hint "Object Deployed.";
