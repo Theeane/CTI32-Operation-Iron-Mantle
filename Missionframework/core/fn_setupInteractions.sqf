@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: HQ Terminal Hold Action for the initial MOB login.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_setupInteractions
+    Project: Military War Framework
+
+    Description:
+    Handles setup interactions for the core framework layer.
 */
 
 params ["_object"];
@@ -21,19 +24,19 @@ params ["_object"];
     {},
     { 
         params ["_target", "_caller"];
-        missionNamespace setVariable ["AGS_system_active", true, true];
+        missionNamespace setVariable ["MWF_system_active", true, true];
         
         // Show the Resource UI for the player
         if (hasInterface) then {
-            cutRsc ["AGS_ResourceBar", "PLAIN"];
-            [] spawn AGS_fnc_updateResourceUI;
+            cutRsc ["MWF_ResourceBar", "PLAIN"];
+            [] spawn MWF_fnc_updateResourceUI;
         };
 
         // Trigger the first task: Deploy FOB
         if (isServer) then { 
-            [1] spawn AGS_fnc_generateInitialMission; 
+            [1] spawn MWF_fnc_generateInitialMission; 
         } else { 
-            [1] remoteExec ["AGS_fnc_generateInitialMission", 2]; 
+            [1] remoteExec ["MWF_fnc_generateInitialMission", 2]; 
         };
 
         [format ["%1 has authorized system access. FOB Container is ready for transport.", name _caller]] remoteExec ["systemChat", 0];
