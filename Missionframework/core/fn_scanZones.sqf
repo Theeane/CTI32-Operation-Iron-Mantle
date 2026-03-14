@@ -4,35 +4,59 @@
     Project: Military War Framework
 
     Description:
-    Scans the map for mission zone markers and registers them for the framework.
-    Marker zones are tracked through missionNamespace state keys instead of marker-local variables.
+    Converts legacy and manual zone markers into normalized zone logic objects for the zone system.
 */
 
-if (!isServer) exitWith {};
+if (!isServer) exitWith {[]};
 
-private _zones = [];
+private _supportedPrefixes = ["capital_", "town_", "factory_", "military_", "MWF_zone_"];
+private _legacyZones = [];
 
 {
     private _markerName = _x;
+    private _isSupported = false;
 
-    if (["MWF_zone_", _markerName] call BIS_fnc_inString) then {
-        _zones pushBackUnique _markerName;
-
-        private _isCaptured = getMarkerColor _markerName == "ColorBLUFOR";
-
-        missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _markerName], _isCaptured, true];
-        missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_underAttack", _markerName], false, true];
-        missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_capProgress", _markerName], if (_isCaptured) then {100} else {0}, true];
-
-        if (isNil { missionNamespace getVariable format ["MWF_zoneState_%1_MWF_contestedAnnounced", _markerName] }) then {
-            missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_contestedAnnounced", _markerName], false, true];
+    {
+        if (_markerName find _x == 0) exitWith {
+            _isSupported = true;
         };
+    } forEach _supportedPrefixes;
+
+    if (_isSupported) then {
+        private _zoneType = "town";
+
+        if (_markerName find "capital_" == 0) then { _zoneType = "capital"; };
+        if (_markerName find "town_" == 0) then { _zoneType = "town"; };
+        if (_markerName find "factory_" == 0) then { _zoneType = "factory"; };
+        if (_markerName find "military_" == 0) then { _zoneType = "military"; };
+
+        private _zonePos = getMarkerPos _markerName;
+        private _zoneRange = ((getMarkerSize _markerName) select 0) max 150;
+        private _zoneName = markerText _markerName;
+
+        if (_zoneName isEqualTo "") then {
+            _zoneName = _markerName;
+        };
+
+        private _zoneLogic = createVehicle ["Logic", _zonePos, [], 0, "CAN_COLLIDE"];
+        _zoneLogic setPosWorld _zonePos;
+        _zoneLogic setVariable ["MWF_zoneID", toLower _markerName, true];
+        _zoneLogic setVariable ["MWF_zoneType", _zoneType, true];
+        _zoneLogic setVariable ["MWF_zoneName", _zoneName, true];
+        _zoneLogic setVariable ["MWF_zoneRange", _zoneRange, true];
+        _zoneLogic setVariable ["MWF_zoneMarker", _markerName, true];
+        _zoneLogic setVariable ["MWF_zoneTextMarker", "", true];
+        _zoneLogic setVariable ["MWF_zoneSource", "marker", true];
+        _zoneLogic setVariable ["MWF_zoneOwnerState", "enemy", true];
+        _zoneLogic setVariable ["MWF_isCaptured", false, true];
+        _zoneLogic setVariable ["MWF_underAttack", false, true];
+        _zoneLogic setVariable ["MWF_contested", false, true];
+        _zoneLogic setVariable ["MWF_capProgress", 0, true];
+
+        _legacyZones pushBack _zoneLogic;
     };
 } forEach allMapMarkers;
 
-missionNamespace setVariable ["MWF_all_mission_zones", _zones, true];
+missionNamespace setVariable ["MWF_LegacyZoneObjects", _legacyZones, true];
 
-// Legacy compatibility cache for scripts still checking marker-only state indirectly.
-missionNamespace setVariable ["MWF_ActiveZones", _zones, true];
-
-diag_log format ["MWF Core: Found and registered %1 zones.", count _zones];
+_legacyZones

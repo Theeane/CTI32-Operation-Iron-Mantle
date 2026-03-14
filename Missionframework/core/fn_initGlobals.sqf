@@ -24,6 +24,20 @@ if (isNil "MWF_res_notoriety") then {
 if (isNil "MWF_CivRep") then {
     missionNamespace setVariable ["MWF_CivRep", _startCivRep, true];
 };
+if (isNil "MWF_ProductionBonus") then {
+    missionNamespace setVariable ["MWF_ProductionBonus", 0, true];
+};
+if (isNil "MWF_LoadedZoneSaveData") then {
+    missionNamespace setVariable ["MWF_LoadedZoneSaveData", [], true];
+};
+if (isNil "MWF_CapturedZoneCount") then {
+    missionNamespace setVariable ["MWF_CapturedZoneCount", 0, true];
+    missionNamespace setVariable ["MWF_CapturedTownCount", 0, true];
+    missionNamespace setVariable ["MWF_CapturedCapitalCount", 0, true];
+    missionNamespace setVariable ["MWF_CapturedFactoryCount", 0, true];
+    missionNamespace setVariable ["MWF_CapturedMilitaryCount", 0, true];
+    missionNamespace setVariable ["MWF_MapControlPercent", 0, true];
+};
 
 missionNamespace setVariable ["MWF_Supplies", missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies], true];
 missionNamespace setVariable ["MWF_Intel", missionNamespace getVariable ["MWF_res_intel", 0], true];
@@ -57,7 +71,7 @@ private _bluforFile = switch (["MWF_Param_Blufor", 0] call BIS_fnc_getParamValue
     case 13: {"RHS_USAF_Woodland.sqf"};
     case 14: {"SOG_MACV.sqf"};
     case 15: {"ws_blufor_desert.sqf"};
-    case 99: {"Custom"};
+    case 99: {"Custom.sqf"};
     default {"NATO.sqf"};
 };
 ["blufor", _bluforFile] call _fnc_loadPreset;
@@ -75,7 +89,7 @@ private _opforFile = switch (["MWF_Param_Opfor", 0] call BIS_fnc_getParamValue) 
     case 9:  {"RHS_AFRF.sqf"};
     case 10: {"Takistan_Army.sqf"};
     case 11: {"Unsung_Vietnam.sqf"};
-    case 99: {"Custom"};
+    case 99: {"Custom.sqf"};
     default {"CSAT.sqf"};
 };
 ["opfor", _opforFile] call _fnc_loadPreset;
@@ -89,7 +103,7 @@ private _resistanceFile = switch (["MWF_Param_Resistance", 0] call BIS_fnc_getPa
     case 5:  {"RHS_GREF.sqf"};
     case 6:  {"Syndikat.sqf"};
     case 7:  {"Vietnam_CIDG.sqf"};
-    case 99: {"Custom"};
+    case 99: {"Custom.sqf"};
     default {"AAF.sqf"};
 };
 ["resistance", _resistanceFile] call _fnc_loadPreset;
