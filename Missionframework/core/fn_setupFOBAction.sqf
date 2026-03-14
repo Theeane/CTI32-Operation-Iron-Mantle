@@ -1,44 +1,54 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_setupFOBAction
+    Function: fn_setupFOBInteractions
     Project: Military War Framework
 
     Description:
-    Handles setup f o b action for the core framework layer.
+    Handles setup f o b interactions for the core framework layer.
 */
 
-params ["_container"];
+params ["_terminal"];
 
-[
-    _container,
-    "Initiate FOB Deployment",
-    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
-    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_request_ca.paa",
-    "_this distance _target < 5",
-    "_caller distance _target < 5",
-    { systemChat "Calibrating deployment site..."; },
-    {},
+// 1. Open Base Architect (Zeus Mode - Free building for decor/walls)
+_terminal addAction [
+    "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect</t>", 
     {
-        params ["_target", "_caller"];
-        private _pos = getPosATL _target;
-        deleteVehicle _target;
-
-        // Create a temporary Zeus logic for the player
-        private _group = createGroup sideLogic;
-        private _curator = _group createUnit ["ModuleCurator_F", [0,0,0], [], 0, "NONE"];
-        
-        _caller assignCurator _curator;
-        
-        // Give the curator the ability to place the composition
-        // (This part requires a helper script to 'attach' the composition to the cursor)
-        [_curator, _pos] remoteExec ["MWF_fnc_startFOBPlacement", _caller];
-
-        systemChat "Deployment Interface Active. Place the FOB Composition.";
+        [] spawn MWF_fnc_openBaseArchitect;
     },
-    { systemChat "Deployment cancelled."; },
     [],
-    10,
-    10,
-    true,
-    false
-] call BIS_fnc_holdActionAdd;
+    10, 
+    true, 
+    true, 
+    "", 
+    "_this distance _target < 3"
+];
+
+// 2. Open Logistics Menu (Ghost Mode - Vehicles/Crates that cost Supplies)
+_terminal addAction [
+    "<t color='#00ff00' size='1.2'>[ FOB ] Open Logistics Menu</t>", 
+    {
+        // Placeholder for the Menu UI we are building
+        [] spawn MWF_fnc_openBuildMenu; 
+    },
+    [],
+    9, 
+    true, 
+    true, 
+    "", 
+    "_this distance _target < 3"
+];
+
+// 3. Status Check (Optional)
+_terminal addAction [
+    "<t color='#ffffff'>Check Resource Levels</t>", 
+    {
+        private _supplies = missionNamespace getVariable ["MWF_res_supplies", 0];
+        hint format ["Current FOB Logistics:\nSupplies: %1", _supplies];
+    },
+    [],
+    1, 
+    false, 
+    true, 
+    "", 
+    "_this distance _target < 3"
+];
