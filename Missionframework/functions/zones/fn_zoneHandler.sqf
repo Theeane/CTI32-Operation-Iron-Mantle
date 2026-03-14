@@ -4,87 +4,106 @@
     Project: Military War Framework
 
     Description:
-    Handles zone handler for the zones system.
+    Handles runtime zone state updates for all active mission zones.
+    This function is intended to run as the authoritative runtime layer after zone registration.
 */
 
-params [
-    ["_pos", [0,0,0]],            // Position of the zone
-    ["_tier", 1],                 // Tier level (1-5)
-    ["_marker", ""],              // The map marker associated with the zone
-    ["_spawnRadius", 800],        // Distance to spawn assets
-    ["_despawnRadius", 1200]      // Distance to clean up assets
-];
+if (!isServer) exitWith {};
 
-if (!isServer) exitWith {}; // Only the server (or HC) should run zone logic
-
-// --- PERFORMANCE AUTO-SCALE ---
-// Increase ranges if a Headless Client is detected to take advantage of extra CPU
-if (!isNil "HC1") then {
-    _spawnRadius = 1200;
-    _despawnRadius = 1600;
+private _activeZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
+if (_activeZones isEqualTo []) exitWith {
+    diag_log "[MWF Zones] fn_zoneHandler aborted. No registered zones found.";
 };
 
-private _isSpawned = false;
-private _sideOwner = east; // Zones start as enemy controlled
-private _isCaptured = false;
+missionNamespace setVariable ["MWF_ActiveZones", _activeZones, true];
 
-// --- MAIN MONITORING LOOP ---
 while {true} do {
-    // 1. Calculate distance to the nearest player
-    private _distances = allPlayers apply { _x distance _pos };
-    private _minDist = if (count _distances > 0) then { selectMin _distances } else { 99999 };
+    {
+        private _zoneRef = _x;
+        private _isMarkerZone = _zoneRef isEqualType "";
+        private _zoneObject = if (_isMarkerZone) then { objNull } else { _zoneRef };
+        private _markerName = if (_isMarkerZone) then { _zoneRef } else { _zoneRef getVariable ["MWF_zoneMarker", ""] };
 
-    // 2. DYNAMIC SPAWN LOGIC
-    if (_minDist < _spawnRadius && !_isSpawned && !_isCaptured) then {
-        [_pos, _tier] spawn MWF_fnc_spawnZoneAssets;
-        _isSpawned = true;
-        diag_log format ["[Iron Mantle] Zone %1 triggered spawn at %2m", _marker, _minDist];
-    };
-
-    // 3. DYNAMIC DESPAWN LOGIC
-    if (_minDist > _despawnRadius && _isSpawned) then {
-        [_pos, _despawnRadius] spawn MWF_fnc_despawnZoneAssets;
-        _isSpawned = false;
-        diag_log format ["[Iron Mantle] Zone %1 triggered despawn at %2m", _marker, _minDist];
-    };
-
-    // 4. CAPTURE LOGIC (Only if not already captured)
-    if (!_isCaptured) then {
-        private _playersInZone = allPlayers select { _x distance _pos < 150 }; // 150m cap range
-        private _enemiesInZone = allUnits select { 
-            (side _x == east || side _x == resistance) && 
-            {_x distance _pos < 150} && 
-            {alive _x} 
+        if (_isMarkerZone && { !(_markerName in allMapMarkers) }) then {
+            continue;
         };
 
-        // If players are present and all defenders are dead
-        if (count _playersInZone > 0 && count _enemiesInZone == 0) then {
-            
-            _isCaptured = true;
-            _sideOwner = west;
+        if (!_isMarkerZone && { isNull _zoneObject }) then {
+            continue;
+        };
 
-            // Visual feedback on map
-            _marker setMarkerColor "ColorGreen";
-            
-            // Economy Integration: Register zone for supply income
-            private _tierData = MWF_Zone_Tier_Settings get _tier;
-            private _income = _tierData select 0;
-            
-            // Add to active zones for the Economy Manager to track
-            MWF_ActiveZones pushBack [_marker, _tier];
-            publicVariable "MWF_ActiveZones";
+        private _zonePos = if (_isMarkerZone) then { getMarkerPos _markerName } else { getPosWorld _zoneObject };
+        private _zoneRange = if (_isMarkerZone) then { (getMarkerSize _markerName) select 0 } else { _zoneObject getVariable ["MWF_zoneRange", 300] };
+        private _zoneName = if (_isMarkerZone) then { markerText _markerName } else { _zoneObject getVariable ["MWF_zoneName", markerText _markerName] };
 
-            // Global Notification
-            [format["STR_MISSION_ZONE_CAPTURED", _marker, _income]] remoteExec ["systemChat", 0];
-            ["TaskSucceeded", ["", format["Zone Captured! Income: +%1 Supplies", _income]]] remoteExec ["BIS_fnc_showNotification", _playersInZone];
+        if (_zoneName isEqualTo "") then {
+            _zoneName = if (_isMarkerZone) then { _markerName } else { "Unnamed Zone" };
+        };
 
-            // Cleanup remaining enemy scripts if any
-            if (_isSpawned) then {
-                [_pos, _despawnRadius] spawn MWF_fnc_despawnZoneAssets;
-                _isSpawned = false;
+        private _isCaptured = if (_isMarkerZone) then {
+            missionNamespace getVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _markerName], false]
+        } else {
+            _zoneObject getVariable ["MWF_isCaptured", false]
+        };
+
+        private _underAttack = if (_isMarkerZone) then {
+            missionNamespace getVariable [format ["MWF_zoneState_%1_MWF_underAttack", _markerName], false]
+        } else {
+            _zoneObject getVariable ["MWF_underAttack", false]
+        };
+
+        private _playersPresent = allPlayers select {
+            alive _x &&
+            { (_x distance2D _zonePos) < _zoneRange }
+        };
+
+        private _enemyUnits = allUnits select {
+            alive _x &&
+            { side _x == east } &&
+            { (_x distance2D _zonePos) < _zoneRange }
+        };
+
+        private _friendlyCount = count _playersPresent;
+        private _enemyCount = count _enemyUnits;
+
+        if (_isCaptured) then {
+            if (_enemyCount > 0 && { _enemyCount > _friendlyCount }) then {
+                if (!_underAttack) then {
+                    if (_isMarkerZone) then {
+                        missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_underAttack", _markerName], true, true];
+                    } else {
+                        _zoneObject setVariable ["MWF_underAttack", true, true];
+                    };
+
+                    if (_markerName != "" && { _markerName in allMapMarkers }) then {
+                        _markerName setMarkerColor "ColorYellow";
+                    };
+
+                    [format ["%1 is under attack.", _zoneName]] remoteExec ["systemChat", 0];
+                };
+            } else {
+                if (_underAttack && { _enemyCount == 0 }) then {
+                    if (_isMarkerZone) then {
+                        missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_underAttack", _markerName], false, true];
+                    } else {
+                        _zoneObject setVariable ["MWF_underAttack", false, true];
+                    };
+
+                    if (_markerName != "" && { _markerName in allMapMarkers }) then {
+                        _markerName setMarkerColor "ColorBLUFOR";
+                    };
+
+                    [format ["%1 is secure again.", _zoneName]] remoteExec ["systemChat", 0];
+                };
+            };
+        } else {
+            if (_friendlyCount > 0 && { _enemyCount == 0 }) then {
+                if (_markerName != "" && { _markerName in allMapMarkers }) then {
+                    _markerName setMarkerColor "ColorYellow";
+                };
             };
         };
-    };
+    } forEach _activeZones;
 
-    sleep 10; // Performance friendly sleep
+    uiSleep 10;
 };
