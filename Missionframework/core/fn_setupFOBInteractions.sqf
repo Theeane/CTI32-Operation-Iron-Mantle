@@ -48,8 +48,9 @@ _actionIds pushBack (
     _terminal addAction [
         "<t color='#ffffff'>Check Resource Levels</t>",
         {
-            private _supplies = missionNamespace getVariable ["MWF_res_supplies", 0];
-            hint format ["Current FOB Logistics:\nSupplies: %1", _supplies];
+            private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
+            private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
+            hint format ["Current FOB Logistics:\nSupplies: %1\nIntel: %2", _supplies, _intel];
         },
         [],
         1,
