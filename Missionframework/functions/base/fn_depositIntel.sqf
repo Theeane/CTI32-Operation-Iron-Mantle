@@ -1,8 +1,10 @@
-/* Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Folder: functions/base
-    Description: Deposits carried digital currency (Temp Intel) into the HQ Bank (S).
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_depositIntel
+    Project: Military War Framework
+
+    Description:
+    Handles deposit intel for the base system.
 */
 
 params [["_laptop", objNull, [objNull]], ["_caller", objNull, [objNull]]];
@@ -10,7 +12,7 @@ params [["_laptop", objNull, [objNull]], ["_caller", objNull, [objNull]]];
 if (isNull _caller) exitWith {};
 
 // 1. Retrieve the player's Temp Intel (The +X value shown in the HUD)
-private _tempIntel = _caller getVariable ["KPIN_carriedIntelValue", 0];
+private _tempIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
 
 // 2. Safety Check: Does the player have anything to upload?
 if (_tempIntel <= 0) exitWith {
@@ -18,14 +20,14 @@ if (_tempIntel <= 0) exitWith {
 };
 
 // 3. Update the global HQ Bank (S-Currency)
-private _currentBank = missionNamespace getVariable ["KPIN_Currency", 0];
+private _currentBank = missionNamespace getVariable ["MWF_Currency", 0];
 private _newTotal = _currentBank + _tempIntel;
 
-missionNamespace setVariable ["KPIN_Currency", _newTotal, true];
+missionNamespace setVariable ["MWF_Currency", _newTotal, true];
 
 // 4. Reset player's Temp Intel (This triggers the 10s HUD fade automatically)
-_caller setVariable ["KPIN_carriedIntelValue", 0, true];
-_caller setVariable ["KPIN_carryingIntel", false, true];
+_caller setVariable ["MWF_carriedIntelValue", 0, true];
+_caller setVariable ["MWF_carryingIntel", false, true];
 
 // 5. Visual Feedback
 [
@@ -34,6 +36,6 @@ _caller setVariable ["KPIN_carryingIntel", false, true];
 ] remoteExec ["BIS_fnc_showNotification", _caller];
 
 // 6. Persistence (Triggers a delayed save for the economy)
-if (!isNil "KPIN_fnc_requestDelayedSave") then { [] call KPIN_fnc_requestDelayedSave; };
+if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
 
 diag_log format ["[KPIN] Economy: %1 deposited %2 S. New HQ Balance: %3 S.", name _caller, _tempIntel, _newTotal];

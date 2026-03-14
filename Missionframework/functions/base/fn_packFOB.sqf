@@ -1,13 +1,16 @@
-/* Author: Theane
-    Project: Operation Iron Mantle
-    Description: Handles the packing up of a deployed FOB into Truck or Box mode.
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_packFOB
+    Project: Military War Framework
+
+    Description:
+    Handles pack f o b for the base system.
 */
 
 params ["_fobObject"];
 
 // Condition check: Distance, speed, and COMMANDER AUTHORIZATION
-private _condition = "_this distance _target < 10 && (_target getVariable ['KPIN_FOB_CanRepack', false])";
+private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false])";
 
 // --- OPTION 1: Pack into Truck (Drive) ---
 [
@@ -21,7 +24,7 @@ private _condition = "_this distance _target < 10 && (_target getVariable ['KPIN
     {},
     {
         params ["_target", "_caller"];
-        [_target, KPIN_FOB_Truck] call KPIN_fnc_executeRepack; 
+        [_target, MWF_FOB_Truck] call MWF_fnc_executeRepack; 
     },
     {}, [], 15, 0, true, false
 ] call BIS_fnc_holdActionAdd;
@@ -38,7 +41,7 @@ private _condition = "_this distance _target < 10 && (_target getVariable ['KPIN
     {},
     {
         params ["_target", "_caller"];
-        [_target, KPIN_FOB_Box_Transport] call KPIN_fnc_executeRepack; 
+        [_target, MWF_FOB_Box_Transport] call MWF_fnc_executeRepack; 
     },
     {}, [], 10, 0, true, false
 ] call BIS_fnc_holdActionAdd;

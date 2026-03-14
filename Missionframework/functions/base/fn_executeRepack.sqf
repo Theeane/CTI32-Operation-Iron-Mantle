@@ -1,8 +1,10 @@
-/* Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Folder: functions/base
-    Description: Deletes linked FOB assets and restores the transport vehicle/box.
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_executeRepack
+    Project: Military War Framework
+
+    Description:
+    Handles execute repack for the base system.
 */
 
 if (!isServer) exitWith {};
@@ -18,23 +20,23 @@ if (isNull _target || _className == "") exitWith {
 
 // 1. AUTHORIZATION CHECK
 // Ensure the Commander has toggled the repack authorization
-private _canRepack = _target getVariable ["KPIN_FOB_CanRepack", false];
+private _canRepack = _target getVariable ["MWF_FOB_CanRepack", false];
 if (!_canRepack) exitWith {
     ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
 };
 
 private _pos = getPosATL _target;
 private _dir = getDir _target;
-private _marker = _target getVariable ["KPIN_FOB_Marker", ""];
+private _marker = _target getVariable ["MWF_FOB_Marker", ""];
 
 // 2. COLLECT LINKED ASSETS
-private _locker = _target getVariable ["KPIN_AttachedLocker", objNull];
-private _siren  = _target getVariable ["KPIN_AttachedSiren", objNull];
+private _locker = _target getVariable ["MWF_AttachedLocker", objNull];
+private _siren  = _target getVariable ["MWF_AttachedSiren", objNull];
 private _table  = attachedTo _target; // Laptop is usually attached to the table
 
 // 3. REGISTRY CLEANUP
 if (_marker != "") then {
-    ["REMOVE", _marker] call KPIN_fnc_baseManager;
+    ["REMOVE", _marker] call MWF_fnc_baseManager;
     deleteMarker _marker;
 };
 
@@ -45,7 +47,7 @@ if (_marker != "") then {
 } forEach [_target, _locker, _siren, _table];
 
 // Delete optional assets (Camo net/Roof)
-private _roofClass = missionNamespace getVariable ["KPIN_FOB_Asset_Roof", ""];
+private _roofClass = missionNamespace getVariable ["MWF_FOB_Asset_Roof", ""];
 if (_roofClass != "") then {
     private _roofs = nearestObjects [_pos, [_roofClass], 15];
     { deleteVehicle _x } forEach _roofs;
@@ -58,7 +60,7 @@ _newObject setDir _dir;
 _newObject setPosATL _pos;
 
 // Re-initialize the vehicle so it can be deployed again
-[_newObject] call KPIN_fnc_initFOB;
+[_newObject] call MWF_fnc_initFOB;
 
 // 6. GLOBAL FEEDBACK
 ["TaskSucceeded", ["", "FOB repacked and ready for transport."]] remoteExec ["BIS_fnc_showNotification", 0];

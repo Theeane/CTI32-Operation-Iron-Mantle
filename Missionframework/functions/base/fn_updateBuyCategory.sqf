@@ -1,7 +1,10 @@
-/* Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Description: Populates the listbox and handles Tech/Tier requirements.
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_updateBuyCategory
+    Project: Military War Framework
+
+    Description:
+    Handles update buy category for the base system.
 */
 
 params ["_category"];
@@ -14,23 +17,23 @@ private _listBox = _display displayCtrl 9002;
 private _currencyText = _display displayCtrl 9001;
 
 // 1. Update the Currency display (S)
-private _currentCurrency = missionNamespace getVariable ["KPIN_Currency", 0];
+private _currentCurrency = missionNamespace getVariable ["MWF_Currency", 0];
 _currencyText ctrlSetText format["Digital Currency: %1 S", _currentCurrency];
 
 lbClear _listBox;
 
 // 2. Fetch Tech & Tier status for filtering
-private _hasMobileTech = missionNamespace getVariable ["KPIN_Upgrade_MobileRespawn", false];
-private _currentTier = missionNamespace getVariable ["KPIN_CurrentTier", 1];
+private _hasMobileTech = missionNamespace getVariable ["MWF_Upgrade_MobileRespawn", false];
+private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 
 // 3. Get data from the KPIN config hashmap
-private _items = missionNamespace getVariable ["KPIN_BuyMenu_Data", createHashMap] getOrDefault [_category, []];
+private _items = missionNamespace getVariable ["MWF_BuyMenu_Data", createHashMap] getOrDefault [_category, []];
 
 {
     _x params ["_name", "_classname", "_cost", "_icon", ["_reqTech", false], ["_reqTier", 1]];
     
     // --- TECH & TIER CHECK ---
-    // Om föremålet kräver Mobile Tech men vi inte har det, eller om Tier är för lågt:
+    // Skip items that require Mobile Tech or a higher tier than currently available
     private _canSee = true;
     if (_reqTech && !_hasMobileTech) then { _canSee = false; };
     if (_currentTier < _reqTier) then { _canSee = false; };

@@ -1,8 +1,10 @@
-/* Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Folder: functions/base
-    Description: Initializes an object as a Mobile Respawn point with Digital Vault.
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_initMobileRespawn
+    Project: Military War Framework
+
+    Description:
+    Handles init mobile respawn for the base system.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -10,9 +12,9 @@ params [["_object", objNull, [objNull]]];
 if (isNull _object) exitWith {};
 
 // 1. SET VARIABLES
-_object setVariable ["KPIN_isMobileRespawn", true, true];
-_object setVariable ["KPIN_isUnderAttack", false, true];
-_object setVariable ["KPIN_vaultCurrency", 0, true]; // Initialize digital vault
+_object setVariable ["MWF_isMobileRespawn", true, true];
+_object setVariable ["MWF_isUnderAttack", false, true];
+_object setVariable ["MWF_vaultCurrency", 0, true]; // Initialize digital vault
 
 // 2. CREATE MARKER (Prefix 'mobile_respawn_' is used by the HUD sensor)
 private _mkrName = format["mobile_respawn_%1", round(random 9999)];
@@ -27,15 +29,15 @@ _object addAction [
     "<t color='#00FFFF'>[ STORE DIGITAL INTEL ]</t>", 
     {
         params ["_target", "_caller"];
-        private _playerIntel = _caller getVariable ["KPIN_carriedIntelValue", 0];
-        private _currentVault = _target getVariable ["KPIN_vaultCurrency", 0];
-        _target setVariable ["KPIN_vaultCurrency", _currentVault + _playerIntel, true];
-        _caller setVariable ["KPIN_carriedIntelValue", 0, true];
-        _caller setVariable ["KPIN_carryingIntel", false, true];
+        private _playerIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
+        private _currentVault = _target getVariable ["MWF_vaultCurrency", 0];
+        _target setVariable ["MWF_vaultCurrency", _currentVault + _playerIntel, true];
+        _caller setVariable ["MWF_carriedIntelValue", 0, true];
+        _caller setVariable ["MWF_carryingIntel", false, true];
         hint format ["Intel Stored.\nVehicle Vault: %1 S", _currentVault + _playerIntel];
     },
     nil, 6, true, true, "", 
-    "(speed _target < 1) && (_this distance _target < 5) && (_this getVariable ['KPIN_carriedIntelValue', 0] > 0)"
+    "(speed _target < 1) && (_this distance _target < 5) && (_this getVariable ['MWF_carriedIntelValue', 0] > 0)"
 ];
 
 // Get Intel (Vehicle -> Player)
@@ -43,15 +45,15 @@ _object addAction [
     "<t color='#FFFF00'>[ EXTRACT INTEL FROM VAULT ]</t>", 
     {
         params ["_target", "_caller"];
-        private _vaultIntel = _target getVariable ["KPIN_vaultCurrency", 0];
-        private _currentPlayerIntel = _caller getVariable ["KPIN_carriedIntelValue", 0];
-        _caller setVariable ["KPIN_carriedIntelValue", _currentPlayerIntel + _vaultIntel, true];
-        _caller setVariable ["KPIN_carryingIntel", true, true];
-        _target setVariable ["KPIN_vaultCurrency", 0, true];
+        private _vaultIntel = _target getVariable ["MWF_vaultCurrency", 0];
+        private _currentPlayerIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
+        _caller setVariable ["MWF_carriedIntelValue", _currentPlayerIntel + _vaultIntel, true];
+        _caller setVariable ["MWF_carryingIntel", true, true];
+        _target setVariable ["MWF_vaultCurrency", 0, true];
         hint format ["Intel Extracted.\nYou are now carrying: %1 S", _currentPlayerIntel + _vaultIntel];
     },
     nil, 5, true, true, "", 
-    "(speed _target < 1) && (_this distance _target < 5) && (_target getVariable ['KPIN_vaultCurrency', 0] > 0)"
+    "(speed _target < 1) && (_this distance _target < 5) && (_target getVariable ['MWF_vaultCurrency', 0] > 0)"
 ];
 
 // 4. MONITOR LOOP
@@ -62,7 +64,7 @@ _object addAction [
         _mkr setMarkerPos (getPosATL _obj);
         
         private _isStationary = (speed _obj < 2);
-        _obj setVariable ["KPIN_respawnAvailable", _isStationary, true];
+        _obj setVariable ["MWF_respawnAvailable", _isStationary, true];
 
         if (_isStationary) then {
             _mkr setMarkerAlpha 1;
@@ -76,7 +78,7 @@ _object addAction [
     };
     
     // Notify players if vault contents are lost upon destruction
-    private _lostS = _obj getVariable ["KPIN_vaultCurrency", 0];
+    private _lostS = _obj getVariable ["MWF_vaultCurrency", 0];
     if (_lostS > 0) then {
         ["TaskFailed", ["", format["Vault Destroyed: %1 S lost!", _lostS]]] remoteExec ["BIS_fnc_showNotification", 0];
     };

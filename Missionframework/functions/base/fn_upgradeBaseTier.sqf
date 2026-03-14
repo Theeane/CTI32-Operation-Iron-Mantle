@@ -1,14 +1,16 @@
-/* Author: Theane / Gemini
-    Project: Operation Iron Mantle
-    Folder: functions/base
-    Description: Handles Base Tier progression using Digital Currency (S).
-    Language: English
+/*
+    Author: Theane / ChatGPT
+    Function: fn_upgradeBaseTier
+    Project: Military War Framework
+
+    Description:
+    Handles upgrade base tier for the base system.
 */
 
 if (!isServer) exitWith {};
 
-private _currentTier = missionNamespace getVariable ["KPIN_CurrentTier", 1];
-private _currency = missionNamespace getVariable ["KPIN_Currency", 0];
+private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+private _currency = missionNamespace getVariable ["MWF_Currency", 0];
 
 // Tier upgrade costs (S-Currency)
 // Tier 1 -> 2: 1500 S | Tier 2 -> 3: 3500 S
@@ -29,11 +31,11 @@ if (_currency < _cost) exitWith {
 
 // 3. Process the upgrade
 _currency = _currency - _cost;
-missionNamespace setVariable ["KPIN_Currency", _currency, true];
-missionNamespace setVariable ["KPIN_CurrentTier", _nextTier, true];
+missionNamespace setVariable ["MWF_Currency", _currency, true];
+missionNamespace setVariable ["MWF_CurrentTier", _nextTier, true];
 
 // 4. Persistence (Trigger delayed save for the world state)
-if (!isNil "KPIN_fnc_requestDelayedSave") then { [] call KPIN_fnc_requestDelayedSave; };
+if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
 
 // 5. Global Announcement
 [
@@ -48,8 +50,8 @@ if (_nextTier == 3) then {
 };
 
 // 7. Refresh UI for all players to update locked/unlocked items
-if (!isNil "KPIN_fnc_updateBuyCategory") then { 
-    [] remoteExec ["KPIN_fnc_updateBuyCategory", -2]; 
+if (!isNil "MWF_fnc_updateBuyCategory") then { 
+    [] remoteExec ["MWF_fnc_updateBuyCategory", -2]; 
 };
 
 diag_log format ["[KPIN] Economy: Base upgraded to Tier %1 by %2. Cost: %3 S.", _nextTier, name (allPlayers select 0), _cost];
