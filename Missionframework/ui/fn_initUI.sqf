@@ -1,8 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Registers User Interface settings in the CBA Options menu.
-    This allows players to move or hide the HUD based on their preference.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_initUI
+    Project: Military War Framework
+
+    Description:
+    Handles UI logic for init u i.
 */
 
 if (!hasInterface) exitWith {};
@@ -14,7 +16,7 @@ if (isNil "CBA_fnc_addSetting") exitWith {
 
 // --- HUD POSITION SETTING ---
 [
-    "AGS_UI_Position", // Variable name used in scripts
+    "MWF_UI_Position", // Variable name used in scripts
     "LIST",            // Type: Dropdown list
     ["HUD Position", "Choose where the Resource Bar and Undercover Eye are displayed."], // Description
     "AGS Framework",   // Category in CBA menu
@@ -27,19 +29,19 @@ if (isNil "CBA_fnc_addSetting") exitWith {
     { 
         // CODE TO RUN ON CHANGE
         // This forces the HUD to reposition itself immediately when the setting is changed
-        [] spawn AGS_fnc_updateResourceUI; 
+        [] spawn MWF_fnc_updateResourceUI; 
     }
 ] call CBA_fnc_addSetting;
 
 // --- HUD OPACITY SETTING ---
 [
-    "AGS_UI_Opacity", 
+    "MWF_UI_Opacity", 
     "SLIDER", 
     ["HUD Opacity", "Adjust the transparency of the background."], 
     "AGS Framework", 
     [0.1, 1, 0.5, 1], // Min, Max, Default, Decimals
     nil, 
-    { [] spawn AGS_fnc_updateResourceUI; }
+    { [] spawn MWF_fnc_updateResourceUI; }
 ] call CBA_fnc_addSetting;
 
 diag_log "AGS UI: Client settings registered successfully.";

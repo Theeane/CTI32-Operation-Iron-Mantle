@@ -1,14 +1,16 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Clean CTI HUD. 
-    - Resources & Eye: Always Visible.
-    - Heat/Notoriety: Visible only in FOB/MOB.
+    Author: Theane / ChatGPT
+    Function: resourceBar
+    Project: Military War Framework
+
+    Description:
+    Defines the UI layout for resource bar.
 */
 
-class AGS_ResourceBar {
+class MWF_ResourceBar {
     idd = 9000;
     duration = 1e+011;
-    onLoad = "uiNamespace setVariable ['AGS_ctrl_resBar', _this select 0]";
+    onLoad = "uiNamespace setVariable ['MWF_ctrl_resBar', _this select 0]";
 
     class Controls {
         // --- 1. RESOURCE PANEL (Always visible) ---

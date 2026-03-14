@@ -1,7 +1,10 @@
 /*
-    Author: Theeane / Gemini
-    Description: Buy Menu Dialog for Operation Iron Mantle.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: buyMenu
+    Project: Military War Framework
+
+    Description:
+    Defines the UI layout for buy menu.
 */
 
 #define IDD_BUY_MENU 9000
@@ -42,7 +45,7 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Infantry";
-            action = "['Infantry'] spawn AGS_fnc_updateBuyCategory;";
+            action = "['Infantry'] spawn MWF_fnc_updateBuyCategory;";
         };
         // Tab 2: Light Vehicles
         class BtnVeh: RscActivePicture {
@@ -51,7 +54,7 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Light Vehicles";
-            action = "['LightVehicles'] spawn AGS_fnc_updateBuyCategory;";
+            action = "['LightVehicles'] spawn MWF_fnc_updateBuyCategory;";
         };
         // Tab 3: Heavy Armor
         class BtnTank: RscActivePicture {
@@ -60,7 +63,7 @@ class IronMantle_BuyMenu {
             y = 0.21 * safezoneH + safezoneY;
             w = 0.03 * safezoneW; h = 0.03 * safezoneH;
             tooltip = "Heavy Armor";
-            action = "['HeavyVehicles'] spawn AGS_fnc_updateBuyCategory;";
+            action = "['HeavyVehicles'] spawn MWF_fnc_updateBuyCategory;";
         };
 
         // Supply Information Display
@@ -90,7 +93,7 @@ class IronMantle_BuyMenu {
             y = 0.68 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.05 * safezoneH;
             colorBackground[] = {0, 0.4, 0, 1}; // Dark green
-            action = "[] spawn AGS_fnc_initiatePurchase;";
+            action = "[] spawn MWF_fnc_initiatePurchase;";
         };
 
         // Close/Exit Button

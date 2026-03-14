@@ -1,10 +1,13 @@
 /*
-    Author: Theane (AGS Project)
-    Description: UI for the Logistics / Vehicle Build Menu.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: buildMenu
+    Project: Military War Framework
+
+    Description:
+    Defines the UI layout for build menu.
 */
 
-class AGS_BuildMenu {
+class MWF_BuildMenu {
     idd = 9000;
     movingEnable = false;
     
@@ -48,7 +51,7 @@ class AGS_BuildMenu {
             y = 0.68 * safezoneH + safezoneY;
             w = 0.1 * safezoneW;
             h = 0.05 * safezoneH;
-            action = "[] spawn AGS_fnc_requestPaidBuild;";
+            action = "[] spawn MWF_fnc_requestPaidBuild;";
         };
     };
 };

@@ -1,22 +1,25 @@
 /*
-    Author: Theeane / Gemini
-    Description: 
-    Updates the AGS Resource Bar HUD. 
-    Handles visibility for Heat and Undercover status.
+    Author: Theane / ChatGPT
+    Function: fn_updateResourceUI
+    Project: Military War Framework
+
+    Description:
+    Handles UI logic for update resource u i.
 */
+
 disableSerialization;
 
 // Start the HUD layer
-"AGS_resLayer" cutRsc ["AGS_ResourceBar", "PLAIN"];
+"MWF_resLayer" cutRsc ["MWF_ResourceBar", "PLAIN"];
 
 while {true} do {
-    private _ui = uiNamespace getVariable ["AGS_ctrl_resBar", displayNull];
+    private _ui = uiNamespace getVariable ["MWF_ctrl_resBar", displayNull];
     
     if (!isNull _ui) then {
         // 1. Fetch Current Values
-        private _supplies = missionNamespace getVariable ["GVAR_Economy_Supplies", 0];
-        private _intel = missionNamespace getVariable ["AGS_res_intel", 0];
-        private _heat = missionNamespace getVariable ["AGS_res_notoriety", 0];
+        private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
+        private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
+        private _heat = missionNamespace getVariable ["MWF_res_notoriety", 0];
         
         // 2. Update Basic Resources
         (_ui displayCtrl 9001) ctrlSetText format ["SUP: %1", _supplies];
@@ -25,7 +28,7 @@ while {true} do {
 
         // 3. Logic: Notoriety/Heat Visibility
         // Show Heat panel only if player is near a FOB or has active Heat
-        private _isNearFOB = player getVariable ["AGS_isNearFOB", false];
+        private _isNearFOB = player getVariable ["MWF_isNearFOB", false];
         if (_heat > 0 || _isNearFOB) then {
             (_ui displayCtrl 9200) ctrlSetFade 0;
         } else {
@@ -34,7 +37,7 @@ while {true} do {
         (_ui displayCtrl 9200) ctrlCommit 0.5;
 
         // 4. Logic: Undercover "The Eye"
-        private _isUndercover = player getVariable ["AGS_isUndercover", false];
+        private _isUndercover = player getVariable ["MWF_isUndercover", false];
         private _eyeCtrl = (_ui displayCtrl 9004);
         
         if (_isUndercover) then {

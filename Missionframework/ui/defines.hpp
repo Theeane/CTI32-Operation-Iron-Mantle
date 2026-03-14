@@ -1,3 +1,12 @@
+/*
+    Author: Theane / ChatGPT
+    Function: defines
+    Project: Military War Framework
+
+    Description:
+    Defines the UI layout for defines.
+*/
+
 // Standard Arma 3 UI Styles
 #define ST_LEFT           0x00
 #define ST_RIGHT          0x01
