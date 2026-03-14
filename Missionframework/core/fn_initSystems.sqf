@@ -76,6 +76,16 @@ missionNamespace setVariable ["MWF_ThreatStateDirty", missionNamespace getVariab
 missionNamespace setVariable ["MWF_ThreatRecalcRunning", missionNamespace getVariable ["MWF_ThreatRecalcRunning", false], false];
 missionNamespace setVariable ["MWF_ThreatLastRecalcAt", missionNamespace getVariable ["MWF_ThreatLastRecalcAt", -1], false];
 
+missionNamespace setVariable ["MWF_MissionTemplateRegistry", missionNamespace getVariable ["MWF_MissionTemplateRegistry", []], true];
+missionNamespace setVariable ["MWF_MissionSessionPlacements", missionNamespace getVariable ["MWF_MissionSessionPlacements", []], true];
+missionNamespace setVariable ["MWF_GrandOperationSessionPlacements", missionNamespace getVariable ["MWF_GrandOperationSessionPlacements", []], true];
+missionNamespace setVariable ["MWF_MissionBoardSlots", missionNamespace getVariable ["MWF_MissionBoardSlots", []], true];
+missionNamespace setVariable ["MWF_MissionBoardCreatedAt", missionNamespace getVariable ["MWF_MissionBoardCreatedAt", 0], true];
+missionNamespace setVariable ["MWF_MissionBoardExpiresAt", missionNamespace getVariable ["MWF_MissionBoardExpiresAt", 0], true];
+missionNamespace setVariable ["MWF_ActiveSideMissions", missionNamespace getVariable ["MWF_ActiveSideMissions", []], true];
+missionNamespace setVariable ["MWF_MissionSystemReady", missionNamespace getVariable ["MWF_MissionSystemReady", false], true];
+missionNamespace setVariable ["MWF_MissionSystemStarted", missionNamespace getVariable ["MWF_MissionSystemStarted", false], true];
+
 setTimeMultiplier (["MWF_Param_TimeMultiplier", 1] call BIS_fnc_getParamValue);
 
 private _wipeRequested = ["MWF_Param_WipeSave", 0] call BIS_fnc_getParamValue;
