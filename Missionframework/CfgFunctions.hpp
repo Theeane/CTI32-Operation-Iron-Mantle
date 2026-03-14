@@ -88,11 +88,13 @@ class CfgFunctions {
             class initUI {};
             class updateResourceUI {};
         };
+
         class Threat {
             file = "functions\threat";
             class determineGlobalThreat {};
             class determineZoneThreat {};
             class getThreatSnapshot {};
+            class markThreatDirty {};
             class recalculateThreatState {};
             class threatManager {};
         };
@@ -102,6 +104,7 @@ class CfgFunctions {
             class determineProgressionState {};
             class determineWorldTier {};
             class getWorldSnapshot {};
+            class markWorldDirty {};
             class recalculateWorldState {};
             class worldManager {};
         };
