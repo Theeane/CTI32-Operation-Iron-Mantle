@@ -100,6 +100,10 @@ missionNamespace setVariable ["MWF_WorldStateVersion", 1, true];
 private _snapshot = [] call MWF_fnc_getWorldSnapshot;
 missionNamespace setVariable ["MWF_WorldSnapshot", _snapshot, true];
 
+if (!isNil "MWF_fnc_recalculateThreatState") then {
+    [] call MWF_fnc_recalculateThreatState;
+};
+
 if (_previousTier != _worldTier || _previousState != _progressionState || {abs (_previousMapControl - _mapControl) >= 0.01}) then {
     diag_log format [
         "[MWF World] Recalculated | Zones: %1/%2 | Control: %3%% | Tier: %4 | State: %5",
