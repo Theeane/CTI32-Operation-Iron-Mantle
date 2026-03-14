@@ -21,7 +21,6 @@ missionNamespace setVariable ["MWF_res_notoriety", _notoriety, true];
 missionNamespace setVariable ["MWF_Supplies", _supplies, true];
 missionNamespace setVariable ["MWF_Intel", _intel, true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", profileNamespace getVariable ["MWF_Save_RepPenalties", 0], true];
-
 missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];
 missionNamespace setVariable ["MWF_FOB_Positions", profileNamespace getVariable ["MWF_Save_FOBs", []], true];
@@ -37,16 +36,37 @@ if (_savedBuildingMode == -1) then {
 };
 
 private _savedZones = profileNamespace getVariable ["MWF_Save_Zones", []];
-{
-    private _zone = _x;
-    private _zoneId = _zone getVariable ["MWF_zoneID", ""];
-    private _zoneName = _zone getVariable ["MWF_zoneName", ""];
 
-    if ((_zoneId in _savedZones) || (_zoneName in _savedZones)) then {
-        _zone setVariable ["MWF_isCaptured", true, true];
-        private _marker = _zone getVariable ["MWF_zoneMarker", ""];
-        if (_marker != "") then {
-            _marker setMarkerColor "ColorBLUFOR";
+{
+    private _zoneRef = _x;
+    private _isMarkerZone = _zoneRef isEqualType "";
+
+    if (_isMarkerZone) then {
+        private _markerName = _zoneRef;
+
+        if (_markerName in _savedZones) then {
+            missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _markerName], true, true];
+            missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_underAttack", _markerName], false, true];
+            missionNamespace setVariable [format ["MWF_zoneState_%1_MWF_capProgress", _markerName], 100, true];
+
+            if (_markerName in allMapMarkers) then {
+                _markerName setMarkerColor "ColorBLUFOR";
+            };
+        };
+    } else {
+        if (!isNull _zoneRef) then {
+            private _zoneId = _zoneRef getVariable ["MWF_zoneID", _zoneRef getVariable ["MWF_zoneName", ""]];
+
+            if (_zoneId in _savedZones) then {
+                _zoneRef setVariable ["MWF_isCaptured", true, true];
+                _zoneRef setVariable ["MWF_underAttack", false, true];
+                _zoneRef setVariable ["MWF_capProgress", 100, true];
+
+                private _marker = _zoneRef getVariable ["MWF_zoneMarker", ""];
+                if (_marker != "" && { _marker in allMapMarkers }) then {
+                    _marker setMarkerColor "ColorBLUFOR";
+                };
+            };
         };
     };
 } forEach (missionNamespace getVariable ["MWF_all_mission_zones", []]);

@@ -8,17 +8,30 @@
 */
 
 if (!isServer) exitWith {};
-params [["_reason", "Auto Save"]];
+params [["_reason", "Auto Save", [""]]];
 
 private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
 private _savedZoneIds = [];
 
 {
-    if (_x getVariable ["MWF_isCaptured", false]) then {
-        private _zoneId = _x getVariable ["MWF_zoneID", _x getVariable ["MWF_zoneName", ""]];
-        if (_zoneId != "") then {
-            _savedZoneIds pushBackUnique _zoneId;
+    private _zoneRef = _x;
+    private _isMarkerZone = _zoneRef isEqualType "";
+    private _isCaptured = false;
+    private _zoneId = "";
+
+    if (_isMarkerZone) then {
+        private _markerName = _zoneRef;
+        _isCaptured = missionNamespace getVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _markerName], false];
+        _zoneId = _markerName;
+    } else {
+        if (!isNull _zoneRef) then {
+            _isCaptured = _zoneRef getVariable ["MWF_isCaptured", false];
+            _zoneId = _zoneRef getVariable ["MWF_zoneID", _zoneRef getVariable ["MWF_zoneName", ""]];
         };
+    };
+
+    if (_isCaptured && { _zoneId != "" }) then {
+        _savedZoneIds pushBackUnique _zoneId;
     };
 } forEach _allZones;
 
@@ -31,6 +44,8 @@ private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
+missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
+missionNamespace setVariable ["MWF_res_intel", _intel, true];
 missionNamespace setVariable ["MWF_Supplies", _supplies, true];
 missionNamespace setVariable ["MWF_Intel", _intel, true];
 
