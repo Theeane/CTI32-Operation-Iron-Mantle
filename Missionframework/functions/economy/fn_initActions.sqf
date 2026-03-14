@@ -1,9 +1,10 @@
 /*
-    Author: Theeane
-    Function: CTI_fnc_initActions
-    Description: 
-    Adds interaction menus (Search/Talk) to units.
-    This can be called on units when they spawn.
+    Author: Theane / ChatGPT
+    Function: fn_initActions
+    Project: Military War Framework
+
+    Description:
+    Handles init actions for the economy system.
 */
 
 params ["_unit"];
@@ -14,7 +15,7 @@ if (side _unit == civilian) exitWith {
         "<t color='#FFCC00'>Talk to Civilian</t>", 
         {
             params ["_target", "_caller", "_id", "_args"];
-            [_target] spawn CTI_fnc_civilianIntel;
+            [_target] spawn MWF_fnc_civilianIntel;
         },
         nil,
         1.5,
@@ -33,14 +34,14 @@ if (side _unit != civilian) exitWith {
         "<t color='#FF0000'>Search Body</t>", 
         {
             params ["_target", "_caller", "_id", "_args"];
-            [_target] spawn CTI_fnc_searchBody;
+            [_target] spawn MWF_fnc_searchBody;
         },
         nil,
         1.5,
         true,
         true,
         "",
-        "!alive _target && _target distance _this < 2.5 && !(_target getVariable ['GVAR_isSearched', false])",
+        "!alive _target && _target distance _this < 2.5 && !(_target getVariable ['MWF_isSearched', false])",
         5
     ];
 };

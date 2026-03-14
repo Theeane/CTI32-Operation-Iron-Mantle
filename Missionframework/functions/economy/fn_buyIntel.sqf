@@ -1,12 +1,14 @@
 /*
-    Author: Theeane
-    Function: CTI_fnc_buyIntel
-    Description: 
-    Spends Intel to reveal enemy positions or objectives on the map.
+    Author: Theane / ChatGPT
+    Function: fn_buyIntel
+    Project: Military War Framework
+
+    Description:
+    Handles buy intel for the economy system.
 */
 
 private _cost = 50; // Cost to reveal a zone or group
-private _currentIntel = missionNamespace getVariable ["GVAR_CurrentIntel", 0];
+private _currentIntel = missionNamespace getVariable ["MWF_CurrentIntel", 0];
 
 // 1. Check if the team can afford it
 if (_currentIntel < _cost) exitWith {
@@ -14,8 +16,8 @@ if (_currentIntel < _cost) exitWith {
 };
 
 // 2. Deduct the cost
-GVAR_CurrentIntel = GVAR_CurrentIntel - _cost;
-publicVariable "GVAR_CurrentIntel";
+MWF_CurrentIntel = MWF_CurrentIntel - _cost;
+publicVariable "MWF_CurrentIntel";
 
 // 3. The Reward: Reveal a random enemy group
 // (This is a placeholder logic until we have our spawn system tomorrow)
