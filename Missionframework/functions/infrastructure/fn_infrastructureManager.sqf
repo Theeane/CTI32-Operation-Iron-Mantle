@@ -4,71 +4,91 @@
     Project: Military War Framework
 
     Description:
-    Handles infrastructure manager for the infrastructure system.
+    Handles HQ and roadblock destruction tracking and infrastructure integration.
+    Updated to preserve persistent destroyed-object registries and feed the threat layer.
 */
 
 if (!isServer) exitWith {};
 
-params [["_mode", "INIT"]];
+params [["_mode", "INIT"], ["_params", []]];
 
 // --- MODE: INIT ---
-// Sets up the global listener for infrastructure destruction
 if (_mode == "INIT") exitWith {
-    diag_log "[KPIN INFRA]: Infrastructure Manager Initialized.";
+    if (missionNamespace getVariable ["MWF_InfrastructureManagerStarted", false]) exitWith {};
+    missionNamespace setVariable ["MWF_InfrastructureManagerStarted", true, true];
+
+    diag_log "[MWF INFRA] Infrastructure Manager Initialized.";
 
     ["MWF_Infra_Destroyed", {
-        params ["_type"]; // "HQ" or "ROADBLOCK"
+        params [
+            ["_type", "ROADBLOCK", [""]],
+            ["_position", [], [[]]],
+            ["_objectNetId", "", [""]]
+        ];
 
-        private _supplyReward = 0;
-        
-        if (_type == "HQ") then {
-            _supplyReward = 50;
-            private _curr = missionNamespace getVariable ["MWF_DestroyedHQs", 0];
-            missionNamespace setVariable ["MWF_DestroyedHQs", _curr + 1, true];
+        private _normalizedType = toUpper _type;
+        private _registryVar = if (_normalizedType == "HQ") then {"MWF_DestroyedHQs"} else {"MWF_DestroyedRoadblocks"};
+        private _destroyedRegistry = + (missionNamespace getVariable [_registryVar, []]);
+
+        if ((_position isEqualType []) && {count _position >= 2}) then {
+            _destroyedRegistry pushBackUnique _position;
+            missionNamespace setVariable [_registryVar, _destroyedRegistry, true];
         };
-        
-        if (_type == "ROADBLOCK") then {
-            _supplyReward = 20;
-            private _curr = missionNamespace getVariable ["MWF_DestroyedRoadblocks", 0];
-            missionNamespace setVariable ["MWF_DestroyedRoadblocks", _curr + 1, true];
+
+        private _supplyReward = if (_normalizedType == "HQ") then {50} else {20};
+        private _supplyVar = "MWF_Economy_Supplies";
+        private _totalSupplies = missionNamespace getVariable [_supplyVar, missionNamespace getVariable ["MWF_Supplies", 0]];
+        _totalSupplies = _totalSupplies + _supplyReward;
+
+        missionNamespace setVariable [_supplyVar, _totalSupplies, true];
+        missionNamespace setVariable ["MWF_Supplies", _totalSupplies, true];
+
+        if (!isNil "MWF_fnc_registerThreatIncident") then {
+            [
+                if (_normalizedType == "HQ") then {"hq_destroyed"} else {"roadblock_destroyed"},
+                "",
+                if (_normalizedType == "HQ") then {4} else {2},
+                format ["%1 destroyed", _normalizedType]
+            ] call MWF_fnc_registerThreatIncident;
+        } else {
+            if (!isNil "MWF_fnc_markThreatDirty") then {
+                ["infrastructure_destroyed"] call MWF_fnc_markThreatDirty;
+            };
         };
 
-        // 1. Update Global Supplies
-        private _totalSupplies = missionNamespace getVariable ["MWF_GlobalSupplies", 0];
-        missionNamespace setVariable ["MWF_GlobalSupplies", _totalSupplies + _supplyReward, true];
+        if (!isNil "MWF_fnc_saveGame") then {
+            ["Infrastructure Destroyed"] call MWF_fnc_saveGame;
+        };
 
-        // 2. Trigger Save
-        ["SAVE"] call MWF_fnc_saveManager;
+        diag_log format ["[MWF INFRA] %1 destroyed. Reward: %2 supplies.", _normalizedType, _supplyReward];
 
-        diag_log format ["[KPIN INFRA]: %1 destroyed. Reward: %2 Supplies. Progression updated.", _type, _supplyReward];
-        
-        // Notification to players via CBA Event
-        ["MWF_Notify", ["Objective Complete", format ["%1 neutralized. Received %2 supplies.", _type, _supplyReward]]] call CBA_fnc_globalEvent;
-
+        if (!isNil "CBA_fnc_globalEvent") then {
+            ["MWF_Notify", ["Objective Complete", format ["%1 neutralized. Received %2 supplies.", _normalizedType, _supplyReward]]] call CBA_fnc_globalEvent;
+        };
     }] call CBA_fnc_addEventHandler;
 };
 
 // --- MODE: REGISTER ---
-// Called for each HQ or Roadblock when they spawn in (at 1km range)
 if (_mode == "REGISTER") exitWith {
-    params ["", "_object", "_type"]; // ["REGISTER", _object, "HQ"]
+    _params params [
+        ["_object", objNull, [objNull]],
+        ["_type", "ROADBLOCK", [""]]
+    ];
 
     if (isNull _object) exitWith {};
 
-    // Tag the object for the Event Handler
-    _object setVariable ["MWF_InfraType", _type, true];
+    private _normalizedType = toUpper _type;
+    _object setVariable ["MWF_InfraType", _normalizedType, true];
 
-    // 1. Trigger the Intel Spawn Check (70% base chance, modified by Intel Pool)
-    ["SPAWN_INTEL", [getPos _object, _type]] call MWF_fnc_intelManager;
+    if (!isNil "MWF_fnc_intelManager") then {
+        ["SPAWN_INTEL", [getPosWorld _object, _normalizedType]] call MWF_fnc_intelManager;
+    };
 
-    // 2. Add Destruction Listener
     _object addEventHandler ["Killed", {
         params ["_unit"];
         private _type = _unit getVariable ["MWF_InfraType", "ROADBLOCK"];
-        
-        // Broadcast to server to process rewards and save
-        ["MWF_Infra_Destroyed", [_type]] call CBA_fnc_serverEvent;
+        ["MWF_Infra_Destroyed", [_type, getPosWorld _unit, netId _unit]] call CBA_fnc_serverEvent;
     }];
 
-    diag_log format ["[KPIN INFRA]: Registered %1 at %2. Intel check triggered.", _type, getPos _object];
+    diag_log format ["[MWF INFRA] Registered %1 at %2.", _normalizedType, getPosWorld _object];
 };
