@@ -1,7 +1,10 @@
 /*
-    Author: Theane (AGS Project)
-    Description: Sequential starter missions: Deploy FOB -> Supply Op -> Capture Zone.
-    Language: English
+    Author: Theane / ChatGPT
+    Function: fn_generateInitialMission
+    Project: Military War Framework
+
+    Description:
+    Handles mission logic for generate initial mission.
 */
 
 if (!isServer) exitWith {};
@@ -28,7 +31,7 @@ switch (_stage) do {
         ] call BIS_fnc_taskCreate;
         
         // Logic to wait for FOB deployment would be triggered from the Build Mode script
-        missionNamespace setVariable ["AGS_current_stage", 1, true];
+        missionNamespace setVariable ["MWF_current_stage", 1, true];
     };
 
     // --- STAGE 2: INITIAL SUPPLY RUN ---
@@ -52,16 +55,16 @@ switch (_stage) do {
         ] call BIS_fnc_taskCreate;
         
         // Here we would call a function to spawn a random supply crate mission
-        // [] spawn AGS_fnc_spawnSupplyCrate;
-        missionNamespace setVariable ["AGS_current_stage", 2, true];
+        // [] spawn MWF_fnc_spawnSupplyCrate;
+        missionNamespace setVariable ["MWF_current_stage", 2, true];
     };
 
     // --- STAGE 3: SECURE SECTOR ---
     case 3: {
         ["task_supply_run", "SUCCEEDED"] call BIS_fnc_taskSetState;
 
-        private _basePos = getMarkerPos "AGS_base_marker";
-        private _allZones = missionNamespace getVariable ["AGS_all_mission_zones", []];
+        private _basePos = getMarkerPos "MWF_base_marker";
+        private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
         private _targetZone = [_allZones, _basePos] call BIS_fnc_nearestPosition;
 
         [
@@ -80,6 +83,6 @@ switch (_stage) do {
             true
         ] call BIS_fnc_taskCreate;
         
-        missionNamespace setVariable ["AGS_current_stage", 3, true];
+        missionNamespace setVariable ["MWF_current_stage", 3, true];
     };
 };
