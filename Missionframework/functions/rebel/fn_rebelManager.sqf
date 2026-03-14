@@ -1,9 +1,10 @@
 /*
-    Author: Theane using gemini
-    Function: KPIN_fnc_rebelManager
-    Description: 
-    Coordinates the rebel leader migration and enforces the 10-second Clean Slate logic. 
-    Ensures discovered infrastructure is refreshed and preserved during world resets.
+    Author: Theane / ChatGPT
+    Function: fn_rebelManager
+    Project: Military War Framework
+
+    Description:
+    Handles rebel manager for the rebel system.
 */
 
 if (!isServer) exitWith {};
@@ -16,14 +17,14 @@ if (_mode == "REFRESH_ZONES") exitWith {
     diag_log "[KPIN REBEL]: Clean Slate initiated. Despawning leader...";
     
     // 1. Remove the leader
-    private _oldLeader = missionNamespace getVariable ["KPIN_ActiveRebelLeader", objNull];
+    private _oldLeader = missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull];
     if (!isNull _oldLeader) then { deleteVehicle _oldLeader; };
     
     // 2. The Void (10 second cooldown as per project rules)
     sleep 10;
     
     // 3. Restart migration to place leader at a safe location
-    ["MIGRATE"] spawn KPIN_fnc_rebelManager;
+    ["MIGRATE"] spawn MWF_fnc_rebelManager;
 };
 
 // --- MODE: MIGRATE ---
@@ -35,7 +36,7 @@ if (_mode == "MIGRATE") exitWith {
     {
         private _pos = _x select 0;
         if (_pos distance [0,0,0] > 10) then { _locations pushBack _pos; };
-    } forEach (missionNamespace getVariable ["KPIN_FOB_Positions", []]);
+    } forEach (missionNamespace getVariable ["MWF_FOB_Positions", []]);
 
     // Determine nearest location to the active player group
     private _avgPos = [0,0,0];
@@ -50,11 +51,11 @@ if (_mode == "MIGRATE") exitWith {
     private _targetPos = [_locations, _avgPos] call BIS_fnc_nearestPosition;
 
     // 1. Spawn the leader at the chosen base
-    [_targetPos] call KPIN_fnc_rebelSpawn; // This will handle addActions for Quests/Bribes
+    [_targetPos] call MWF_fnc_rebelSpawn; // This will handle addActions for Quests/Bribes
 
     // 2. IMPORTANT SYNC: Tell the spawn system to refresh "Fixed Infrastructure"
     // This ensures discovered HQs/Roadblocks stay on the map even after a reset.
-    ["REFRESH_FIXED_BASES"] call KPIN_fnc_spawnManager;
+    ["REFRESH_FIXED_BASES"] call MWF_fnc_spawnManager;
 
     diag_log format ["[KPIN REBEL]: Migration complete. Leader positioned at %1.", _targetPos];
 };
