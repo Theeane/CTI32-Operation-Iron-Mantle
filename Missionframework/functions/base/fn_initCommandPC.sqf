@@ -68,3 +68,25 @@ _laptop addAction [
 // --- 6. VISUALS & LOGGING ---
 _laptop setObjectTextureGlobal [0, "A3\Structures_F\Items\Electronics\Data\Laptops_01_screen_CO.paa"];
 diag_log "[KPIN] Command PC Initialized.";
+
+
+// --- 7. FOB REPACK CONTROL ---
+_laptop addAction [
+    "<t color='#ffaa00'>[ AUTHORIZE FOB REPACK ]</t>",
+    {
+        params ["_target", "_caller"];
+        [_target, true] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
+    },
+    nil, 4, true, true, "", "!(_target getVariable ['MWF_FOB_CanRepack', false])"
+];
+
+_laptop addAction [
+    "<t color='#ff6600'>[ LOCK FOB REPACK ]</t>",
+    {
+        params ["_target", "_caller"];
+        [_target, false] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
+    },
+    nil, 4, true, true, "", "_target getVariable ['MWF_FOB_CanRepack', false]"
+];
+
+[_laptop] call MWF_fnc_packFOB;

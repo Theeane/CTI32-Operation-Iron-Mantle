@@ -4,65 +4,18 @@
     Project: Military War Framework
 
     Description:
-    Handles execute repack for the base system.
+    Backward-compatible wrapper that routes repack requests into the dedicated FOB repack pipeline.
 */
 
 if (!isServer) exitWith {};
 
 params [
-    ["_target", objNull, [objNull]], // Typically the Command PC
-    ["_className", "", [""]]        // The vehicle or box class to restore
+    ["_target", objNull, [objNull]],
+    ["_repackTarget", "TRUCK", [""]]
 ];
 
-if (isNull _target || _className == "") exitWith { 
-    diag_log "[KPIN ERROR]: Invalid repack parameters."; 
+if (isNull _target) exitWith {
+    diag_log "[MWF FOB] executeRepack called with null target.";
 };
 
-// 1. AUTHORIZATION CHECK
-// Ensure the Commander has toggled the repack authorization
-private _canRepack = _target getVariable ["MWF_FOB_CanRepack", false];
-if (!_canRepack) exitWith {
-    ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
-};
-
-private _pos = getPosATL _target;
-private _dir = getDir _target;
-private _marker = _target getVariable ["MWF_FOB_Marker", ""];
-
-// 2. COLLECT LINKED ASSETS
-private _locker = _target getVariable ["MWF_AttachedLocker", objNull];
-private _siren  = _target getVariable ["MWF_AttachedSiren", objNull];
-private _table  = attachedTo _target; // Laptop is usually attached to the table
-
-// 3. REGISTRY CLEANUP
-if (_marker != "") then {
-    ["REMOVE", _marker] call MWF_fnc_baseManager;
-    deleteMarker _marker;
-};
-
-// 4. THE CLEAN SWEEP
-// Delete the core assets
-{
-    if (!isNull _x) then { deleteVehicle _x };
-} forEach [_target, _locker, _siren, _table];
-
-// Delete optional assets (Camo net/Roof)
-private _roofClass = missionNamespace getVariable ["MWF_FOB_Asset_Roof", ""];
-if (_roofClass != "") then {
-    private _roofs = nearestObjects [_pos, [_roofClass], 15];
-    { deleteVehicle _x } forEach _roofs;
-};
-
-// 5. RESTORE TRANSPORT VEHICLE
-// We use "CAN_COLLIDE" to ensure it spawns exactly where the FOB was
-private _newObject = createVehicle [_className, _pos, [], 0, "CAN_COLLIDE"];
-_newObject setDir _dir;
-_newObject setPosATL _pos;
-
-// Re-initialize the vehicle so it can be deployed again
-[_newObject] call MWF_fnc_initFOB;
-
-// 6. GLOBAL FEEDBACK
-["TaskSucceeded", ["", "FOB repacked and ready for transport."]] remoteExec ["BIS_fnc_showNotification", 0];
-
-diag_log format ["[KPIN] Logistics: FOB assets removed and restored to %1 at %2.", _className, _pos];
+[_target, _repackTarget] call MWF_fnc_repackFOB;
