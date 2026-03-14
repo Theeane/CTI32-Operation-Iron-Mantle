@@ -5,6 +5,7 @@
 
     Description:
     Recalculates strategic progression values from the authoritative zone registry.
+    Kept as a compatibility layer while world progression is the strategic authority.
 */
 
 if (!isServer) exitWith {};
@@ -19,7 +20,7 @@ private _capturedMilitary = 0;
 {
     private _zone = _x;
 
-    if (!isNull _zone && { _zone getVariable ["MWF_isCaptured", false] }) then {
+    if (!isNull _zone && {_zone getVariable ["MWF_isCaptured", false]}) then {
         _capturedZones pushBack _zone;
 
         switch (toLower (_zone getVariable ["MWF_zoneType", "town"])) do {
@@ -43,6 +44,10 @@ missionNamespace setVariable ["MWF_CapturedFactoryCount", _capturedFactories, tr
 missionNamespace setVariable ["MWF_CapturedMilitaryCount", _capturedMilitary, true];
 missionNamespace setVariable ["MWF_MapControlPercent", _mapControl, true];
 
-if (!isNil "MWF_fnc_recalculateWorldState") then {
-    [] call MWF_fnc_recalculateWorldState;
+if (!isNil "MWF_fnc_markWorldDirty") then {
+    ["zone_progression"] call MWF_fnc_markWorldDirty;
+} else {
+    if (!isNil "MWF_fnc_recalculateWorldState") then {
+        [] call MWF_fnc_recalculateWorldState;
+    };
 };
