@@ -4,7 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Saves strategic campaign state with normalized zone progression data.
+    Saves strategic campaign state, normalized zone progression data, and all campaign-persistent
+    lobby params / faction selections.
 */
 
 if (!isServer) exitWith {};
@@ -21,6 +22,7 @@ private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
+profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
 profileNamespace setVariable ["MWF_Save_CapturedZoneCount", missionNamespace getVariable ["MWF_CapturedZoneCount", 0]];
 profileNamespace setVariable ["MWF_Save_CapturedTownCount", missionNamespace getVariable ["MWF_CapturedTownCount", 0]];
@@ -30,16 +32,34 @@ profileNamespace setVariable ["MWF_Save_CapturedMilitaryCount", missionNamespace
 profileNamespace setVariable ["MWF_Save_MapControlPercent", missionNamespace getVariable ["MWF_MapControlPercent", 0]];
 profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
-profileNamespace setVariable ["MWF_Save_CivRep", _civRep];
-profileNamespace setVariable ["MWF_Save_Notoriety", _notoriety];
+profileNamespace setVariable ["MWF_Save_CivRep_State", _civRep];
+profileNamespace setVariable ["MWF_Save_Notoriety_State", _notoriety];
 profileNamespace setVariable ["MWF_Save_RepPenalties", missionNamespace getVariable ["MWF_RepPenaltyCount", 0]];
 profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVariable ["MWF_DestroyedHQs", []]];
 profileNamespace setVariable ["MWF_Save_DestroyedRoadblocks", missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]];
 profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
 profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariable ["MWF_FixedInfrastructure", []]];
 profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
-profileNamespace setVariable ["MWF_Save_BuildingMode", missionNamespace getVariable ["MWF_LockedBuildingMode", -1]];
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
+
+/* Persistent lobby params */
+profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
+profileNamespace setVariable ["MWF_Save_SupplyTimer", missionNamespace getVariable ["MWF_Locked_SupplyTimer", 10]];
+profileNamespace setVariable ["MWF_Save_CivReputation", missionNamespace getVariable ["MWF_Locked_CivReputation", 0]];
+profileNamespace setVariable ["MWF_Save_NotorietyMultiplier", missionNamespace getVariable ["MWF_Locked_NotorietyMultiplier", 1]];
+profileNamespace setVariable ["MWF_Save_BuildingMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
+profileNamespace setVariable ["MWF_Save_IncomeMultiplier", missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", 1]];
+profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable ["MWF_Locked_MaxFOBs", 5]];
+
+/* Faction locks */
+{
+    private _prefix = _x;
+    profileNamespace setVariable [format ["MWF_Save_%1Source", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Source", _prefix], 0]];
+    profileNamespace setVariable [format ["MWF_Save_%1Choice", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Choice", _prefix], 0]];
+    profileNamespace setVariable [format ["MWF_Save_%1ResolvedChoice", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1ResolvedChoice", _prefix], 0]];
+    profileNamespace setVariable [format ["MWF_Save_%1Label", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Label", _prefix], ""]];
+    profileNamespace setVariable [format ["MWF_Save_%1File", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1File", _prefix], ""]];
+} forEach ["Blufor", "Opfor", "Resistance", "Civs"];
 
 saveProfileNamespace;
 

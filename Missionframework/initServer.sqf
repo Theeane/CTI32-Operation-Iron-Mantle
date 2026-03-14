@@ -5,7 +5,8 @@
 
     Description:
     Server bootstrap for the framework.
-    Initializes globals, loads persistence, builds the zone registry, and starts runtime managers in a stable order.
+    Initializes persistence, global state, preset resolution, builds the zone registry,
+    and starts runtime managers in a stable order.
 */
 
 if (!isServer) exitWith {};
@@ -18,12 +19,16 @@ missionNamespace setVariable ["MWF_ServerInitialized", false, true];
 missionNamespace setVariable ["MWF_PersistenceLoaded", false, true];
 missionNamespace setVariable ["MWF_AllSystemsInitialized", false, true];
 
-[] call MWF_fnc_initGlobals;
-
 if (!isNil "MWF_fnc_loadGame") then {
     [] call MWF_fnc_loadGame;
 };
 missionNamespace setVariable ["MWF_PersistenceLoaded", true, true];
+
+[] call MWF_fnc_initGlobals;
+
+if (!isNil "MWF_fnc_presetManager") then {
+    [] call MWF_fnc_presetManager;
+};
 
 if (!isNil "MWF_fnc_initPersistence") then {
     [] call MWF_fnc_initPersistence;

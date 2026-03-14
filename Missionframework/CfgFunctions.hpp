@@ -11,6 +11,7 @@ class CfgFunctions {
             class limitZeusAssets {};
             class openBaseArchitect {};
             class openBuildZeus {};
+            class presetManager {};
             class scanZones {};
             class setupFOBAction {};
             class setupFOBInteractions {};
