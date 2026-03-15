@@ -1,17 +1,18 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_openBuyMenu
+    Function: MWF_fn_openBuyMenu
     Project: Military War Framework
 
     Description:
     Handles open buy menu for the base system.
+    Strict migration from original fn_openBuyMenu.sqf.
 */
 
 disableSerialization;
 
 // 1. Create the dialog
 if !(createDialog "IronMantle_BuyMenu") exitWith {
-    diag_log "[KPIN Error] Master UI could not be opened.";
+    diag_log "[MWF Error] Master UI could not be opened.";
 };
 
 private _display = findDisplay 9000;
@@ -35,6 +36,7 @@ private _techStatus = if (_hasMobileTech) then {"Mobile Tech: ACTIVE"} else {"Mo
 (_display displayCtrl 9005) ctrlSetText _techStatus; // Reuse the Intel field to display tech status
 
 // 5. Default View: Vehicle Menu
+// Updated to use the new MWF_fnc_ prefix for the sub-function
 ["Infantry"] spawn MWF_fnc_updateBuyCategory;
 
 // 6. Grand Op Cooldown Check
@@ -47,4 +49,4 @@ if (time - _lastOpTime < _cooldown) then {
     // (_display displayCtrl 9010) ctrlEnable false; // Optional: disable the button completely
 };
 
-diag_log "[KPIN] Master Command Map opened. Currency & Tech initialized.";
+diag_log "[MWF] Master Command Map opened. Currency & Tech initialized.";
