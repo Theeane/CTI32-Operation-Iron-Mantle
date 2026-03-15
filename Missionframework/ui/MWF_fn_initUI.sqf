@@ -1,17 +1,18 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_initUI
+    Function: MWF_fn_initUI
     Project: Military War Framework
 
     Description:
-    Handles UI logic for init u i.
+    Handles UI logic for init UI.
+    Strict migration from original fn_initUI.sqf.
 */
 
 if (!hasInterface) exitWith {};
 
 // Wait for CBA to be ready before adding settings
 if (isNil "CBA_fnc_addSetting") exitWith {
-    diag_log "AGS UI Error: CBA not found. UI Settings could not be initialized.";
+    diag_log "[MWF] UI Error: CBA not found. UI Settings could not be initialized.";
 };
 
 // --- HUD POSITION SETTING ---
@@ -28,7 +29,7 @@ if (isNil "CBA_fnc_addSetting") exitWith {
     nil,               // Global? No, this is a local client setting
     { 
         // CODE TO RUN ON CHANGE
-        // This forces the HUD to reposition itself immediately when the setting is changed
+        // Updated to use the new MWF_fnc_ prefix
         [] spawn MWF_fnc_updateResourceUI; 
     }
 ] call CBA_fnc_addSetting;
@@ -44,4 +45,4 @@ if (isNil "CBA_fnc_addSetting") exitWith {
     { [] spawn MWF_fnc_updateResourceUI; }
 ] call CBA_fnc_addSetting;
 
-diag_log "AGS UI: Client settings registered successfully.";
+diag_log "[MWF] UI: Client settings registered successfully.";
