@@ -1,10 +1,11 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_depositIntel
+    Function: MWF_fn_depositIntel
     Project: Military War Framework
 
     Description:
-    Handles deposit intel for the base system.
+    Handles deposit intel for the base system. 
+    Strict migration from original fn_depositIntel.sqf.
 */
 
 params [["_laptop", objNull, [objNull]], ["_caller", objNull, [objNull]]];
@@ -38,4 +39,4 @@ _caller setVariable ["MWF_carryingIntel", false, true];
 // 6. Persistence (Triggers a delayed save for the economy)
 if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
 
-diag_log format ["[KPIN] Economy: %1 deposited %2 S. New HQ Balance: %3 S.", name _caller, _tempIntel, _newTotal];
+diag_log format ["[MWF] Economy: %1 deposited %2 S. New HQ Balance: %3 S.", name _caller, _tempIntel, _newTotal];
