@@ -1,19 +1,9 @@
-
 // Author: Theane / ChatGPT
 // Project: Mission War Framework
 
-MWF_fnc_checkUndercover = {
-    private["_player", "_uniform"];
-    
-    _player = _this select 0; // The player object
-    _uniform = uniform _player; // Get the uniform of the player
-    
-    if (_uniform in MWF_Undercover_Blacklist) then {
-        // Disable "Save Respawn Loadout" if uniform is on blacklist
-        MWF_SaveLoadout_Enabled = false;
-        hintSilent "Undercover status: Loadout save is locked due to uniform!";
-    } else {
-        // Allow "Save Respawn Loadout"
-        MWF_SaveLoadout_Enabled = true;
-    };
-};
+MWF_Undercover_Blacklist = [
+    "U_B_CTRG_1", // Example Uniform 1
+    "U_B_CTRG_2", // Example Uniform 2
+    "U_B_T_Soldier_F", // Example Uniform 3
+    "U_O_Soldier_F" // Example Uniform 4
+];

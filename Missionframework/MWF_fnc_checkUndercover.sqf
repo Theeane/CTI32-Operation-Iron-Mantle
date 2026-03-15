@@ -1,29 +1,28 @@
+/*
+    Author: Theane / ChatGPT
+    Function: MWF_fnc_checkUndercover
+    Project: Military War Framework
 
-// Author: Theane / ChatGPT
-// Project: Mission War Framework
+    Description:
+    Checks if a player's uniform is blacklisted for undercover operations.
+    Disables respawn loadout saving if detected.
+*/
 
-MWF_VehicleMenu = [
-    // Category: Light Vehicles
-    ["Light Vehicle 1", "land", 100, 1, "Unlocked"],
-    ["Light Vehicle 2", "land", 200, 2, "Unlocked"],
+params ["_player"];
 
-    // Category: APC
-    ["APC 1", "land", 500, 3, "Unlocked"],
-    ["APC 2", "land", 600, 4, "Unlocked"],
+// Get player's uniform
+private _uniform = uniform _player;
 
-    // Category: Tanks
-    ["Tank 1", "land", 1000, 5, "Unlocked"],
-    ["Tank 2", "land", 1500, 6, "Unlocked"],
+// Check blacklist
+if (_uniform in MWF_Undercover_Blacklist) then {
 
-    // Category: Helicopters (Locked until Grand Op)
-    ["Helicopter 1", "air", 500, 3, "false"],
-    ["Helicopter 2", "air", 700, 4, "false"],
+    // Disable Save Respawn Loadout
+    MWF_SaveLoadout_Enabled = false;
+    hintSilent "Undercover status: Loadout save is locked due to uniform!";
 
-    // Category: Jets (Locked until Grand Op)
-    ["Jet 1", "air", 1000, 5, "false"],
-    ["Jet 2", "air", 1500, 6, "false"],
+} else {
 
-    // Category: Rearm Trucks (Requires Base Tier 3)
-    ["Rearm Truck 1", "land", 300, 3, "Unlocked"],
-    ["Rearm Truck 2", "land", 400, 4, "Unlocked"]
-];
+    // Enable Save Respawn Loadout
+    MWF_SaveLoadout_Enabled = true;
+
+};
