@@ -8,7 +8,7 @@
 */
 
 MWF_RES_Preset = createHashMapFromArray [
-    // --- INFANTRY Tiers ---
+    // --- INFANTRY POOLS (Military Standard) ---
     ["Infantry_T1", [
         "LOP_RACS_Infantry_Rifleman",        // Rifleman
         "LOP_RACS_Infantry_Rifleman_2",      // Rifleman (M16)
@@ -20,44 +20,49 @@ MWF_RES_Preset = createHashMapFromArray [
         "LOP_RACS_Infantry_TL"               // Team Leader
     ]],
     ["Infantry_T3", [
-        "LOP_RACS_Infantry_AT",              // AT Specialist (MAAWS)
-        "LOP_RACS_Infantry_MG",              // Heavy Gunner
-        "LOP_RACS_Infantry_SL"               // Squad Leader
-    ]],
-    ["Infantry_T4", [
-        "LOP_RACS_Infantry_Marksman",        // Marksman
-        "LOP_RACS_Infantry_AA",              // AA Specialist
+        "LOP_RACS_Infantry_SL",              // Squad Leader
+        "LOP_RACS_Infantry_M",               // Marksman
         "LOP_RACS_Infantry_Engineer"         // Engineer
     ]],
+    ["Infantry_T4", [
+        "LOP_RACS_Infantry_AA",              // AA Specialist
+        "LOP_RACS_Infantry_AT",              // AT Specialist
+        "LOP_RACS_Infantry_MG"               // HMG Assistant
+    ]],
     ["Infantry_T5", [
-        "LOP_RACS_Infantry_Officer",         // Officer
-        "LOP_RACS_Infantry_SL",              // Commander
-        "LOP_RACS_Infantry_Marksman"         // Sharpshooter
+        "LOP_RACS_Infantry_Sniper",          // Sniper
+        "LOP_RACS_Infantry_Explosive"        // Explosives Specialist
     ]],
 
-    // --- VEHICLE Tiers ---
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
     ["Vehicles_T1", [
-        "LOP_RACS_UAZ",                      // UAZ
-        "LOP_RACS_Ural"                      // Ural Transport
+        "LOP_RACS_Vehicle_Truck", 
+        "LOP_RACS_Vehicle_MRAP"              // MRAP (Unarmed)
     ]],
     ["Vehicles_T2", [
-        "LOP_RACS_Offroad_M2",               // Offroad (M2)
-        "LOP_RACS_Landrover_M2"              // Land Rover (M2)
+        "LOP_RACS_Vehicle_MRAP_HMG",         // MRAP (HMG)
+        "LOP_RACS_Vehicle_MRAP_GMG"          // MRAP (GMG)
     ]],
     ["Vehicles_T3", [
-        "LOP_RACS_M113_W",                   // M113A3
-        "LOP_RACS_M113_W_MK19"               // M113A3 (Mk19)
+        "LOP_RACS_Vehicle_Radar",            // Radar Vehicle
+        "LOP_RACS_Vehicle_Cannon"            // Cannon Vehicle
     ]],
     ["Vehicles_T4", [
-        "LOP_RACS_M60A3",                    // M60A3 Patton
-        "CUP_I_ZSU23_AAF"                    // ZSU-23-4 (AAF/RACS)
+        "LOP_RACS_Vehicle_Armored",          // Gorgon (Tracked)
+        "LOP_RACS_Vehicle_Tracked_APC"       // Mora
     ]],
     ["Vehicles_T5", [
-        "LOP_RACS_M1A1_W",                   // M1A1 Abrams
-        "LOP_RACS_MH60L_DAP"                 // MH-60L DAP (Attack)
+        "LOP_RACS_Vehicle_MBT",              // Main Battle Tank
+        "LOP_RACS_Vehicle_Armed_Helicopter", // Armed Helicopter
+        "LOP_RACS_Vehicle_Fighter_Aircraft"  // Fighter Aircraft
     ]],
 
     // --- SPECIAL UNITS ---
-    ["Leader", "LOP_RACS_Infantry_SL"],
-    ["Pilot", "LOP_RACS_Infantry_Pilot"]
+    ["Leader", "LOP_RACS_Infantry_Officer"],
+    ["Pilot",  "LOP_RACS_Infantry_HelicopterPilot"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: RACS.sqf (RESISTANCE) Loaded.";
