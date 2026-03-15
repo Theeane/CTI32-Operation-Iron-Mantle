@@ -4,61 +4,60 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for RHS AFRF.
+    Defines the OPFOR preset configuration for RHS AFRF using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
     // --- INFANTRY Tiers ---
     ["Infantry_T1", [
-        "rhs_msv_emr_rifleman",              // Rifleman
-        "rhs_msv_emr_LAT",                   // Rifleman (LAT)
-        "rhs_msv_emr_medic"                  // Medic
+        "RHS_O_Soldier",                      // Rifleman
+        "RHS_O_Soldier_Medic",                 // Medic
+        "RHS_O_Soldier_LAT"                    // Rifleman (LAT)
     ]],
     ["Infantry_T2", [
-        "rhs_msv_emr_grenadier",             // Grenadier
-        "rhs_msv_emr_arifleman",             // Autorifleman
-        "rhs_msv_emr_sergeant"               // Sergeant
+        "RHS_O_Soldier_GL",                    // Grenadier
+        "RHS_O_Soldier_AR",                    // Autorifleman
+        "RHS_O_Soldier_TL"                     // Team Leader
     ]],
     ["Infantry_T3", [
-        "rhs_msv_emr_at",                    // AT Specialist
-        "rhs_msv_emr_machinegunner",         // Heavy Gunner
-        "rhs_msv_emr_officer"                // Officer
+        "RHS_O_Soldier_AT",                    // AT Specialist
+        "RHS_O_Soldier_MG",                    // Heavy Gunner
+        "RHS_O_Soldier_SL"                     // Squad Leader
     ]],
     ["Infantry_T4", [
-        "rhs_msv_emr_marksman",              // Marksman
-        "rhs_msv_emr_aa",                    // AA Specialist
-        "rhs_msv_emr_engineer"               // Engineer
+        "RHS_O_Marksman",                      // Marksman
+        "RHS_O_Soldier_AA",                    // AA Specialist
+        "RHS_O_Engineer"                       // Engineer
     ]],
     ["Infantry_T5", [
-        "rhs_msv_emr_recon_rifleman",        // Recon Rifleman
-        "rhs_msv_emr_recon_marksman",        // Recon Marksman
-        "rhs_msv_emr_recon_at"               // Recon AT
+        "RHS_O_Sharpshooter",                  // Sharpshooter
+        "RHS_O_Officer"                        // Officer
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "rhs_uaz_open_MSV_01",               // UAZ (Open)
-        "RHS_Ural_Open_MSV_01"               // Ural Transport
+        "RHS_O_Ural_4320",                     // Light Transport Vehicle
+        "RHS_O_LSV_M2",                        // Light Support Vehicle
     ]],
     ["Vehicles_T2", [
-        "rhs_tigr_sts_msv",                  // Tigr-M (STS)
-        "rhs_btr80_msv"                      // BTR-80
+        "RHS_O_MRAP_M1151",                    // MRAP (Heavy Machine Gun)
+        "RHS_O_LAV25",                         // Light Armored Vehicle
     ]],
     ["Vehicles_T3", [
-        "rhs_bmp2d_msv",                     // BMP-2D
-        "rhs_btr80a_msv"                     // BTR-80A
+        "RHS_O_BMP2",                          // Infantry Fighting Vehicle (IFV)
+        "RHS_O_T80U"                           // Main Battle Tank
     ]],
     ["Vehicles_T4", [
-        "rhs_t72ba_tv",                      // T-72BA
-        "rhs_zsu234_aa"                      // Shilka (AA)
+        "RHS_O_MBT_T90",                       // Main Battle Tank (T-90)
+        "RHS_O_BTR80A"                         // APC (BTR-80A)
     ]],
     ["Vehicles_T5", [
-        "rhs_t90a_tv",                       // T-90A
-        "RHS_Ka52_vvsc",                     // Ka-52 Alligator
-        "RHS_Su25SM_vvsc"                    // Su-25SM Frogfoot
-    ]],
-
-    // --- Special Classes ---
-    ["Leader", "rhs_msv_emr_officer"],
-    ["Pilot", "rhs_pilot_combat_heli"]
+        "RHS_O_MBT_T80BVM",                    // Heavy Main Battle Tank (T-80BVM)
+        "RHS_O_Mi24V"                          // Attack Helicopter (Mi-24V)
+    ]]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: RHS_AFRF.sqf (OPFOR) Loaded.";
