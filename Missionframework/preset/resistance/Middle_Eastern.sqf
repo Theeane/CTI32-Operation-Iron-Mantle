@@ -8,6 +8,7 @@
 */
 
 MWF_RES_Preset = createHashMapFromArray [
+    // --- INFANTRY POOLS (Military Standard) ---
     ["Infantry_T1", [
         "LOP_AM_Infantry_Rifleman",          // Rifleman
         "LOP_AM_Infantry_Rifleman_2",        // Rifleman (AKM)
@@ -19,27 +20,49 @@ MWF_RES_Preset = createHashMapFromArray [
         "LOP_AM_Infantry_TL"                 // Team Leader
     ]],
     ["Infantry_T3", [
-        "LOP_AM_Infantry_AT",                // AT Specialist
-        "LOP_AM_Infantry_MG",                // Heavy Gunner
-        "LOP_AM_Infantry_SL"                 // Squad Leader
+        "LOP_AM_Infantry_SL",                // Squad Leader
+        "LOP_AM_Infantry_M",                 // Marksman
+        "LOP_AM_Infantry_Engineer"           // Engineer
     ]],
     ["Infantry_T4", [
-        "LOP_AM_Infantry_Marksman",          // Marksman
-        "LOP_AM_Infantry_Engineer",          // Engineer
-        "CUP_I_TK_GUE_Soldier_AA"            // AA Specialist
+        "LOP_AM_Infantry_AA",                // AA Specialist
+        "LOP_AM_Infantry_AT",                // AT Specialist
+        "LOP_AM_Infantry_MG"                 // HMG Assistant
     ]],
     ["Infantry_T5", [
-        "CUP_I_TK_GUE_Sniper",               // Sniper
-        "LOP_AM_Infantry_Officer",           // Officer
-        "CUP_I_TK_GUE_Commander"             // Commander
+        "LOP_AM_Infantry_Sniper",            // Sniper
+        "LOP_AM_Infantry_Explosive"          // Explosives Specialist
     ]],
 
-    ["Vehicles_T1", ["LOP_AM_UAZ", "CUP_I_Hilux_unarmed_TK"]],
-    ["Vehicles_T2", ["LOP_AM_UAZ_DshKM", "CUP_I_Hilux_DSHKM_TK"]],
-    ["Vehicles_T3", ["CUP_I_Hilux_BMP1_TK", "CUP_I_BRDM2_TK_GUE"]],
-    ["Vehicles_T4", ["CUP_I_T55_TK_GUE", "CUP_I_Hilux_zu23_TK"]],
-    ["Vehicles_T5", ["CUP_I_T72_TK_GUE", "CUP_O_Mi8_VIV_TK"]],
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
+    ["Vehicles_T1", [
+        "LOP_AM_Vehicle_Truck", 
+        "LOP_AM_Vehicle_MRAP"                // MRAP (Unarmed)
+    ]],
+    ["Vehicles_T2", [
+        "LOP_AM_Vehicle_MRAP_HMG",           // MRAP (HMG)
+        "LOP_AM_Vehicle_MRAP_GMG"            // MRAP (GMG)
+    ]],
+    ["Vehicles_T3", [
+        "LOP_AM_Vehicle_Radar",              // Radar Vehicle
+        "LOP_AM_Vehicle_Cannon"              // Cannon Vehicle
+    ]],
+    ["Vehicles_T4", [
+        "LOP_AM_Vehicle_Armored",            // Gorgon (Tracked)
+        "LOP_AM_Vehicle_Tracked_APC"         // Mora
+    ]],
+    ["Vehicles_T5", [
+        "LOP_AM_Vehicle_MBT",                // Main Battle Tank
+        "LOP_AM_Vehicle_Armed_Helicopter",   // Armed Helicopter
+        "LOP_AM_Vehicle_Fighter_Aircraft"    // Fighter Aircraft
+    ]],
 
-    ["Leader", "LOP_AM_Infantry_SL"],
-    ["Pilot", "LOP_AM_Infantry_Pilot"]
+    // --- SPECIAL UNITS ---
+    ["Leader", "LOP_AM_Infantry_Officer"],
+    ["Pilot",  "LOP_AM_Infantry_HelicopterPilot"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: Middle_Eastern.sqf (RESISTANCE) Loaded.";
