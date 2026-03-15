@@ -1,31 +1,39 @@
-class CfgFunctions {
-    class MWF {
-        class Core {
-            file = "core";
-            class buildMode {};
+class CfgFunctions
+{
+    class MWF
+    {
+        tag = "MWF";
+
+        class Core
+        {
+            file = "Missionframework/core";
+
+            class zoneCapture {};
             class economy {};
-            class finalizeBuild {};
-            class initGlobals {};
-            class initSystems {};
-            class initZones {};
-            class limitZeusAssets {};
-            class openBaseArchitect {};
-            class openBuildZeus {};
             class presetManager {};
-            class scanZones {};
+            class undercoverHandler {};
+            class initGlobals {};
+            class openBuildZeus {};
             class setupFOBAction {};
+            class openBaseArchitect {};
+            class startFOBPlacement {};
+            class initZones {};
+            class initSystems {};
+            class buildMode {};
+            class finalizeBuild {};
+            class limitZeusAssets {};
+            class scanZones {};
             class setupFOBInteractions {};
             class setupInteractions {};
             class spawnFOBComposition {};
             class startBuildPlacement {};
-            class startFOBPlacement {};
-            class undercoverHandler {};
-            class zoneCapture {};
             class zoneManager {};
         };
 
-        class Base {
-            file = "functions\base";
+        class Base
+        {
+            file = "Missionframework/functions/base";
+
             class baseManager {};
             class commanderToggleRepack {};
             class deployFOB {};
@@ -46,81 +54,10 @@ class CfgFunctions {
             class upgradeBaseTier {};
         };
 
-        class Economy {
-            file = "functions\economy";
-            class buyIntel {};
-            class civilianIntel {};
-            class initActions {};
-            class searchBody {};
-            class undercoverTalk {};
-        };
+        class Zones
+        {
+            file = "Missionframework/functions/zones";
 
-        class Infrastructure {
-            file = "functions\infrastructure";
-            class infrastructureManager {};
-            class intelManager {};
-            class spawnManager {};
-        };
-
-        class Interactions {
-            file = "functions\interactions";
-            class initInformant {};
-            class initInteractions {};
-            class signalPlayer {};
-        };
-
-        class Persistence {
-            file = "functions\persistence";
-            class initPersistence {};
-            class loadGame {};
-            class saveGame {};
-            class wipeSave {};
-        };
-
-        class Rebel {
-            file = "functions\rebel";
-            class rebelManager {};
-        };
-
-        class Reputation {
-            file = "functions\reputation";
-            class cityMonitor {};
-            class civRep {};
-        };
-
-        class UI {
-            file = "ui";
-            class initUI {};
-            class updateResourceUI {};
-        };
-
-        class Threat {
-            file = "functions\threat";
-            class buildThreatDirectives {};
-            class buildThreatResponses {};
-            class determineGlobalThreat {};
-            class determineZoneThreat {};
-            class evaluateBaseThreat {};
-            class getThreatSnapshot {};
-            class markThreatDirty {};
-            class recalculateThreatState {};
-            class registerThreatIncident {};
-            class selectThreatTargets {};
-            class threatManager {};
-        };
-
-        class World {
-            file = "functions\world";
-            class determineProgressionState {};
-            class determineWorldTier {};
-            class getWorldSnapshot {};
-            class markWorldDirty {};
-            class recalculateWorldState {};
-            class worldManager {};
-        };
-
-        class Zones {
-            file = "functions\zones";
             class abandonManager {};
             class applyZoneSaveData {};
             class despawnZoneAssets {};
@@ -135,17 +72,82 @@ class CfgFunctions {
             class zoneHandler {};
         };
 
-        class Missions {
-            file = "missions";
+        class Economy
+        {
+            file = "Missionframework/functions/economy";
+
+            class buyIntel {};
+            class civilianIntel {};
+            class initActions {};
+            class searchBody {};
+            class undercoverTalk {};
+        };
+
+        class Missions
+        {
+            file = "Missionframework/missions";
+
+            class openMissionBoard {};
             class activateMissionBoardSlot {};
             class buildGrandOperationPlacements {};
             class buildMissionSessionPlacements {};
             class discoverMissionTemplates {};
             class executeMissionTemplate {};
             class generateInitialMission {};
-            class initMissionSystem {};
-            class openMissionBoard {};
-            class refreshMissionBoard {};
+        };
+
+        class UI
+        {
+            file = "Missionframework/ui";
+
+            class initUI {};
+            class updateResourceUI {};
+        };
+
+        class World
+        {
+            file = "Missionframework/functions/world";
+
+            class determineProgressionState {};
+            class determineWorldTier {};
+            class getWorldSnapshot {};
+            class markWorldDirty {};
+            class recalculateWorldState {};
+            class worldManager {};
+        };
+
+        class Threat
+        {
+            file = "Missionframework/functions/threat";
+
+            class buildThreatDirectives {};
+            class buildThreatResponses {};
+            class determineGlobalThreat {};
+            class determineZoneThreat {};
+            class evaluateBaseThreat {};
+            class getThreatSnapshot {};
+            class markThreatDirty {};
+            class recalculateThreatState {};
+            class registerThreatIncident {};
+            class selectThreatTargets {};
+            class threatManager {};
+        };
+
+        class Persistence
+        {
+            file = "Missionframework/functions/persistence";
+
+            class initPersistence {};
+            class loadGame {};
+            class saveGame {};
+            class wipeSave {};
+        };
+
+        class Presets
+        {
+            file = "Missionframework/functions/presets";
+
+            class initPresets {};
         };
     };
 };

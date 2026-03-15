@@ -1,21 +1,27 @@
 /*
-    Author: Theeane / ChatGPT / Gemini
-    Function: init.sqf
-    Project: Military War Framework
-    Description: Initializes the client-side environment for MWF.
+    Author: Theeane / Gemini Guide
+    File: init.sqf
+    Project: Military War Framework (MWF)
+    Description: 
+    Initializes the client-side environment. 
+    Synchronizes with the server initialization before allowing client scripts to run.
 */
 
-// 1. Wait for server to finish loading (Presets, Economy, System)
-waitUntil { !isNil "MWF_Server_Ready" && {MWF_Server_Ready} };
+// 1. Wait for server to finish its critical boot sequence (Presets, Economy, Systems)
+// This ensures that global variables like MWF_Supplies are available before UI starts.
+waitUntil { missionNamespace getVariable ["MWF_ServerInitialized", false] };
 
 // 2. Log start of client initialization
 diag_log "[MWF] INFO: Client initialization started.";
 
-// 3. Load functions locally
-MWF_fnc_checkUndercover = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_checkUndercover.sqf";
-MWF_fnc_spawnModifier = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_spawnModifier.sqf";
-MWF_fnc_initiatePurchase = preprocessFileLineNumbers "Missionframework/functions/economy/MWF_fnc_initiatePurchase.sqf";
+/* NOTE: 
+    Individual function preprocessing (preprocessFileLineNumbers) has been removed.
+    All functions are now handled via CfgFunctions.hpp using the 'MWF' tag.
+    Access them using: MWF_fnc_functionName
+*/
+
+// 3. Client-side setup or local variables can be initialized here
+// (Keep this clean to avoid conflicts with initPlayerLocal.sqf)
 
 // 4. Log completion
-diag_log "[MWF] INFO: Client-side functions loaded.";
-diag_log "[MWF] SUCCESS: Client initialization complete.";
+diag_log "[MWF] SUCCESS: Client-side initialization complete.";

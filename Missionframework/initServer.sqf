@@ -1,29 +1,36 @@
 /*
-    Author: Theeane / ChatGPT / Gemini
-    Function: initServer.sqf
-    Project: Military War Framework
-    Description: Initializes the server-side environment for MWF.
+    Author: Theeane / Gemini Guide
+    File: initServer.sqf
+    Project: Military War Framework (MWF)
+    Description: 
+    Initializes the server-side environment. 
+    Sets up core variables, starts background loops, and signals client readiness.
 */
 
-// 1. Load Presets
-execVM "Missionframework/preset/civilians/Arma3_Civ.sqf";
+if (!isServer) exitWith {};
 
-// 2. Global System Initialization
-MWF_Supply = 1000;
-MWF_Intel = 0;
-MWF_Opfor_Tier = 1;
+diag_log "[MWF] INFO: Server-side initialization started.";
 
-// 3. Load Functions (preprocess)
-MWF_fnc_checkUndercover = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_checkUndercover.sqf";
-MWF_fnc_spawnModifier = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_spawnModifier.sqf";
-MWF_fnc_initiatePurchase = preprocessFileLineNumbers "Missionframework/functions/economy/MWF_fnc_initiatePurchase.sqf";
+// 1. Initialize Global Variables and Economy
+// This replaces manual assignments to ensure lobby parameters are respected.
+[] call MWF_fnc_initGlobals;
 
-// 4. Broadcast Variables
-publicVariable "MWF_Supply";
-publicVariable "MWF_Intel";
-publicVariable "MWF_Opfor_Tier";
+// 2. Initialize Core Systems
+// Sets up zones, infrastructure, and faction presets.
+[] call MWF_fnc_initSystems;
+[] call MWF_fnc_presetManager;
 
-// 5. Clean server log messages
-diag_log "[MWF] Preset Arma3_Civ loaded successfully.";
-diag_log "[MWF] Global variables initialized: MWF_Supply, MWF_Intel, MWF_Opfor_Tier.";
-diag_log "[MWF] Functions loaded and preprocessed.";
+// 3. Start Background Loops
+// Starts the digital economy income loop and zone monitoring.
+[] spawn MWF_fnc_economy;
+[] call MWF_fnc_initZones;
+
+// 4. Mission Logic
+// You can add logic here to start the first mission or check save-game status.
+// [] call MWF_fnc_generateInitialMission;
+
+// 5. Signal Readiness
+// This flag allows clients (init.sqf / initPlayerLocal.sqf) to proceed.
+missionNamespace setVariable ["MWF_ServerInitialized", true, true];
+
+diag_log "[MWF] SUCCESS: Server initialization complete. Framework is ready.";

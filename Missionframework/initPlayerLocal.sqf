@@ -1,43 +1,25 @@
 /*
-    Author: Theane / ChatGPT
+    Author: Theeane / ChatGPT / Gemini
     File: initPlayerLocal.sqf
     Project: Military War Framework
-
     Description:
-    Initializes player-local UI and command terminal interactions after the player and mission runtime are ready.
+    Handles client-side initialization for each player.
 */
 
-if (!hasInterface) exitWith {};
+// Wait until server initialization is complete
+waitUntil { missionNamespace getVariable ["MWF_ServerInitialized", false] };
 
-[] spawn {
-    waitUntil {
-        !isNull player &&
-        { time > 0 } &&
-        { missionNamespace getVariable ["MWF_ServerInitialized", false] }
-    };
+// Log player initialization start
+diag_log format ["[MWF] INFO: Player initialization started for %1.", name player];
 
-    if (!isNil "MWF_fnc_initUI") then {
-        [] call MWF_fnc_initUI;
-    };
+// Initialize UI
+[] call MWF_fnc_initUI;
 
-    private _terminals = [];
+// Setup player interactions
+[] call MWF_fnc_setupInteractions;
 
-    {
-        private _terminal = missionNamespace getVariable [_x, objNull];
-        if (!isNull _terminal) then {
-            _terminals pushBackUnique _terminal;
-        };
-    } forEach [
-        "MWF_HQ_Terminal",
-        "MWF_MOB_Terminal",
-        "MWF_CommandTerminal"
-    ];
+// Update resource display
+[] call MWF_fnc_updateResourceUI;
 
-    {
-        [_x] call MWF_fnc_setupInteractions;
-    } forEach _terminals;
-
-    [] spawn MWF_fnc_updateResourceUI;
-
-    diag_log format ["[MWF] Client initialization complete for %1.", profileName];
-};
+// Log completion
+diag_log format ["[MWF] SUCCESS: Player initialization completed for %1.", name player];
