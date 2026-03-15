@@ -1,26 +1,29 @@
-sqf
-// Author: Theane / ChatGPT
-// Project: Mission War Framework
+/*
+    Author: Theeane / ChatGPT / Gemini
+    Function: initServer.sqf
+    Project: Military War Framework
+    Description: Initializes the server-side environment for MWF.
+*/
 
-// Server-side initialization
-hint "Mission War Framework: Server initialization started.";
+// 1. Load Presets
+execVM "Missionframework/preset/civilians/Arma3_Civ.sqf";
 
-// Define current era and default uniform
-MWF_Current_Era = "Vietnam"; // Example: "Vietnam" or "Modern"
-MWF_Default_Uniform = "U_B_CombatUniform_mcam"; // Example: Default uniform
+// 2. Global System Initialization
+MWF_Supply = 1000;
+MWF_Intel = 0;
+MWF_Opfor_Tier = 1;
 
-// Load the blacklist lists
-preprocessFileLineNumbers "preset/blacklist/global_blacklist.sqf";
-preprocessFileLineNumbers "preset/blacklist/modern_removed.sqf";
+// 3. Load Functions (preprocess)
+MWF_fnc_checkUndercover = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_checkUndercover.sqf";
+MWF_fnc_spawnModifier = preprocessFileLineNumbers "Missionframework/functions/base/MWF_fnc_spawnModifier.sqf";
+MWF_fnc_initiatePurchase = preprocessFileLineNumbers "Missionframework/functions/economy/MWF_fnc_initiatePurchase.sqf";
 
-// Initialize the blacklist manager
-[] execVM "preset/blacklist/blacklist_manager.sqf";
-MWF_fnc_blacklistManager; // Call the function to set the undercover blacklist
+// 4. Broadcast Variables
+publicVariable "MWF_Supply";
+publicVariable "MWF_Intel";
+publicVariable "MWF_Opfor_Tier";
 
-// Define the base radius for arsenal and build mode
-MWF_Base_Radius = 500; // Example radius value (meters)
-
-// Make MWF_Undercover_Blacklist available to all clients
-publicVariable "MWF_Undercover_Blacklist";
-
-// Example of further server-side logic can be added below.
+// 5. Clean server log messages
+diag_log "[MWF] Preset Arma3_Civ loaded successfully.";
+diag_log "[MWF] Global variables initialized: MWF_Supply, MWF_Intel, MWF_Opfor_Tier.";
+diag_log "[MWF] Functions loaded and preprocessed.";
