@@ -1,6 +1,6 @@
 /*
     Author: Theane / ChatGPT
-    Function: MWF_fn_markThreatDirty
+    Function: MWF_fnc_markThreatDirty
     Project: Military War Framework
 
     Description:
