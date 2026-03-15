@@ -15,50 +15,54 @@ MWF_RES_Preset = createHashMapFromArray [
         "I_C_Soldier_Bandit_07_F"           // Bandit (Pistol)
     ]],
     ["Infantry_T2", [
-        "I_C_Soldier_Bandit_02_F",          // Bandit (AK)
-        "I_C_Soldier_Bandit_05_F",          // Bandit (AR)
-        "I_C_Soldier_Bandit_08_F"           // Bandit (LAT)
+        "I_C_Soldier_Bandit_02_F",          // Bandit (Grenadier)
+        "I_C_Soldier_Bandit_04_F",          // Bandit (Autorifleman)
+        "I_C_Soldier_Bandit_08_F"           // Bandit (Team Leader)
     ]],
     ["Infantry_T3", [
-        "I_C_Soldier_Para_01_F",            // Paramilitary (Rifle)
-        "I_C_Soldier_Para_04_F",            // Paramilitary (AR)
-        "I_C_Soldier_Para_06_F"             // Paramilitary (Medic)
+        "I_C_Soldier_Bandit_05_F",          // Bandit (Squad Leader)
+        "I_C_Soldier_Bandit_06_F",          // Bandit (Marksman)
+        "I_C_Soldier_Bandit_09_F"           // Bandit (Engineer)
     ]],
     ["Infantry_T4", [
-        "I_C_Soldier_Para_02_F",            // Paramilitary (AK)
-        "I_C_Soldier_Para_03_F",            // Paramilitary (GL)
-        "I_C_Soldier_Para_05_F"             // Paramilitary (Marksman)
+        "I_C_Soldier_Bandit_10_F",          // Bandit (AA Specialist)
+        "I_C_Soldier_Bandit_11_F",          // Bandit (AT Specialist)
+        "I_C_Soldier_Bandit_12_F"           // Bandit (HMG Assistant)
     ]],
     ["Infantry_T5", [
-        "I_C_Soldier_Para_07_F",            // Paramilitary (Heavy)
-        "I_C_Soldier_Para_08_F",            // Paramilitary (AT)
-        "I_C_Soldier_Camo_F"                // Recon Specialist
+        "I_C_Soldier_Bandit_13_F",          // Bandit (Sniper)
+        "I_C_Soldier_Bandit_14_F"           // Bandit (Explosives Specialist)
     ]],
 
-    // --- VEHICLE POOLS (Escalation from Technicals to Looted/Stolen Air) ---
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
     ["Vehicles_T1", [
-        "C_Offroad_01_F", 
-        "I_C_Offroad_02_unarmed_F"          // MB 4WD
+        "I_C_Truck_01_F", 
+        "I_C_MRAP_01_F"                     // MRAP (Unarmed)
     ]],
     ["Vehicles_T2", [
-        "I_C_Offroad_02_LMG_F", 
-        "O_G_Offroad_01_armed_F"            // Offroad HMG
+        "I_C_MRAP_01_hmg_F",                // MRAP (HMG)
+        "I_C_MRAP_01_gmg_F"                 // MRAP (GMG)
     ]],
     ["Vehicles_T3", [
-        "I_C_Van_01_transport_F", 
-        "O_G_Offroad_01_AT_F"               // Offroad AT
+        "I_C_LT_01_scout_F",                // Nyx (Radar)
+        "I_C_LT_01_cannon_F"                // Nyx (Autocannon)
     ]],
     ["Vehicles_T4", [
-        "I_C_Offroad_02_AT_F", 
-        "O_G_Van_01_multipurpose_F"         // Transport Van
+        "I_C_APC_Wheeled_01_cannon_F",      // Gorgon
+        "I_C_APC_tracked_01_cannon_F"       // Mora
     ]],
     ["Vehicles_T5", [
-        "I_E_APC_tracked_03_cannon_F",      // Looted Mora/APC
-        "I_C_Plane_Civil_01_F",             // Caesar BTT (Armed Recon)
-        "C_IDAP_Heli_Light_01_civil_F"      // Stolen/Modified M-900
+        "I_C_MBT_01_cannon_F",              // Kuma (MBT)
+        "I_C_Heli_light_01_dynamicLoadout_F", // WY-55 Hellcat (Armed)
+        "I_C_Plane_Fighter_01_dynamicLoadout_F" // A-143 Buzzard (CAS)
     ]],
 
     // --- SPECIAL UNITS ---
-    ["Leader", "I_C_Soldier_Para_01_F"],
-    ["Pilot",  "I_C_Soldier_Para_04_F"]
+    ["Leader", "I_C_Officer_F"],
+    ["Pilot",  "I_C_helipilot_F"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: Syndikat.sqf (RESISTANCE) Loaded.";
