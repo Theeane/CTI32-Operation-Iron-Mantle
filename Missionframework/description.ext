@@ -1,40 +1,43 @@
 /*
-    Author: Theane / ChatGPT
-    Function: Mission Description
-    Project: Military War Framework
-
-    Description:
-    Defines mission configuration, function registration, mission parameters, and UI includes.
+    Author: Theane / Gemini
+    Project: Military War Framework (MWF)
+    
+    Description: 
+    Central funktionsregistrering. Alla funktioner här kompileras vid start 
+    och blir tillgängliga via 'MWF_fnc_'.
 */
 
-#include "CfgFunctions.hpp"
-#include "ui\defines.hpp"
-#include "ui\buildMenu.hpp"
-#include "ui\buyMenu.hpp"
+class CfgFunctions {
+    class MWF {
+        tag = "MWF";
 
-class RscTitles {
-    #include "ui\resourceBar.hpp"
-};
+        // --- TERMINAL SYSTEM ---
+        class Terminal {
+            file = "Missionframework\Functions\Terminal";
+            class terminal_main {};
+            class terminal_upload {};
+            class terminal_disrupt {};
+        };
 
-author = "Theane / ChatGPT";
-onLoadName = "Operation Iron Mantle";
-onLoadMission = "Establish FOBs, capture sectors, and liberate the region.";
+        // --- GRAND OPERATIONS ---
+        // Notera: file-sökvägen pekar direkt på mappen där .sqf-filerna ligger.
+        class GrandOps {
+            file = "Missionframework\MainOp\grand_ops";
+            class op_skyGuardian {};
+            class op_pointBlank {};
+            class op_severedNerve {};
+            class op_stasisStrike {};
+            class op_steelRain {};
+            class op_apexPredator {};
+        };
 
-enableDebugConsole = 1;
-saving = 0;
-disabledAI = 1;
-respawn = 3;
-respawnDelay = 10;
-respawnDialog = 0;
-
-#include "configs\params.hpp"
-
-class CfgNotifications {
-    class PriorityAlert {
-        title = "%1";
-        iconPicture = "\A3\ui_f\data\map\mapcontrol\taskIcon_ca.paa";
-        description = "%2";
-        priority = 9;
-        duration = 10;
+        /* // --- FRAMTIDA MODULER (Aktiveras när filerna skapas) ---
+        class Core {
+            file = "Missionframework\Functions\Core";
+            class addResource {};
+            class saveGame {};
+            class showNotification {};
+        };
+        */
     };
 };
