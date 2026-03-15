@@ -25,3 +25,9 @@ MWF_CIV_Vehicles = [
     "C_Van_01_transport_F",
     "C_Truck_02_transport_F"
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Tanoa_Civ Loaded.";

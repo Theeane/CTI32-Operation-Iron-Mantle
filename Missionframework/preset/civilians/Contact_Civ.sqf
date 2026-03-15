@@ -27,3 +27,9 @@ MWF_CIV_Vehicles = [
     "C_Van_02_vehicle_F",                // Van (LoW DLC)
     "C_SUV_01_F"                         // SUV
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Contact_Civ Loaded.";

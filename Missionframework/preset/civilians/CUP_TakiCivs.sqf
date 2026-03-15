@@ -30,3 +30,9 @@ MWF_CIV_Vehicles = [
     "CUP_C_Datsun_Plain",                // Datsun Pickup
     "CUP_C_Volha_Limo_TK_CIV"            // Volha Limo
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: CUP_TakiCivs Loaded.";

@@ -30,3 +30,9 @@ MWF_CIV_Vehicles = [
     "CUP_C_Skoda_White_CIV",             // Skoda
     "CUP_C_Ural_Civ_01"                  // Ural Truck
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Eastern_European Loaded.";

@@ -27,3 +27,9 @@ MWF_CIV_Vehicles = [
     "RDS_Lada_Civ_01",                   // Lada
     "RDS_Ikarus_Civ_01"                  // Bus
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: RDSCiv Loaded.";

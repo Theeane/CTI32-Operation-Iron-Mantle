@@ -30,3 +30,9 @@ MWF_CIV_Vehicles = [
     "CUP_C_Ural_Civ_01",                 // Ural Truck
     "CUP_C_Lada_Green_Civ"               // Lada (Green)
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: CUP_ChernoCivs Loaded.";

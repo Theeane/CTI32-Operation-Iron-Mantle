@@ -30,3 +30,9 @@ MWF_CIV_Vehicles = [
     "C_Van_02_vehicle_F",               // Van (Laws of War DLC)
     "C_Truck_02_transport_F"            // Zamak Transport
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: custom_1 Loaded.";

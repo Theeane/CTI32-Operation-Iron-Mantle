@@ -23,3 +23,9 @@ MWF_CIV_Vehicles = [
     "C_Truck_02_covered_F",              // Zamak (Covered)
     "C_Truck_02_fuel_F"                  // Fuel Truck
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Vietnam_Unsung Loaded.";

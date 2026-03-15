@@ -31,3 +31,9 @@ MWF_CIV_Vehicles = [
     "CUP_C_V3S_Open_TK_CIV",             // Praga Truck
     "CUP_C_Datsun_Plain"                 // Datsun Pickup
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Middle_Eastern Loaded.";

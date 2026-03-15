@@ -24,3 +24,9 @@ MWF_CIV_Vehicles = [
     "gm_ge_pol_typ1200_grn",             // Police Beetle
     "gm_ge_dbp_typ1200_yel"              // Post Beetle
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_CIV_Units";
+publicVariable "MWF_CIV_Vehicles";
+
+diag_log "[MWF] Preset: Global_Mobilization Loaded.";
