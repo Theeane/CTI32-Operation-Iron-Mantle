@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for LDF Contact.
+    Defines the BLUFOR preset configuration for LDF Contact.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
@@ -22,126 +22,82 @@ MWF_Pilot = "I_E_Helipilot_F";                                   // LDF Pilot
 
 // Button 1: Recon & Marksman Team
 MWF_Support_Group1 = [
-    "I_E_Offroad_01_comms_F",           // LDF Comms Offroad
-    [
-        "I_E_Soldier_TL_F",             // Unit 1: Team Leader
-        "I_E_Soldier_Pathfinder_F",     // Unit 2: Marksman/Pathfinder
-        "I_E_Soldier_F"                 // Unit 3: Rifleman
-    ],
-    150                                 
+    "I_E_LSV_01_armed_F",  // Armed light support vehicle from LDF Contact
+    ["I_E_Soldier_SL_F", "I_E_Soldier_M_F", "I_E_Soldier_AR_F"], 
+    150, 2
 ];
 
-// Button 2: Infantry Section
+// Button 2: Transport Team
 MWF_Support_Group2 = [
-    "I_E_Truck_02_Transport_F",         // Zamak Transport
-    [
-        "I_E_Soldier_SL_F",             // Unit 1: Squad Leader
-        "I_E_Soldier_AR_F",             // Unit 2: Auto Rifleman
-        "I_E_Soldier_AR_F",             // Unit 3: Auto Rifleman
-        "I_E_Soldier_LAT_F",            // Unit 4: AT Specialist
-        "I_E_Medic_F"                   // Unit 5: Medic
-    ],
-    250                                 
+    "I_E_Truck_02_transport_F",  // Transport truck from LDF Contact
+    ["I_E_Soldier_SL_F", "I_E_Soldier_AR_F", "I_E_Soldier_LAT_F", "I_E_Soldier_Medic_F"], 
+    250, 3
 ];
 
-// Button 3: Anti-Tank Squad
+// Button 3: Armored Support
 MWF_Support_Group3 = [
-    "I_E_Offroad_01_AT_F",              // LDF AT Offroad
-    [
-        "I_E_Soldier_SL_F",             // Unit 1: Squad Leader
-        "I_E_Soldier_AT_F",             // Unit 2: AT Specialist
-        "I_E_Soldier_AT_F",             // Unit 3: AT Specialist
-        "I_E_Medic_F"                   // Unit 4: Medic
-    ],
-    300                                 
+    "I_E_LSV_01_AT_F",  // Anti-tank light support vehicle from LDF Contact
+    ["I_E_Soldier_SL_F", "I_E_Soldier_AT_F", "I_E_Soldier_AT_F", "I_E_Soldier_Medic_F"], 
+    300, 4
 ];
 
-// Button 4: Armored Support
+// Button 4: APC Support
 MWF_Support_Group4 = [
-    "I_E_APC_tracked_03_cannon_F",      // FV510 Mora (LDF)
-    [
-        "I_E_Soldier_SL_F",             // Unit 1: Squad Leader
-        "I_E_Soldier_F",                // Unit 2: Rifleman
-        "I_E_Soldier_Marksman_F",       // Unit 3: Marksman
-        "I_E_Engineer_F"                // Unit 4: Engineer
-    ],
-    450                                 
+    "I_E_APC_Wheeled_01_F",  // APC from LDF Contact
+    ["I_E_Soldier_SL_F", "I_E_Soldier_F_F", "I_E_Soldier_M_F", "I_E_Soldier_Engineer_F"], 
+    450, 5
 ];
 
-// Button 5: Air Assault
+// Button 5: Helicopter Support
 MWF_Support_Group5 = [
-    "I_E_Heli_light_03_unarmed_F",      // Hellcat Transport
-    [
-        "I_E_Soldier_TL_F",             // Unit 1: Team Leader
-        "I_E_Soldier_F",                // Unit 2: Rifleman
-        "I_E_Soldier_LAT_F",            // Unit 3: AT Specialist
-        "I_E_Soldier_Pathfinder_F"      // Unit 4: Marksman
-    ],
-    600                                 
+    "I_E_Heli_Transport_01_F",  // Transport helicopter from LDF Contact
+    ["I_E_Soldier_TL_F", "I_E_Soldier_F_F", "I_E_Soldier_LAT_F", "I_E_Soldier_M_F"], 
+    600, 5
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// --- 4. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
-    [MWF_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
-    ["I_E_Offroad_01_F", 15],                                      // Basic Offroad
-    ["I_E_Offroad_01_comms_F", 25],                                // Comms Offroad
-    ["I_E_Offroad_01_AT_F", 45],                                   // AT Offroad
-    ["I_E_Truck_02_covered_F", 50]                                 // Zamak Covered
+    [MWF_Respawn_Truck, 100, 1], 
+    ["I_E_LSV_01_unarmed_F", 20, 1],  // Unarmed LSV from LDF
+    ["I_E_LSV_01_armed_F", 45, 2],  // Armed LSV from LDF
+    ["I_E_MRAP_01_F", 60, 2]  // MRAP vehicle from LDF
 ];
 
 MWF_Preset_APC = [
-    ["I_E_APC_tracked_03_cannon_F", 200]                            // Mora
+    ["I_E_APC_Wheeled_01_F", 180, 3],  // APC from LDF
+    ["I_E_AFV_Wheeled_01_F", 250, 4]  // AFV from LDF
 ];
 
 MWF_Preset_Tanks = [
-    ["I_E_APC_tracked_03_cannon_F", 250]                            // High Tier Mora (LDF lacks MBTs)
+    ["I_E_MBT_01_cannon_F", 450, 5],  // Main battle tank from LDF
+    ["I_E_MBT_01_TUSK_F", 500, 5]  // TUSK variant from LDF
 ];
 
 MWF_Preset_Helis = [
-    ["I_E_Heli_light_03_unarmed_F", 200]                           
+    ["I_E_Heli_Light_01_F", 150, 3],  // Light helicopter from LDF
+    ["I_E_Heli_Transport_01_F", 250, 4],  // Transport helicopter from LDF
+    ["I_E_Heli_Transport_03_unarmed_F", 280, 5]  // Unarmed transport helicopter from LDF
 ];
 
 MWF_Preset_Jets = [
-    // LDF lacks Jets (Ready for community/mod addition)
+    ["I_E_Plane_CAS_01_dynamicLoadout_F", 550, 4],  // CAS jet from LDF
+    ["I_E_Plane_Fighter_01_F", 700, 5]  // Fighter jet from LDF
 ];
 
-// --- 5. MISSION UNLOCKS ---
-
-// Grand Op 1: Helicopters
-MWF_Unlock_GrandOp1_Helis = [
-    "I_E_Heli_light_03_dynamicLoadout_F"                           // Armed Hellcat
-];
-
-// Grand Op 2: Fixed Wing
-MWF_Unlock_GrandOp2_Jets = [
-    // LDF lacks Jets
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-MWF_Unlock_Disrupt = [
-    "I_E_Offroad_01_covered_F",
-    "I_E_Offroad_01_comms_F"
-];
-
-// Side Op: Supply (Logistics/FOB)
-MWF_Unlock_Supply = [
-    MWF_FOB_Truck,                                               
-    "I_E_Truck_02_fuel_F",                                         
-    "I_E_Truck_02_Repair_F"                                        
-];
-
-// Side Op: Intel (Information/Command)
-MWF_Unlock_Intel = [
-    "I_E_Truck_02_MRL_F"                                            // Zamak MRL
-];
+// --- 5. SPECIAL ASSETS ---
+MWF_Rearm_Truck = ["I_E_Truck_02_Medical_F", 300, 5];  // Rearm truck from LDF
 
 // --- 6. SYNC & BROADCAST ---
-{ publicVariable _x; } forEach [
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+private _allVars = [
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
+    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
     "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
-diag_log "[CTI32] Preset: LDF_Contact.sqf loaded successfully.";
+{ publicVariable _x; } forEach _allVars;
+
+diag_log "[MWF] Preset: LDF_Contact.sqf Loaded.";
