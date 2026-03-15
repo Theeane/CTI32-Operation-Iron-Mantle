@@ -7,7 +7,7 @@
     Defines custom assets for BLUFOR preset in Military War Framework.
 */
 
-// Global Variables for Custom BLUFOR Preset
+// --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---
 MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
 MWF_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
 MWF_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
@@ -16,11 +16,6 @@ MWF_Preset_FOB_Table = "Land_CampingTable_small_F";
 MWF_Preset_FOB_Light = "Land_Camping_Light_F";
 MWF_Preset_FOB_Siren = "Land_Loudspeakers_F";
 MWF_Preset_FOB_Spawn = "Land_HelipadEmpty_F";
-
-// --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---
-MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
-MWF_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
-MWF_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
 
 // --- 2. CORE SUPPORT ASSETS ---
 MWF_FOB_Truck      = "B_Truck_01_Repair_F"; 
@@ -36,7 +31,6 @@ MWF_Tent_Object     = "Land_TentDome_F";
 MWF_Tent_Price      = 10;                    
 
 // --- 4. NPC SUPPORT GROUPS [Vehicle, [Units], Price, MinTier] ---
-
 MWF_Support_Group1 = [
     "B_LSV_01_armed_F", 
     ["B_recon_TL_F", "B_recon_M_F", "B_recon_F"], 
@@ -68,7 +62,6 @@ MWF_Support_Group5 = [
 ];
 
 // --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
-
 MWF_Preset_Light = [
     [MWF_Respawn_Truck, 100, 1], 
     ["B_Quadbike_01_F", 5, 1],
