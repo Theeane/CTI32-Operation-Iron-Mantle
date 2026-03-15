@@ -12,7 +12,7 @@ params [
     ["_price", 0, [0]]
 ];
 
-if (!hasInterface) exitWith {}; 
+if (!hasInterface) exitWith {};
 if (_className isEqualTo "") exitWith {};
 
 private _currentSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
@@ -30,4 +30,47 @@ private _confirmed = false;
 private _aborted = false;
 private _rotation = getDir player;
 
-dia...
+diag_log "Use [LMB] to Place, [RMB] to Cancel, [Q/E] to Rotate.";
+
+while {!_confirmed && !_aborted && alive player} do {
+    private _pos = player modelToWorld [0, 5, 0];
+    _ghost setPosATL _pos;
+    _ghost setDir _rotation;
+
+    if (inputAction "TurnLeft" > 0) then {
+        _rotation = _rotation - 2;
+    };
+    if (inputAction "TurnRight" > 0) then {
+        _rotation = _rotation + 2;
+    };
+
+    if (inputAction "DefaultAction" > 0) then {
+        _confirmed = true;
+    };
+    if (inputAction "ReloadMagazine" > 0) then {
+        _aborted = true;
+    };
+
+    uiSleep 0.01;
+};
+
+private _finalPos = getPosATL _ghost;
+private _finalDir = getDir _ghost;
+
+deleteVehicle _ghost;
+
+if (_confirmed) then {
+    [(_price * -1), "SUPPLIES"] call MWF_fnc_addResource;
+
+    private _realObject = createVehicle [_className, _finalPos, [], 0, "CAN_COLLIDE"];
+    _realObject setDir _finalDir;
+    _realObject setPosATL _finalPos;
+
+    if (_className == "B_Slingload_01_Cargo_F") then {
+        [_realObject] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
+    };
+
+    diag_log "Object Deployed.";
+} else {
+    diag_log "Construction Aborted.";
+};

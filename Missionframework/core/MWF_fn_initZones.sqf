@@ -1,13 +1,27 @@
-// MWF_fn_initZones.sqf
-// Date: 2026-03-15 13:12:17 UTC
-// This script initializes zone capture loops for all registered zone objects.
+/*
+    Author: Theane / ChatGPT
+    Function: MWF_fn_initZones
+    Project: Military War Framework
 
-// List of all registered zones
-private _zones = ["Zone1", "Zone2", "Zone3"]; // Example zone names
+    Description:
+    Starts zone capture loops for all registered zone objects.
+*/
 
-// Function to start capture loop for each zone
-{ 
+if (!isServer) exitWith {};
+
+private _registeredZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
+private _startedCount = 0;
+
+{
     private _zone = _x;
-    // Your zone start logic here
-    hint format ["Starting capture loop for %1", _zone];
-} forEach _zones;
+
+    if (!isNull _zone) then {
+        if !(_zone getVariable ["MWF_zoneCaptureStarted", false]) then {
+            _zone setVariable ["MWF_zoneCaptureStarted", true, true];
+            [_zone] spawn MWF_fnc_zoneCapture;
+            _startedCount = _startedCount + 1;
+        };
+    };
+} forEach _registeredZones;
+
+diag_log format ["[MWF Zones] Started capture loops for %1 zones.", _startedCount];
