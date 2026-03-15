@@ -4,160 +4,110 @@
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for CUP BAF Desert.
+    Defines the BLUFOR preset configuration for CUP BAF Desert.
 */
 
-// --- 1. CORE SUPPORT UNITS ---
-MWF_FOB_Truck = "CUP_B_MTVR_Repair_BAF_DES";                     // Heavy FOB builder truck
-MWF_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
-MWF_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
-MWF_Respawn_Truck = "CUP_B_MTVR_Reammo_BAF_DES";                // Mobile Respawn vehicle (Fixed 100 S)
-MWF_Crewman = "CUP_B_BAF_Soldier_Crew_DDPM";                    // Default crew for armored vehicles
-MWF_Pilot = "CUP_B_BAF_Soldier_Pilot_DDPM";                     // Default pilot for helis and jets
+// --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---
+MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
+MWF_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
+MWF_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
+MWF_Preset_FOB_Center = "Land_Laptop_unfolded_F";
+MWF_Preset_FOB_Table = "Land_CampingTable_small_F";
+MWF_Preset_FOB_Light = "Land_Camping_Light_F";
+MWF_Preset_FOB_Siren = "Land_Loudspeakers_F";
+MWF_Preset_FOB_Spawn = "Land_HelipadEmpty_F";
 
-// --- 2. LOGISTICS & ECONOMY ---
-// Supply and Intel are digital currencies. 
-// Physical Intel (Laptops/Officers) must be returned to FOB/MOB Laptop interaction.
-// Player death with physical Intel: 15 min loot window before garbage cleanup.
+// --- 2. CORE SUPPORT ASSETS ---
+MWF_FOB_Truck      = "CUP_B_MTVR_Repair_BAF_DES";  // Heavy FOB builder truck from CUP BAF
+MWF_FOB_Box        = "B_Slingload_01_Cargo_F";     // FOB container from CUP
+MWF_Arsenal_Box    = "B_supplyCrate_F";            // Arsenal crate for supplying gear
+MWF_Respawn_Truck  = "CUP_B_MTVR_Reammo_BAF_DES";  // Mobile Respawn vehicle (Ammo truck from CUP BAF)
+MWF_Crewman        = "CUP_B_BAF_Soldier_Crew_DDPM"; // CUP BAF Crewman class
+MWF_Pilot          = "CUP_B_BAF_Soldier_Pilot_DDPM"; // CUP BAF Pilot class
 
-// --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
+// --- 3. TENT SYSTEM (Portable Respawn) ---
+MWF_Tent_Backpack   = "B_Messenger_IDAP_F";  // Tent backpack for mobile respawn
+MWF_Tent_Object     = "Land_TentDome_F";     // Tent object for respawn
+MWF_Tent_Price      = 10;                     // Cost of the tent system
 
-// Button 1: Recon Team (Jackal Patrol)
+// --- 4. NPC SUPPORT GROUPS [Vehicle, [Units], Price, MinTier] ---
+
 MWF_Support_Group1 = [
-    // Vehicle used
-    "CUP_B_Jackal2_GMG_GB_D",           // Jackal 2 (GMG)
-    [
-        // AI Units
-        "CUP_B_BAF_Soldier_TL_DDPM",    // Unit 1: Team Leader
-        "CUP_B_BAF_Soldier_Scout_DDPM", // Unit 2: Scout
-        "CUP_B_BAF_Soldier_MG_DDPM"     // Unit 3: Machinegunner
-    ],
-    150                                 // Cost
+    "CUP_LSV_01_armed_F",  // Armed light support vehicle from CUP
+    ["CUP_B_BAF_Soldier_SL_DDPM", "CUP_B_BAF_Soldier_AR_DDPM", "CUP_B_BAF_Soldier_AR_DDPM"], 
+    150, 2
 ];
 
-// Button 2: Infantry Section
 MWF_Support_Group2 = [
-    // Vehicle used
-    "CUP_B_Ridgback_HMG_GB_D",          // Ridgback PPV (HMG)
-    [
-        // AI Units
-        "CUP_B_BAF_Soldier_SL_DDPM",    // Unit 1: Squad Leader
-        "CUP_B_BAF_Soldier_AR_DDPM",    // Unit 2: Auto Rifleman
-        "CUP_B_BAF_Soldier_AR_DDPM",    // Unit 3: Auto Rifleman
-        "CUP_B_BAF_Soldier_AT_DDPM",    // Unit 4: AT Specialist (NLAW/Javelin)
-        "CUP_B_BAF_Soldier_Medic_DDPM"  // Unit 5: Medic
-    ],
-    250                                 // Cost
+    "CUP_Truck_01_transport_F",  // Transport truck from CUP
+    ["CUP_B_BAF_Soldier_SL_DDPM", "CUP_B_BAF_Soldier_AR_DDPM", "CUP_B_BAF_Soldier_AR_DDPM", "CUP_B_BAF_Soldier_LAT_DDPM", "CUP_B_BAF_Soldier_Medic_DDPM"], 
+    250, 3
 ];
 
-// Button 3: Anti-Tank Squad
 MWF_Support_Group3 = [
-    // Vehicle used
-    "CUP_B_Jackal2_HMG_GB_D",           // Jackal 2 (HMG)
-    [
-        // AI Units
-        "CUP_B_BAF_Soldier_SL_DDPM",    // Unit 1: Squad Leader
-        "CUP_B_BAF_Soldier_AT_DDPM",    // Unit 2: AT Specialist
-        "CUP_B_BAF_Soldier_AT_DDPM",    // Unit 3: AT Specialist
-        "CUP_B_BAF_Soldier_Medic_DDPM"  // Unit 4: Medic
-    ],
-    300                                 // Cost
+    "CUP_LSV_01_AT_F",  // Anti-tank light support vehicle from CUP
+    ["CUP_B_BAF_Soldier_SL_DDPM", "CUP_B_BAF_Soldier_AT_DDPM", "CUP_B_BAF_Soldier_AT_DDPM", "CUP_B_BAF_Soldier_Medic_DDPM"], 
+    300, 4
 ];
 
-// Button 4: Armored Support
 MWF_Support_Group4 = [
-    // Vehicle used
-    "CUP_B_FV432_Bulldog_GB_D",         // FV432 Bulldog APC
-    [
-        // AI Units
-        "CUP_B_BAF_Soldier_SL_DDPM",    // Unit 1: Squad Leader
-        "CUP_B_BAF_Soldier_DDPM",       // Unit 2: Rifleman
-        "CUP_B_BAF_Soldier_GL_DDPM",    // Unit 3: Grenadier
-        "CUP_B_BAF_Soldier_EN_DDPM"     // Unit 4: Engineer
-    ],
-    450                                 // Cost
+    "CUP_APC_Wheeled_01_cannon_F",  // Wheeled APC from CUP
+    ["CUP_B_BAF_Soldier_SL_DDPM", "CUP_B_BAF_Soldier_F_DDPM", "CUP_B_BAF_Soldier_M_DDPM", "CUP_B_BAF_Soldier_Engineer_DDPM"], 
+    450, 5
 ];
 
-// Button 5: Air Assault
 MWF_Support_Group5 = [
-    // Vehicle used
-    "CUP_B_Merlin_HC3_GB",              // Merlin Transport Heli
-    [
-        // AI Units
-        "CUP_B_BAF_Soldier_TL_DDPM",    // Unit 1: Team Leader
-        "CUP_B_BAF_Soldier_Scout_DDPM", // Unit 2: Scout
-        "CUP_B_BAF_Soldier_AT_DDPM",    // Unit 3: AT Specialist
-        "CUP_B_BAF_Soldier_MG_DDPM"     // Unit 4: Machinegunner
-    ],
-    600                                 // Cost
+    "CUP_Heli_Transport_01_F",  // Transport helicopter from CUP
+    ["CUP_B_BAF_Soldier_TL_DDPM", "CUP_B_BAF_Soldier_F_DDPM", "CUP_B_BAF_Soldier_LAT_DDPM", "CUP_B_BAF_Soldier_M_DDPM"], 
+    600, 5
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
-    [MWF_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
-    ["CUP_B_LandRover_Amb_GB_D", 20],                              // Ambulance
-    ["CUP_B_Jackal2_L2A1_GB_D", 45],                               // Jackal 2 HMG
-    ["CUP_B_Coyote_L2A1_GB_D", 60],                                // Coyote HMG
-    ["CUP_B_MTVR_BAF_DES", 50]                                     // Heavy Transport
+    [MWF_Respawn_Truck, 100, 1], 
+    ["CUP_Quadbike_01_F", 5, 1],  // CUP Quadbike
+    ["CUP_LSV_01_unarmed_F", 20, 1],  // Unarmed LSV from CUP
+    ["CUP_LSV_01_armed_F", 45, 2],  // Armed LSV from CUP
+    ["CUP_MRAP_01_F", 60, 2]  // MRAP vehicle from CUP
 ];
 
 MWF_Preset_APC = [
-    ["CUP_B_FV432_Bulldog_GB_D_RWS", 160],                         // Bulldog RWS
-    ["CUP_B_MCV80_GB_D", 220]                                      // Warrior IFV
+    ["CUP_APC_Wheeled_01_cannon_F", 180, 3],  // APC with cannon from CUP
+    ["CUP_APC_Tracked_01_rcws_F", 200, 3],  // Tracked APC from CUP
+    ["CUP_AFV_Wheeled_01_cannon_F", 250, 4]  // Wheeled AFV from CUP
 ];
 
 MWF_Preset_Tanks = [
-    ["CUP_B_Challenger2_Desert_BAF", 450]                          // Challenger 2
+    ["CUP_MBT_01_cannon_F", 450, 5],  // Main battle tank from CUP
+    ["CUP_MBT_01_TUSK_F", 500, 5],  // TUSK variant tank from CUP
+    ["CUP_MBT_01_arty_F", 650, 5]  // Artillery tank from CUP
 ];
 
 MWF_Preset_Helis = [
-    ["CUP_B_Wildcat_Unarmed_GB_D", 200],                           // Wildcat Transport
-    ["CUP_B_Merlin_HC3_GB", 250]                                   // Merlin Transport
+    ["CUP_Heli_Light_01_F", 150, 3],  // Light helicopter from CUP
+    ["CUP_Heli_Transport_01_F", 250, 4],  // Transport helicopter from CUP
+    ["CUP_Heli_Transport_03_unarmed_F", 280, 5]  // Unarmed transport helicopter from CUP
 ];
 
 MWF_Preset_Jets = [
-    ["CUP_B_GR9_D_GB", 550]                                        // Harrier GR9
+    ["CUP_Plane_CAS_01_dynamicLoadout_F", 550, 4],  // CAS jet from CUP
+    ["CUP_Plane_Fighter_01_F", 700, 5]  // Fighter jet from CUP
 ];
 
-// --- 5. MISSION UNLOCKS ---
+// --- 6. SPECIAL ASSETS ---
+MWF_Rearm_Truck = ["CUP_B_Truck_01_Repair_F", 300, 5];  // Rearm truck from CUP
 
-// Grand Op 1: Helicopters
-MWF_Unlock_GrandOp1_Helis = [
-    "CUP_B_Apache_AH1_BAF",                                        // AH1 Apache Attack Heli
-    "CUP_B_Wildcat_AH1_CAS_GB_D"                                   // Wildcat CAS
-];
-
-// Grand Op 2: Fixed Wing
-MWF_Unlock_GrandOp2_Jets = [
-    "CUP_B_F35B_BAF",                                              // F-35B Lightning II
-    "CUP_B_F35B_Stealth_BAF"                                       // F-35B Stealth
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-MWF_Unlock_Disrupt = [
-    "CUP_B_Mastiff_HMG_GB_D",                                      // Mastiff PPV HMG
-    "CUP_B_Mastiff_GMG_GB_D"                                       // Mastiff PPV GMG
-];
-
-// Side Op: Supply (Logistics/FOB)
-MWF_Unlock_Supply = [
-    MWF_FOB_Truck,                                               // FOB Builder Truck
-    "CUP_B_MTVR_Fuel_BAF_DES",                                     // Fuel Truck
-    "CUP_B_MTVR_Repair_BAF_DES"                                    // Repair Truck
-];
-
-// Side Op: Intel (Information/Command)
-MWF_Unlock_Intel = [
-    "CUP_B_FV432_GB_D_HQ"                                          // FV432 HQ Command Vehicle
-];
-
-// --- 6. SYNC & BROADCAST ---
-{ publicVariable _x; } forEach [
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+// --- 7. SYNC & BROADCAST ---
+private _allVars = [
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
+    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
     "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
-diag_log "[CTI32] Preset: CUP BAF Desert loaded successfully.";
+{ publicVariable _x; } forEach _allVars;
+
+diag_log "[MWF] Preset: CUP_BAF_Desert.sqf Loaded.";
