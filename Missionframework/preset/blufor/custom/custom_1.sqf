@@ -1,11 +1,21 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - Custom 1 (Safe Fallback)
+    Function: Preset - Custom
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for BLUFOR Custom 1 safe fallback.
+    Defines custom assets for BLUFOR preset in Military War Framework.
 */
+
+// Global Variables for Custom BLUFOR Preset
+MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
+MWF_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
+MWF_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
+MWF_Preset_FOB_Center = "Land_Laptop_unfolded_F";
+MWF_Preset_FOB_Table = "Land_CampingTable_small_F";
+MWF_Preset_FOB_Light = "Land_Camping_Light_F";
+MWF_Preset_FOB_Siren = "Land_Loudspeakers_F";
+MWF_Preset_FOB_Spawn = "Land_HelipadEmpty_F";
 
 // --- 1. PHYSICAL INFRASTRUCTURE (Invulnerable objects) ---
 MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
@@ -100,9 +110,9 @@ private _allVars = [
     "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
     "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Rearm_Truck"
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
 { publicVariable _x; } forEach _allVars;
 
-diag_log "[KPIN] Preset: custom_1.sqf (Final Naming Convention) Loaded.";
+diag_log "[MWF] Preset: Custom.sqf Loaded.";
