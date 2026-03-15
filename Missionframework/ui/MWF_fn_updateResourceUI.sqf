@@ -1,10 +1,11 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_updateResourceUI
+    Function: MWF_fn_updateResourceUI
     Project: Military War Framework
 
     Description:
-    Handles UI logic for update resource u i.
+    Handles UI logic for updating the resource bar HUD.
+    Strict migration from original fn_updateResourceUI.sqf.
 */
 
 disableSerialization;
