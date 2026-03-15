@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for Contact.
+    Defines the OPFOR preset configuration for Contact using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -26,35 +26,37 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Infantry_T4", [
         "O_R_marksman_F",                   // Marksman
-        "O_R_soldier_M_F",                  // Rifleman (M)
-        "O_R_soldier_AR_F"                  // Heavy Gunner
+        "O_R_soldier_M_F",                  // Heavy Gunner
+        "O_R_soldier_AA_F"                  // Anti-Air Specialist
     ]],
     ["Infantry_T5", [
-        "O_R_recon_F",                      // Recon Rifleman
-        "O_R_recon_GL_F",                   // Recon Grenadier
-        "O_R_recon_M_F"                     // Recon Marksman
+        "O_R_Sharpshooter_F",               // Sniper
+        "O_R_Special_Forces_F",             // Special Forces (Heavy)
+        "O_R_Officer_F"                     // Officer
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "O_R_Truck_02_transport_F",         // Zamak Transport
-        "O_R_Offroad_02_LMG_F"              // MB 4WD (LMG)
+        "O_R_Truck_02_transport_F"          // Transport Vehicle
     ]],
     ["Vehicles_T2", [
-        "O_R_LSV_02_armed_F",               // Qilin (Armed)
-        "O_R_MRAP_02_hmg_F"                 // Ifrit (HMG)
+        "O_R_MRAP_02_hmg_F"                 // MRAP HMG
     ]],
     ["Vehicles_T3", [
-        "O_R_APC_Wheeled_02_rcws_v2_F"      // Marid (Enoch)
+        "O_R_APC_Wheeled_02_rcws_v2_F",     // APC
+        "O_R_APC_Tracked_02_cannon_F"       // BTR-K Kamysh
     ]],
     ["Vehicles_T4", [
-        "O_R_MBT_02_cannon_F"               // T-100 Varsuk (Enoch)
+        "O_R_MBT_02_cannon_F",              // T-100 Varsuk
+        "O_R_APC_Tracked_02_AA_F"           // Tigris (AA)
     ]],
     ["Vehicles_T5", [
-        "O_R_Heli_Attack_02_dynamicLoadout_F" // Mi-48 Kajman (Enoch)
-    ]],
-
-    // --- Special Classes ---
-    ["Leader", "O_R_soldier_SL_F"],
-    ["Pilot", "O_R_helipilot_F"]
+        "O_R_MBT_04_cannon_F",              // T-140 Angara
+        "O_R_Heli_Attack_02_dynamicLoadout_F" // Mi-48 Kajman
+    ]]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: Contact.sqf (OPFOR) Loaded.";
