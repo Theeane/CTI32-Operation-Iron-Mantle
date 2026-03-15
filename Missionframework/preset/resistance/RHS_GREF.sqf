@@ -8,7 +8,7 @@
 */
 
 MWF_RES_Preset = createHashMapFromArray [
-    // --- INFANTRY Tiers ---
+    // --- INFANTRY POOLS (Military Standard) ---
     ["Infantry_T1", [
         "rhsgref_ins_g_rifleman",            // Rifleman
         "rhsgref_ins_g_rifleman_akm",        // Rifleman (AKM)
@@ -16,48 +16,53 @@ MWF_RES_Preset = createHashMapFromArray [
     ]],
     ["Infantry_T2", [
         "rhsgref_ins_g_grenadier",           // Grenadier
-        "rhsgref_ins_g_arifleman",           // Autorifleman
-        "rhsgref_ins_g_squadleader"          // Team Leader
+        "rhsgref_ins_g_autorifleman",        // Autorifleman
+        "rhsgref_ins_g_teamleader"           // Team Leader
     ]],
     ["Infantry_T3", [
-        "rhsgref_ins_g_at",                  // AT Specialist
-        "rhsgref_ins_g_machinegunner",       // Heavy Gunner
-        "rhsgref_ins_g_commander"            // Squad Leader
+        "rhsgref_ins_g_squadleader",         // Squad Leader
+        "rhsgref_ins_g_marksman",            // Marksman
+        "rhsgref_ins_g_engineer"             // Engineer
     ]],
     ["Infantry_T4", [
-        "rhsgref_ins_g_marksman",            // Marksman
-        "rhsgref_ins_g_engineer",            // Engineer
-        "rhsgref_ins_g_sniper"               // Sniper
+        "rhsgref_ins_g_aa",                  // AA Specialist
+        "rhsgref_ins_g_at",                  // AT Specialist
+        "rhsgref_ins_g_mg"                   // HMG Assistant
     ]],
     ["Infantry_T5", [
-        "rhsgref_ins_g_special_enforcer",    // Elite Enforcer
-        "rhsgref_ins_g_officer",             // Officer
-        "rhsgref_ins_g_commander"            // High Command
+        "rhsgref_ins_g_sniper",              // Sniper
+        "rhsgref_ins_g_explosive"            // Explosives Specialist
     ]],
 
-    // --- VEHICLE Tiers ---
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
     ["Vehicles_T1", [
-        "rhsgref_ins_g_uaz",                 // UAZ
-        "rhsgref_ins_g_ural"                // Ural Transport
+        "rhsgref_ins_g_truck", 
+        "rhsgref_ins_g_mrap"                 // MRAP (Unarmed)
     ]],
     ["Vehicles_T2", [
-        "rhsgref_ins_g_uaz_dshkm",           // UAZ (DShKM)
-        "rhsgref_ins_g_uaz_spg9"             // UAZ (SPG-9)
+        "rhsgref_ins_g_mrap_hmg",            // MRAP (HMG)
+        "rhsgref_ins_g_mrap_gmg"             // MRAP (GMG)
     ]],
     ["Vehicles_T3", [
-        "rhsgref_ins_g_btr60",               // BTR-60PB
-        "rhsgref_ins_g_brdm2"                // BRDM-2
+        "rhsgref_ins_g_vehicle_radar",       // Radar Vehicle
+        "rhsgref_ins_g_vehicle_cannon"      // Cannon Vehicle
     ]],
     ["Vehicles_T4", [
-        "rhsgref_ins_g_bmp1",                // BMP-1
-        "rhsgref_ins_g_zsu234"               // ZSU-23-4 Shilka
+        "rhsgref_ins_g_armor",               // Gorgon (Tracked)
+        "rhsgref_ins_g_tracked_apc"          // Mora
     ]],
     ["Vehicles_T5", [
-        "rhsgref_ins_g_t72ba",               // T-72B
-        "rhsgref_ins_g_Mi8amt"               // Mi-8AMT (Armed)
+        "rhsgref_ins_g_mbt",                 // Main Battle Tank
+        "rhsgref_ins_g_armed_heli",          // Armed Helicopter
+        "rhsgref_ins_g_fighter_aircraft"     // Fighter Aircraft
     ]],
 
     // --- SPECIAL UNITS ---
-    ["Leader", "rhsgref_ins_g_commander"],
-    ["Pilot", "rhsgref_ins_g_pilot"]
+    ["Leader", "rhsgref_ins_g_officer"],
+    ["Pilot",  "rhsgref_ins_g_helipilot"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: RHS_GREF.sqf (RESISTANCE) Loaded.";
