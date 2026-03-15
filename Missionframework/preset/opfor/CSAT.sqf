@@ -1,10 +1,10 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - CSAT
+    Function: Preset - CSAT (OPFOR)
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for CSAT.
+    Defines the OPFOR preset configuration for CSAT using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -45,7 +45,7 @@ MWF_OPFOR_Preset = createHashMapFromArray [
         "O_MRAP_02_hmg_F"                   // Ifrit (HMG)
     ]],
     ["Vehicles_T3", [
-        "O_APC_Wheeled_02_rcws_v2_F",        // Marid
+        "O_APC_Wheeled_02_rcws_v2_F",       // Marid
         "O_APC_Tracked_02_cannon_F"         // BTR-K Kamysh
     ]],
     ["Vehicles_T4", [
@@ -54,4 +54,11 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Vehicles_T5", [
         "O_MBT_04_cannon_F",                // T-140 Angara
-        "O_Heli_Attack_02_dynamicLoadout_F
+        "O_Heli_Attack_02_dynamicLoadout_F" // Mi-48 Kajman
+    ]]
+];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: CSAT.sqf (OPFOR) Loaded.";
