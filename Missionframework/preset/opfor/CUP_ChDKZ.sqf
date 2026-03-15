@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for CUP ChDKZ.
+    Defines the OPFOR preset configuration for CUP ChDKZ using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -26,38 +26,37 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Infantry_T4", [
         "CUP_O_INS_Sniper",                  // Sniper
-        "CUP_O_INS_Soldier_AA",              // AA Specialist
-        "CUP_O_INS_Soldier_Exp"              // Explosives Expert
+        "CUP_O_INS_Soldier_AA",              // Anti-Air Specialist
+        "CUP_O_INS_Soldier_Engineer"         // Engineer
     ]],
     ["Infantry_T5", [
-        "CUP_O_INS_Soldier_Engineer",        // Engineer
-        "CUP_O_INS_Story_Lopotev",           // High Command (Lopotev)
+        "CUP_O_INS_Sharpshooter",            // Sharpshooter
+        "CUP_O_INS_HeavyUnit_01",            // Heavy Unit (Elite)
         "CUP_O_INS_Officer"                  // Officer
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "CUP_O_UAZ_Open_CHDKZ",              // UAZ (Open)
-        "CUP_O_Ural_CHDKZ"                   // Ural Transport
+        "CUP_O_INS_Truck_02_transport"       // Light Transport Vehicle
     ]],
     ["Vehicles_T2", [
-        "CUP_O_UAZ_MG_CHDKZ",                // UAZ (DShKM)
-        "CUP_O_BTR60_CHDKZ"                  // BTR-60PB
+        "CUP_O_INS_MRAP_02_hmg"              // MRAP (Heavy Machine Gun)
     ]],
     ["Vehicles_T3", [
-        "CUP_O_BRDM2_CHDKZ",                 // BRDM-2
-        "CUP_O_BMP2_CHDKZ"                   // BMP-2
+        "CUP_O_INS_APC_Wheeled_02_rcws_v2",   // APC
+        "CUP_O_INS_APC_Tracked_02_cannon"     // APC (BTR-K Kamysh)
     ]],
     ["Vehicles_T4", [
-        "CUP_O_T55_CHDKZ",                   // T-55
-        "CUP_O_Ural_ZU23_CHDKZ"              // Ural (ZU-23)
+        "CUP_O_INS_MBT_02_cannon",            // Main Battle Tank
+        "CUP_O_INS_APC_Tracked_02_AA"         // Tigris (AA Variant)
     ]],
     ["Vehicles_T5", [
-        "CUP_O_T72_CHDKZ",                   // T-72
-        "CUP_O_Mi8_CHDKZ",                   // Mi-8MT
-        "CUP_O_Su25_Dyn_RU"                  // Su-25 Frogfoot
-    ]],
-
-    ["Leader", "CUP_O_INS_Commander"],
-    ["Pilot", "CUP_O_INS_Pilot"]
+        "CUP_O_INS_MBT_04_cannon",            // Main Battle Tank (T-140 Angara)
+        "CUP_O_INS_Heli_Attack_02_dynamicLoadout"  // Mi-48 Kajman Attack Helicopter
+    ]]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: CUP_ChDKZ.sqf (OPFOR) Loaded.";
