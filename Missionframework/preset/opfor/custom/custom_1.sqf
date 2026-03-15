@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for OPFOR Custom 1 safe fallback.
+    Defines the OPFOR preset configuration for OPFOR Custom 1 safe fallback.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -41,3 +41,8 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ["Leader", "O_Officer_F"],
     ["Pilot", "O_helipilot_F"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: Custom.sqf (OPFOR) Loaded.";
