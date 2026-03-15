@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for Unsung Vietnam.
+    Defines the OPFOR preset configuration for Unsung Vietnam using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -26,39 +26,38 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Infantry_T4", [
         "uns_men_NVA_68_Rmrk",               // Marksman
-        "uns_men_NVA_68_SPR",                // Sniper
-        "uns_men_NVA_68_ENG"                 // Engineer
+        "uns_men_NVA_68_Engineer",           // Engineer
+        "uns_men_NVA_68_Sniper"              // Sniper (Elite)
     ]],
     ["Infantry_T5", [
-        "uns_men_NVA_68_MR7",                // Elite Scout
-        "uns_men_NVA_68_COM",                // Commander
-        "uns_men_NVA_68_off"                 // High Officer
+        "uns_men_NVA_68_Officer",            // Officer (High Rank)
+        "uns_men_NVA_68_Elite"               // Elite Soldier
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "uns_nvatruck_open",                 // Ural (Open)
-        "uns_nvatruck"                       // Ural (Closed)
+        "uns_vhc_NVA_Truck",                 // Light Transport Vehicle
+        "uns_vhc_NVA_Motorbike"              // Motorbike
     ]],
     ["Vehicles_T2", [
-        "uns_nvatruck_mg",                    // Ural (ZPU-2)
-        "uns_Type63_mg"                      // Type 63 APC
+        "uns_vhc_NVA_MRAP",                  // MRAP (Heavy Machine Gun)
+        "uns_vhc_NVA_Vehicle"                // Armed Vehicle
     ]],
     ["Vehicles_T3", [
-        "uns_Type63_amb",                    // Type 63 (Ambulance)
-        "uns_BTR152_ZPU"                     // BTR-152 (AA)
+        "uns_vhc_NVA_APC",                   // APC (Armored Personnel Carrier)
+        "uns_vhc_NVA_BTR60"                  // IFV (Infantry Fighting Vehicle)
     ]],
     ["Vehicles_T4", [
-        "uns_t34_76_vc",                     // T-34 Tank
-        "pook_ZSU57_NVA"                     // ZSU-57-2 (AA)
+        "uns_vhc_NVA_Tank",                  // Main Battle Tank
+        "uns_vhc_NVA_Turret"                 // Anti-Tank Vehicle
     ]],
     ["Vehicles_T5", [
-        "uns_t54_nva",                       // T-54 Main Battle Tank
-        "uns_Mi8TV_VPAF_MG",                 // Mi-8 Hip (Armed)
-        "uns_Mig21_CAS"                      // Mig-21 Frogfoot
-    ]],
-
-    // --- Special Classes ---
-    ["Leader", "uns_men_NVA_68_COM"],
-    ["Pilot", "uns_pilot_nva"]
+        "uns_vhc_NVA_Heli_Attack",           // Attack Helicopter
+        "uns_vhc_NVA_Heavy_Vehicle"          // Heavy Vehicle (Elite)
+    ]]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: Unsung_Vietnam.sqf (OPFOR) Loaded.";
