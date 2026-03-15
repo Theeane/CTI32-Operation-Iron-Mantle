@@ -4,11 +4,11 @@
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for ws blufor desert.
+    Defines the BLUFOR preset configuration for WS BLUFOR Desert.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
-MWF_FOB_Truck = "B_D_Truck_01_Repair_F";                         // HEMTT Repair (Desert)
+MWF_FOB_Truck = "B_D_Truck_01_Repair_F";                        // HEMTT Repair (Desert)
 MWF_FOB_Box = "B_Slingload_01_Cargo_F";                         // FOB construction container
 MWF_Arsenal_Box = "B_supplyCrate_F";                            // Portable virtual arsenal crate
 MWF_Respawn_Truck = "B_D_Truck_01_ammo_F";                       // Mobile Respawn vehicle (Fixed 100 S)
@@ -22,140 +22,109 @@ MWF_Pilot = "B_D_Helipilot_F";                                   // Default pilo
 
 // Button 1: Recon Team (Zubr Patrol)
 MWF_Support_Group1 = [
-    // Vehicle used
-    "B_D_LSV_01_armed_F",               // Prowler HMG (Desert)
+    "B_D_LSV_01_armed_F",              // Zubr armed patrol vehicle (Desert)
     [
-        // AI Units
-        "B_D_Soldier_TL_F",             // Unit 1: Team Leader
-        "B_D_soldier_UAV_06_F",         // Unit 2: UAV Operator
-        "B_D_Soldier_AR_F"              // Unit 3: Machinegunner
+        "B_D_Soldier_SL_F",             // Team Leader
+        "B_D_Soldier_M_F",              // Marksman
+        "B_D_Soldier_AR_F"              // Automatic Rifleman
     ],
-    150                                 // Cost
+    150, 2
 ];
 
-// Button 2: Infantry Section
+// Button 2: Transport Team (Logistics)
 MWF_Support_Group2 = [
-    // Vehicle used
-    "B_D_Truck_01_transport_F",         // HEMTT Transport
+    "B_D_Truck_01_transport_F",        // Transport truck (Desert)
     [
-        // AI Units
-        "B_D_Soldier_SL_F",             // Unit 1: Squad Leader
-        "B_D_Soldier_AR_F",             // Unit 2: Auto Rifleman
-        "B_D_Soldier_AR_F",             // Unit 3: Auto Rifleman
-        "B_D_Soldier_LAT_F",            // Unit 4: AT Specialist
-        "B_D_Medic_F"                   // Unit 5: Medic
+        "B_D_Soldier_SL_F", 
+        "B_D_Soldier_AR_F", 
+        "B_D_Soldier_AR_F", 
+        "B_D_Soldier_LAT_F", 
+        "B_D_Soldier_Medic_F"
     ],
-    250                                 // Cost
+    250, 3
 ];
 
-// Button 3: Anti-Tank Squad
+// Button 3: Armored Team (Desert APC)
 MWF_Support_Group3 = [
-    // Vehicle used
-    "B_D_LSV_01_AT_F",                  // Prowler AT
+    "B_D_APC_Wheeled_01_F",            // APC from WS
     [
-        // AI Units
-        "B_D_Soldier_SL_F",             // Unit 1: Squad Leader
-        "B_D_Soldier_AT_F",             // Unit 2: AT Specialist (Titan)
-        "B_D_Soldier_AT_F",             // Unit 3: AT Specialist (Titan)
-        "B_D_Medic_F"                   // Unit 4: Medic
+        "B_D_Soldier_SL_F", 
+        "B_D_Soldier_F_F", 
+        "B_D_Soldier_M_F", 
+        "B_D_Soldier_Engineer_F"
     ],
-    300                                 // Cost
+    350, 4
 ];
 
-// Button 4: Armored Support
+// Button 4: Tank Support
 MWF_Support_Group4 = [
-    // Vehicle used
-    "B_D_APC_Wheeled_01_cannon_v2_F",   // Marshall APC (Desert)
+    "B_D_MBT_01_cannon_F",             // Main Battle Tank (Desert)
     [
-        // AI Units
-        "B_D_Soldier_SL_F",             // Unit 1: Squad Leader
-        "B_D_Soldier_F",                // Unit 2: Rifleman
-        "B_D_Soldier_GL_F",             // Unit 3: Grenadier
-        "B_D_Engineer_F"                // Unit 4: Engineer
+        "B_D_Soldier_SL_F", 
+        "B_D_Soldier_F_F", 
+        "B_D_Soldier_M_F", 
+        "B_D_Soldier_LAT_F"
     ],
-    450                                 // Cost
+    500, 5
 ];
 
-// Button 5: Air Assault
+// Button 5: Helicopter Support
 MWF_Support_Group5 = [
-    // Vehicle used
-    "B_Heli_Transport_01_F",            // Ghost Hawk
+    "B_D_Heli_Transport_01_F",         // Transport helicopter (Desert)
     [
-        // AI Units
-        "B_D_Soldier_TL_F",             // Unit 1: Team Leader
-        "B_D_Soldier_F",                // Unit 2: Rifleman
-        "B_D_Soldier_LAT_F",            // Unit 3: AT Specialist
-        "B_D_Soldier_MG_F"              // Unit 4: Machinegunner
+        "B_D_Soldier_TL_F", 
+        "B_D_Soldier_F_F", 
+        "B_D_Soldier_LAT_F", 
+        "B_D_Soldier_M_F"
     ],
-    600                                 // Cost
+    600, 5
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// --- 4. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
-    [MWF_Respawn_Truck, 100],                                    // Mobile Respawn (Rule: 100 S)
-    ["B_D_LSV_01_unarmed_F", 20],                                  // Prowler Unarmed
-    ["B_D_LSV_01_armed_F", 45],                                    // Prowler HMG
-    ["B_D_LSV_01_AT_F", 60],                                       // Prowler AT
-    ["B_D_Truck_01_covered_F", 50]                                 // HEMTT Covered
+    [MWF_Respawn_Truck, 100, 1], 
+    ["B_D_Quadbike_01_F", 5, 1],        // Quadbike from WS (Desert)
+    ["B_D_LSV_01_unarmed_F", 20, 1],   // Unarmed LSV from WS (Desert)
+    ["B_D_LSV_01_armed_F", 45, 2],     // Armed LSV from WS (Desert)
+    ["B_D_MRAP_01_F", 60, 2]           // MRAP vehicle from WS (Desert)
 ];
 
 MWF_Preset_APC = [
-    ["B_D_APC_Wheeled_01_cannon_v2_F", 180],                       // Marshall
-    ["B_D_APC_Tracked_01_rcws_F", 200]                             // Panther
+    ["B_D_APC_Wheeled_01_F", 180, 3],  // APC from WS (Desert)
+    ["B_D_AFV_Wheeled_01_cannon_F", 250, 4]  // AFV from WS (Desert)
 ];
 
 MWF_Preset_Tanks = [
-    ["B_D_MBT_01_cannon_F", 450]                                   // Slammer
+    ["B_D_MBT_01_cannon_F", 450, 5],   // Main battle tank from WS (Desert)
+    ["B_D_MBT_01_TUSK_F", 500, 5],     // TUSK variant tank from WS (Desert)
+    ["B_D_MBT_01_arty_F", 650, 5]      // Artillery tank from WS (Desert)
 ];
 
 MWF_Preset_Helis = [
-    ["B_Heli_Light_01_F", 150],                                    // Hummingbird
-    ["B_Heli_Transport_01_F", 250]                                 // Ghost Hawk
+    ["B_D_Heli_Light_01_F", 150, 3],   // Light helicopter from WS (Desert)
+    ["B_D_Heli_Transport_01_F", 250, 4],  // Transport helicopter from WS (Desert)
+    ["B_D_Heli_Transport_03_unarmed_F", 280, 5]  // Unarmed transport helicopter from WS (Desert)
 ];
 
 MWF_Preset_Jets = [
-    ["B_Plane_CAS_01_dynamicLoadout_F", 550]                       // Wipeout
+    ["B_D_Plane_CAS_01_dynamicLoadout_F", 550, 4],  // CAS jet from WS (Desert)
+    ["B_D_Plane_Fighter_01_F", 700, 5]   // Fighter jet from WS (Desert)
 ];
 
-// --- 5. MISSION UNLOCKS ---
-
-// Grand Op 1: Helicopters
-MWF_Unlock_GrandOp1_Helis = [
-    "B_Heli_Attack_01_dynamicLoadout_F",                           // Blackfoot
-    "B_Heli_Transport_03_unarmed_F"                                // Huron
-];
-
-// Grand Op 2: Fixed Wing
-MWF_Unlock_GrandOp2_Jets = [
-    "B_Plane_Fighter_01_F",                                        // Black Wasp II
-    "B_Plane_Fighter_01_Stealth_F"                                 // Black Wasp Stealth
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-MWF_Unlock_Disrupt = [
-    "B_D_MRAP_01_hmg_F",                                           // Hunter HMG
-    "B_D_MRAP_01_gmg_F"                                            // Hunter GMG
-];
-
-// Side Op: Supply (Logistics/FOB)
-MWF_Unlock_Supply = [
-    MWF_FOB_Truck,                                               // FOB Builder Truck
-    "B_D_Truck_01_fuel_F",                                         // Fuel Truck
-    "B_D_Truck_01_Repair_F"                                        // Repair Truck
-];
-
-// Side Op: Intel (Information/Command)
-MWF_Unlock_Intel = [
-    "B_D_APC_Tracked_01_CRV_F"                                      // CRV Bobcat
-];
+// --- 5. SPECIAL ASSETS ---
+MWF_Rearm_Truck = ["B_D_Truck_01_Repair_F", 300, 5];  // Rearm truck from WS (Desert)
 
 // --- 6. SYNC & BROADCAST ---
-{ publicVariable _x; } forEach [
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+private _allVars = [
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
+    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
     "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
-diag_log "[CTI32] Preset: Western Sahara (DLC) loaded successfully.";
+{ publicVariable _x; } forEach _allVars;
+
+diag_log "[MWF] Preset: ws_blufor_desert.sqf Loaded.";
