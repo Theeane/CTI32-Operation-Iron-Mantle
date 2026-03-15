@@ -62,3 +62,8 @@ MWF_RES_Preset = createHashMapFromArray [
     ["Leader", "I_Officer_F"],
     ["Pilot",  "I_helipilot_F"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: Custom 1.sqf (RESISTANCE) Loaded.";
