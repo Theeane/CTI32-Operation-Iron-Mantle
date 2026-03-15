@@ -4,19 +4,19 @@
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for RHS USAF Woodland.
+    Defines the BLUFOR preset configuration for RHS USAF Woodland.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
 MWF_FOB_Truck = "rhsusf_M1083A1P2_B_WD_repair_fmtv_usarmy";      // M1083A1 Repair (Woodland)
 MWF_FOB_Box = "B_Slingload_01_Cargo_F"; 
-MWF_Arsenal_Box = "B_supplyCrate_F";
+MWF_Arsenal_Box = "B_supplyCrate_F";                             // Standard Arsenal box
 MWF_Respawn_Truck = "rhsusf_M1083A1P2_B_WD_fmtv_usarmy";         // M1083A1 Transport as Respawn (Fixed 100 S)
 MWF_Crewman = "rhsusf_army_ucp_combatcrewman";                  // Default crew (UCP/Woodland mix)
 MWF_Pilot = "rhsusf_army_ucp_helipilot";                        // Default pilot
 
 // --- 2. LOGISTICS & ECONOMY ---
-// Digital Currency System Active.
+// Digital Currency System Active. Physical Intel (Laptops/Officers) rules apply.
 
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
@@ -26,126 +26,97 @@ MWF_Support_Group1 = [
     [
         "rhsusf_army_ucp_teamleader",   // Leader
         "rhsusf_army_ucp_marksman",     // Marksman
-        "rhsusf_army_ucp_rifleman"      // Scout
+        "rhsusf_army_ucp_rifleman"      // Rifleman
     ],
-    150                                 
+    150, 2
 ];
 
-// Button 2: US Army Infantry Section
+// Button 2: Transport Team
 MWF_Support_Group2 = [
-    "rhsusf_M1083A1P2_WD_open_fmtv_usarmy", 
-    [
-        "rhsusf_army_ucp_squadleader", 
-        "rhsusf_army_ucp_autorifleman", 
-        "rhsusf_army_ucp_autorifleman", 
-        "rhsusf_army_ucp_riflemanat", 
-        "rhsusf_army_ucp_medic"
-    ],
-    250                                 
-];
-
-// Button 3: Anti-Tank Squad (Javelin)
-MWF_Support_Group3 = [
-    "rhsusf_m1167_w",                   // HMMWV TOW (Woodland)
-    [
-        "rhsusf_army_ucp_squadleader", 
-        "rhsusf_army_ucp_javelin",      // Javelin Specialist
-        "rhsusf_army_ucp_javelin",      // Javelin Specialist
-        "rhsusf_army_ucp_medic"
-    ],
-    300                                 
-];
-
-// Button 4: Armored Support (Bradley)
-MWF_Support_Group4 = [
-    "RHS_M2A2_BUSKI_WD",                // M2A2 Bradley (Woodland)
-    [
-        "rhsusf_army_ucp_squadleader", 
-        "rhsusf_army_ucp_rifleman", 
-        "rhsusf_army_ucp_marksman", 
-        "rhsusf_army_ucp_engineer"
-    ],
-    450                                 
-];
-
-// Button 5: Air Assault (Blackhawk)
-MWF_Support_Group5 = [
-    "RHS_UH60M",                        // UH-60M Blackhawk (Standard/Woodland)
+    "rhsusf_M1083A1P2_B_WD_transport_fmtv_usarmy",  // M1083 Transport Truck
     [
         "rhsusf_army_ucp_teamleader", 
         "rhsusf_army_ucp_rifleman", 
-        "rhsusf_army_ucp_riflemanat", 
-        "rhsusf_army_ucp_marksman"
+        "rhsusf_army_ucp_medic", 
+        "rhsusf_army_ucp_rifleman", 
+        "rhsusf_army_ucp_soldierlat"
     ],
-    600                                 
+    250, 3
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// Button 3: Armored Support
+MWF_Support_Group3 = [
+    "rhsusf_M2A3_Abrams",  // M2A3 Abrams
+    [
+        "rhsusf_army_ucp_teamleader", 
+        "rhsusf_army_ucp_gunner", 
+        "rhsusf_army_ucp_rifleman", 
+        "rhsusf_army_ucp_engineer"
+    ],
+    350, 4
+];
+
+// Button 4: Tank Support
+MWF_Support_Group4 = [
+    "rhsusf_M1A2_Abrams",  // M1A2 Abrams
+    [
+        "rhsusf_army_ucp_teamleader", 
+        "rhsusf_army_ucp_gunner", 
+        "rhsusf_army_ucp_rifleman", 
+        "rhsusf_army_ucp_soldierlat"
+    ],
+    500, 5
+];
+
+// Button 5: Helicopter Support
+MWF_Support_Group5 = [
+    "rhsusf_CH53E",  // Helicopter from RHS
+    [
+        "rhsusf_army_ucp_pilot", 
+        "rhsusf_army_ucp_rifleman"
+    ],
+    600, 5
+];
+
+// --- 4. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
-    [MWF_Respawn_Truck, 100],                                    
-    ["rhsusf_m1025_w", 20],                                        
-    ["rhsusf_m1025_w_m2", 45],                                     
-    ["rhsusf_m1025_w_Mk19", 55],                                   
-    ["rhsusf_M1083A1P2_WD_fmtv_usarmy", 50]                        
+    [MWF_Respawn_Truck, 100, 1], 
+    ["rhsusf_M1083A1P2_B_WD_fmtv_usarmy", 50, 1],  // Transport truck from RHS
+    ["rhsusf_M1025_w_M2", 40, 2]  // HMMWV with M2 from RHS
 ];
 
 MWF_Preset_APC = [
-    ["RHS_M2A2_BUSKI_WD", 200],                                    // Bradley
-    ["rhsusf_stryker_m1126_m2_wd", 180]                            // Stryker
+    ["rhsusf_M2A3_Abrams", 350, 4],  // M2A3 Abrams from RHS
+    ["rhsusf_M1A2_Abrams", 450, 5]   // M1A2 Abrams from RHS
 ];
 
 MWF_Preset_Tanks = [
-    ["rhsusf_m1a1aim_wd_usarmy", 450],                             // M1A1
-    ["rhsusf_m1a2sep1tuskiiwd_usarmy", 550]                        // M1A2 TUSK II
+    ["rhsusf_M1A2_Abrams", 550, 5]  // M1A2 tank from RHS
 ];
 
 MWF_Preset_Helis = [
-    ["RHS_UH60M", 220],                                          
-    ["rhsusf_CH47F", 300]                                       
+    ["rhsusf_CH53E", 300, 5],  // CH-53E from RHS
+    ["rhsusf_UH60M", 250, 3]   // UH-60M from RHS
 ];
 
 MWF_Preset_Jets = [
-    ["RHS_A10", 550]                                               
+    ["rhsusf_F16C", 700, 5]  // F16 from RHS
 ];
 
-// --- 5. MISSION UNLOCKS ---
-
-// Grand Op 1: Helicopters
-MWF_Unlock_GrandOp1_Helis = [
-    "RHS_AH64D",                                                   // Apache
-    "RHS_AH6E_wd"                                                  // Little Bird
-];
-
-// Grand Op 2: Fixed Wing
-MWF_Unlock_GrandOp2_Jets = [
-    "rhsusf_f22"                                                   
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-MWF_Unlock_Disrupt = [
-    "rhsusf_rg33_m2_wd",                                           
-    "rhsusf_m113_usarmy"                                          
-];
-
-// Side Op: Supply (Logistics/FOB)
-MWF_Unlock_Supply = [
-    MWF_FOB_Truck,                                               
-    "rhsusf_M1083A1P2_B_WD_fuel_fmtv_usarmy",                      
-    "rhsusf_M1083A1P2_B_WD_repair_fmtv_usarmy"                     
-];
-
-// Side Op: Intel (Information/Command)
-MWF_Unlock_Intel = [
-    "rhsusf_m1152_rsv_usarmy_wd"                                    
-];
+// --- 5. SPECIAL ASSETS ---
+MWF_Rearm_Truck = ["rhsusf_M1083A1P2_B_WD_repair_fmtv_usarmy", 300, 5];  // Rearm truck from RHS
 
 // --- 6. SYNC & BROADCAST ---
-{ publicVariable _x; } forEach [
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+private _allVars = [
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
+    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
     "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
-diag_log "[CTI32] Preset: RHS_USAF_Woodland loaded successfully.";
+{ publicVariable _x; } forEach _allVars;
+
+diag_log "[MWF] Preset: RHS_USAF_Woodland.sqf Loaded.";
