@@ -1,6 +1,6 @@
 /*
     Author: Theane / ChatGPT
-    Function: MWF_fn_getZoneSaveData
+    Function: MWF_fnc_getZoneSaveData
     Project: Military War Framework
 
     Description:
