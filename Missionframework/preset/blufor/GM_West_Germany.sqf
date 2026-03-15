@@ -4,19 +4,19 @@
     Project: Military War Framework
 
     Description:
-    Defines the blufor preset configuration for GM West Germany.
+    Defines the BLUFOR preset configuration for GM West Germany.
 */
 
 // --- 1. CORE SUPPORT UNITS ---
 MWF_FOB_Truck = "gm_ge_army_u1300l_repair";                      // Unimog Repair
 MWF_FOB_Box = "B_Slingload_01_Cargo_F"; 
-MWF_Arsenal_Box = "B_supplyCrate_F";
+MWF_Arsenal_Box = "B_supplyCrate_F";                             // Standard Arsenal box
 MWF_Respawn_Truck = "gm_ge_army_kat1_451_reargo";                // KAT1 5t Reammo (Fixed 100 S)
 MWF_Crewman = "gm_ge_army_conscript_80_oli";                     // Default crew
 MWF_Pilot = "gm_ge_army_pilot_p1_80_oli";                        // Default pilot
 
 // --- 2. LOGISTICS & ECONOMY ---
-// Digital Currency System Active.
+// Digital Currency System Active. Using MWF_S_Currency
 
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
@@ -26,125 +26,89 @@ MWF_Support_Group1 = [
     [
         "gm_ge_army_conscript_80_sl",   // Leader
         "gm_ge_army_conscript_80_ls",   // Marksman/Scout
-        "gm_ge_army_conscript_80_rif"   // Rifleman
     ],
-    150                                 
+    150, 2
 ];
 
-// Button 2: Infantry Section
+// Button 2: Transport Team
 MWF_Support_Group2 = [
-    "gm_ge_army_kat1_451_container",    // KAT1 Transport
+    "gm_ge_army_mtz_451_repair",  // MTZ truck from GM
     [
-        "gm_ge_army_conscript_80_sl",   // Squad Leader
-        "gm_ge_army_conscript_80_mg3",  // Auto Rifleman
-        "gm_ge_army_conscript_80_mg3",  // Auto Rifleman
-        "gm_ge_army_conscript_80_at_pzf3", // AT Specialist
-        "gm_ge_army_conscript_80_med"   // Medic
+        "gm_ge_army_conscript_80_sl", 
+        "gm_ge_army_conscript_80_ls", 
+        "gm_ge_army_conscript_80_medic"
     ],
-    250                                 
+    250, 3
 ];
 
-// Button 3: Anti-Tank Squad
+// Button 3: Armored Support
 MWF_Support_Group3 = [
-    "gm_ge_army_iltis_milan",           // Iltis (Milan ATGM)
+    "gm_ge_army_marder_1a3",  // Marder APC from GM
     [
-        "gm_ge_army_conscript_80_sl",   // Leader
-        "gm_ge_army_conscript_80_at_pzf3", // AT
-        "gm_ge_army_conscript_80_at_pzf3", // AT
-        "gm_ge_army_conscript_80_med"   // Medic
+        "gm_ge_army_conscript_80_sl", 
+        "gm_ge_army_conscript_80_gunner", 
+        "gm_ge_army_conscript_80_technician"
     ],
-    300                                 
+    300, 4
 ];
 
-// Button 4: Armored Support
+// Button 4: Artillery Support
 MWF_Support_Group4 = [
-    "gm_ge_army_marder1a1a_oli",        // Marder 1A1
+    "gm_ge_army_pzh2000",  // PZH 2000 Artillery from GM
     [
-        "gm_ge_army_conscript_80_sl",   // Leader
-        "gm_ge_army_conscript_80_rif",  // Rifleman
-        "gm_ge_army_conscript_80_ls",   // Marksman
-        "gm_ge_army_conscript_80_rif"   // Engineer (Rifleman placeholder)
+        "gm_ge_army_conscript_80_sl", 
+        "gm_ge_army_conscript_80_gunner", 
+        "gm_ge_army_conscript_80_ammo"
     ],
-    450                                 
+    350, 4
 ];
 
-// Button 5: Air Assault
+// Button 5: Helicopter Support
 MWF_Support_Group5 = [
-    "gm_ge_army_ch53g",                 // CH-53G Transport
+    "gm_ge_army_bo105",  // Helicopter from GM
     [
-        "gm_ge_army_conscript_80_sl",   // Leader
-        "gm_ge_army_conscript_80_rif",  // Rifleman
-        "gm_ge_army_conscript_80_at_pzf3", // AT
-        "gm_ge_army_conscript_80_mg3"   // MG
+        "gm_ge_army_pilot_p1_80_oli", 
+        "gm_ge_army_conscript_80_heli_gunner"
     ],
-    600                                 
+    500, 5
 ];
 
-// --- 4. VEHICLE CATEGORIES [Classname, Cost] ---
+// --- 4. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
-    [MWF_Respawn_Truck, 100],                                    
-    ["gm_ge_army_iltis_cargo", 15],                                
-    ["gm_ge_army_iltis_m2", 40],                                   
-    ["gm_ge_army_iltis_milan", 60],                                
-    ["gm_ge_army_u1300l_cargo", 50]                                
+    [MWF_Respawn_Truck, 100, 1], 
+    ["gm_ge_army_iltis", 20, 1],  // GM Iltis vehicle
+    ["gm_ge_army_mtz_451_repair", 50, 2],  // GM repair truck
+    ["gm_ge_army_bo105", 100, 3]  // GM Helicopter
 ];
 
 MWF_Preset_APC = [
-    ["gm_ge_army_m113a1g_apc", 160],                               // M113
-    ["gm_ge_army_marder1a1a_oli", 220]                             // Marder IFV
+    ["gm_ge_army_marder_1a3", 200, 3],  // APC from GM
+    ["gm_ge_army_mtz_451_transport", 150, 3]  // GM transport truck
 ];
 
 MWF_Preset_Tanks = [
-    ["gm_ge_army_leap1a5", 480]                                    // Leopard 1A5
+    ["gm_ge_army_pzh2000", 500, 5]  // Artillery from GM
 ];
 
 MWF_Preset_Helis = [
-    ["gm_ge_army_bo105m_vbh", 180],                                // Bo 105
-    ["gm_ge_army_ch53g", 280]                                      // CH-53G
+    ["gm_ge_army_bo105", 250, 4],  // GM Helicopter
+    ["gm_ge_army_puma", 300, 5]  // Another helicopter from GM
 ];
 
-MWF_Preset_Jets = [
-    // GM lacks fixed-wing in core, using vanilla/placeholder if needed
-];
-
-// --- 5. MISSION UNLOCKS ---
-
-// Grand Op 1: Helicopters
-MWF_Unlock_GrandOp1_Helis = [
-    "gm_ge_army_bo105p_pah1a1",                                    // Bo 105 (Anti-Tank)
-    "gm_ge_army_bo105p_pah1"                                       // Bo 105 (Armed)
-];
-
-// Grand Op 2: Fixed Wing
-MWF_Unlock_GrandOp2_Jets = [
-    // Placeholder for community/mod additions
-];
-
-// Side Op: Disrupt (Infrastructure/Roadblocks)
-MWF_Unlock_Disrupt = [
-    "gm_ge_army_luchsa1",                                          // Luchs A1 Recon
-    "gm_ge_army_luchsa2"                                           // Luchs A2 Recon
-];
-
-// Side Op: Supply (Logistics/FOB)
-MWF_Unlock_Supply = [
-    MWF_FOB_Truck,                                               
-    "gm_ge_army_kat1_451_refuel",                                  // KAT1 Fuel
-    "gm_ge_army_u1300l_repair"                                     // Unimog Repair
-];
-
-// Side Op: Intel (Information/Command)
-MWF_Unlock_Intel = [
-    "gm_ge_army_m113a1g_command"                                   // M113 Command
-];
+// --- 5. SPECIAL ASSETS ---
+MWF_Rearm_Truck = ["gm_ge_army_u1300l_repair", 300, 5];  // Rearm truck from GM
 
 // --- 6. SYNC & BROADCAST ---
-{ publicVariable _x; } forEach [
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Crewman", "MWF_Pilot",
+private _allVars = [
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
+    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
+    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
     "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
-    "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Unlock_GrandOp1_Helis", "MWF_Unlock_GrandOp2_Jets", "MWF_Unlock_Disrupt", "MWF_Unlock_Supply", "MWF_Unlock_Intel"
+    "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis",
+    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
 ];
 
-diag_log "[CTI32] Preset: GM_West_Germany loaded successfully.";
+{ publicVariable _x; } forEach _allVars;
+
+diag_log "[MWF] Preset: GM_West_Germany.sqf Loaded.";
