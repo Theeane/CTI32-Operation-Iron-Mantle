@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Defines the opfor preset configuration for CUP AFRF Modern.
+    Defines the OPFOR preset configuration for CUP AFRF Modern using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
@@ -26,38 +26,37 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Infantry_T4", [
         "CUP_O_RU_Soldier_Marksman_M_EMR",   // Marksman
-        "CUP_O_RU_Soldier_AA_M_EMR",         // AA Specialist
-        "CUP_O_RU_Engineer_M_EMR"            // Engineer
+        "CUP_O_RU_Soldier_AA_M_EMR",         // Anti-Air Specialist
+        "CUP_O_RU_Soldier_Engineer_M_EMR"    // Engineer
     ]],
     ["Infantry_T5", [
-        "CUP_O_RU_Sniper_M_EMR",             // Sniper
-        "CUP_O_RU_Soldier_HAT_M_EMR",        // Heavy AT
+        "CUP_O_RU_Sharpshooter_M_EMR",       // Sniper
+        "CUP_O_RU_HeavyUnit_01_M_EMR",       // Heavy Unit (Elite)
         "CUP_O_RU_Officer_M_EMR"             // Officer
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "CUP_O_UAZ_Open_RU",                 // UAZ (Open)
-        "CUP_O_Ural_RU"                      // Ural Transport
+        "CUP_O_RU_Truck_02_transport_M_EMR"   // Light Transport Vehicle
     ]],
     ["Vehicles_T2", [
-        "CUP_O_GAZ_Vodnik_PK_RU",            // Vodnik (PKM)
-        "CUP_O_BTR80_CAMO_RU"                // BTR-80
+        "CUP_O_RU_MRAP_02_hmg_M_EMR"          // MRAP (Heavy Machine Gun)
     ]],
     ["Vehicles_T3", [
-        "CUP_O_BMP2_RU",                     // BMP-2
-        "CUP_O_BTR80A_CAMO_RU"               // BTR-80A
+        "CUP_O_RU_APC_Wheeled_02_rcws_v2_M_EMR",   // APC (Marid)
+        "CUP_O_RU_APC_Tracked_02_cannon_M_EMR"      // APC (BTR-K Kamysh)
     ]],
     ["Vehicles_T4", [
-        "CUP_O_T72_RU",                      // T-72
-        "CUP_O_2S6M_RU"                      // Tunguska (AA)
+        "CUP_O_RU_MBT_02_cannon_M_EMR",       // T-100 Varsuk
+        "CUP_O_RU_APC_Tracked_02_AA_M_EMR"    // Tigris (AA Variant)
     ]],
     ["Vehicles_T5", [
-        "CUP_O_T90_RU",                      // T-90
-        "CUP_O_Mi24_V_Dynamic_RU",           // Mi-24V Hind
-        "CUP_O_Su25_Dyn_RU"                  // Su-25 Frogfoot
-    ]],
-
-    ["Leader", "CUP_O_RU_Officer_M_EMR"],
-    ["Pilot", "CUP_O_RU_Pilot"]
+        "CUP_O_RU_MBT_04_cannon_M_EMR",       // T-140 Angara
+        "CUP_O_RU_Heli_Attack_02_dynamicLoadout_M_EMR"  // Mi-48 Kajman
+    ]]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_OPFOR_Preset";
+
+diag_log "[MWF] Preset: CUP_AFRF_Modern.sqf (OPFOR) Loaded.";
