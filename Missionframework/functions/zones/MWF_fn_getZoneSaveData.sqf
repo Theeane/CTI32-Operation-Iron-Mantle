@@ -1,10 +1,11 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_getZoneSaveData
+    Function: MWF_fn_getZoneSaveData
     Project: Military War Framework
 
     Description:
     Exports strategic zone state for persistence without runtime-only combat details.
+    Strict migration from original fn_getZoneSaveData.sqf.
 */
 
 if (!isServer) exitWith {[]};
