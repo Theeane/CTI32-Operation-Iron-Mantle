@@ -1,6 +1,6 @@
 /*
     Author: Theane / ChatGPT
-    Function: MWF_fn_updateResourceUI
+    Function: MWF_fnc_updateResourceUI
     Project: Military War Framework
 
     Description:
