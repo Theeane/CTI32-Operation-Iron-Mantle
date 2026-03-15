@@ -1,10 +1,10 @@
 /*
     Author: Theane / ChatGPT
-    Function: Preset - AAF
+    Function: Preset - AAF (RESISTANCE)
     Project: Military War Framework
 
     Description:
-    Defines the resistance preset configuration for AAF.
+    Defines the resistance preset configuration for AAF using MWF_RES_Preset.
 */
 
 MWF_RES_Preset = createHashMapFromArray [
@@ -62,3 +62,8 @@ MWF_RES_Preset = createHashMapFromArray [
     ["Leader", "I_Officer_F"],
     ["Pilot",  "I_helipilot_F"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: AAF.sqf (RESISTANCE) Loaded.";
