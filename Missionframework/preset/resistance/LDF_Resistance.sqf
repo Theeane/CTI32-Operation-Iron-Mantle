@@ -27,38 +27,43 @@ MWF_RES_Preset = createHashMapFromArray [
     ["Infantry_T4", [
         "I_E_Soldier_AA_F",                 // AA Specialist
         "I_E_Soldier_AT_F",                 // AT Specialist
-        "I_E_Support_MG_F"                  // HMG Assistant
+        "I_E_support_MG_F"                  // HMG Assistant
     ]],
     ["Infantry_T5", [
-        "I_E_Soldier_Pathfinder_F",         // Pathfinder (Recon)
-        "I_E_Soldier_Exp_F",                // Explosives Specialist
-        "I_E_Spotter_F"                     // Spotter
+        "I_E_ghillie_ard_F",                // Sniper (Arid)
+        "I_E_ghillie_lsh_F",                // Sniper (Lush)
+        "I_E_Soldier_exp_F"                 // Explosives Specialist
     ]],
 
-    // --- VEHICLE POOLS (Escalation from Forest Logistics to Heavy Armor) ---
+    // --- VEHICLE POOLS (Escalation from Cars to MBTs and Air) ---
     ["Vehicles_T1", [
-        "I_E_Truck_02_transport_F",         // Zamak Transport
-        "I_E_Offroad_01_F"                  // Offroad (LDF)
+        "I_E_Truck_02_transport_F", 
+        "I_E_MRAP_03_F"                     // Strider (Unarmed)
     ]],
     ["Vehicles_T2", [
-        "I_E_Offroad_01_comms_F",           // Comms Truck
-        "I_E_Offroad_01_covered_F"          // Covered Offroad
+        "I_E_MRAP_03_hmg_F",                // Strider (HMG)
+        "I_E_MRAP_03_gmg_F"                 // Strider (GMG)
     ]],
     ["Vehicles_T3", [
-        "I_E_APC_tracked_03_cannon_F",      // FV-720 Mora (LDF)
-        "I_E_Truck_02_MRL_F"                // Zamak MRL (Artillery)
+        "I_E_LT_01_scout_F",                // Nyx (Radar)
+        "I_E_LT_01_cannon_F"                // Nyx (Autocannon)
     ]],
     ["Vehicles_T4", [
-        "B_T_MBT_01_cannon_F",              // Looted Slammer (Forest Camo - Tanks DLC)
-        "B_AFV_Wheeled_01_up_cannon_F"      // Rhino MGS UP (Forest - Tanks DLC)
+        "I_E_APC_Wheeled_03_cannon_F",      // Gorgon
+        "I_E_APC_tracked_03_cannon_F"       // Mora
     ]],
     ["Vehicles_T5", [
-        "B_T_MBT_01_arty_F",                // Scorcher (Forest - Tanks DLC)
+        "I_E_MBT_03_cannon_F",              // Kuma (MBT)
         "I_E_Heli_light_03_dynamicLoadout_F", // WY-55 Hellcat (Armed)
-        "I_Plane_Fighter_03_dynamicLoadout_F" // A-143 Buzzard (Jets DLC)
+        "I_E_Plane_Fighter_03_dynamicLoadout_F" // A-143 Buzzard (CAS)
     ]],
 
     // --- SPECIAL UNITS ---
     ["Leader", "I_E_Officer_F"],
-    ["Pilot",  "I_E_Helipilot_F"]
+    ["Pilot",  "I_E_helipilot_F"]
 ];
+
+// --- SYNC & BROADCAST ---
+publicVariable "MWF_RES_Preset";
+
+diag_log "[MWF] Preset: LDF_Resistance.sqf (RESISTANCE) Loaded.";
