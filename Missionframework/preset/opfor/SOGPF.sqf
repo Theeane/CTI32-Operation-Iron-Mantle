@@ -1,63 +1,59 @@
 /*
-    Author: Theane / ChatGPT
+    Author: Theane / ChatGPT / Gemini
     Function: Preset - SOGPF (OPFOR Vietnam)
     Project: Military War Framework
-
-    Description:
-    Defines the OPFOR preset configuration for SOGPF (Vietnam War mod) using MWF_OPFOR_Preset and Tiered structure.
 */
 
 MWF_OPFOR_Preset = createHashMapFromArray [
-    // --- INFANTRY Tiers ---
+    // --- INFANTRY Tiers (NVA - North Vietnamese Army) ---
     ["Infantry_T1", [
-        "vn_men_soldier_rifle",             // Rifleman (M16)
-        "vn_men_soldier_medic",             // Medic
-        "vn_men_soldier_lat"                // Rifleman (LAT)
+        "vn_o_men_nva_05",                  // Rifleman (Type 56)
+        "vn_o_men_nva_01",                  // Medic
+        "vn_o_men_nva_14"                   // Scout
     ]],
     ["Infantry_T2", [
-        "vn_men_soldier_grenadier",         // Grenadier
-        "vn_men_soldier_lmg",               // Light Machine Gunner
-        "vn_men_soldier_teamleader"         // Team Leader
+        "vn_o_men_nva_07",                  // Grenadier (M79)
+        "vn_o_men_nva_11",                  // Light MG (RPK)
+        "vn_o_men_nva_01"                   // Team Leader
     ]],
     ["Infantry_T3", [
-        "vn_men_soldier_at",                // AT Specialist (M72 LAW)
-        "vn_men_soldier_mg",                // Heavy Gunner
-        "vn_men_soldier_squadleader"        // Squad Leader
+        "vn_o_men_nva_12",                  // AT Specialist (B41/RPG7)
+        "vn_o_men_nva_10",                  // Machine Gunner (PK)
+        "vn_o_men_nva_01"                   // Squad Leader
     ]],
     ["Infantry_T4", [
-        "vn_men_marksman",                  // Marksman
-        "vn_men_soldier_aa",                // AA Specialist
-        "vn_men_soldier_engineer"           // Engineer
+        "vn_o_men_nva_13",                  // Marksman (SVD)
+        "vn_o_men_nva_43",                  // AA Specialist (Strela)
+        "vn_o_men_nva_09"                   // Engineer
     ]],
     ["Infantry_T5", [
-        "vn_men_sharpshooter",              // Sharpshooter
-        "vn_men_officer"                    // Officer
+        "vn_o_men_nva_65",                  // Dak Cong (Spec Ops)
+        "vn_o_men_nva_64",                  // Dak Cong SL
+        "vn_o_men_nva_01"                   // Officer
     ]],
 
     // --- VEHICLE Tiers ---
     ["Vehicles_T1", [
-        "vn_vhc_jeep",                      // Light Transport Vehicle
-        "vn_vhc_truck"                      // Light Transport Truck
+        "vn_o_wheeled_z157_01",             // Z-157 Transport
+        "vn_o_wheeled_btr40_01"             // BTR-40 (Unarmed)
     ]],
     ["Vehicles_T2", [
-        "vn_vhc_mrap",                      // MRAP (Heavy Machine Gun)
-        "vn_vhc_lsv"                        // Light Support Vehicle
+        "vn_o_wheeled_btr40_mg_01",          // BTR-40 (MG)
+        "vn_o_wheeled_z157_mg_01"           // Z-157 (MG)
     ]],
     ["Vehicles_T3", [
-        "vn_vhc_apc",                       // APC (Infantry Fighting Vehicle)
-        "vn_vhc_btr60"                      // BTR-60 (IFV)
+        "vn_o_wheeled_btr40_mg_03",          // BTR-40 (AA/Heavy)
+        "vn_o_armor_type63"                 // Type 63 (Light Tank)
     ]],
     ["Vehicles_T4", [
-        "vn_vhc_mbt",                       // Main Battle Tank (T-72)
-        "vn_vhc_tigris"                     // Tigris (AA Variant)
+        "vn_o_armor_t54b",                  // T-54B (Main Battle Tank)
+        "vn_o_wheeled_z157_mg_02"           // Z-157 (Anti-Air)
     ]],
     ["Vehicles_T5", [
-        "vn_vhc_mbt_advanced",              // T-90 (Elite Tank)
-        "vn_vhc_heli_attack"                // Mi-24V (Attack Helicopter)
+        "vn_o_armor_ot34_01",               // Flame Tank / Advanced MBT
+        "vn_o_air_mi2_04_05"                // Mi-2 (Attack Variant)
     ]]
 ];
 
-// --- SYNC & BROADCAST ---
 publicVariable "MWF_OPFOR_Preset";
-
 diag_log "[MWF] Preset: SOGPF.sqf (OPFOR Vietnam) Loaded.";
