@@ -1,11 +1,12 @@
 /*
     Author: Theane / ChatGPT
-    Function: fn_markThreatDirty
+    Function: MWF_fn_markThreatDirty
     Project: Military War Framework
 
     Description:
-    Marks the threat layer as dirty so the threat manager can recalculate safely
+    Marks the threat layer as dirty so the threat manager can recalculate safely 
     on the next cycle.
+    Strict migration from original fn_markThreatDirty.sqf.
 */
 
 if (!isServer) exitWith {false};
