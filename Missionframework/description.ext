@@ -3,15 +3,25 @@
     Project: Military War Framework (MWF)
     
     Description: 
-    Central funktionsregistrering. Alla funktioner här kompileras vid start 
-    och blir tillgängliga via 'MWF_fnc_'.
+    Central function registration. All functions listed here are compiled 
+    on mission start and available via the 'MWF_fnc_' prefix.
 */
 
 class CfgFunctions {
     class MWF {
         tag = "MWF";
 
+        // --- CORE SYSTEMS ---
+        // Path: Missionframework\Functions\Core
+        class Core {
+            file = "Missionframework\Functions\Core";
+            class addResource {};
+            class saveGame {};
+            class showNotification {};
+        };
+
         // --- TERMINAL SYSTEM ---
+        // Path: Missionframework\Functions\Terminal
         class Terminal {
             file = "Missionframework\Functions\Terminal";
             class terminal_main {};
@@ -19,10 +29,10 @@ class CfgFunctions {
             class terminal_disrupt {};
         };
 
-        // --- GRAND OPERATIONS ---
-        // Notera: file-sökvägen pekar direkt på mappen där .sqf-filerna ligger.
+        // --- MAIN OPERATIONS ---
+        // Path: Missionframework\MainOp
         class GrandOps {
-            file = "Missionframework\MainOp\grand_ops";
+            file = "Missionframework\MainOp";
             class op_skyGuardian {};
             class op_pointBlank {};
             class op_severedNerve {};
@@ -30,14 +40,5 @@ class CfgFunctions {
             class op_steelRain {};
             class op_apexPredator {};
         };
-
-        /* // --- FRAMTIDA MODULER (Aktiveras när filerna skapas) ---
-        class Core {
-            file = "Missionframework\Functions\Core";
-            class addResource {};
-            class saveGame {};
-            class showNotification {};
-        };
-        */
     };
 };
