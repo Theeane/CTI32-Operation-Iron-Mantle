@@ -226,6 +226,13 @@ class Params {
         default = 5;
     };
 
+    class MWF_Param_InitialFOBType {
+        title = "Initial FOB Asset";
+        values[] = {0, 1};
+        texts[] = {"Truck", "Box"};
+        default = 0;
+    };
+
     class MWF_Param_TimeMultiplier {
         title = "Time Acceleration";
         values[] = {1, 2, 4, 6, 8, 12, 24};

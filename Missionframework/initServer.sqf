@@ -22,6 +22,7 @@ diag_log "[MWF] INFO: Server-side initialization started.";
 [] call MWF_fnc_initPersistence;
 [] call MWF_fnc_loadGame;
 [] call MWF_fnc_presetManager;
+[] call MWF_fnc_spawnInitialFOBAsset;
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;
 [] call MWF_fnc_threatManager;
