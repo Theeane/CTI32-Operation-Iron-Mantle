@@ -29,14 +29,26 @@ switch (toUpper _mode) do {
         private _maxFOBs = missionNamespace getVariable ["MWF_Param_MaxFOBs", 3];
         private _currentCount = count _registry;
         private _minDist = 500;
+        private _mobMinDist = 1000;
 
         if (_currentCount >= _maxFOBs) exitWith {
             [format ["Logistical Limit Reached: %1/%2 FOBs active.", _currentCount, _maxFOBs]] remoteExec ["systemChat", remoteExecutedOwner];
             false
         };
 
-        private _allBases = [];
         private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
+        private _mobPos = if (!isNull _mainBase) then {
+            getPosATL _mainBase
+        } else {
+            getMarkerPos "respawn_west"
+        };
+
+        if ((_pos distance _mobPos) < _mobMinDist) exitWith {
+            ["Deployment Failed: Must be 1000m from MOB to deploy FOB."] remoteExec ["systemChat", remoteExecutedOwner];
+            false
+        };
+
+        private _allBases = [];
         if (!isNull _mainBase) then {
             _allBases pushBack (getPosATL _mainBase);
         };
