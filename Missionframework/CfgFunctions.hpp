@@ -57,6 +57,7 @@ class CfgFunctions {
             class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
             class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
             class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
+            class validateTerminalAccess { file = "Missionframework/functions/terminal/MWF_fnc_validateTerminalAccess.sqf"; };
             class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
             class getVehicleCatalog { file = "Missionframework/functions/terminal/MWF_fnc_getVehicleCatalog.sqf"; };
             class getVehiclePlacementProfile { file = "Missionframework/functions/terminal/MWF_fnc_getVehiclePlacementProfile.sqf"; };
