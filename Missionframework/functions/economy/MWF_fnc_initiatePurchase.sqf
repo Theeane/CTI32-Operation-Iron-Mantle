@@ -1,39 +1,45 @@
 /*
-    Author: Theane / ChatGPT / Gemini
-    Function: MWF_fnc_initiatePurchase.sqf
-    Project: Military War Framework
-    Description: Handles digital currency transactions for Supply and Intel.
+    Legacy compatibility purchase helper.
+    Redirects old Supply/Intel references to the authoritative missionNamespace economy.
 */
 
 params [
-    ["_cost", 0, [0]], 
+    ["_cost", 0, [0]],
     ["_currencyType", "Supply", [""]]
 ];
 
-private _success = false;
+private _normalized = toUpper _currencyType;
 
-// 1. Transaction Logic
-if (_currencyType == "Supply") then {
-    if (MWF_Supply >= _cost) then {
-        MWF_Supply = MWF_Supply - _cost;
-        publicVariable "MWF_Supply";
-        _success = true;
+switch (_normalized) do {
+    case "SUPPLY";
+    case "SUPPLIES": {
+        private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+        if (_supplies >= _cost) then {
+            _supplies = _supplies - _cost;
+            missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
+            missionNamespace setVariable ["MWF_Supplies", _supplies, true];
+            missionNamespace setVariable ["MWF_Supply", _supplies, true];
+            missionNamespace setVariable ["MWF_Currency", _supplies + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
+            true
+        } else {
+            false
+        };
     };
-} else {
-    if (MWF_Intel >= _cost) then {
-        MWF_Intel = MWF_Intel - _cost;
-        publicVariable "MWF_Intel";
-        _success = true;
+
+    case "INTEL": {
+        private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+        if (_intel >= _cost) then {
+            _intel = _intel - _cost;
+            missionNamespace setVariable ["MWF_res_intel", _intel, true];
+            missionNamespace setVariable ["MWF_Intel", _intel, true];
+            missionNamespace setVariable ["MWF_Currency", (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + _intel, true];
+            true
+        } else {
+            false
+        };
+    };
+
+    default {
+        false
     };
 };
-
-// 2. Logging and Feedback
-if (_success) then {
-    diag_log format ["[MWF] SUCCESS: Purchased for %1 %2. Transaction complete.", _cost, _currencyType];
-} else {
-    private _current = if (_currencyType == "Supply") then {MWF_Supply} else {MWF_Intel};
-    diag_log format ["[MWF] ERROR: Insufficient funds. Need %1 %2, have %3.", _cost, _currencyType, _current];
-};
-
-// 3. Return status
-_success

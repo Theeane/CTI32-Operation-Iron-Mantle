@@ -40,6 +40,8 @@ if (["CAN_DEPLOY"] call MWF_fnc_baseManager && { _currentSupplies >= _cost }) th
     private _newSupplies = _currentSupplies - _cost;
     missionNamespace setVariable ["MWF_Economy_Supplies", _newSupplies, true];
     missionNamespace setVariable ["MWF_Supplies", _newSupplies, true];
+    missionNamespace setVariable ["MWF_Supply", _newSupplies, true];
+    missionNamespace setVariable ["MWF_Currency", _newSupplies + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
 
     if (!isNil "MWF_fnc_requestDelayedSave") then {
         [] call MWF_fnc_requestDelayedSave;

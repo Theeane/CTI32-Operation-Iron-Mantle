@@ -92,6 +92,8 @@ missionNamespace setVariable ["MWF_CivRep", _civRepState, true];
 missionNamespace setVariable ["MWF_res_notoriety", _notoriety, true];
 missionNamespace setVariable ["MWF_Supplies", _supplies, true];
 missionNamespace setVariable ["MWF_Intel", _intel, true];
+missionNamespace setVariable ["MWF_Supply", _supplies, true];
+missionNamespace setVariable ["MWF_Currency", _supplies + _intel, true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", profileNamespace getVariable ["MWF_Save_RepPenalties", 0], true];
 missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];

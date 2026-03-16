@@ -16,9 +16,9 @@ if (isNull _display) exitWith {};
 private _listBox = _display displayCtrl 9002;
 private _currencyText = _display displayCtrl 9001;
 
-// 1. Update the Currency display (S)
-private _currentCurrency = missionNamespace getVariable ["MWF_Currency", 0];
-_currencyText ctrlSetText format["Digital Currency: %1 S", _currentCurrency];
+// 1. Update the authoritative Supplies display
+private _currentCurrency = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+_currencyText ctrlSetText format["Supplies: %1", _currentCurrency];
 
 lbClear _listBox;
 

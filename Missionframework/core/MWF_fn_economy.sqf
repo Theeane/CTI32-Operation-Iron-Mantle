@@ -25,8 +25,13 @@ if (isNil "MWF_res_notoriety") then {
     missionNamespace setVariable ["MWF_res_notoriety", 0, true];
 };
 
-missionNamespace setVariable ["MWF_Supplies", missionNamespace getVariable ["MWF_Economy_Supplies", 0], true];
-missionNamespace setVariable ["MWF_Intel", missionNamespace getVariable ["MWF_res_intel", 0], true];
+private _bootSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
+private _bootIntel = missionNamespace getVariable ["MWF_res_intel", 0];
+
+missionNamespace setVariable ["MWF_Supplies", _bootSupplies, true];
+missionNamespace setVariable ["MWF_Intel", _bootIntel, true];
+missionNamespace setVariable ["MWF_Supply", _bootSupplies, true];
+missionNamespace setVariable ["MWF_Currency", _bootSupplies + _bootIntel, true];
 
 MWF_fnc_addResource = {
     params [
@@ -57,6 +62,13 @@ MWF_fnc_addResource = {
             missionNamespace setVariable ["MWF_res_notoriety", 0 max (100 min _value), true];
         };
     };
+
+    missionNamespace setVariable [
+        "MWF_Currency",
+        (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + (missionNamespace getVariable ["MWF_res_intel", 0]),
+        true
+    ];
+    missionNamespace setVariable ["MWF_Supply", missionNamespace getVariable ["MWF_Economy_Supplies", 0], true];
 
     remoteExec ["MWF_fnc_updateResourceUI", 0];
 
@@ -112,8 +124,12 @@ while {true} do {
         missionNamespace setVariable ["MWF_res_notoriety", 0 max (_currentNotoriety - _decay), true];
     };
 
-    missionNamespace setVariable ["MWF_Supplies", missionNamespace getVariable ["MWF_Economy_Supplies", 0], true];
-    missionNamespace setVariable ["MWF_Intel", missionNamespace getVariable ["MWF_res_intel", 0], true];
+    private _loopSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
+    private _loopIntel = missionNamespace getVariable ["MWF_res_intel", 0];
+    missionNamespace setVariable ["MWF_Supplies", _loopSupplies, true];
+    missionNamespace setVariable ["MWF_Intel", _loopIntel, true];
+    missionNamespace setVariable ["MWF_Supply", _loopSupplies, true];
+    missionNamespace setVariable ["MWF_Currency", _loopSupplies + _loopIntel, true];
 
     remoteExec ["MWF_fnc_updateResourceUI", 0];
 

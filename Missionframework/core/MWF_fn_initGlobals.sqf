@@ -78,8 +78,13 @@ if (isNil { missionNamespace getVariable "MWF_CapturedZoneCount" }) then {
     missionNamespace setVariable ["MWF_MapControlPercent", 0, true];
 };
 
-missionNamespace setVariable ["MWF_Supplies", missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies], true];
-missionNamespace setVariable ["MWF_Intel", missionNamespace getVariable ["MWF_res_intel", 0], true];
+private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
+private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
+
+missionNamespace setVariable ["MWF_Supplies", _resolvedSupplies, true];
+missionNamespace setVariable ["MWF_Intel", _resolvedIntel, true];
+missionNamespace setVariable ["MWF_Supply", _resolvedSupplies, true];
+missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
 missionNamespace setVariable ["MWF_Economy_SupplyInterval", _supplyTimer, true];
 missionNamespace setVariable ["MWF_Economy_HeatMult", _heatMult, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _maxFOBs, true];

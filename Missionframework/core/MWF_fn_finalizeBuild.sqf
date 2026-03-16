@@ -23,6 +23,8 @@ private _newValue = (_current - _price) max 0;
 
 missionNamespace setVariable ["MWF_Economy_Supplies", _newValue, true];
 missionNamespace setVariable ["MWF_Supplies", _newValue, true];
+missionNamespace setVariable ["MWF_Supply", _newValue, true];
+missionNamespace setVariable ["MWF_Currency", _newValue + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
 
 private _vehicle = createVehicle [_className, _pos, [], 0, "CAN_COLLIDE"];
 _vehicle setDir _dir;

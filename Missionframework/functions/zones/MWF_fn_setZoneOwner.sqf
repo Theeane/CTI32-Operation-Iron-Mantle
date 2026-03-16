@@ -58,6 +58,8 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
     missionNamespace setVariable ["MWF_ProductionBonus", _productionBonus, true];
     missionNamespace setVariable ["MWF_Supplies", _supplies, true];
     missionNamespace setVariable ["MWF_Intel", _intel, true];
+    missionNamespace setVariable ["MWF_Supply", _supplies, true];
+    missionNamespace setVariable ["MWF_Currency", _supplies + _intel, true];
 
     [format ["%1 secured. %2", _zoneName, _reason]] remoteExec ["systemChat", 0];
 };
