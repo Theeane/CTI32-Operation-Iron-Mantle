@@ -34,9 +34,6 @@ class CfgFunctions {
             class zoneManager { file = "Missionframework/core/MWF_fn_zoneManager.sqf"; };
             class addResource { file = "Missionframework/core/MWF_fn_addResource.sqf"; };
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
-            class getBuildAssetCost { file = "Missionframework/core/MWF_fn_getBuildAssetCost.sqf"; };
-            class isBuildAssetAllowed { file = "Missionframework/core/MWF_fn_isBuildAssetAllowed.sqf"; };
-            class handleBuildPlacement { file = "Missionframework/core/MWF_fn_handleBuildPlacement.sqf"; };
         };
 
         class Compatibility {
@@ -59,6 +56,7 @@ class CfgFunctions {
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
             class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
             class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
+            class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
             class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
             class getVehicleCatalog { file = "Missionframework/functions/terminal/MWF_fnc_getVehicleCatalog.sqf"; };
             class getVehiclePlacementProfile { file = "Missionframework/functions/terminal/MWF_fnc_getVehiclePlacementProfile.sqf"; };
