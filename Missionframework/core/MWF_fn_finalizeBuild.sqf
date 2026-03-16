@@ -20,11 +20,10 @@ if (_className isEqualTo "") exitWith {};
 
 private _current = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 private _newValue = (_current - _price) max 0;
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
-missionNamespace setVariable ["MWF_Economy_Supplies", _newValue, true];
-missionNamespace setVariable ["MWF_Supplies", _newValue, true];
-missionNamespace setVariable ["MWF_Supply", _newValue, true];
-missionNamespace setVariable ["MWF_Currency", _newValue + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
+[_newValue, _intel, _notoriety] call MWF_fnc_syncEconomyState;
 
 private _vehicle = createVehicle [_className, _pos, [], 0, "CAN_COLLIDE"];
 _vehicle setDir _dir;
@@ -34,10 +33,5 @@ if (_className == "B_Slingload_01_Cargo_F") then {
     [_vehicle] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
 };
 
-remoteExec ["MWF_fnc_updateResourceUI", 0];
-
-if (!isNil "MWF_fnc_requestDelayedSave") then {
-    [] call MWF_fnc_requestDelayedSave;
-};
 
 diag_log format ["[MWF Build] %1 spawned at %2 for %3 supplies.", _className, _pos, _price];

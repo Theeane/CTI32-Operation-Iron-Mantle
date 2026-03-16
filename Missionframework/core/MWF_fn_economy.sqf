@@ -27,55 +27,9 @@ if (isNil "MWF_res_notoriety") then {
 
 private _bootSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
 private _bootIntel = missionNamespace getVariable ["MWF_res_intel", 0];
+private _bootNotoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 
-missionNamespace setVariable ["MWF_Supplies", _bootSupplies, true];
-missionNamespace setVariable ["MWF_Intel", _bootIntel, true];
-missionNamespace setVariable ["MWF_Supply", _bootSupplies, true];
-missionNamespace setVariable ["MWF_Currency", _bootSupplies + _bootIntel, true];
-
-MWF_fnc_addResource = {
-    params [
-        ["_amount", 0, [0]],
-        ["_type", "", [""]]
-    ];
-
-    private _normalizedType = toUpper _type;
-
-    switch (_normalizedType) do {
-        case "SUPPLIES": {
-            private _value = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
-            _value = _value + _amount;
-            missionNamespace setVariable ["MWF_Economy_Supplies", _value max 0, true];
-            missionNamespace setVariable ["MWF_Supplies", _value max 0, true];
-        };
-
-        case "INTEL": {
-            private _value = missionNamespace getVariable ["MWF_res_intel", 0];
-            _value = _value + _amount;
-            missionNamespace setVariable ["MWF_res_intel", _value max 0, true];
-            missionNamespace setVariable ["MWF_Intel", _value max 0, true];
-        };
-
-        case "NOTORIETY": {
-            private _value = missionNamespace getVariable ["MWF_res_notoriety", 0];
-            _value = _value + _amount;
-            missionNamespace setVariable ["MWF_res_notoriety", 0 max (100 min _value), true];
-        };
-    };
-
-    missionNamespace setVariable [
-        "MWF_Currency",
-        (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + (missionNamespace getVariable ["MWF_res_intel", 0]),
-        true
-    ];
-    missionNamespace setVariable ["MWF_Supply", missionNamespace getVariable ["MWF_Economy_Supplies", 0], true];
-
-    remoteExec ["MWF_fnc_updateResourceUI", 0];
-
-    if (!isNil "MWF_fnc_requestDelayedSave") then {
-        [] call MWF_fnc_requestDelayedSave;
-    };
-};
+[_bootSupplies, _bootIntel, _bootNotoriety, true, false] call MWF_fnc_syncEconomyState;
 
 while {true} do {
     private _sleepTime = (missionNamespace getVariable ["MWF_Economy_SupplyInterval", 10]) * 60;
@@ -126,12 +80,8 @@ while {true} do {
 
     private _loopSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
     private _loopIntel = missionNamespace getVariable ["MWF_res_intel", 0];
-    missionNamespace setVariable ["MWF_Supplies", _loopSupplies, true];
-    missionNamespace setVariable ["MWF_Intel", _loopIntel, true];
-    missionNamespace setVariable ["MWF_Supply", _loopSupplies, true];
-    missionNamespace setVariable ["MWF_Currency", _loopSupplies + _loopIntel, true];
-
-    remoteExec ["MWF_fnc_updateResourceUI", 0];
+    private _loopNotoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+    [_loopSupplies, _loopIntel, _loopNotoriety, true, false] call MWF_fnc_syncEconomyState;
 
     diag_log format [
         "[MWF Economy] Safe Zones: %1 | Under Attack: %2 | Income: +%3",
