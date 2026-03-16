@@ -33,7 +33,6 @@ class CfgFunctions {
             class startBuildPlacement { file = "Missionframework/core/MWF_fn_startBuildPlacement.sqf"; };
             class zoneManager { file = "Missionframework/core/MWF_fn_zoneManager.sqf"; };
             class addResource { file = "Missionframework/core/MWF_fn_addResource.sqf"; };
-            class syncEconomyState { file = "Missionframework/core/MWF_fn_syncEconomyState.sqf"; };
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
         };
 
@@ -66,6 +65,8 @@ class CfgFunctions {
             class confirmVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_confirmVehiclePlacement.sqf"; };
             class cancelVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cancelVehiclePlacement.sqf"; };
             class cleanupVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cleanupVehiclePlacement.sqf"; };
+            class terminal_redeploy { file = "Missionframework/functions/terminal/MWF_fnc_terminal_redeploy.sqf"; };
+            class handleRedeployMapClick { file = "Missionframework/functions/terminal/MWF_fnc_handleRedeployMapClick.sqf"; };
         };
 
         class GrandOps {

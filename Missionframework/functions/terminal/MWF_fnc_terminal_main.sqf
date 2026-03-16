@@ -21,6 +21,7 @@ switch (toUpper _mode) do {
         _terminal addAction ["<t color='#7CC8FF'>[Terminal] Mission Hub</t>", { ["MISSION_HUB"] call MWF_fnc_terminal_main; }, nil, 1.4, true, true, "", _cond];
         _terminal addAction ["<t color='#FFD700'>[Terminal] Intelligence Disrupt (150 I)</t>", { [player] call MWF_fnc_terminal_disrupt; }, nil, 1.3, true, true, "", _cond];
         _terminal addAction ["<t color='#7CFF9B'>[Terminal] Vehicle Menu</t>", { ["OPEN", _target] call MWF_fnc_terminal_vehicleMenu; }, nil, 1.2, true, true, "", _cond];
+        _terminal addAction ["<t color='#66E0FF'>[Terminal] Redeploy</t>", { ["OPEN"] call MWF_fnc_terminal_redeploy; }, nil, 1.1, true, true, "", _cond];
     };
 
     case "INIT_ACE": {
@@ -43,6 +44,9 @@ switch (toUpper _mode) do {
 
         private _veh = ["MWF_Term_Veh", "Vehicle Menu", "", { ["OPEN", _target] call MWF_fnc_terminal_vehicleMenu; }, {alive _target}] call ace_interact_menu_fnc_createAction;
         [_terminal, 0, ["ACE_MainActions", "MWF_Term_Root"], _veh] call ace_interact_menu_fnc_addActionToObject;
+
+        private _redeploy = ["MWF_Term_Redeploy", "Redeploy", "", { ["OPEN"] call MWF_fnc_terminal_redeploy; }, {alive _target}] call ace_interact_menu_fnc_createAction;
+        [_terminal, 0, ["ACE_MainActions", "MWF_Term_Root"], _redeploy] call ace_interact_menu_fnc_addActionToObject;
     };
 
     case "MISSION_HUB": {
@@ -52,5 +56,9 @@ switch (toUpper _mode) do {
 
     case "VEHICLE_MENU": {
         ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu;
+    };
+
+    case "REDEPLOY": {
+        ["OPEN"] call MWF_fnc_terminal_redeploy;
     };
 };
