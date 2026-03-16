@@ -18,7 +18,7 @@ _actionIds pushBack (
     _terminal addAction [
         "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect</t>",
         {
-            [] spawn MWF_fnc_openBaseArchitect;
+            [_target] spawn MWF_fnc_openBaseArchitect;
         },
         [],
         10,
@@ -33,7 +33,7 @@ _actionIds pushBack (
     _terminal addAction [
         "<t color='#00ff00' size='1.2'>[ FOB ] Open Logistics Menu</t>",
         {
-            [] spawn MWF_fnc_openBuildMenu;
+            [_target] spawn MWF_fnc_openBuildMenu;
         },
         [],
         9,
@@ -50,7 +50,9 @@ _actionIds pushBack (
         {
             private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
             private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
-            hint format ["Current FOB Logistics:\nSupplies: %1\nIntel: %2", _supplies, _intel];
+            hint format ["Current FOB Logistics:
+Supplies: %1
+Intel: %2", _supplies, _intel];
         },
         [],
         1,
