@@ -1,2 +1,138 @@
-# CTI32-Operation-Iron-Mantle
-Asymmetric warfare framework for up to 32 players.  Infiltrate or cause mayhem through carefully planned warfare.  Gather intel and resources to help your road to completion and flush out the Red Beret HVT.  Features persistent CBA stats tracking kills, deaths, and teamkills.  Your mission, your way.
+# CTI32 – Operation Iron Mantle  
+### Mission War Framework (MWF)
+
+**Mission War Framework (MWF)** is a community-focused warfare framework for Arma 3 designed to let servers run dynamic campaigns on almost any map.
+
+Instead of relying on a hardcoded mission layout, MWF analyzes the terrain, generates strategic zones automatically, and lets the campaign evolve based on player actions.
+
+The goal is simple:
+
+> **The map should become boring before the missions do.**
+
+---
+
+# What makes MWF different
+
+MWF is not just another CTI mission.
+
+It is a **framework designed for communities and server administrators** who want to build their own warfare experience.
+
+---
+
+## Auto-generated strategic zones
+
+MWF scans the map and generates strategic areas such as:
+
+- Towns  
+- Capitals  
+- Military sites  
+- Factories  
+- Special objectives  
+
+This allows the framework to run on **almost any terrain** without rebuilding the mission from scratch.
+
+---
+
+## Map freedom for server admins
+
+Server administrators are not locked to a single map.
+
+MWF can run on:
+
+- Vanilla maps (Altis, Tanoa, etc.)
+- DLC terrains
+- Community maps
+- Small experimental terrains
+
+The framework adapts the campaign to the terrain instead of forcing the terrain to match the mission.
+
+---
+
+## Community-driven side missions
+
+One of the core design goals is **infinite mission potential**.
+
+MWF supports large pools of side missions, including:
+
+- up to **99 missions per difficulty tier**
+- community-created mission packs
+- custom reward systems
+- expandable mission categories
+
+Communities can add new content **without touching the core framework**.
+
+---
+
+## Performance-focused design
+
+MWF was built with performance in mind from the beginning.
+
+Instead of stacking scripts endlessly, the framework focuses on:
+
+- dynamic spawning  
+- aggressive cleanup systems  
+- optimized AI usage  
+- long-session server stability  
+
+> Not "script and pray".  
+> More like **script and hey — the server still runs.**
+
+---
+
+## Expansion-ready architecture
+
+MWF is designed to grow without breaking the core system.
+
+Planned or supported operational environments include:
+
+- Land warfare  
+- Naval operations  
+- River operations  
+- Underground / tunnel missions  
+- Future air operations
+
+Systems activate only when the map environment supports them.
+
+---
+
+## Community first
+
+MWF is designed to empower the community.
+
+The framework allows:
+
+- server admins to shape the campaign
+- mission creators to expand content
+- players to influence how the war unfolds
+
+The project is intended to remain **open and accessible for community use**.
+
+---
+
+## Project status
+
+Current phase:
+
+**Alpha preparation / internal testing**
+
+The upcoming milestone will focus on:
+
+- gameplay stability
+- performance testing
+- community server testing
+
+---
+
+## Repository
+
+Source code and development progress:
+
+https://github.com/Theeane/CTI32-Operation-Iron-Mantle
+
+---
+
+## Philosophy
+
+MWF was built around a simple idea:
+
+> **A warfare mission should feel alive, adaptable, and community driven — not locked to one scenario.**
