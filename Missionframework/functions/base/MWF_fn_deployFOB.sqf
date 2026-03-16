@@ -144,4 +144,18 @@ if (!_isRestore) then {
 
 diag_log format ["[MWF FOB] %1 deployed at %2 (origin: %3, marker: %4).", _resolvedName, _posAsl, _originType, _markerName];
 
+if (!_isRestore) then {
+    [] spawn {
+        uiSleep 10;
+
+        private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
+        if (_currentStage == 1) then {
+            [] call MWF_fnc_generateInitialMission;
+            diag_log "[MWF FOB] Tutorial mission advanced to post-deploy stage.";
+        } else {
+            diag_log format ["[MWF FOB] Tutorial mission post-deploy trigger skipped. Current stage: %1.", _currentStage];
+        };
+    };
+};
+
 _laptop
