@@ -52,14 +52,10 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
         };
     };
 
-    missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
-    missionNamespace setVariable ["MWF_res_intel", _intel, true];
+    private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+    [_supplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
     missionNamespace setVariable ["MWF_CivRep", _civRep, true];
     missionNamespace setVariable ["MWF_ProductionBonus", _productionBonus, true];
-    missionNamespace setVariable ["MWF_Supplies", _supplies, true];
-    missionNamespace setVariable ["MWF_Intel", _intel, true];
-    missionNamespace setVariable ["MWF_Supply", _supplies, true];
-    missionNamespace setVariable ["MWF_Currency", _supplies + _intel, true];
 
     [format ["%1 secured. %2", _zoneName, _reason]] remoteExec ["systemChat", 0];
 };

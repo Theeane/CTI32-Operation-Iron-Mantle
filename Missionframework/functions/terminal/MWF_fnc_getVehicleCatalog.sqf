@@ -13,7 +13,12 @@
         ["APC",   [...]],
         ["TANKS", [...]],
         ["HELIS", [...]],
-        ["JETS",  [...]]
+        ["JETS",  [...]],
+        ["__META__", [
+            ["totalEntries", _count],
+            ["emptyCategories", [...]],
+            ["invalidEntries", _count]
+        ]]
     ]
 */
 
@@ -26,6 +31,9 @@ private _definitions = [
 ];
 
 private _catalog = [];
+private _totalEntries = 0;
+private _emptyCategories = [];
+private _invalidEntries = 0;
 
 {
     _x params ["_category", "_varName"];
@@ -39,16 +47,31 @@ private _catalog = [];
             private _cost = _x param [1, 0, [0]];
             private _minTier = _x param [2, 1, [0]];
 
-            if !(_className isEqualTo "") then {
+            if (_className isEqualTo "") then {
+                _invalidEntries = _invalidEntries + 1;
+            } else {
                 private _displayName = getText (configFile >> "CfgVehicles" >> _className >> "displayName");
                 if (_displayName isEqualTo "") then { _displayName = _className; };
 
                 _entries pushBack [_className, _cost, _minTier, _displayName];
             };
+        } else {
+            _invalidEntries = _invalidEntries + 1;
         };
     } forEach _source;
 
+    if (_entries isEqualTo []) then {
+        _emptyCategories pushBack _category;
+    };
+
+    _totalEntries = _totalEntries + (count _entries);
     _catalog pushBack [_category, _entries];
 } forEach _definitions;
+
+_catalog pushBack ["__META__", [
+    ["totalEntries", _totalEntries],
+    ["emptyCategories", _emptyCategories],
+    ["invalidEntries", _invalidEntries]
+]];
 
 _catalog

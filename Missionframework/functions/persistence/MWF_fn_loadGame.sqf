@@ -86,14 +86,8 @@ private _intel = profileNamespace getVariable ["MWF_Save_Intel", 0];
 private _civRepState = profileNamespace getVariable ["MWF_Save_CivRep_State", _lockedCivRep];
 private _notoriety = profileNamespace getVariable ["MWF_Save_Notoriety_State", 0];
 
-missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_res_intel", _intel, true];
+[_supplies, _intel, _notoriety, true, false] call MWF_fnc_syncEconomyState;
 missionNamespace setVariable ["MWF_CivRep", _civRepState, true];
-missionNamespace setVariable ["MWF_res_notoriety", _notoriety, true];
-missionNamespace setVariable ["MWF_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_Intel", _intel, true];
-missionNamespace setVariable ["MWF_Supply", _supplies, true];
-missionNamespace setVariable ["MWF_Currency", _supplies + _intel, true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", profileNamespace getVariable ["MWF_Save_RepPenalties", 0], true];
 missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];

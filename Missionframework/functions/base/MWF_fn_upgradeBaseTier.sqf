@@ -26,10 +26,9 @@ if (_supplies < _cost) exitWith {
 };
 
 _supplies = _supplies - _cost;
-missionNamespace setVariable ["MWF_Economy_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_Supplies", _supplies, true];
-missionNamespace setVariable ["MWF_Supply", _supplies, true];
-missionNamespace setVariable ["MWF_Currency", _supplies + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+[_supplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
 missionNamespace setVariable ["MWF_CurrentTier", _nextTier, true];
 
 if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };

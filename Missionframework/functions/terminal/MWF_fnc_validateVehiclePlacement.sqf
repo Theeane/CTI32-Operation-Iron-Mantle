@@ -34,15 +34,19 @@ if (_surfaceRule isEqualTo "LAND" && {_isWater}) exitWith {
 };
 
 private _ghost = missionNamespace getVariable ["MWF_VehiclePlacement_Ghost", objNull];
-private _near = nearestObjects [_posATL, ["LandVehicle", "Ship", "Air", "Static", "Building", "Thing"], _safetyRadius + 40, true];
+private _near = nearestObjects [_posATL, ["LandVehicle", "Ship", "Air", "Static", "Building", "Thing", "CAManBase"], _safetyRadius + 40, true];
 
 private _blockingObject = objNull;
 
 {
     if (!isNull _x && {_x != _ghost} && {_x != player}) then {
-        private _otherDiameter = sizeOf (typeOf _x);
-        if (_otherDiameter <= 0) then { _otherDiameter = 2; };
-        private _otherRadius = (_otherDiameter * 0.5) + 1;
+        private _otherRadius = if (_x isKindOf "CAManBase") then {
+            1.2
+        } else {
+            private _otherDiameter = sizeOf (typeOf _x);
+            if (_otherDiameter <= 0) then { _otherDiameter = 2; };
+            (_otherDiameter * 0.5) + 1
+        };
 
         if ((_x distance2D _posATL) < (_safetyRadius + _otherRadius)) exitWith {
             _blockingObject = _x;
@@ -51,7 +55,12 @@ private _blockingObject = objNull;
 } forEach _near;
 
 if (!isNull _blockingObject) exitWith {
-    [false, format ["Placement blocked by nearby object: %1", typeOf _blockingObject]]
+    private _label = if (_blockingObject isKindOf "CAManBase") then {
+        "nearby unit"
+    } else {
+        typeOf _blockingObject
+    };
+    [false, format ["Placement blocked by %1.", _label]]
 };
 
 [true, "Placement valid."]

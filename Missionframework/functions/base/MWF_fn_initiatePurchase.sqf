@@ -38,14 +38,9 @@ private _currentSupplies = missionNamespace getVariable ["MWF_Economy_Supplies",
 
 if (["CAN_DEPLOY"] call MWF_fnc_baseManager && { _currentSupplies >= _cost }) then {
     private _newSupplies = _currentSupplies - _cost;
-    missionNamespace setVariable ["MWF_Economy_Supplies", _newSupplies, true];
-    missionNamespace setVariable ["MWF_Supplies", _newSupplies, true];
-    missionNamespace setVariable ["MWF_Supply", _newSupplies, true];
-    missionNamespace setVariable ["MWF_Currency", _newSupplies + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
-
-    if (!isNil "MWF_fnc_requestDelayedSave") then {
-        [] call MWF_fnc_requestDelayedSave;
-    };
+    private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+    private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+    [_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
 
     private _spawnPos = if (_isFobAsset) then {
         getPosATL MWF_MOB_FobPad

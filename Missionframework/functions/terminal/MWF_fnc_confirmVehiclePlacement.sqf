@@ -81,13 +81,9 @@ if (_surfaceRule isEqualTo "WATER") then {
 };
 
 private _newSupplies = (_supplies - _cost) max 0;
-missionNamespace setVariable ["MWF_Economy_Supplies", _newSupplies, true];
-missionNamespace setVariable ["MWF_Supplies", _newSupplies, true];
-missionNamespace setVariable ["MWF_Supply", _newSupplies, true];
-missionNamespace setVariable ["MWF_Currency", _newSupplies + (missionNamespace getVariable ["MWF_res_intel", 0]), true];
-
-remoteExec ["MWF_fnc_updateResourceUI", 0];
-if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+[_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
 
 [format ["Vehicle deployed: %1", _className]] remoteExec ["systemChat", remoteExecutedOwner];
 diag_log format ["[MWF VehiclePlacement] Spawned %1 for %2 supplies at %3.", _className, _cost, _posASL];
