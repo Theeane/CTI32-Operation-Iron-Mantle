@@ -6,7 +6,8 @@
     Description:
     Confirms preset-driven ghost placement.
     Client branch validates and forwards the build request to the server.
-    Server branch performs final resource validation, spawns the real vehicle, and syncs resources.
+    Server branch performs final resource validation, spawns the real vehicle, syncs resources,
+    and auto-initializes preset-defined Mobile Respawn Units.
 */
 
 params [
@@ -64,7 +65,6 @@ _spawnVehicle setDir _dir;
 
 if (_surfaceRule isEqualTo "WATER") then {
     private _spawnASL = +_posASL;
-    _spawnASL set [2, 0.3];
     _spawnVehicle setPosASL _spawnASL;
     _spawnVehicle setVectorUp [0, 0, 1];
 } else {
@@ -74,16 +74,33 @@ if (_surfaceRule isEqualTo "WATER") then {
     _spawnVehicle setVectorUp surfaceNormal _spawnATL;
 };
 
+private _respawnTruckClass = missionNamespace getVariable ["MWF_Respawn_Truck", ""];
+if (_respawnTruckClass isNotEqualTo "" && {_className isEqualTo _respawnTruckClass}) then {
+    [_spawnVehicle] call MWF_fnc_initMobileRespawn;
+    ["Mobile Respawn Unit deployed."] remoteExec ["systemChat", remoteExecutedOwner];
+};
+
 [_spawnVehicle] spawn {
     params ["_veh"];
     uiSleep 0.5;
     if (!isNull _veh) then { _veh allowDamage true; };
 };
 
-private _newSupplies = (_supplies - _cost) max 0;
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
-[_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
+private _notoriety = missionNamespace getVariable ["MWF_notoriety", 0];
+private _newSupplies = (_supplies - _cost) max 0;
+
+if (!isNil "MWF_fnc_syncEconomyState") then {
+    [_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
+} else {
+    missionNamespace setVariable ["MWF_Economy_Supplies", _newSupplies, true];
+    missionNamespace setVariable ["MWF_Supplies", _newSupplies, true];
+    missionNamespace setVariable ["MWF_Supply", _newSupplies, true];
+    missionNamespace setVariable ["MWF_Currency", _newSupplies + _intel, true];
+    remoteExec ["MWF_fnc_updateResourceUI", 0];
+};
+
+if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
 
 [format ["Vehicle deployed: %1", _className]] remoteExec ["systemChat", remoteExecutedOwner];
 diag_log format ["[MWF VehiclePlacement] Spawned %1 for %2 supplies at %3.", _className, _cost, _posASL];

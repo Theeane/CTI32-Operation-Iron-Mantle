@@ -1,33 +1,81 @@
 /*
-    Author: Theeane / Gemini Guide
-    Function: MWF_fn_initMobileRespawn
+    Author: Theane / ChatGPT
+    Function: MWF_fnc_initMobileRespawn
     Project: Military War Framework
 
     Description:
-    Initializes a vehicle as a mobile respawn point.
-    Sets the required network variables and adds the map marker.
+    Initializes a vehicle as a Mobile Respawn Unit (MRU).
+    Registers a dynamic respawn position, exposes redeploy/map state,
+    and tears itself down cleanly when the vehicle is destroyed.
 */
 
 params [["_vehicle", objNull, [objNull]]];
 
+if (!isServer) exitWith { false };
 if (isNull _vehicle) exitWith {
     diag_log "[MWF] Error: initMobileRespawn called with null vehicle.";
+    false
 };
 
-// 1. Mark the vehicle as a mobile respawn globally
-_vehicle setVariable ["MWF_isMobileRespawn", true, true];
+private _respawnTruckClass = missionNamespace getVariable ["MWF_Respawn_Truck", ""];
+if (_respawnTruckClass isNotEqualTo "" && {typeOf _vehicle isNotEqualTo _respawnTruckClass}) exitWith {
+    diag_log format ["[MWF] initMobileRespawn skipped for %1. Active MRU class is %2.", typeOf _vehicle, _respawnTruckClass];
+    false
+};
 
-// 2. Add to the global registry (if needed for cleanup/tracking)
 private _currentRespawns = missionNamespace getVariable ["MWF_allMobileRespawns", []];
+_currentRespawns = _currentRespawns select { !isNull _x };
 _currentRespawns pushBackUnique _vehicle;
 missionNamespace setVariable ["MWF_allMobileRespawns", _currentRespawns, true];
 
-// 3. Visual feedback/Map markers
-// We call the marker refresh logic to ensure it shows up on the map
-if (!isNil "MWF_fnc_refreshFOBMarkers") then {
-    [] remoteExec ["MWF_fnc_refreshFOBMarkers", 0, true];
+_vehicle setVariable ["MWF_isMobileRespawn", true, true];
+_vehicle setVariable ["MWF_respawnAvailable", true, true];
+_vehicle setVariable ["MWF_MRU_DisplayName", "Mobile Respawn Unit", true];
+
+private _existingRespawnId = _vehicle getVariable ["MWF_respawnPositionId", -1];
+if (_existingRespawnId isEqualType 0 && {_existingRespawnId >= 0}) then {
+    [west, _existingRespawnId] call BIS_fnc_removeRespawnPosition;
 };
 
-diag_log format ["[MWF] System: Mobile Respawn initialized on %1", typeOf _vehicle];
+private _respawnId = [west, _vehicle, "Mobile Respawn Unit"] call BIS_fnc_addRespawnPosition;
+_vehicle setVariable ["MWF_respawnPositionId", _respawnId, true];
 
+private _cleanupCode = {
+    params ["_veh"];
+    if (!isServer || {isNull _veh}) exitWith {};
+
+    _veh setVariable ["MWF_respawnAvailable", false, true];
+
+    private _respawnIdLocal = _veh getVariable ["MWF_respawnPositionId", -1];
+    if (_respawnIdLocal isEqualType 0 && {_respawnIdLocal >= 0}) then {
+        [west, _respawnIdLocal] call BIS_fnc_removeRespawnPosition;
+        _veh setVariable ["MWF_respawnPositionId", -1, true];
+    };
+
+    private _allRespawns = missionNamespace getVariable ["MWF_allMobileRespawns", []];
+    _allRespawns = _allRespawns select { !isNull _x && {_x != _veh} };
+    missionNamespace setVariable ["MWF_allMobileRespawns", _allRespawns, true];
+
+    if (!isNil "MWF_fnc_refreshFOBMarkers") then {
+        [] call MWF_fnc_refreshFOBMarkers;
+    };
+};
+
+_vehicle addEventHandler ["Killed", {
+    params ["_veh"];
+    [_veh] call (_thisEventHandlerArgs select 0);
+}, [_cleanupCode]];
+
+_vehicle addEventHandler ["Deleted", {
+    params ["_veh"];
+    [_veh] call (_thisEventHandlerArgs select 0);
+}, [_cleanupCode]];
+
+if (!isNil "MWF_fnc_refreshFOBMarkers") then {
+    [] call MWF_fnc_refreshFOBMarkers;
+};
+
+missionNamespace setVariable ["MWF_LastMobileRespawn", _vehicle, true];
+
+diag_log format ["[MWF] System: Mobile Respawn initialized on %1", typeOf _vehicle];
 true
