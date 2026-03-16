@@ -1,44 +1,18 @@
 /*
-    Author: Theane / Gemini
+    Author: Theane / ChatGPT
     Project: Military War Framework (MWF)
-    
-    Description: 
-    Central function registration. All functions listed here are compiled 
-    on mission start and available via the 'MWF_fnc_' prefix.
+
+    Description:
+    Mission config entrypoint.
+    Restores the full function registry, mission params, and UI declarations.
 */
 
-class CfgFunctions {
-    class MWF {
-        tag = "MWF";
+#include "ui/defines.hpp"
+#include "configs/params.hpp"
+#include "CfgFunctions.hpp"
+#include "ui/buildMenu.hpp"
+#include "ui/buyMenu.hpp"
 
-        // --- CORE SYSTEMS ---
-        // Path: Missionframework\Functions\Core
-        class Core {
-            file = "Missionframework\Functions\Core";
-            class addResource {};
-            class saveGame {};
-            class showNotification {};
-        };
-
-        // --- TERMINAL SYSTEM ---
-        // Path: Missionframework\Functions\Terminal
-        class Terminal {
-            file = "Missionframework\Functions\Terminal";
-            class terminal_main {};
-            class terminal_upload {};
-            class terminal_disrupt {};
-        };
-
-        // --- MAIN OPERATIONS ---
-        // Path: Missionframework\MainOp
-        class GrandOps {
-            file = "Missionframework\MainOp";
-            class op_skyGuardian {};
-            class op_pointBlank {};
-            class op_severedNerve {};
-            class op_stasisStrike {};
-            class op_steelRain {};
-            class op_apexPredator {};
-        };
-    };
+class RscTitles {
+    #include "ui/resourceBar.hpp"
 };

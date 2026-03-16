@@ -1,36 +1,54 @@
 /*
-    Author: Theeane / Gemini Guide
+    Author: Theane / ChatGPT
     File: initServer.sqf
     Project: Military War Framework (MWF)
-    Description: 
-    Initializes the server-side environment. 
-    Sets up core variables, starts background loops, and signals client readiness.
+
+    Description:
+    Authoritative server boot chain.
+    Brings persistence, zones, world, threat, economy, and mission layers online
+    before exposing the framework as ready to clients.
 */
 
 if (!isServer) exitWith {};
+if (missionNamespace getVariable ["MWF_ServerBootRunning", false]) exitWith {};
+
+missionNamespace setVariable ["MWF_ServerBootRunning", true, true];
+missionNamespace setVariable ["MWF_ServerInitialized", false, true];
 
 diag_log "[MWF] INFO: Server-side initialization started.";
 
-// 1. Initialize Global Variables and Economy
-// This replaces manual assignments to ensure lobby parameters are respected.
 [] call MWF_fnc_initGlobals;
-
-// 2. Initialize Core Systems
-// Sets up zones, infrastructure, and faction presets.
 [] call MWF_fnc_initSystems;
+[] call MWF_fnc_initPersistence;
+[] call MWF_fnc_loadGame;
 [] call MWF_fnc_presetManager;
-
-// 3. Start Background Loops
-// Starts the digital economy income loop and zone monitoring.
+[] call MWF_fnc_zoneManager;
+[] call MWF_fnc_worldManager;
+[] call MWF_fnc_threatManager;
 [] spawn MWF_fnc_economy;
-[] call MWF_fnc_initZones;
+[] call MWF_fnc_initMissionSystem;
 
-// 4. Mission Logic
-// You can add logic here to start the first mission or check save-game status.
-// [] call MWF_fnc_generateInitialMission;
+private _bootDeadline = diag_tickTime + 180;
+waitUntil {
+    uiSleep 1;
+    (
+        missionNamespace getVariable ["MWF_ZoneSystemReady", false] &&
+        missionNamespace getVariable ["MWF_WorldSystemReady", false] &&
+        missionNamespace getVariable ["MWF_ThreatSystemReady", false]
+    ) || {diag_tickTime >= _bootDeadline}
+};
 
-// 5. Signal Readiness
-// This flag allows clients (init.sqf / initPlayerLocal.sqf) to proceed.
+if (!(missionNamespace getVariable ["MWF_ZoneSystemReady", false])) then {
+    diag_log "[MWF] WARNING: Zone system not fully ready before server-ready release.";
+};
+if (!(missionNamespace getVariable ["MWF_WorldSystemReady", false])) then {
+    diag_log "[MWF] WARNING: World system not fully ready before server-ready release.";
+};
+if (!(missionNamespace getVariable ["MWF_ThreatSystemReady", false])) then {
+    diag_log "[MWF] WARNING: Threat system not fully ready before server-ready release.";
+};
+
 missionNamespace setVariable ["MWF_ServerInitialized", true, true];
+missionNamespace setVariable ["MWF_ServerBootRunning", false, true];
 
-diag_log "[MWF] SUCCESS: Server initialization complete. Framework is ready.";
+diag_log "[MWF] SUCCESS: Server initialization complete. Core framework is ready.";

@@ -1,10 +1,9 @@
 /*
-    Author: Theane / Gemini
+    Author: Theane / ChatGPT
     Project: Military War Framework (MWF)
-    
-    Description: 
-    Central function registration. All functions listed here are compiled 
-    on mission start and available via the 'MWF_fnc_' prefix.
+
+    Description:
+    Central function registration for the runtime-safe MWF boot chain.
 */
 
 class CfgFunctions {
@@ -33,21 +32,32 @@ class CfgFunctions {
             class spawnFOBComposition { file = "Missionframework/core/MWF_fn_spawnFOBComposition.sqf"; };
             class startBuildPlacement { file = "Missionframework/core/MWF_fn_startBuildPlacement.sqf"; };
             class zoneManager { file = "Missionframework/core/MWF_fn_zoneManager.sqf"; };
-            
-            // Shared Library Helpers
             class addResource { file = "Missionframework/core/MWF_fn_addResource.sqf"; };
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
         };
 
-        // --- NEW: TERMINAL SYSTEM ---
-        class Terminal {
-            file = "Missionframework/functions/terminal";
-            class terminal_main { file = "Missionframework/functions/terminal/MWF_fn_terminal_main.sqf"; };
-            class terminal_upload { file = "Missionframework/functions/terminal/MWF_fn_terminal_upload.sqf"; };
-            class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fn_terminal_disrupt.sqf"; };
+        class Compatibility {
+            file = "Missionframework/functions/compat";
+            class initInteractions { file = "Missionframework/functions/compat/MWF_fn_initInteractions.sqf"; };
+            class openBuildMenu { file = "Missionframework/functions/compat/MWF_fn_openBuildMenu.sqf"; };
+            class cleanupCurator { file = "Missionframework/functions/compat/MWF_fn_cleanupCurator.sqf"; };
+            class saveManager { file = "Missionframework/functions/compat/MWF_fn_saveManager.sqf"; };
         };
 
-        // --- NEW: GRAND OPERATIONS ---
+        class Misc {
+            file = "Missionframework/functions";
+            class addIntel { file = "Missionframework/functions/compat/MWF_fn_addIntel.sqf"; };
+            class checkUndercover { file = "Missionframework/functions/MWF_fnc_checkUndercover.sqf"; };
+            class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
+        };
+
+        class Terminal {
+            file = "Missionframework/functions/terminal";
+            class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
+            class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
+            class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
+        };
+
         class GrandOps {
             file = "Missionframework/MainOp";
             class op_skyGuardian { file = "Missionframework/MainOp/MWF_fn_op_skyGuardian.sqf"; };
@@ -114,6 +124,8 @@ class CfgFunctions {
             class discoverMissionTemplates { file = "Missionframework/missions/MWF_fn_discoverMissionTemplates.sqf"; };
             class executeMissionTemplate { file = "Missionframework/missions/MWF_fn_executeMissionTemplate.sqf"; };
             class generateInitialMission { file = "Missionframework/missions/MWF_fn_generateInitialMission.sqf"; };
+            class initMissionSystem { file = "Missionframework/missions/MWF_fn_initMissionSystem.sqf"; };
+            class refreshMissionBoard { file = "Missionframework/missions/MWF_fn_refreshMissionBoard.sqf"; };
         };
 
         class UI {
@@ -158,6 +170,29 @@ class CfgFunctions {
         class Presets {
             file = "Missionframework/functions/presets";
             class initPresets { file = "Missionframework/functions/presets/MWF_fn_initPresets.sqf"; };
+        };
+
+        class Infrastructure {
+            file = "Missionframework/functions/infrastructure";
+            class infrastructureManager { file = "Missionframework/functions/infrastructure/MWF_fn_infrastructureManager.sqf"; };
+            class intelManager { file = "Missionframework/functions/infrastructure/MWF_fn_intelManager.sqf"; };
+            class spawnManager { file = "Missionframework/functions/infrastructure/MWF_fn_spawnManager.sqf"; };
+        };
+
+        class Rebel {
+            file = "Missionframework/functions/rebel";
+            class rebelManager { file = "Missionframework/functions/rebel/MWF_fn_rebelManager.sqf"; };
+        };
+
+        class Reputation {
+            file = "Missionframework/functions/reputation";
+            class cityMonitor { file = "Missionframework/functions/reputation/MWF_fn_cityMonitor.sqf"; };
+            class civRep { file = "Missionframework/functions/reputation/MWF_fn_civRep.sqf"; };
+        };
+
+        class Interactions {
+            file = "Missionframework/functions/interactions";
+            class signalPlayer { file = "Missionframework/functions/interactions/MWF_fn_signalPlayer.sqf"; };
         };
     };
 };
