@@ -33,7 +33,8 @@ while {true} do {
             private _enemyCount = count (allUnits select {
                 alive _x &&
                 {side _x == east} &&
-                {(_x distance2D _zonePos) < _zoneRange}
+                {(_x distance2D _zonePos) < _zoneRange} &&
+                {!(_x getVariable ["MWF_isQRF", false])}
             });
 
             private _previousContested = _zone getVariable ["MWF_contested", false];
