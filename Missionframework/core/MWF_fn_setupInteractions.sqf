@@ -5,12 +5,19 @@
 
     Description:
     Handles setup interactions for the core framework layer.
-    For the MOB computer this now routes through the smart login bridge,
+    For the MOB computer this routes through the smart login bridge,
     so loaded campaigns do not get forced back into tutorial progression.
+
+    Flow:
+    1. Resolve the intended MOB computer object.
+    2. Add a single hold action once per object.
+    3. On completion, defer access routing to MWF_fnc_MOBComputerLogin.
 */
 
 params [["_object", objNull, [objNull]]];
 
+// Allow callers to omit the MOB terminal object. In that case, search near the
+// main respawn marker for the nearest recognized laptop/terminal class.
 if (isNull _object) then {
     private _mobPos = getMarkerPos "respawn_west";
     if !(_mobPos isEqualTo [0,0,0]) then {
