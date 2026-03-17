@@ -14,7 +14,6 @@ class CfgFunctions {
             file = "Missionframework/core";
             class zoneCapture { file = "Missionframework/core/MWF_fn_zoneCapture.sqf"; };
             class economy { file = "Missionframework/core/MWF_fn_economy.sqf"; };
-            class syncEconomyState { file = "Missionframework/core/MWF_fn_syncEconomyState.sqf"; };
             class presetManager { file = "Missionframework/core/MWF_fn_presetManager.sqf"; };
             class undercoverHandler { file = "Missionframework/core/MWF_fn_undercoverHandler.sqf"; };
             class initGlobals { file = "Missionframework/core/MWF_fn_initGlobals.sqf"; };
@@ -166,10 +165,7 @@ class CfgFunctions {
         class Persistence {
             file = "Missionframework/functions/persistence";
             class initPersistence { file = "Missionframework/functions/persistence/MWF_fn_initPersistence.sqf"; };
-            class initCampaignAnalytics { file = "Missionframework/functions/persistence/MWF_fn_initCampaignAnalytics.sqf"; };
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
-            class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
-            class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
         };
@@ -195,6 +191,7 @@ class CfgFunctions {
             file = "Missionframework/functions/reputation";
             class cityMonitor { file = "Missionframework/functions/reputation/MWF_fn_cityMonitor.sqf"; };
             class civRep { file = "Missionframework/functions/reputation/MWF_fn_civRep.sqf"; };
+            class handleCivilianCasualty { file = "Missionframework/functions/reputation/MWF_fn_handleCivilianCasualty.sqf"; };
         };
 
         class Interactions {

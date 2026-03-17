@@ -48,6 +48,10 @@ addMissionEventHandler ["EntityKilled", {
             };
             case civilian: {
                 [_uid, _name, "CIVILIANS_KILLED", 1] call MWF_fnc_recordCampaignEvent;
+
+                if (!isNil "MWF_fnc_handleCivilianCasualty") then {
+                    [_killed, _actor, _uid, _name] call MWF_fnc_handleCivilianCasualty;
+                };
             };
         };
 

@@ -22,7 +22,6 @@ private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missio
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
-private _productionBonus = missionNamespace getVariable ["MWF_ProductionBonus", missionNamespace getVariable ["MWF_CapturedFactoryCount", 0]];
 private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
 private _boughtVehicles = [];
@@ -54,8 +53,8 @@ profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
 profileNamespace setVariable ["MWF_Save_CivRep_State", _civRep];
 profileNamespace setVariable ["MWF_Save_Notoriety_State", _notoriety];
-profileNamespace setVariable ["MWF_Save_ProductionBonus", _productionBonus];
 profileNamespace setVariable ["MWF_Save_RepPenalties", missionNamespace getVariable ["MWF_RepPenaltyCount", 0]];
+profileNamespace setVariable ["MWF_Save_CivilianCasualties", missionNamespace getVariable ["MWF_CivilianCasualties", 0]];
 profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVariable ["MWF_DestroyedHQs", []]];
 profileNamespace setVariable ["MWF_Save_DestroyedRoadblocks", missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]];
 profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MWF_CurrentTier", 1]];

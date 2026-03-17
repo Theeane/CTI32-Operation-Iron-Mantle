@@ -23,6 +23,7 @@ missionNamespace setVariable ["MWF_FOBsRestored", missionNamespace getVariable [
 missionNamespace setVariable ["MWF_FixedInfrastructure", missionNamespace getVariable ["MWF_FixedInfrastructure", []], true];
 missionNamespace setVariable ["MWF_completedMissions", missionNamespace getVariable ["MWF_completedMissions", []], true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", missionNamespace getVariable ["MWF_RepPenaltyCount", 0], true];
+missionNamespace setVariable ["MWF_CivilianCasualties", missionNamespace getVariable ["MWF_CivilianCasualties", 0], true];
 missionNamespace setVariable ["MWF_CurrentTier", missionNamespace getVariable ["MWF_CurrentTier", 1], true];
 missionNamespace setVariable ["MWF_AuthenticatedPlayers", missionNamespace getVariable ["MWF_AuthenticatedPlayers", []], true];
 missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];

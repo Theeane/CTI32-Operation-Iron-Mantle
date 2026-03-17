@@ -71,6 +71,14 @@ if (isNil { missionNamespace getVariable "MWF_CivRep" }) then {
     missionNamespace setVariable ["MWF_CivRep", _startCivRep, true];
 };
 
+if (isNil { missionNamespace getVariable "MWF_CivRep_Penalty_CivilianDeath" }) then {
+    missionNamespace setVariable ["MWF_CivRep_Penalty_CivilianDeath", 2, true];
+};
+
+if (isNil { missionNamespace getVariable "MWF_CivilianCasualties" }) then {
+    missionNamespace setVariable ["MWF_CivilianCasualties", 0, true];
+};
+
 if (isNil { missionNamespace getVariable "MWF_ProductionBonus" }) then {
     missionNamespace setVariable ["MWF_ProductionBonus", 0, true];
 };
