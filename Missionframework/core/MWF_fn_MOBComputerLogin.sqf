@@ -4,24 +4,14 @@
     Project: Military War Framework
 
     Description:
-    Smart login bridge for the MOB computer.
-    Routes the player into the correct early-game path after restart/load:
-    - Stage 1: No FOBs -> deploy FOB quest
-    - Stage 2: FOB exists but supplies below threshold -> supply quest
-    - Stage 3+: FOB exists and supplies threshold met -> full terminal access
+    Smart MOB computer login gate.
+    Uses persistent campaign milestones instead of current supply totals so players
+    do not get forced back into old tutorial gates after a save/load.
 
-    Notes:
-    - Authentication is intentionally session-scoped and player-scoped.
-    - This function does NOT persist login state across restarts.
-    - The goal is to bypass incorrect tutorial rerouting on a loaded campaign,
-      not to create permanent account-style authentication.
-
-    Parameters:
-    0: _target <OBJECT> MOB computer / terminal object
-    1: _caller <OBJECT> player using the hold action
-
-    Returns:
-    <BOOL> True when full terminal access was granted, otherwise false.
+    Stage model:
+    - Stage 1: Deploy FOB gate
+    - Stage 2: Complete initial supply run gate
+    - Stage 3+: Full terminal access / normal campaign flow
 */
 
 params [
@@ -30,27 +20,41 @@ params [
 ];
 
 if (isNull _caller) exitWith { false };
-if (!local _caller && {hasInterface}) exitWith { false };
+if (!hasInterface) exitWith { false };
+if (!local _caller) exitWith { false };
 
 private _hasCampaignSave = missionNamespace getVariable ["MWF_HasCampaignSave", false];
 private _fobRegistry = + (missionNamespace getVariable ["MWF_FOB_Registry", []]);
 private _hasFOB = (count _fobRegistry) > 0;
-private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-private _threshold = 1000;
+private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
 private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
 
 private _showPlayerUI = {
     if (!hasInterface) exitWith {};
     cutRsc ["MWF_ResourceBar", "PLAIN"];
-    [] spawn MWF_fnc_updateResourceUI;
+    if (!isNil "MWF_fnc_updateResourceUI") then {
+        [] spawn MWF_fnc_updateResourceUI;
+    };
+};
+
+private _requestInitialMission = {
+    params [["_stage", 1, [0]]];
+    if (isServer) then {
+        [_stage] spawn MWF_fnc_generateInitialMission;
+    } else {
+        [_stage] remoteExec ["MWF_fnc_generateInitialMission", 2];
+    };
 };
 
 private _grantTerminalAccess = {
     params ["_terminal", "_player"];
 
-    // Player variable is the source of truth for terminal authentication.
     _player setVariable ["MWF_Player_Authenticated", true, true];
     missionNamespace setVariable ["MWF_system_active", true, true];
+
+    if (_currentStage < 3) then {
+        missionNamespace setVariable ["MWF_current_stage", 3, true];
+    };
 
     call _showPlayerUI;
 
@@ -59,67 +63,65 @@ private _grantTerminalAccess = {
             ["INIT_SCROLL", _terminal] call MWF_fnc_terminal_main;
             ["INIT_ACE", _terminal] call MWF_fnc_terminal_main;
         } else {
-            diag_log "[MWF MOB Login] terminal_main missing during terminal grant. UI auth succeeded but terminal init was skipped.";
+            diag_log "[MWF Login] Warning: terminal_main not loaded during MOB login grant.";
         };
     };
 
-    ["ACCESS GRANTED", "Command Network access verified. Full terminal access available."] call MWF_fnc_showNotification;
-    systemChat "Command Network login complete. Full terminal access granted.";
+    [
+        ["COMMAND NETWORK", "Authentication successful. Terminal access granted."],
+        "success"
+    ] call MWF_fnc_showNotification;
+
+    systemChat "Command Network login accepted.";
     true
 };
 
-private _requestInitialMission = {
-    params ["_stage"];
-
-    if (isServer) then {
-        [_stage] spawn MWF_fnc_generateInitialMission;
-    } else {
-        [_stage] remoteExec ["MWF_fnc_generateInitialMission", 2];
-    };
-};
-
-// Reset player-scoped auth until the correct route is confirmed.
+/* Session-scoped auth. Players may need to log in again after restart, but
+   tutorial gating should no longer repeat once milestones are completed. */
 _caller setVariable ["MWF_Player_Authenticated", false, true];
+missionNamespace setVariable ["MWF_system_active", false, true];
 
-// Stage 1 gate: no FOB exists yet, so force the FOB deployment path.
+/* Gate 1: FOB must exist. */
 if (!_hasFOB) exitWith {
-    missionNamespace setVariable ["MWF_system_active", false, true];
     call _showPlayerUI;
 
     if (_currentStage != 1) then {
         [1] call _requestInitialMission;
     };
 
-    private _msg = if (_hasCampaignSave) then {
-        "Campaign save loaded, but no FOB is registered. Deploy a FOB before terminal access is granted."
+    if (_hasCampaignSave) then {
+        [
+            ["COMMAND NETWORK", "No active FOB detected. Deploy a FOB before terminal access can be granted."],
+            "warning"
+        ] call MWF_fnc_showNotification;
     } else {
-        "No FOB found. Deploy your first FOB to unlock the command network."
+        [
+            ["COMMAND NETWORK", "Deploy your first FOB to unlock the Command Network terminal."],
+            "warning"
+        ] call MWF_fnc_showNotification;
     };
 
-    ["LOGIN ROUTED", _msg] call MWF_fnc_showNotification;
-    systemChat _msg;
+    systemChat "Terminal locked: Deploy a FOB first.";
     false
 };
 
-// Stage 2 gate: FOB exists, but the early logistics threshold has not been met yet.
-if (_supplies < _threshold) exitWith {
-    missionNamespace setVariable ["MWF_system_active", false, true];
+/* Gate 2: Player must have completed the initial supply-run milestone.
+   This is history-driven, not supply-amount-driven, so access stays unlocked
+   permanently once the player has proved they can complete the logistics step. */
+if (!_supplyRunDone) exitWith {
     call _showPlayerUI;
 
-    if (_currentStage < 2) then {
+    if (_currentStage != 2) then {
         [2] call _requestInitialMission;
     };
 
-    private _msg = format [
-        "FOB online, but logistics are below %1 supplies (%2 available). Complete the supply quest before full terminal access.",
-        _threshold,
-        _supplies
-    ];
+    [
+        ["COMMAND NETWORK", "Complete the initial supply run to unlock permanent terminal access."],
+        "warning"
+    ] call MWF_fnc_showNotification;
 
-    ["LOGIN ROUTED", _msg] call MWF_fnc_showNotification;
-    systemChat _msg;
+    systemChat "Terminal locked: Complete the initial supply run milestone.";
     false
 };
 
-// Stage 3+: campaign state is healthy enough to allow normal terminal usage.
 [_target, _caller] call _grantTerminalAccess
