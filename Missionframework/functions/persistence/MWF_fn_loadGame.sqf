@@ -110,4 +110,4 @@ missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", false, tr
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
-diag_log format ["[MWF] Campaign state restored. Pending saved zones: %1. Pending vehicles: %2. Pending side missions: %3. Existing campaign save: %4.", count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]), count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]), count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]), _hasCampaignSave];
+diag_log format ["[MWF] Campaign state restored. Pending saved zones: %1 | Pending vehicles: %2 | Pending active missions: %3 | Existing campaign save: %4.", count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]), count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]), count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]), _hasCampaignSave];
