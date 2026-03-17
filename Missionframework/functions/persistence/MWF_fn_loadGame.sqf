@@ -103,6 +103,7 @@ private _supplies = [profileNamespace getVariable ["MWF_Save_Supplies", _lockedS
 private _intel = [profileNamespace getVariable ["MWF_Save_Intel", 0], 0, 50000, 0] call _clampNumber;
 private _civRepState = [profileNamespace getVariable ["MWF_Save_CivRep_State", _lockedCivRep], -1000, 1000, _lockedCivRep] call _clampNumber;
 private _notoriety = [profileNamespace getVariable ["MWF_Save_Notoriety_State", 0], 0, 1000, 0] call _clampNumber;
+private _productionBonus = [profileNamespace getVariable ["MWF_Save_ProductionBonus", missionNamespace getVariable ["MWF_CapturedFactoryCount", 0]], 0, 1000, 0] call _clampNumber;
 
 if (!isNil "MWF_fnc_syncEconomyState") then {
     [_supplies, _intel, _notoriety, true, false] call MWF_fnc_syncEconomyState;
@@ -118,6 +119,7 @@ if (!isNil "MWF_fnc_syncEconomyState") then {
 };
 
 missionNamespace setVariable ["MWF_CivRep", _civRepState, true];
+missionNamespace setVariable ["MWF_ProductionBonus", _productionBonus, true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", [profileNamespace getVariable ["MWF_Save_RepPenalties", 0], 0, 100000, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];

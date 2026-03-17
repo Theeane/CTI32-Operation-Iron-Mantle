@@ -32,7 +32,6 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
     private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
     private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
     private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
-    private _productionBonus = missionNamespace getVariable ["MWF_ProductionBonus", 0];
 
     switch (_zoneType) do {
         case "capital": {
@@ -41,7 +40,6 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
         };
         case "factory": {
             _supplies = _supplies + 200;
-            _productionBonus = _productionBonus + 1;
         };
         case "military": {
             _intel = _intel + 10;
@@ -55,7 +53,6 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
     private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
     [_supplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
     missionNamespace setVariable ["MWF_CivRep", _civRep, true];
-    missionNamespace setVariable ["MWF_ProductionBonus", _productionBonus, true];
 
     [format ["%1 secured. %2", _zoneName, _reason]] remoteExec ["systemChat", 0];
 };

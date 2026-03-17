@@ -23,6 +23,7 @@ private _keys = [
     "MWF_Save_Intel",
     "MWF_Save_CivRep_State",
     "MWF_Save_Notoriety_State",
+    "MWF_Save_ProductionBonus",
     "MWF_Save_RepPenalties",
     "MWF_Save_DestroyedHQs",
     "MWF_Save_DestroyedRoadblocks",

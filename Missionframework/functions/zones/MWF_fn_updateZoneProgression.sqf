@@ -41,6 +41,7 @@ missionNamespace setVariable ["MWF_CapturedZoneCount", _capturedCount, true];
 missionNamespace setVariable ["MWF_CapturedTownCount", _capturedTowns, true];
 missionNamespace setVariable ["MWF_CapturedCapitalCount", _capturedCapitals, true];
 missionNamespace setVariable ["MWF_CapturedFactoryCount", _capturedFactories, true];
+missionNamespace setVariable ["MWF_ProductionBonus", _capturedFactories, true];
 missionNamespace setVariable ["MWF_CapturedMilitaryCount", _capturedMilitary, true];
 missionNamespace setVariable ["MWF_MapControlPercent", _mapControl, true];
 

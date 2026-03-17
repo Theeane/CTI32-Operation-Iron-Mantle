@@ -36,15 +36,19 @@ while {true} do {
     uiSleep _sleepTime;
 
     private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
-    private _incomeSupplies = 0;
+    private _baseIncomeSupplies = 0;
+    private _factoryBonusIncome = 0;
     private _activeZonesCount = 0;
     private _underAttackCount = 0;
+    private _activeFactoryCount = 0;
+    private _disabledFactoryCount = 0;
 
     {
         private _zoneRef = _x;
         private _isMarkerZone = _zoneRef isEqualType "";
         private _isCaptured = false;
         private _isUnderAttack = false;
+        private _zoneType = "town";
 
         if (_isMarkerZone) then {
             private _markerName = _zoneRef;
@@ -54,22 +58,59 @@ while {true} do {
             if (!isNull _zoneRef) then {
                 _isCaptured = _zoneRef getVariable ["MWF_isCaptured", false];
                 _isUnderAttack = _zoneRef getVariable ["MWF_underAttack", false];
+                _zoneType = toLower (_zoneRef getVariable ["MWF_zoneType", "town"]);
             };
         };
 
         if (_isCaptured) then {
             if (!_isUnderAttack) then {
-                _incomeSupplies = _incomeSupplies + 5;
+                _baseIncomeSupplies = _baseIncomeSupplies + 5;
                 _activeZonesCount = _activeZonesCount + 1;
+
+                if (_zoneType isEqualTo "factory") then {
+                    _activeFactoryCount = _activeFactoryCount + 1;
+                };
             } else {
                 _underAttackCount = _underAttackCount + 1;
+
+                if (_zoneType isEqualTo "factory") then {
+                    _disabledFactoryCount = _disabledFactoryCount + 1;
+                };
             };
         };
     } forEach _allZones;
 
+    private _capturedFactoryCount = _activeFactoryCount + _disabledFactoryCount;
+    private _storedProductionBonus = missionNamespace getVariable ["MWF_ProductionBonus", missionNamespace getVariable ["MWF_CapturedFactoryCount", _capturedFactoryCount]];
+
+    if (_storedProductionBonus != _capturedFactoryCount) then {
+        missionNamespace setVariable ["MWF_ProductionBonus", _capturedFactoryCount, true];
+        _storedProductionBonus = _capturedFactoryCount;
+    };
+
+    private _onlineProductionBonus = 0 max (_storedProductionBonus - _disabledFactoryCount);
+    _factoryBonusIncome = _onlineProductionBonus * 5;
+
+    private _incomeSetting = missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", missionNamespace getVariable ["MWF_Param_IncomeMultiplier", 1]];
+    private _incomeMultiplier = switch (_incomeSetting) do {
+        case 0: { 0.5 };
+        case 2: { 2.0 };
+        default { 1.0 };
+    };
+
+    private _grossIncomeSupplies = _baseIncomeSupplies + _factoryBonusIncome;
+    private _incomeSupplies = round (_grossIncomeSupplies * _incomeMultiplier);
+
     if (_incomeSupplies > 0) then {
         [_incomeSupplies, "SUPPLIES"] call MWF_fnc_addResource;
-        [format ["Income received: +%1 Supplies.", _incomeSupplies]] remoteExec ["systemChat", 0];
+
+        private _incomeMessage = if (_onlineProductionBonus > 0) then {
+            format ["Income received: +%1 Supplies (%2 safe zones, %3 active factory production).", _incomeSupplies, _activeZonesCount, _onlineProductionBonus]
+        } else {
+            format ["Income received: +%1 Supplies.", _incomeSupplies]
+        };
+
+        [_incomeMessage] remoteExec ["systemChat", 0];
     };
 
     private _currentNotoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
@@ -84,9 +125,10 @@ while {true} do {
     [_loopSupplies, _loopIntel, _loopNotoriety, true, false] call MWF_fnc_syncEconomyState;
 
     diag_log format [
-        "[MWF Economy] Safe Zones: %1 | Under Attack: %2 | Income: +%3",
+        "[MWF Economy] Safe Zones: %1 | Under Attack: %2 | Factory Production: %3 | Income: +%4",
         _activeZonesCount,
         _underAttackCount,
+        _onlineProductionBonus,
         _incomeSupplies
     ];
 };
