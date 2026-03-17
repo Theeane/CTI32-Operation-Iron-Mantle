@@ -56,17 +56,6 @@ class CfgFunctions {
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
             class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
             class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
-            class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
-            class validateTerminalAccess { file = "Missionframework/functions/terminal/MWF_fnc_validateTerminalAccess.sqf"; };
-            class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
-            class getVehicleCatalog { file = "Missionframework/functions/terminal/MWF_fnc_getVehicleCatalog.sqf"; };
-            class getVehiclePlacementProfile { file = "Missionframework/functions/terminal/MWF_fnc_getVehiclePlacementProfile.sqf"; };
-            class beginVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_beginVehiclePlacement.sqf"; };
-            class updateVehicleGhost { file = "Missionframework/functions/terminal/MWF_fnc_updateVehicleGhost.sqf"; };
-            class validateVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_validateVehiclePlacement.sqf"; };
-            class confirmVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_confirmVehiclePlacement.sqf"; };
-            class cancelVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cancelVehiclePlacement.sqf"; };
-            class cleanupVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cleanupVehiclePlacement.sqf"; };
         };
 
         class GrandOps {
@@ -175,7 +164,7 @@ class CfgFunctions {
             file = "Missionframework/functions/persistence";
             class initPersistence { file = "Missionframework/functions/persistence/MWF_fn_initPersistence.sqf"; };
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
-            class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
+            class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
         };
