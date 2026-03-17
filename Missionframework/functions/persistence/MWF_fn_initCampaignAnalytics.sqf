@@ -39,6 +39,12 @@ addMissionEventHandler ["EntityKilled", {
     private _name = name _actor;
 
     if (_killed isKindOf "CAManBase") then {
+        if (_killed getVariable ["MWF_IsRebelLeader", false]) then {
+            if (!(_killed getVariable ["MWF_RebelLeaderResolved", false]) && {!isNil "MWF_fnc_fobAttackSystem"}) then {
+                ["START", _killed, _actor] spawn MWF_fnc_fobAttackSystem;
+            };
+        };
+
         switch (side group _killed) do {
             case east: {
                 [_uid, _name, "OPFOR_KILLED", 1] call MWF_fnc_recordCampaignEvent;

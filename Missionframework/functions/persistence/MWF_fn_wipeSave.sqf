@@ -4,8 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Handles wipe save for the persistence system, including campaign-persistent lobby params
-    and locked faction selections.
+    Handles wipe save for the persistence system, including campaign-persistent lobby params,
+    locked faction selections, rebel escalation state, and damaged FOB timers.
 */
 
 if (!isServer) exitWith {};
@@ -23,6 +23,7 @@ private _keys = [
     "MWF_Save_Intel",
     "MWF_Save_CivRep_State",
     "MWF_Save_Notoriety_State",
+    "MWF_Save_ProductionBonus",
     "MWF_Save_RepPenalties",
     "MWF_Save_CivilianCasualties",
     "MWF_Save_DestroyedHQs",
@@ -31,6 +32,14 @@ private _keys = [
     "MWF_Save_FOBs",
     "MWF_Save_Tier",
     "MWF_Save_Missions",
+    "MWF_Save_BoughtVehicles",
+    "MWF_Save_ActiveSideMissions",
+    "MWF_Save_Campaign_Phase",
+    "MWF_Save_Tutorial_SupplyRunDone",
+    "MWF_Save_RebelLeaderContext",
+    "MWF_Save_RebelLeaderSettlementCount",
+    "MWF_Save_FOBAttackState",
+    "MWF_Save_DamagedFOBs",
     "MWF_Save_StartSupplies",
     "MWF_Save_SupplyTimer",
     "MWF_Save_CivReputation",

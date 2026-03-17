@@ -5,7 +5,7 @@
 
     Description:
     Authoritative server boot chain.
-    Brings persistence, zones, world, threat, economy, and mission layers online
+    Brings persistence, zones, world, threat, economy, mission, FOB, and rebel layers online
     before exposing the framework as ready to clients.
 */
 
@@ -24,12 +24,23 @@ diag_log "[MWF] INFO: Server-side initialization started.";
 [] call MWF_fnc_initCampaignAnalytics;
 [] call MWF_fnc_presetManager;
 [] call MWF_fnc_restoreSession;
+[] call MWF_fnc_restoreFOBs;
 [] call MWF_fnc_spawnInitialFOBAsset;
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;
 [] call MWF_fnc_threatManager;
 [] spawn MWF_fnc_economy;
 [] call MWF_fnc_initMissionSystem;
+
+if (!isNil "MWF_fnc_rebelLeaderSystem") then {
+    ["RESTORE_PENDING"] call MWF_fnc_rebelLeaderSystem;
+};
+if (!isNil "MWF_fnc_fobAttackSystem") then {
+    ["RESTORE_PENDING"] call MWF_fnc_fobAttackSystem;
+};
+if (!isNil "MWF_fnc_fobDespawnSystem") then {
+    ["RESTORE_PENDING"] call MWF_fnc_fobDespawnSystem;
+};
 
 private _bootDeadline = diag_tickTime + 180;
 waitUntil {

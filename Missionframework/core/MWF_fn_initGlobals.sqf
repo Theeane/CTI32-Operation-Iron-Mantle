@@ -71,16 +71,12 @@ if (isNil { missionNamespace getVariable "MWF_CivRep" }) then {
     missionNamespace setVariable ["MWF_CivRep", _startCivRep, true];
 };
 
-if (isNil { missionNamespace getVariable "MWF_CivRep_Penalty_CivilianDeath" }) then {
-    missionNamespace setVariable ["MWF_CivRep_Penalty_CivilianDeath", 2, true];
+if (isNil { missionNamespace getVariable "MWF_ProductionBonus" }) then {
+    missionNamespace setVariable ["MWF_ProductionBonus", 0, true];
 };
 
 if (isNil { missionNamespace getVariable "MWF_CivilianCasualties" }) then {
     missionNamespace setVariable ["MWF_CivilianCasualties", 0, true];
-};
-
-if (isNil { missionNamespace getVariable "MWF_ProductionBonus" }) then {
-    missionNamespace setVariable ["MWF_ProductionBonus", 0, true];
 };
 
 if (isNil { missionNamespace getVariable "MWF_LoadedZoneSaveData" }) then {
@@ -104,6 +100,75 @@ if (isNil { missionNamespace getVariable "MWF_Tutorial_SupplyRunDone" }) then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", false, true];
 };
 
+/* Civilian reputation escalation / rebel leader defaults */
+missionNamespace setVariable [
+    "MWF_CivRep_Penalty_CivilianDeath",
+    missionNamespace getVariable ["MWF_CivRep_Penalty_CivilianDeath", 2],
+    true
+];
+missionNamespace setVariable [
+    "MWF_CivRep_Threshold_Rebel",
+    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30],
+    true
+];
+missionNamespace setVariable [
+    "MWF_RebelLeaderCost_Base",
+    missionNamespace getVariable ["MWF_RebelLeaderCost_Base", 30],
+    true
+];
+missionNamespace setVariable [
+    "MWF_RebelLeaderCost_Max",
+    missionNamespace getVariable ["MWF_RebelLeaderCost_Max", 1000],
+    true
+];
+missionNamespace setVariable [
+    "MWF_FOBRepairCostPercent",
+    missionNamespace getVariable ["MWF_FOBRepairCostPercent", 0.20],
+    true
+];
+missionNamespace setVariable [
+    "MWF_RebelLeaderAttackDuration",
+    missionNamespace getVariable ["MWF_RebelLeaderAttackDuration", 900],
+    true
+];
+missionNamespace setVariable [
+    "MWF_FOBDespawnGraceSeconds",
+    missionNamespace getVariable ["MWF_FOBDespawnGraceSeconds", 900],
+    true
+];
+
+if (isNil { missionNamespace getVariable "MWF_RebelLeaderSettlementCount" }) then {
+    missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", 0, true];
+};
+if (isNil { missionNamespace getVariable "MWF_RebelLeaderEventActive" }) then {
+    missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+};
+if (isNil { missionNamespace getVariable "MWF_ActiveRebelLeader" }) then {
+    missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+};
+if (isNil { missionNamespace getVariable "MWF_RebelLeaderContext" }) then {
+    missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_FOBAttackState" }) then {
+    missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
+};
+if (isNil { missionNamespace getVariable "MWF_DamagedFOBs" }) then {
+    missionNamespace setVariable ["MWF_DamagedFOBs", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_isUnderAttack" }) then {
+    missionNamespace setVariable ["MWF_isUnderAttack", false, true];
+};
+
+if (isNil { missionNamespace getVariable "MWF_PendingRebelLeaderContext" }) then {
+    missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_PendingFOBAttackState" }) then {
+    missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_PendingDamagedFOBs" }) then {
+    missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
+};
+
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
 
@@ -124,4 +189,9 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
     missionNamespace setVariable ["MWF_current_stage", 3, true];
 };
 
-diag_log format ["[MWF] Global state initialized. Campaign phase: %1.", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
+diag_log format [
+    "[MWF] Global state initialized. Campaign phase: %1 | Rebel threshold: %2 | Civilian penalty: -%3",
+    missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
+    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30],
+    missionNamespace getVariable ["MWF_CivRep_Penalty_CivilianDeath", 2]
+];

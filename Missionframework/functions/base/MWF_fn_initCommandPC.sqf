@@ -4,48 +4,40 @@
     Project: Military War Framework
 
     Description:
-    Handles init command p c for the base system.
+    Initializes the FOB command PC action set.
 */
 
 params [["_laptop", objNull, [objNull]]];
 
 if (isNull _laptop) exitWith {};
 
-// --- 1. INITIAL SETUP ---
-_laptop allowDamage false; // Laptop is invulnerable until the defense logic triggers damage
+_laptop allowDamage false;
 
-// --- 2. COMMAND MENU (Buy Menu / Logistics) ---
-// Condition: Only available when the base is NOT under attack
-private _condPeace = "!(missionNamespace getVariable ['MWF_isUnderAttack', false])";
+private _condPeace = "!(missionNamespace getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condDamaged = "_target getVariable ['MWF_FOB_IsDamaged', false]";
+private _condIntel = "(player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condAttack = "missionNamespace getVariable ['MWF_isUnderAttack', false]";
 
 _laptop addAction [
-    "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>", 
+    "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>",
     {
         params ["_target", "_caller"];
-        // Opens the UI for buying vehicles, upgrades, and managing the base
-        [_target, _caller] spawn MWF_fnc_openBuyMenu; 
+        [_target, _caller] spawn MWF_fnc_openBuyMenu;
     },
     nil, 6, true, true, "", _condPeace
 ];
 
-// --- 3. INTEL UPLOAD ---
-// Transfers Temp Intel (Digital Currency) from player to HQ Bank
-private _condIntel = "(player getVariable ['MWF_carriedIntelValue', 0]) > 0";
-
 _laptop addAction [
-    "<t color='#00FFFF'>[ UPLOAD SECURED INTEL ]</t>", 
+    "<t color='#00FFFF'>[ UPLOAD SECURED INTEL ]</t>",
     {
         params ["_target", "_caller"];
-        // Process the deposit and clear player's temp intel
         [_target, _caller] call MWF_fnc_depositIntel;
     },
     nil, 10, true, true, "", _condIntel
 ];
 
-// --- 4. TIER UPGRADE (Direct Access) ---
-// Condition: Only shows if the base can be upgraded (handled inside the function)
 _laptop addAction [
-    "<t color='#FFFF00'>[ UPGRADE BASE TIER ]</t>", 
+    "<t color='#FFFF00'>[ UPGRADE BASE TIER ]</t>",
     {
         params ["_target", "_caller"];
         [_target, _caller] call MWF_fnc_upgradeBaseTier;
@@ -53,12 +45,9 @@ _laptop addAction [
     nil, 5, true, true, "", _condPeace
 ];
 
-// --- 5. MISSION BOARD ---
 _laptop addAction [
     "<t color='#66CCFF'>[ OPEN MISSION BOARD ]</t>",
-    {
-        [] spawn MWF_fnc_openMissionBoard;
-    },
+    { [] spawn MWF_fnc_openMissionBoard; },
     nil, 7, true, true, "", _condPeace
 ];
 
@@ -89,31 +78,32 @@ _laptop addAction [
     nil, 7, true, true, "", _condPeace
 ];
 
-// --- 6. LOCKDOWN NOTIFICATION ---
-// Visual feedback when the system is disabled due to combat
-private _condAttack = "missionNamespace getVariable ['MWF_isUnderAttack', false]";
-
 _laptop addAction [
-    "<t color='#FF0000'>[ SYSTEM LOCKDOWN - UNDER ATTACK ]</t>", 
-    {
-        hint "Critical Error: Command functions disabled during active engagement. Defend the perimeter!";
-    },
+    "<t color='#FF0000'>[ SYSTEM LOCKDOWN - UNDER ATTACK ]</t>",
+    { hint "Critical Error: Command functions disabled during active engagement. Defend the perimeter!"; },
     nil, 6, true, true, "", _condAttack, 5
 ];
 
-// --- 7. VISUALS & LOGGING ---
+_laptop addAction [
+    "<t color='#ff8800'>[ TERMINAL OFFLINE - REPAIR REQUIRED ]</t>",
+    {
+        params ["_target", "_caller"];
+        private _cost = _target getVariable ['MWF_FOB_RepairCost', 0];
+        hint format ["FOB terminal damaged. Repair cost: %1 Supplies.", _cost];
+    },
+    nil, 6, true, true, "", _condDamaged, 5
+];
+
 _laptop setObjectTextureGlobal [0, "A3\Structures_F\Items\Electronics\Data\Laptops_01_screen_CO.paa"];
 diag_log "[KPIN] Command PC Initialized.";
 
-
-// --- 8. FOB REPACK CONTROL ---
 _laptop addAction [
     "<t color='#ffaa00'>[ AUTHORIZE FOB REPACK ]</t>",
     {
         params ["_target", "_caller"];
         [_target, true] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", "!(_target getVariable ['MWF_FOB_CanRepack', false])"
+    nil, 4, true, true, "", "!(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ];
 
 _laptop addAction [
@@ -122,7 +112,7 @@ _laptop addAction [
         params ["_target", "_caller"];
         [_target, false] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", "_target getVariable ['MWF_FOB_CanRepack', false]"
+    nil, 4, true, true, "", "_target getVariable ['MWF_FOB_CanRepack', false] && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ];
 
 [_laptop] call MWF_fnc_packFOB;

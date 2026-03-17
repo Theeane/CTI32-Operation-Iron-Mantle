@@ -4,9 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Saves strategic campaign state, normalized zone progression data, and all campaign-persistent
-    lobby params / faction selections.
-    Also persists the global campaign phase used for tutorial bypass.
+    Saves strategic campaign state, normalized zone progression data, campaign-persistent
+    lobby params, economy state, rebel escalation state, and damaged FOB timers.
 */
 
 if (!isServer) exitWith {};
@@ -22,6 +21,7 @@ private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missio
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+private _productionBonus = missionNamespace getVariable ["MWF_ProductionBonus", 0];
 private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
 private _boughtVehicles = [];
@@ -41,6 +41,44 @@ private _boughtVehicles = [];
 
 private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
 
+private _leaderContext = if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) then {
+    + (missionNamespace getVariable ["MWF_RebelLeaderContext", []])
+} else {
+    []
+};
+
+private _attackState = missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]];
+private _savedAttackState = [];
+if ((_attackState param [0, "idle"]) isEqualTo "active") then {
+    private _remaining = ((_attackState param [4, -1]) - diag_tickTime) max 0;
+    if (_remaining > 0) then {
+        _savedAttackState = [
+            "active",
+            _attackState param [1, []],
+            _attackState param [2, ""],
+            _attackState param [3, ""],
+            _remaining
+        ];
+    };
+};
+
+private _damagedFOBs = [];
+{
+    _x params [
+        ["_posASL", [], [[]]],
+        ["_displayName", "", [""]],
+        ["_marker", "", [""]],
+        ["_deadline", -1, [0]],
+        ["_repairCost", 0, [0]],
+        ["_originType", "TRUCK", [""]]
+    ];
+
+    private _remaining = (_deadline - diag_tickTime) max 0;
+    if (_remaining > 0) then {
+        _damagedFOBs pushBack [_posASL, _displayName, _marker, _remaining, _repairCost, _originType];
+    };
+} forEach (missionNamespace getVariable ["MWF_DamagedFOBs", []]);
+
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
 profileNamespace setVariable ["MWF_Save_CapturedZoneCount", missionNamespace getVariable ["MWF_CapturedZoneCount", 0]];
@@ -53,6 +91,7 @@ profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
 profileNamespace setVariable ["MWF_Save_CivRep_State", _civRep];
 profileNamespace setVariable ["MWF_Save_Notoriety_State", _notoriety];
+profileNamespace setVariable ["MWF_Save_ProductionBonus", _productionBonus];
 profileNamespace setVariable ["MWF_Save_RepPenalties", missionNamespace getVariable ["MWF_RepPenaltyCount", 0]];
 profileNamespace setVariable ["MWF_Save_CivilianCasualties", missionNamespace getVariable ["MWF_CivilianCasualties", 0]];
 profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVariable ["MWF_DestroyedHQs", []]];
@@ -65,8 +104,11 @@ profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
+profileNamespace setVariable ["MWF_Save_RebelLeaderContext", _leaderContext];
+profileNamespace setVariable ["MWF_Save_RebelLeaderSettlementCount", missionNamespace getVariable ["MWF_RebelLeaderSettlementCount", 0]];
+profileNamespace setVariable ["MWF_Save_FOBAttackState", _savedAttackState];
+profileNamespace setVariable ["MWF_Save_DamagedFOBs", _damagedFOBs];
 
-/* Persistent lobby params */
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
 profileNamespace setVariable ["MWF_Save_SupplyTimer", missionNamespace getVariable ["MWF_Locked_SupplyTimer", 10]];
 profileNamespace setVariable ["MWF_Save_CivReputation", missionNamespace getVariable ["MWF_Locked_CivReputation", 0]];
@@ -75,7 +117,6 @@ profileNamespace setVariable ["MWF_Save_BuildingMode", _buildingMode];
 profileNamespace setVariable ["MWF_Save_IncomeMultiplier", missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", 1]];
 profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable ["MWF_Locked_MaxFOBs", 5]];
 
-/* Faction locks */
 {
     private _prefix = _x;
     profileNamespace setVariable [format ["MWF_Save_%1Source", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1Source", _prefix], 0]];
@@ -88,27 +129,18 @@ profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable [
 private _zoneCount = count _zoneSaveData;
 private _vehicleCount = count _boughtVehicles;
 private _missionCount = count _activeSideMissions;
-
-private _zoneBytes = count toArray str _zoneSaveData;
-private _vehicleBytes = count toArray str _boughtVehicles;
-private _missionBytes = count toArray str _activeSideMissions;
-private _estimatedTotalBytes = _zoneBytes + _vehicleBytes + _missionBytes;
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 (~%4KB) | Vehicles: %5 (~%6KB) | Active Missions: %7 (~%8KB) | Est. Payload: ~%9KB.",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Missions: %5 | Leader Active: %6 | Damaged FOBs: %7 | Est. Payload: ~%8KB.",
     _reason,
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     _zoneCount,
-    round (_zoneBytes / 1024),
     _vehicleCount,
-    round (_vehicleBytes / 1024),
     _missionCount,
-    round (_missionBytes / 1024),
+    !(_leaderContext isEqualTo []),
+    count _damagedFOBs,
     round (_estimatedTotalBytes / 1024)
 ];
-
-if (_estimatedTotalBytes > 1000000) then {
-    diag_log format ["[MWF Save] WARNING: Estimated save payload exceeds 1MB (~%1KB).", round (_estimatedTotalBytes / 1024)];
-};

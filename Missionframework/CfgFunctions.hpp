@@ -36,6 +36,7 @@ class CfgFunctions {
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
             class MOBComputerLogin { file = "Missionframework/core/MWF_fn_MOBComputerLogin.sqf"; };
             class setCampaignPhase { file = "Missionframework/core/MWF_fn_setCampaignPhase.sqf"; };
+            class syncEconomyState { file = "Missionframework/core/MWF_fn_syncEconomyState.sqf"; };
         };
 
         class Compatibility {
@@ -58,6 +59,19 @@ class CfgFunctions {
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
             class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
             class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
+            class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
+            class terminal_redeploy { file = "Missionframework/functions/terminal/MWF_fnc_terminal_redeploy.sqf"; };
+            class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
+            class beginVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_beginVehiclePlacement.sqf"; };
+            class confirmVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_confirmVehiclePlacement.sqf"; };
+            class cancelVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cancelVehiclePlacement.sqf"; };
+            class cleanupVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cleanupVehiclePlacement.sqf"; };
+            class getVehicleCatalog { file = "Missionframework/functions/terminal/MWF_fnc_getVehicleCatalog.sqf"; };
+            class getVehiclePlacementProfile { file = "Missionframework/functions/terminal/MWF_fnc_getVehiclePlacementProfile.sqf"; };
+            class handleRedeployMapClick { file = "Missionframework/functions/terminal/MWF_fnc_handleRedeployMapClick.sqf"; };
+            class updateVehicleGhost { file = "Missionframework/functions/terminal/MWF_fnc_updateVehicleGhost.sqf"; };
+            class validateTerminalAccess { file = "Missionframework/functions/terminal/MWF_fnc_validateTerminalAccess.sqf"; };
+            class validateVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_validateVehiclePlacement.sqf"; };
         };
 
         class GrandOps {
@@ -168,6 +182,12 @@ class CfgFunctions {
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
+            class initCampaignAnalytics { file = "Missionframework/functions/persistence/MWF_fn_initCampaignAnalytics.sqf"; };
+            class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
+            class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
+            class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
+            class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
+            class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
         };
 
         class Presets {
@@ -185,6 +205,11 @@ class CfgFunctions {
         class Rebel {
             file = "Missionframework/functions/rebel";
             class rebelManager { file = "Missionframework/functions/rebel/MWF_fn_rebelManager.sqf"; };
+            class rebelLeaderSystem { file = "Missionframework/functions/rebel/MWF_fn_rebelLeaderSystem.sqf"; };
+            class rebelLeaderDialogue { file = "Missionframework/functions/rebel/MWF_fn_rebelLeaderDialogue.sqf"; };
+            class fobAttackSystem { file = "Missionframework/functions/rebel/MWF_fn_fobAttackSystem.sqf"; };
+            class fobRepairInteraction { file = "Missionframework/functions/rebel/MWF_fn_fobRepairInteraction.sqf"; };
+            class fobDespawnSystem { file = "Missionframework/functions/rebel/MWF_fn_fobDespawnSystem.sqf"; };
         };
 
         class Reputation {

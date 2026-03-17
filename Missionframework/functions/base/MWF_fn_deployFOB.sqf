@@ -73,6 +73,9 @@ _laptop setVariable ["MWF_isFOB", true, true];
 _laptop setVariable ["MWF_FOB_OriginType", _originType, true];
 _laptop setVariable ["MWF_isUnderAttack", false, true];
 _laptop setVariable ["MWF_FOB_CanRepack", false, true];
+_laptop setVariable ["MWF_FOB_IsDamaged", false, true];
+_laptop setVariable ["MWF_FOB_RepairCost", 0, true];
+_laptop setVariable ["MWF_FOB_DespawnDeadline", -1, true];
 _laptop allowDamage false;
 [_laptop] remoteExec ["MWF_fnc_initCommandPC", 0, true];
 
@@ -115,10 +118,29 @@ private _registration = [_laptop, _displayName, _originType, !_isRestore] call M
 private _markerName = _registration param [0, ""];
 private _resolvedName = _registration param [1, "FOB"];
 
+_laptop addEventHandler ["HandleDamage", {
+    params ["_unit", "_selection", "_damage", "_source", "_projectile"];
+
+    if (_unit getVariable ["MWF_FOB_IsDamaged", false]) exitWith {0.89};
+
+    if (_unit getVariable ["MWF_isUnderAttack", false]) then {
+        if (!isNil "MWF_fnc_fobAttackSystem") then {
+            ["HANDLE_DAMAGE", _unit, _damage, _source] call MWF_fnc_fobAttackSystem
+        } else {
+            _damage
+        }
+    } else {
+        0
+    };
+}];
+
 _laptop addEventHandler ["Killed", {
     params ["_unit"];
     [_unit] spawn {
         params ["_terminal"];
+
+        if (_terminal getVariable ["MWF_FOB_IsDamaged", false]) exitWith {};
+
         [_terminal, "", true] call MWF_fnc_unregisterFOB;
 
         {
