@@ -23,6 +23,7 @@ private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
+
 private _boughtVehicles = [];
 {
     if (!isNull _x && {alive _x} && {_x getVariable ["MWF_isBought", false]}) then {
@@ -39,6 +40,8 @@ private _boughtVehicles = [];
 } forEach vehicles;
 
 private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
+private _authenticatedPlayers = + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []]);
+private _campaignAnalytics = + (missionNamespace getVariable ["MWF_Campaign_Analytics", []]);
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
@@ -61,6 +64,9 @@ profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
+profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
+profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", _authenticatedPlayers];
+profileNamespace setVariable ["MWF_Save_CampaignAnalytics", _campaignAnalytics];
 
 /* Persistent lobby params */
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
@@ -81,6 +87,35 @@ profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable [
     profileNamespace setVariable [format ["MWF_Save_%1File", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1File", _prefix], ""]];
 } forEach ["Blufor", "Opfor", "Resistance", "Civs"];
 
+private _zoneCount = count _zoneSaveData;
+private _vehicleCount = count _boughtVehicles;
+private _missionCount = count _activeSideMissions;
+private _authCount = count _authenticatedPlayers;
+private _analyticsCount = count _campaignAnalytics;
+
+private _zoneBytes = count toArray str _zoneSaveData;
+private _vehicleBytes = count toArray str _boughtVehicles;
+private _missionBytes = count toArray str _activeSideMissions;
+private _authBytes = count toArray str _authenticatedPlayers;
+private _analyticsBytes = count toArray str _campaignAnalytics;
+private _estimatedTotalBytes = _zoneBytes + _vehicleBytes + _missionBytes + _authBytes + _analyticsBytes;
+
 saveProfileNamespace;
 
-diag_log format ["[MWF] Game saved (%1). Zones saved: %2. Bought vehicles: %3. Active side missions: %4.", _reason, count _zoneSaveData, count _boughtVehicles, count _activeSideMissions];
+diag_log format [
+    "[MWF] Game saved (%1). Zones: %2 (~%3KB) | Vehicles: %4 (~%5KB) | Active Missions: %6 (~%7KB) | Auth Players: %8 | Analytics Rows: %9 | Est. Payload: ~%10KB.",
+    _reason,
+    _zoneCount,
+    round (_zoneBytes / 1024),
+    _vehicleCount,
+    round (_vehicleBytes / 1024),
+    _missionCount,
+    round (_missionBytes / 1024),
+    _authCount,
+    _analyticsCount,
+    round (_estimatedTotalBytes / 1024)
+];
+
+if (_estimatedTotalBytes > 1000000) then {
+    diag_log format ["[MWF Save] WARNING: Estimated save payload exceeds 1MB (~%1KB).", round (_estimatedTotalBytes / 1024)];
+};

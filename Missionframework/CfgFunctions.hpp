@@ -34,7 +34,6 @@ class CfgFunctions {
             class zoneManager { file = "Missionframework/core/MWF_fn_zoneManager.sqf"; };
             class addResource { file = "Missionframework/core/MWF_fn_addResource.sqf"; };
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
-            class MOBComputerLogin { file = "Missionframework/core/MWF_fn_MOBComputerLogin.sqf"; };
         };
 
         class Compatibility {
@@ -57,6 +56,17 @@ class CfgFunctions {
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
             class terminal_upload { file = "Missionframework/functions/terminal/MWF_fnc_terminal_upload.sqf"; };
             class terminal_disrupt { file = "Missionframework/functions/terminal/MWF_fnc_terminal_disrupt.sqf"; };
+            class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
+            class validateTerminalAccess { file = "Missionframework/functions/terminal/MWF_fnc_validateTerminalAccess.sqf"; };
+            class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
+            class getVehicleCatalog { file = "Missionframework/functions/terminal/MWF_fnc_getVehicleCatalog.sqf"; };
+            class getVehiclePlacementProfile { file = "Missionframework/functions/terminal/MWF_fnc_getVehiclePlacementProfile.sqf"; };
+            class beginVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_beginVehiclePlacement.sqf"; };
+            class updateVehicleGhost { file = "Missionframework/functions/terminal/MWF_fnc_updateVehicleGhost.sqf"; };
+            class validateVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_validateVehiclePlacement.sqf"; };
+            class confirmVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_confirmVehiclePlacement.sqf"; };
+            class cancelVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cancelVehiclePlacement.sqf"; };
+            class cleanupVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cleanupVehiclePlacement.sqf"; };
         };
 
         class GrandOps {
@@ -163,9 +173,14 @@ class CfgFunctions {
 
         class Persistence {
             file = "Missionframework/functions/persistence";
+            class initCampaignAnalytics { file = "Missionframework/functions/persistence/MWF_fn_initCampaignAnalytics.sqf"; };
             class initPersistence { file = "Missionframework/functions/persistence/MWF_fn_initPersistence.sqf"; };
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
+            class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
+            class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
+            class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
+            class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
         };
 

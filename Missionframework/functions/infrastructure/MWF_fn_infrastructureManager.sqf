@@ -23,7 +23,9 @@ if (_mode == "INIT") exitWith {
         params [
             ["_type", "ROADBLOCK", [""]],
             ["_position", [], [[]]],
-            ["_objectNetId", "", [""]]
+            ["_objectNetId", "", [""]],
+            ["_destroyerUid", "", [""]],
+            ["_destroyerName", "Unknown", [""]]
         ];
 
         private _normalizedType = toUpper _type;
@@ -56,6 +58,10 @@ if (_mode == "INIT") exitWith {
             };
         };
 
+        if (_destroyerUid isNotEqualTo "" && {!isNil "MWF_fnc_recordCampaignEvent"}) then {
+            [_destroyerUid, _destroyerName, "HQ_ROADBLOCKS_DESTROYED", 1] call MWF_fnc_recordCampaignEvent;
+        };
+
         if (!isNil "MWF_fnc_saveGame") then {
             ["Infrastructure Destroyed"] call MWF_fnc_saveGame;
         };
@@ -85,9 +91,24 @@ if (_mode == "REGISTER") exitWith {
     };
 
     _object addEventHandler ["Killed", {
-        params ["_unit"];
+        params ["_unit", "_killer", "_instigator"];
         private _type = _unit getVariable ["MWF_InfraType", "ROADBLOCK"];
-        ["MWF_Infra_Destroyed", [_type, getPosWorld _unit, netId _unit]] call CBA_fnc_serverEvent;
+
+        private _actor = if (!isNull _instigator) then { _instigator } else { _killer };
+        if (!isNull _actor && {!isPlayer _actor}) then {
+            private _veh = vehicle _actor;
+            if (!isNull _veh) then {
+                private _cmd = effectiveCommander _veh;
+                if (!isNull _cmd && {isPlayer _cmd}) then {
+                    _actor = _cmd;
+                };
+            };
+        };
+
+        private _uid = if (!isNull _actor && {isPlayer _actor}) then { getPlayerUID _actor } else { "" };
+        private _name = if (!isNull _actor && {isPlayer _actor}) then { name _actor } else { "Unknown" };
+
+        ["MWF_Infra_Destroyed", [_type, getPosWorld _unit, netId _unit, _uid, _name]] call CBA_fnc_serverEvent;
     }];
 
     diag_log format ["[MWF INFRA] Registered %1 at %2.", _normalizedType, getPosWorld _object];

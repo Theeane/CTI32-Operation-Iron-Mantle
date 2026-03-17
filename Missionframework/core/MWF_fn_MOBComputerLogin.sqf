@@ -28,6 +28,9 @@ private _fobRegistry = + (missionNamespace getVariable ["MWF_FOB_Registry", []])
 private _hasFOB = (count _fobRegistry) > 0;
 private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
 private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
+private _uid = getPlayerUID _caller;
+private _authenticatedPlayers = + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []]);
+private _playerMilestoneAuthenticated = (_uid isNotEqualTo "" && {_uid in _authenticatedPlayers});
 
 private _showPlayerUI = {
     if (!hasInterface) exitWith {};
@@ -80,6 +83,20 @@ private _grantTerminalAccess = {
    tutorial gating should no longer repeat once milestones are completed. */
 _caller setVariable ["MWF_Player_Authenticated", false, true];
 missionNamespace setVariable ["MWF_system_active", false, true];
+
+/* Legacy compatibility: if an older campaign already passed the supply-run milestone
+   before per-player authentication existed, the first returning player may claim that
+   milestone once and become permanently authenticated for future logins. */
+if (!_playerMilestoneAuthenticated && _hasCampaignSave && _supplyRunDone && {(count _authenticatedPlayers) == 0} && {_uid isNotEqualTo ""}) then {
+    if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
+        [_uid] remoteExecCall ["MWF_fnc_registerAuthenticatedPlayer", 2];
+    };
+    _playerMilestoneAuthenticated = true;
+};
+
+if (_playerMilestoneAuthenticated) exitWith {
+    [_target, _caller] call _grantTerminalAccess
+};
 
 /* Gate 1: FOB must exist. */
 if (!_hasFOB) exitWith {

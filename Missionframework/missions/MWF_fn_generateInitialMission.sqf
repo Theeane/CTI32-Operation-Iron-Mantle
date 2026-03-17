@@ -9,7 +9,7 @@
 
 if (!isServer) exitWith {};
 
-params [["_stage", 1]];
+params [["_stage", 1], ["_completedBy", objNull, [objNull, ""]]];
 
 switch (_stage) do {
     case 1: {
@@ -56,6 +56,19 @@ switch (_stage) do {
 
     case 3: {
         ["task_supply_run", "SUCCEEDED"] call BIS_fnc_taskSetState;
+        missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
+
+        private _authSubject = _completedBy;
+        if ((_authSubject isEqualType objNull && {isNull _authSubject}) || {_authSubject isEqualType "" && {_authSubject isEqualTo ""}}) then {
+            private _livePlayers = allPlayers select { isPlayer _x };
+            if ((count _livePlayers) == 1) then {
+                _authSubject = _livePlayers # 0;
+            };
+        };
+
+        if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
+            [_authSubject] call MWF_fnc_registerAuthenticatedPlayer;
+        };
 
         private _basePos = getMarkerPos "MWF_base_marker";
         private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
