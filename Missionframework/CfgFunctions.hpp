@@ -34,6 +34,7 @@ class CfgFunctions {
             class zoneManager { file = "Missionframework/core/MWF_fn_zoneManager.sqf"; };
             class addResource { file = "Missionframework/core/MWF_fn_addResource.sqf"; };
             class showNotification { file = "Missionframework/core/MWF_fn_showNotification.sqf"; };
+            class MOBComputerLogin { file = "Missionframework/core/MWF_fn_MOBComputerLogin.sqf"; };
         };
 
         class Compatibility {
@@ -164,7 +165,6 @@ class CfgFunctions {
             file = "Missionframework/functions/persistence";
             class initPersistence { file = "Missionframework/functions/persistence/MWF_fn_initPersistence.sqf"; };
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
-            class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
         };
