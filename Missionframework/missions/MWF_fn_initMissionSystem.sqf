@@ -7,6 +7,10 @@
     Initializes the folder-driven rotating side mission framework.
     The system waits for zone, world, and threat foundations, discovers templates from folders,
     generates session-only placements, and rotates fixed mission board slots every 5 minutes.
+
+    OPEN_WAR bypass:
+    If the campaign phase is OPEN_WAR, tutorial gating is considered globally complete.
+    No tutorial progression should be auto-created during startup.
 */
 
 if (!isServer) exitWith {};
@@ -37,6 +41,12 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
         diag_log "[MWF Missions] Startup timeout reached before threat system reported ready. Continuing with current threat outputs.";
     };
 
+    if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
+        missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
+        missionNamespace setVariable ["MWF_current_stage", 3, true];
+        diag_log "[MWF Missions] OPEN_WAR detected on startup. Tutorial gating bypassed globally.";
+    };
+
     private _templates = [];
     if (!isNil "MWF_fnc_discoverMissionTemplates") then {
         _templates = [] call MWF_fnc_discoverMissionTemplates;
@@ -59,15 +69,24 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
         };
 
         private _pendingActiveMissions = + (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]);
+        private _successfulRestores = [];
+        private _failedRestores = [];
+
         if !(_pendingActiveMissions isEqualTo []) then {
             {
-                private _savedMissionKey = _x param [0, ""];
-                if (_savedMissionKey isNotEqualTo "") then {
+                private _missionData = +_x;
+                private _savedMissionKey = _missionData param [0, ""];
+
+                if (_savedMissionKey isEqualTo "") then {
+                    diag_log "[MWF Missions] Pending mission restore entry missing mission key. Will retry next boot.";
+                    _failedRestores pushBack _missionData;
+                } else {
                     private _registry = + (missionNamespace getVariable ["MWF_MissionTemplateRegistry", []]);
                     private _templateIndex = _registry findIf { (_x # 0) isEqualTo _savedMissionKey };
 
                     if (_templateIndex < 0) then {
-                        diag_log format ["[MWF Missions] Pending mission restore skipped. Template key not found: %1", _savedMissionKey];
+                        diag_log format ["[MWF Missions] Pending mission restore skipped. Template key not found: %1. Will retry next boot.", _savedMissionKey];
+                        _failedRestores pushBack _missionData;
                     } else {
                         private _template = + (_registry # _templateIndex);
                         _template params ["_missionKey", "_category", "_difficulty", "_missionId", "_missionPath"];
@@ -76,17 +95,17 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                         private _placementIndex = _placements findIf { (_x # 0) isEqualTo _missionKey };
 
                         if (_placementIndex < 0) then {
-                            diag_log format ["[MWF Missions] Pending mission restore skipped. Placement key not found: %1", _missionKey];
+                            diag_log format ["[MWF Missions] Pending mission restore skipped. Placement key not found: %1. Will retry next boot.", _missionKey];
+                            _failedRestores pushBack _missionData;
                         } else {
                             private _placement = + (_placements # _placementIndex);
                             _placement params ["_placementMissionKey", "_position", "_zoneId", "_zoneName"];
 
                             private _boardSlots = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
-                            private _slotIndex = _boardSlots findIf { (_x # 4) isEqualTo _missionKey };
-                            if (_slotIndex >= 0) then {
-                                _slotIndex = (_boardSlots # _slotIndex) # 0;
-                            } else {
-                                _slotIndex = -1;
+                            private _slotIndex = -1;
+                            private _slotEntryIndex = _boardSlots findIf { (_x # 4) isEqualTo _missionKey };
+                            if (_slotEntryIndex >= 0) then {
+                                _slotIndex = (_boardSlots # _slotEntryIndex) # 0;
                             };
 
                             private _slotData = [
@@ -103,14 +122,25 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                             ];
 
                             [_slotData, objNull, _category, _difficulty, _missionId] call MWF_fnc_executeMissionTemplate;
+
+                            private _missionRestored = ((missionNamespace getVariable ["MWF_ActiveSideMissions", []]) findIf {
+                                (_x # 0) isEqualTo _missionKey
+                            }) >= 0;
+
+                            if (_missionRestored) then {
+                                _successfulRestores pushBack _missionData;
+                            } else {
+                                diag_log format ["[MWF Missions] Mission execution failed for %1. Will retry next boot.", _missionKey];
+                                _failedRestores pushBack _missionData;
+                            };
                         };
                     };
                 };
             } forEach _pendingActiveMissions;
 
-            missionNamespace setVariable ["MWF_PendingActiveSideMissions", [], true];
+            missionNamespace setVariable ["MWF_PendingActiveSideMissions", _failedRestores, true];
             missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", true, true];
-            diag_log format ["[MWF Missions] Restored %1 pending active mission(s).", count _pendingActiveMissions];
+            diag_log format ["[MWF Missions] Restored %1 pending active mission(s). %2 failed and remain pending.", count _successfulRestores, count _failedRestores];
         };
 
         missionNamespace setVariable ["MWF_MissionSystemReady", true, true];

@@ -6,6 +6,11 @@
     Description:
     Initializes shared global state and synchronizes campaign-persistent parameter values.
     Faction preset loading is handled by MWF_fn_presetManager.
+
+    Campaign phase model:
+    - TUTORIAL   : FOB deployment gate
+    - SUPPLY_RUN : initial logistics gate
+    - OPEN_WAR   : sandbox campaign state, tutorial bypassed globally
 */
 
 if (!isServer) exitWith {};
@@ -83,6 +88,14 @@ if (isNil { missionNamespace getVariable "MWF_CapturedZoneCount" }) then {
     missionNamespace setVariable ["MWF_MapControlPercent", 0, true];
 };
 
+if (isNil { missionNamespace getVariable "MWF_Campaign_Phase" }) then {
+    missionNamespace setVariable ["MWF_Campaign_Phase", "TUTORIAL", true];
+};
+
+if (isNil { missionNamespace getVariable "MWF_Tutorial_SupplyRunDone" }) then {
+    missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", false, true];
+};
+
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
 
@@ -98,4 +111,9 @@ missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, t
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
 missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
 
-diag_log "[MWF] Global state initialized.";
+if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
+    missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
+    missionNamespace setVariable ["MWF_current_stage", 3, true];
+};
+
+diag_log format ["[MWF] Global state initialized. Campaign phase: %1.", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];

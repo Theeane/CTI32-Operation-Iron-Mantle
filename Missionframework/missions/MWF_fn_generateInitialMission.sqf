@@ -4,12 +4,17 @@
     Project: Military War Framework
 
     Description:
-    Handles mission logic for generate initial mission.
+    Handles tutorial-stage mission logic.
+
+    Global phase model:
+    - Stage 1: Deploy FOB
+    - Stage 2: Complete initial supply run
+    - Stage 3: Supply milestone complete; campaign can transition to OPEN_WAR on next MOB login
 */
 
 if (!isServer) exitWith {};
 
-params [["_stage", 1], ["_completedBy", objNull, [objNull, ""]]];
+params [["_stage", 1]];
 
 switch (_stage) do {
     case 1: {
@@ -39,7 +44,7 @@ switch (_stage) do {
             west,
             "task_supply_run",
             [
-                "We are low on resources. A supply crate has been located in a nearby village. Recover it to fund our first offensive.",
+                "We are low on resources. A supply crate has been located in a nearby village. Recover it to complete the logistics tutorial.",
                 "Conduct Supply Run",
                 ""
             ],
@@ -57,44 +62,16 @@ switch (_stage) do {
     case 3: {
         ["task_supply_run", "SUCCEEDED"] call BIS_fnc_taskSetState;
         missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
+        missionNamespace setVariable ["MWF_current_stage", 3, true];
 
-        private _authSubject = _completedBy;
-        if ((_authSubject isEqualType objNull && {isNull _authSubject}) || {_authSubject isEqualType "" && {_authSubject isEqualTo ""}}) then {
-            private _livePlayers = allPlayers select { isPlayer _x };
-            if ((count _livePlayers) == 1) then {
-                _authSubject = _livePlayers # 0;
+        if (!isNil "MWF_fnc_requestDelayedSave") then {
+            [] call MWF_fnc_requestDelayedSave;
+        } else {
+            if (!isNil "MWF_fnc_saveGame") then {
+                ["Tutorial Supply Milestone"] call MWF_fnc_saveGame;
             };
         };
 
-        if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
-            [_authSubject] call MWF_fnc_registerAuthenticatedPlayer;
-        };
-
-        private _basePos = getMarkerPos "MWF_base_marker";
-        private _allZones = missionNamespace getVariable ["MWF_all_mission_zones", []];
-        private _targetZone = [_allZones, _basePos] call BIS_fnc_nearestPosition;
-
-        if (!isNull _targetZone) then {
-            private _zoneName = _targetZone getVariable ["MWF_zoneName", "the nearest sector"];
-            private _zonePos = getPosWorld _targetZone;
-
-            [
-                west,
-                "task_initial_capture",
-                [
-                    format ["With the FOB and supplies secured, capture %1 to establish a permanent Supply Line.", _zoneName],
-                    "Secure First Sector",
-                    _zonePos
-                ],
-                _zonePos,
-                "CREATED",
-                5,
-                true,
-                "target",
-                true
-            ] call BIS_fnc_taskCreate;
-        };
-
-        missionNamespace setVariable ["MWF_current_stage", 3, true];
+        diag_log "[MWF Tutorial] Initial supply-run milestone complete. Waiting for MOB login to transition into OPEN_WAR.";
     };
 };

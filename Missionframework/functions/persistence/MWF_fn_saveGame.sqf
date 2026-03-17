@@ -6,6 +6,7 @@
     Description:
     Saves strategic campaign state, normalized zone progression data, and all campaign-persistent
     lobby params / faction selections.
+    Also persists the global campaign phase used for tutorial bypass.
 */
 
 if (!isServer) exitWith {};
@@ -23,7 +24,6 @@ private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
-
 private _boughtVehicles = [];
 {
     if (!isNull _x && {alive _x} && {_x getVariable ["MWF_isBought", false]}) then {
@@ -40,8 +40,6 @@ private _boughtVehicles = [];
 } forEach vehicles;
 
 private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
-private _authenticatedPlayers = + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []]);
-private _campaignAnalytics = + (missionNamespace getVariable ["MWF_Campaign_Analytics", []]);
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
@@ -64,9 +62,8 @@ profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
+profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
-profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", _authenticatedPlayers];
-profileNamespace setVariable ["MWF_Save_CampaignAnalytics", _campaignAnalytics];
 
 /* Persistent lobby params */
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
@@ -90,29 +87,24 @@ profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable [
 private _zoneCount = count _zoneSaveData;
 private _vehicleCount = count _boughtVehicles;
 private _missionCount = count _activeSideMissions;
-private _authCount = count _authenticatedPlayers;
-private _analyticsCount = count _campaignAnalytics;
 
 private _zoneBytes = count toArray str _zoneSaveData;
 private _vehicleBytes = count toArray str _boughtVehicles;
 private _missionBytes = count toArray str _activeSideMissions;
-private _authBytes = count toArray str _authenticatedPlayers;
-private _analyticsBytes = count toArray str _campaignAnalytics;
-private _estimatedTotalBytes = _zoneBytes + _vehicleBytes + _missionBytes + _authBytes + _analyticsBytes;
+private _estimatedTotalBytes = _zoneBytes + _vehicleBytes + _missionBytes;
 
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Game saved (%1). Zones: %2 (~%3KB) | Vehicles: %4 (~%5KB) | Active Missions: %6 (~%7KB) | Auth Players: %8 | Analytics Rows: %9 | Est. Payload: ~%10KB.",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 (~%4KB) | Vehicles: %5 (~%6KB) | Active Missions: %7 (~%8KB) | Est. Payload: ~%9KB.",
     _reason,
+    missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     _zoneCount,
     round (_zoneBytes / 1024),
     _vehicleCount,
     round (_vehicleBytes / 1024),
     _missionCount,
     round (_missionBytes / 1024),
-    _authCount,
-    _analyticsCount,
     round (_estimatedTotalBytes / 1024)
 ];
 

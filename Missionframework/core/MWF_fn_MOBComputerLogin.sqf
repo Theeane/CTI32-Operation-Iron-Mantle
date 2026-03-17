@@ -4,14 +4,13 @@
     Project: Military War Framework
 
     Description:
-    Smart MOB computer login gate.
-    Uses persistent campaign milestones instead of current supply totals so players
-    do not get forced back into old tutorial gates after a save/load.
+    Global campaign-phase-driven MOB computer login bridge.
+    Tutorial repetition is controlled by MWF_Campaign_Phase, not by individual players.
 
-    Stage model:
-    - Stage 1: Deploy FOB gate
-    - Stage 2: Complete initial supply run gate
-    - Stage 3+: Full terminal access / normal campaign flow
+    Phase behavior:
+    - TUTORIAL   -> show / re-request Stage 1 (Deploy FOB)
+    - SUPPLY_RUN -> show / re-request Stage 2 until the supply milestone is complete
+    - OPEN_WAR   -> full terminal access for any player after login hold action
 */
 
 params [
@@ -23,14 +22,9 @@ if (isNull _caller) exitWith { false };
 if (!hasInterface) exitWith { false };
 if (!local _caller) exitWith { false };
 
-private _hasCampaignSave = missionNamespace getVariable ["MWF_HasCampaignSave", false];
-private _fobRegistry = + (missionNamespace getVariable ["MWF_FOB_Registry", []]);
-private _hasFOB = (count _fobRegistry) > 0;
+private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
 private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
 private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
-private _uid = getPlayerUID _caller;
-private _authenticatedPlayers = + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []]);
-private _playerMilestoneAuthenticated = (_uid isNotEqualTo "" && {_uid in _authenticatedPlayers});
 
 private _showPlayerUI = {
     if (!hasInterface) exitWith {};
@@ -55,10 +49,6 @@ private _grantTerminalAccess = {
     _player setVariable ["MWF_Player_Authenticated", true, true];
     missionNamespace setVariable ["MWF_system_active", true, true];
 
-    if (_currentStage < 3) then {
-        missionNamespace setVariable ["MWF_current_stage", 3, true];
-    };
-
     call _showPlayerUI;
 
     if (!isNull _terminal) then {
@@ -79,66 +69,61 @@ private _grantTerminalAccess = {
     true
 };
 
-/* Session-scoped auth. Players may need to log in again after restart, but
-   tutorial gating should no longer repeat once milestones are completed. */
+/* Session-scoped terminal auth. The campaign phase is persistent; the login itself is not. */
 _caller setVariable ["MWF_Player_Authenticated", false, true];
 missionNamespace setVariable ["MWF_system_active", false, true];
 
-/* Legacy compatibility: if an older campaign already passed the supply-run milestone
-   before per-player authentication existed, the first returning player may claim that
-   milestone once and become permanently authenticated for future logins. */
-if (!_playerMilestoneAuthenticated && _hasCampaignSave && _supplyRunDone && {(count _authenticatedPlayers) == 0} && {_uid isNotEqualTo ""}) then {
-    if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
-        [_uid] remoteExecCall ["MWF_fnc_registerAuthenticatedPlayer", 2];
+switch (_campaignPhase) do {
+    case "TUTORIAL": {
+        call _showPlayerUI;
+
+        if (_currentStage != 1) then {
+            [1] call _requestInitialMission;
+        };
+
+        [
+            ["COMMAND NETWORK", "Deploy your first FOB to unlock the command terminal."],
+            "warning"
+        ] call MWF_fnc_showNotification;
+
+        systemChat "Terminal locked: Deploy FOB Alpha first.";
+        false
     };
-    _playerMilestoneAuthenticated = true;
-};
 
-if (_playerMilestoneAuthenticated) exitWith {
-    [_target, _caller] call _grantTerminalAccess
-};
+    case "SUPPLY_RUN": {
+        if (_supplyRunDone) then {
+            if (!isNil "MWF_fnc_setCampaignPhase") then {
+                ["OPEN_WAR", "MOB Login Unlock"] remoteExecCall ["MWF_fnc_setCampaignPhase", 2];
+            } else {
+                diag_log "[MWF Login] Warning: setCampaignPhase missing during OPEN_WAR unlock.";
+            };
 
-/* Gate 1: FOB must exist. */
-if (!_hasFOB) exitWith {
-    call _showPlayerUI;
+            [_target, _caller] call _grantTerminalAccess
+        } else {
+            call _showPlayerUI;
 
-    if (_currentStage != 1) then {
+            if (_currentStage != 2) then {
+                [2] call _requestInitialMission;
+            };
+
+            [
+                ["COMMAND NETWORK", "Complete the initial supply run to open the war and unlock the command terminal permanently."],
+                "warning"
+            ] call MWF_fnc_showNotification;
+
+            systemChat "Terminal locked: Complete the initial supply run milestone.";
+            false
+        };
+    };
+
+    case "OPEN_WAR": {
+        [_target, _caller] call _grantTerminalAccess
+    };
+
+    default {
+        diag_log format ["[MWF Login] Unknown campaign phase '%1'. Falling back to tutorial gate.", _campaignPhase];
+        call _showPlayerUI;
         [1] call _requestInitialMission;
+        false
     };
-
-    if (_hasCampaignSave) then {
-        [
-            ["COMMAND NETWORK", "No active FOB detected. Deploy a FOB before terminal access can be granted."],
-            "warning"
-        ] call MWF_fnc_showNotification;
-    } else {
-        [
-            ["COMMAND NETWORK", "Deploy your first FOB to unlock the Command Network terminal."],
-            "warning"
-        ] call MWF_fnc_showNotification;
-    };
-
-    systemChat "Terminal locked: Deploy a FOB first.";
-    false
 };
-
-/* Gate 2: Player must have completed the initial supply-run milestone.
-   This is history-driven, not supply-amount-driven, so access stays unlocked
-   permanently once the player has proved they can complete the logistics step. */
-if (!_supplyRunDone) exitWith {
-    call _showPlayerUI;
-
-    if (_currentStage != 2) then {
-        [2] call _requestInitialMission;
-    };
-
-    [
-        ["COMMAND NETWORK", "Complete the initial supply run to unlock permanent terminal access."],
-        "warning"
-    ] call MWF_fnc_showNotification;
-
-    systemChat "Terminal locked: Complete the initial supply run milestone.";
-    false
-};
-
-[_target, _caller] call _grantTerminalAccess

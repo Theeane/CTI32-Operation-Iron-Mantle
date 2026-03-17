@@ -6,6 +6,7 @@
     Description:
     Registers a live FOB terminal in the active registry, creates/refreshes its marker,
     and updates the strategic persistence list used by save/load, threat, and rebel systems.
+    The first successful FOB registration transitions the campaign from TUTORIAL to SUPPLY_RUN.
 */
 
 if (!isServer) exitWith {[]};
@@ -58,6 +59,10 @@ _fobPosList = _fobPosList select {
 };
 _fobPosList pushBack [_posAsl, getDir _terminal, _displayName, _originType];
 missionNamespace setVariable ["MWF_FOB_Positions", _fobPosList, true];
+
+if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "TUTORIAL") then {
+    ["SUPPLY_RUN", format ["FOB Registered: %1", _displayName]] call MWF_fnc_setCampaignPhase;
+};
 
 if (_requestSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {
     [] call MWF_fnc_requestDelayedSave;

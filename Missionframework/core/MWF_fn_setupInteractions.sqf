@@ -5,13 +5,8 @@
 
     Description:
     Handles setup interactions for the core framework layer.
-    For the MOB computer this routes through the smart login bridge,
-    so loaded campaigns do not get forced back into tutorial progression.
-
-    Flow:
-    1. Resolve the intended MOB computer object.
-    2. Add a single hold action once per object.
-    3. On completion, defer access routing to MWF_fnc_MOBComputerLogin.
+    For the MOB computer this routes through the campaign-phase login bridge,
+    so a loaded OPEN_WAR campaign never replays tutorial gates for any player.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -70,4 +65,4 @@ _object setVariable ["MWF_MOB_LoginInit", true, true];
     false
 ] call BIS_fnc_holdActionAdd;
 
-diag_log format ["[MWF Setup] Smart MOB login interaction added to %1.", _object];
+diag_log format ["[MWF Setup] Campaign-phase MOB login interaction added to %1.", _object];
