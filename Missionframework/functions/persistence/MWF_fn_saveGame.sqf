@@ -23,6 +23,23 @@ private _civRep = missionNamespace getVariable ["MWF_CivRep", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _buildingMode = missionNamespace getVariable ["MWF_Locked_BuildingDamageMode", missionNamespace getVariable ["MWF_LockedBuildingMode", 0]];
 
+private _boughtVehicles = [];
+{
+    if (!isNull _x && {alive _x} && {_x getVariable ["MWF_isBought", false]}) then {
+        _boughtVehicles pushBack [
+            typeOf _x,
+            getPosASL _x,
+            vectorDir _x,
+            vectorUp _x,
+            damage _x,
+            fuel _x,
+            _x getVariable ["MWF_isMobileRespawn", false]
+        ];
+    };
+} forEach vehicles;
+
+private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
+
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
 profileNamespace setVariable ["MWF_Save_CapturedZoneCount", missionNamespace getVariable ["MWF_CapturedZoneCount", 0]];
@@ -42,6 +59,8 @@ profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariable ["MWF_FixedInfrastructure", []]];
 profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
+profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
+profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 
 /* Persistent lobby params */
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
@@ -64,4 +83,4 @@ profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable [
 
 saveProfileNamespace;
 
-diag_log format ["[MWF] Game saved (%1). Zones saved: %2.", _reason, count _zoneSaveData];
+diag_log format ["[MWF] Game saved (%1). Zones saved: %2. Bought vehicles: %3. Active side missions: %4.", _reason, count _zoneSaveData, count _boughtVehicles, count _activeSideMissions];

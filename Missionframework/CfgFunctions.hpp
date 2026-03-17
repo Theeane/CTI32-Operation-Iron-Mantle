@@ -175,6 +175,7 @@ class CfgFunctions {
             file = "Missionframework/functions/persistence";
             class initPersistence { file = "Missionframework/functions/persistence/MWF_fn_initPersistence.sqf"; };
             class loadGame { file = "Missionframework/functions/persistence/MWF_fn_loadGame.sqf"; };
+            class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
             class saveGame { file = "Missionframework/functions/persistence/MWF_fn_saveGame.sqf"; };
             class wipeSave { file = "Missionframework/functions/persistence/MWF_fn_wipeSave.sqf"; };
         };

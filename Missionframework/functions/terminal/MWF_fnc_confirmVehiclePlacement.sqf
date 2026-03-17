@@ -60,6 +60,7 @@ if (_currentTier < _minTier) exitWith {
 };
 
 private _spawnVehicle = createVehicle [_className, [0, 0, 0], [], 0, "CAN_COLLIDE"];
+_spawnVehicle setVariable ["MWF_isBought", true, true];
 _spawnVehicle allowDamage false;
 _spawnVehicle setDir _dir;
 

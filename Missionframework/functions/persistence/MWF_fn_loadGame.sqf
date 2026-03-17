@@ -102,8 +102,12 @@ missionNamespace setVariable ["MWF_CapturedFactoryCount", profileNamespace getVa
 missionNamespace setVariable ["MWF_CapturedMilitaryCount", profileNamespace getVariable ["MWF_Save_CapturedMilitaryCount", 0], true];
 missionNamespace setVariable ["MWF_MapControlPercent", profileNamespace getVariable ["MWF_Save_MapControlPercent", 0], true];
 missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVariable ["MWF_Save_ZoneData", []], true];
+missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
+missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];
+missionNamespace setVariable ["MWF_SessionVehiclesRestored", false, true];
+missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", false, true];
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
-diag_log format ["[MWF] Campaign state restored. Pending saved zones: %1. Existing campaign save: %2.", count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]), _hasCampaignSave];
+diag_log format ["[MWF] Campaign state restored. Pending saved zones: %1. Pending vehicles: %2. Pending side missions: %3. Existing campaign save: %4.", count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]), count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]), count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]), _hasCampaignSave];
