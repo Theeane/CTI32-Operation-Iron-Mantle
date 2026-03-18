@@ -57,7 +57,7 @@ switch (_stage) do {
             west,
             "task_supply_run",
             [
-                "We are low on resources. A supply crate has been located in a nearby village. Recover it to complete the logistics tutorial.",
+                "We are low on resources. Recover the nearby supply target and bring it back. Civilian clothing keeps you hidden only if you stay unarmed and wear no vest. Completing the run undercover grants bonus Intel.",
                 "Conduct Supply Run",
                 ""
             ],
