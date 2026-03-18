@@ -40,9 +40,14 @@ private _maxFOBs = missionNamespace getVariable [
     ["MWF_Param_MaxFOBs", 5] call BIS_fnc_getParamValue
 ];
 
+private _sideMissionTemplateLimit = missionNamespace getVariable [
+    "MWF_Locked_SideMissionTemplateLimit",
+    ["MWF_Param_SideMissionTemplateLimit", 24] call BIS_fnc_getParamValue
+];
+
 private _initialFOBType = missionNamespace getVariable [
     "MWF_Locked_InitialFOBType",
-    ["MWF_Param_InitialFOBType", 1] call BIS_fnc_getParamValue
+    ["MWF_Param_InitialFOBType", 0] call BIS_fnc_getParamValue
 ];
 
 private _incomeMultiplier = missionNamespace getVariable [
@@ -179,6 +184,7 @@ missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel
 missionNamespace setVariable ["MWF_Economy_SupplyInterval", _supplyTimer, true];
 missionNamespace setVariable ["MWF_Economy_HeatMult", _heatMult, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _maxFOBs, true];
+missionNamespace setVariable ["MWF_Param_SideMissionTemplateLimit", (_sideMissionTemplateLimit max 9) min 99, true];
 missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];

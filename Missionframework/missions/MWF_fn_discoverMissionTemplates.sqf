@@ -5,7 +5,8 @@
 
     Description:
     Discovers side mission templates from the folder-driven mission structure.
-    Missions are discovered by category, difficulty, and template id without hardcoding mission content.
+    The mission pool is parameter-driven and only scans numbered templates.
+    Legacy suffix files such as MissionDisrupt_easy.sqf are ignored.
 
     Return:
     Array of mission template records:
@@ -22,6 +23,7 @@ private _definitions = [
 
 private _difficulties = ["easy", "medium", "hard"];
 private _templates = [];
+private _maxTemplateId = (missionNamespace getVariable ["MWF_Param_SideMissionTemplateLimit", 24]) max 1 min 99;
 
 {
     _x params ["_category", "_prefix"];
@@ -29,7 +31,7 @@ private _templates = [];
     {
         private _difficulty = _x;
 
-        for "_missionId" from 1 to 99 do {
+        for "_missionId" from 1 to _maxTemplateId do {
             private _missionPath = format ["SideMissions\%1\%2\%3_%4.sqf", _category, _difficulty, _prefix, _missionId];
 
             if (fileExists _missionPath) then {
@@ -41,4 +43,5 @@ private _templates = [];
 } forEach _definitions;
 
 missionNamespace setVariable ["MWF_MissionTemplateRegistry", _templates, true];
+diag_log format ["[MWF Missions] Discovered %1 side mission template(s). Pool limit: %2.", count _templates, _maxTemplateId];
 _templates

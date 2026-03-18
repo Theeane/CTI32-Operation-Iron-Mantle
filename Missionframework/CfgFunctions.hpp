@@ -54,15 +54,6 @@ class CfgFunctions {
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
         };
 
-
-        class DataUI {
-            file = "Missionframework/ui/datahub";
-            class dataHub { file = "Missionframework/ui/datahub/MWF_fn_dataHub.sqf"; };
-            class collectDataMapEntries { file = "Missionframework/ui/datahub/MWF_fn_collectDataMapEntries.sqf"; };
-            class collectRespawnPoints { file = "Missionframework/ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
-            class refreshDataMap { file = "Missionframework/ui/datahub/MWF_fn_refreshDataMap.sqf"; };
-        };
-
         class Terminal {
             file = "Missionframework/functions/terminal";
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
@@ -148,10 +139,13 @@ class CfgFunctions {
             class buildGrandOperationPlacements { file = "Missionframework/missions/MWF_fn_buildGrandOperationPlacements.sqf"; };
             class buildMissionSessionPlacements { file = "Missionframework/missions/MWF_fn_buildMissionSessionPlacements.sqf"; };
             class discoverMissionTemplates { file = "Missionframework/missions/MWF_fn_discoverMissionTemplates.sqf"; };
+            class completeSideMission { file = "Missionframework/missions/MWF_fn_completeSideMission.sqf"; };
             class executeMissionTemplate { file = "Missionframework/missions/MWF_fn_executeMissionTemplate.sqf"; };
             class generateInitialMission { file = "Missionframework/missions/MWF_fn_generateInitialMission.sqf"; };
+            class getSideMissionRewardProfile { file = "Missionframework/missions/MWF_fn_getSideMissionRewardProfile.sqf"; };
             class initMissionSystem { file = "Missionframework/missions/MWF_fn_initMissionSystem.sqf"; };
             class refreshMissionBoard { file = "Missionframework/missions/MWF_fn_refreshMissionBoard.sqf"; };
+            class applyTutorialReward { file = "Missionframework/missions/MWF_fn_applyTutorialReward.sqf"; };
         };
 
         class UI {

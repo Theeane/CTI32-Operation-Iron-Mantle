@@ -226,11 +226,18 @@ class Params {
         default = 5;
     };
 
+    class MWF_Param_SideMissionTemplateLimit {
+        title = "Side Mission Template Pool";
+        values[] = {9, 18, 24, 36, 48, 72, 99};
+        texts[] = {"9", "18", "24", "36", "48", "72", "99"};
+        default = 24;
+    };
+
     class MWF_Param_InitialFOBType {
         title = "Initial FOB Asset";
         values[] = {0, 1};
         texts[] = {"Truck", "Box"};
-        default = 1;
+        default = 0;
     };
 
     class MWF_Param_TimeMultiplier {

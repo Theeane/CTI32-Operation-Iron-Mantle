@@ -10,11 +10,18 @@
     - Stage 1: Deploy FOB
     - Stage 2: Complete initial supply run
     - Stage 3: Supply milestone complete; campaign can transition to OPEN_WAR on next MOB login
+
+    Parameters:
+    0: stage <NUMBER>
+    1: wasUndercover <BOOL> (optional, used by stage 3 reward application)
 */
 
 if (!isServer) exitWith {};
 
-params [["_stage", 1]];
+params [
+    ["_stage", 1, [0]],
+    ["_wasUndercover", false, [false]]
+];
 
 switch (_stage) do {
     case 1: {
@@ -40,6 +47,12 @@ switch (_stage) do {
     case 2: {
         ["task_deploy_fob", "SUCCEEDED"] call BIS_fnc_taskSetState;
 
+        if (!isNil "MWF_fnc_setCampaignPhase") then {
+            ["SUPPLY_RUN", "FOB deployed"] call MWF_fnc_setCampaignPhase;
+        } else {
+            missionNamespace setVariable ["MWF_Campaign_Phase", "SUPPLY_RUN", true];
+        };
+
         [
             west,
             "task_supply_run",
@@ -64,17 +77,8 @@ switch (_stage) do {
         missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
         missionNamespace setVariable ["MWF_current_stage", 3, true];
 
-        [100, "SUPPLIES"] call MWF_fnc_addResource;
-
-        private _participants = allPlayers select { alive _x };
-        private _undercoverCompletion = (_participants findIf { _x getVariable ["MWF_isUndercover", false] }) >= 0;
-
-        if (_undercoverCompletion) then {
-            [50] call MWF_fnc_addIntel;
-        } else {
-            if (!isNil "MWF_fnc_registerThreatIncident") then {
-                ["tutorial_supply_run", "", 1, "Tutorial supply run completed loudly."] call MWF_fnc_registerThreatIncident;
-            };
+        if (!isNil "MWF_fnc_applyTutorialReward") then {
+            [_wasUndercover, "tutorial_supply_run"] call MWF_fnc_applyTutorialReward;
         };
 
         if (!isNil "MWF_fnc_requestDelayedSave") then {
@@ -85,9 +89,6 @@ switch (_stage) do {
             };
         };
 
-        diag_log format [
-            "[MWF Tutorial] Initial supply-run milestone complete. Supplies +100 | Intel bonus: %1 | Waiting for MOB login to transition into OPEN_WAR.",
-            if (_undercoverCompletion) then {50} else {0}
-        ];
+        diag_log format ["[MWF Tutorial] Initial supply-run milestone complete. Undercover: %1. Waiting for MOB login to transition into OPEN_WAR.", _wasUndercover];
     };
 };
