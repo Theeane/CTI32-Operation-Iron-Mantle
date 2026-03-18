@@ -1,36 +1,273 @@
+# AI Mission Generation Instructions (_4–_99)
 
-    AI Instructions for Mission Generation (_4–_99):
+## Purpose
 
-    1. Mission Categories:
-        - Disrupt
-        - Supply
-        - Intel
+These instructions apply only to **community-created missions** in the `_4–_99` range.
 
-    2. Mission Difficulty:
-        - Easy
-        - Medium
-        - Hard
+* Missions `_1–_3` are reserved for core/internal use.
+* Do NOT overwrite or duplicate `_1–_3`.
 
-    3. Mission Creation Process:
-        - Templates should be created in the appropriate folder:
-            e.g., 'SideMissions/disrupt/easy/', 'SideMissions/intel/medium/'
-        - Templates should have unique IDs in their naming (e.g., MissionDisrupt_1, MissionIntel_2).
+---
 
-    4. Random Mission Generation:
-        - AI should select one template at random from the selected category/difficulty folder.
-        - _4–_99 missions are allowed, but system should use parameters to define their limits.
+## 1. Mission Categories
 
-    5. Presets:
-        - Use the following presets for enemy units, vehicles, and civilian NPCs:
-            - opfor_preset
-            - civ_preset
-            - rebel_preset
-            - blufor_preset
-        - Presets should not be modified after mission creation (prevents mission corruption).
-        - Vehicle classnames are derived from the respective preset categories, not hardcoded.
+Allowed mission categories:
 
-    6. Important Rules:
-        - **Do not hardcode classnames or assets!**
-        - Always check for the correct zone placement (missions should be placed randomly based on the zone available).
-        - Always generate a variety of missions in terms of difficulty and category (easy missions should be lower difficulty, but scale appropriately).
-    
+* DisruptMission
+* SupplyMission
+* IntelMission
+* MainOperation
+
+Each mission must be placed in the correct category folder.
+
+Example:
+
+* SideMissions/modern/DisruptMission/
+* SideMissions/modern/SupplyMission/
+
+---
+
+## 2. Theme / Content Pack Structure
+
+Missions must be placed inside a valid theme pack:
+
+Examples:
+
+* modern
+* gm
+* vietnam
+* ww2
+* custom packs
+
+Structure:
+SideMissions/{theme}/DisruptMission/
+SideMissions/{theme}/SupplyMission/
+SideMissions/{theme}/IntelMission/
+SideMissions/{theme}/MainOperation/
+SideMissions/{theme}/compositions/
+
+---
+
+## 3. Mission ID Rules (IMPORTANT)
+
+Before creating a mission, ALWAYS:
+
+1. Scan the target folder
+2. List existing mission IDs
+3. Find used numbers
+4. Select the next available ID between `_4–_99`
+
+Example:
+
+* If MissionSupply_4 exists → DO NOT create another _4
+* Use the next free ID (e.g., _5)
+
+---
+
+## 4. Reserved Range
+
+* `_1–_3` → core/internal missions
+* `_4–_99` → community missions
+
+Never modify `_1–_3`.
+
+---
+
+## 5. NO Hardcoded Classnames
+
+Mission files must be **mod agnostic**.
+
+DO NOT hardcode:
+
+* Units
+* Vehicles
+* Props
+* Objects
+* Factions
+
+❌ Example (NOT allowed):
+"O_Soldier_F", "B_Truck_01_transport_F"
+
+---
+
+## 6. Unit / Vehicle Sources
+
+### OPFOR
+
+* Source: preset/opfor
+* Scaled by: world tier
+
+### BLUFOR
+
+* Source: preset/blufor
+* Scaled by: player base tier
+
+### Civilians
+
+* Source: preset/civ
+
+### Rebels
+
+* Source: preset/rebel
+* Scaled by: rebel tier
+* May depend on reputation
+
+---
+
+## 7. Compositions (REQUIRED)
+
+All mission environments must use **composition keys**.
+
+Examples:
+
+* supply_cache_small
+* intel_meeting_site
+* roadblock_light
+* field_hq_medium
+
+DO NOT place objects manually.
+
+---
+
+## 8. Mission Data Standard
+
+Each mission must define:
+
+* missionId
+
+* title
+
+* description
+
+* category
+
+* difficulty
+
+* allowedZoneTypes
+
+* allowUndercover
+
+* usesOpfor
+
+* usesBluforSupport
+
+* usesCivilians
+
+* usesRebels
+
+* compositionKey
+
+* rewardSupplies
+
+* rewardIntel
+
+* rewardThreat
+
+* rewardTier
+
+* rewardThreatUndercover
+
+---
+
+## 9. Reward Rules
+
+* Rewards are **fixed per mission**
+* Rewards can vary between missions
+* Do NOT randomize rewards
+
+Undercover:
+
+* Uses rewardThreatUndercover (usually 0)
+
+---
+
+## 10. Difficulty
+
+Allowed:
+
+* Easy
+* Medium
+* Hard
+
+Difficulty affects:
+
+* complexity
+* resistance
+* reward
+
+NOT classnames.
+
+---
+
+## 11. Placement Rules
+
+Missions must spawn in valid zones only.
+
+Examples:
+
+* town
+* military
+* factory
+* capital
+* rural
+* roadside
+
+---
+
+## 12. Rebel / Reputation Rules
+
+If a mission uses rebels:
+
+* May require reputation
+* May fail if reputation is too low
+* May restrict access
+
+---
+
+## 13. Variety
+
+Ensure variation in:
+
+* category
+* difficulty
+* stealth vs loud
+* civilian presence
+
+Avoid repetition.
+
+---
+
+## 14. Safety Rules
+
+Community missions must NOT:
+
+* modify presets
+* modify economy
+* modify tier/threat systems
+* modify core framework logic
+
+---
+
+## 15. Generation Workflow (MANDATORY)
+
+1. Select theme
+2. Select category
+3. Scan existing missions
+4. Find free ID (_4–_99)
+5. Build mission data
+6. Use NO classnames
+7. Use compositions
+8. Use presets/tier systems
+9. Define fixed rewards
+10. Save mission
+
+---
+
+## 16. Internal Scope
+
+* `_1–_3` → internal development only
+* `_4–_99` → community expansion
+
+---
+
+END OF INSTRUCTIONS
