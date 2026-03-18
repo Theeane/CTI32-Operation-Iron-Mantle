@@ -7,6 +7,12 @@
     Restores the full function registry, mission params, and UI declarations.
 */
 
+respawn = 3;
+respawnDelay = 5;
+respawnOnStart = -1;
+respawnTemplatesWest[] = {"Counter"};
+respawnTemplates[] = {"Counter"};
+
 #include "ui/defines.hpp"
 #include "configs/params.hpp"
 #include "CfgFunctions.hpp"

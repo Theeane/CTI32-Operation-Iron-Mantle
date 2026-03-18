@@ -230,7 +230,7 @@ class Params {
         title = "Initial FOB Asset";
         values[] = {0, 1};
         texts[] = {"Truck", "Box"};
-        default = 0;
+        default = 1;
     };
 
     class MWF_Param_TimeMultiplier {

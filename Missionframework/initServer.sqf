@@ -18,6 +18,20 @@ missionNamespace setVariable ["MWF_ServerInitialized", false, true];
 diag_log "[MWF] INFO: Server-side initialization started.";
 
 [] call MWF_fnc_initGlobals;
+
+private _mainRespawnMarker = "respawn_west";
+if (markerColor _mainRespawnMarker isNotEqualTo "") then {
+    private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
+    if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
+        [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
+    };
+
+    private _mainRespawnId = [west, _mainRespawnMarker, missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"]] call BIS_fnc_addRespawnPosition;
+    missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
+    diag_log format ["[MWF] Main Operating Base respawn registered on marker %1.", _mainRespawnMarker];
+} else {
+    diag_log format ["[MWF] WARNING: Main Operating Base respawn marker %1 was not found during server init.", _mainRespawnMarker];
+};
 [] call MWF_fnc_initSystems;
 [] call MWF_fnc_initPersistence;
 [] call MWF_fnc_loadGame;

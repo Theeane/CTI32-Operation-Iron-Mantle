@@ -42,7 +42,7 @@ private _maxFOBs = missionNamespace getVariable [
 
 private _initialFOBType = missionNamespace getVariable [
     "MWF_Locked_InitialFOBType",
-    ["MWF_Param_InitialFOBType", 0] call BIS_fnc_getParamValue
+    ["MWF_Param_InitialFOBType", 1] call BIS_fnc_getParamValue
 ];
 
 private _incomeMultiplier = missionNamespace getVariable [
@@ -168,53 +168,6 @@ if (isNil { missionNamespace getVariable "MWF_PendingFOBAttackState" }) then {
 if (isNil { missionNamespace getVariable "MWF_PendingDamagedFOBs" }) then {
     missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
 };
-
-// --- FOB ASSET CONFIGURATION ---
-missionNamespace setVariable [
-    "MWF_FOB_Asset_Roof",
-    missionNamespace getVariable ["MWF_FOB_Asset_Roof", ""],
-    true
-];
-// Optional: Set to valid classname to enable roof on FOBs.
-// Empty string = no roof.
-
-missionNamespace setVariable [
-    "MWF_FOB_Asset_Table",
-    missionNamespace getVariable ["MWF_FOB_Asset_Table", missionNamespace getVariable ["MWF_Preset_FOB_Table", "Land_CampingTable_small_F"]],
-    true
-];
-// Required: Central table for FOB asset attachment.
-
-missionNamespace setVariable [
-    "MWF_FOB_Asset_Terminal",
-    missionNamespace getVariable ["MWF_FOB_Asset_Terminal", missionNamespace getVariable ["MWF_Preset_FOB_Center", "Land_Laptop_unfolded_F"]],
-    true
-];
-// Required: Command PC / FOB computer.
-
-missionNamespace setVariable [
-    "MWF_FOB_Asset_Siren",
-    missionNamespace getVariable ["MWF_FOB_Asset_Siren", missionNamespace getVariable ["MWF_Preset_FOB_Siren", "Land_Loudspeakers_F"]],
-    true
-];
-// Required: Visual/audio alarm indicator.
-
-missionNamespace setVariable [
-    "MWF_FOB_Asset_Lamp",
-    missionNamespace getVariable ["MWF_FOB_Asset_Lamp", ""],
-    true
-];
-// Optional: Lighting around FOBs.
-// Empty string = no lamp.
-
-diag_log format [
-    "[MWF FOB Assets] Configuration loaded. Roof: %1 | Lamp: %2 | Table: %3 | Terminal: %4 | Siren: %5",
-    missionNamespace getVariable ["MWF_FOB_Asset_Roof", "NONE"],
-    missionNamespace getVariable ["MWF_FOB_Asset_Lamp", "NONE"],
-    missionNamespace getVariable ["MWF_FOB_Asset_Table", "UNKNOWN"],
-    missionNamespace getVariable ["MWF_FOB_Asset_Terminal", "UNKNOWN"],
-    missionNamespace getVariable ["MWF_FOB_Asset_Siren", "UNKNOWN"]
-];
 
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];

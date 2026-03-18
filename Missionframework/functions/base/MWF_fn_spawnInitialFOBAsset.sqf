@@ -25,13 +25,20 @@ if (!(isNil { missionNamespace getVariable "MWF_InitialFOBAssetRef" })) then {
 
 private _paramValue = missionNamespace getVariable [
     "MWF_Param_InitialFOBType",
-    ["MWF_Param_InitialFOBType", 0] call BIS_fnc_getParamValue
+    ["MWF_Param_InitialFOBType", 1] call BIS_fnc_getParamValue
 ];
 
 private _assetClass = if (_paramValue == 1) then {
     missionNamespace getVariable ["MWF_FOB_Box", "B_Slingload_01_Cargo_F"]
 } else {
     missionNamespace getVariable ["MWF_FOB_Truck", "B_Truck_01_Repair_F"]
+};
+
+private _fobTruckClass = missionNamespace getVariable ["MWF_FOB_Truck", "B_Truck_01_Repair_F"];
+if (_assetClass isEqualTo _fobTruckClass) then {
+    _assetClass = missionNamespace getVariable ["MWF_FOB_Box", "B_Slingload_01_Cargo_F"];
+    _paramValue = 1;
+    diag_log "[MWF FOB] Fresh campaign initial FOB truck coerced to box to keep the MOB respawn state clean.";
 };
 
 if (_assetClass isEqualTo "") exitWith {
