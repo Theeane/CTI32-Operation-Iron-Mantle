@@ -11,6 +11,8 @@ params [["_laptop", objNull, [objNull]]];
 
 if (isNull _laptop) exitWith {};
 
+// Legacy locker-driven FOB inventory has been retired.
+// Command PC actions remain focused on terminal/base-control logic only.
 _laptop allowDamage false;
 
 private _condPeace = "!(missionNamespace getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";

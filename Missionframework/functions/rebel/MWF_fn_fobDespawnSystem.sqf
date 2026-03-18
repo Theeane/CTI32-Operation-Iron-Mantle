@@ -62,7 +62,6 @@ if (_mode == "DESPAWN") exitWith {
     } forEach [
         _terminal getVariable ["MWF_AttachedRoof", objNull],
         _terminal getVariable ["MWF_AttachedSiren", objNull],
-        _terminal getVariable ["MWF_AttachedLocker", objNull],
         _terminal getVariable ["MWF_AttachedLamp", objNull],
         _terminal getVariable ["MWF_AttachedTable", objNull]
     ];

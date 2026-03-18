@@ -50,7 +50,6 @@ private _marker = _target getVariable ["MWF_FOB_Marker", ""];
 } forEach [
     _target getVariable ["MWF_AttachedRoof", objNull],
     _target getVariable ["MWF_AttachedSiren", objNull],
-    _target getVariable ["MWF_AttachedLocker", objNull],
     _target getVariable ["MWF_AttachedLamp", objNull],
     _target getVariable ["MWF_AttachedTable", objNull],
     _target

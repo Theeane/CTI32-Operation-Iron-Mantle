@@ -5,7 +5,7 @@
 
     Description:
     Server-side FOB deployment pipeline. Converts a deployable truck/container into
-    a live FOB terminal and attached assets, then registers it for persistence.
+    a live FOB with five configured assets, then registers it for persistence.
 */
 
 if (!isServer) exitWith {objNull};
@@ -43,7 +43,6 @@ private _assetRoof     = missionNamespace getVariable ["MWF_FOB_Asset_Roof", ""]
 private _assetTable    = missionNamespace getVariable ["MWF_FOB_Asset_Table", "Land_CampingTable_small_F"];
 private _assetTerminal = missionNamespace getVariable ["MWF_FOB_Asset_Terminal", "Land_Laptop_unfolded_F"];
 private _assetSiren    = missionNamespace getVariable ["MWF_FOB_Asset_Siren", "Land_Loudspeakers_F"];
-private _assetLocker   = missionNamespace getVariable ["MWF_FOB_Asset_Locker", "Prop_Locker_01_F"];
 private _assetLamp     = missionNamespace getVariable ["MWF_FOB_Asset_Lamp", ""];
 
 if (!isNull _sourceObject) then {
@@ -88,18 +87,6 @@ if (_assetSiren != "") then {
     _siren allowDamage false;
 };
 
-private _locker = objNull;
-if (_assetLocker != "") then {
-    private _lockerPos = [ASLToATL _posAsl, 4, _dir - 110] call BIS_fnc_relPos;
-    _locker = createVehicle [_assetLocker, _lockerPos, [], 0, "NONE"];
-    _locker setDir (_dir + 70);
-    _locker allowDamage false;
-
-    if (!isNil "MWF_fnc_initFOBInventory") then {
-        [_locker] remoteExec ["MWF_fnc_initFOBInventory", 0, true];
-    };
-};
-
 private _lamp = objNull;
 if (_assetLamp != "") then {
     private _lampPos = [ASLToATL _posAsl, 6, _dir + 135] call BIS_fnc_relPos;
@@ -111,13 +98,11 @@ if (_assetLamp != "") then {
 _laptop setVariable ["MWF_AttachedTable", _table, true];
 _laptop setVariable ["MWF_AttachedRoof", _roofObj, true];
 _laptop setVariable ["MWF_AttachedSiren", _siren, true];
-_laptop setVariable ["MWF_AttachedLocker", _locker, true];
 _laptop setVariable ["MWF_AttachedLamp", _lamp, true];
 
 private _registration = [_laptop, _displayName, _originType, !_isRestore] call MWF_fnc_registerFOB;
 private _markerName = _registration param [0, ""];
 private _resolvedName = _registration param [1, "FOB"];
-[_laptop, 500, "FOB", objNull, false] call MWF_fnc_registerLoadoutZone;
 
 _laptop addEventHandler ["HandleDamage", {
     params ["_unit", "_selection", "_damage", "_source", "_projectile"];
@@ -151,7 +136,6 @@ _laptop addEventHandler ["Killed", {
         } forEach [
             _terminal getVariable ["MWF_AttachedRoof", objNull],
             _terminal getVariable ["MWF_AttachedSiren", objNull],
-            _terminal getVariable ["MWF_AttachedLocker", objNull],
             _terminal getVariable ["MWF_AttachedLamp", objNull],
             _terminal getVariable ["MWF_AttachedTable", objNull]
         ];

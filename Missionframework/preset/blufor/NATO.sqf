@@ -17,6 +17,28 @@ MWF_Preset_FOB_Light = "Land_Camping_Light_F";
 MWF_Preset_FOB_Siren = "Land_Loudspeakers_F";
 MWF_Preset_FOB_Spawn = "Land_HelipadEmpty_F";
 
+// --- FOB ASSET CONFIGURATION NOTES ---
+// These values are resolved by MWF_fn_initGlobals.sqf into the active FOB asset configuration.
+//
+// REQUIRED assets (always spawn):
+// - MWF_FOB_Asset_Table (camping table attachment point)
+// - MWF_FOB_Asset_Terminal (laptop / command PC)
+// - MWF_FOB_Asset_Siren (alarm / warning prop)
+//
+// OPTIONAL assets (spawn only if classname defined):
+// - MWF_FOB_Asset_Roof (set to "" to disable)
+// - MWF_FOB_Asset_Lamp (set to "" to disable)
+//
+// REMOVED:
+// - MWF_FOB_Asset_Locker (legacy system replaced by virtual arsenal / loadout flow)
+//
+// Asset positions relative to FOB center:
+// - Table: center (0m)
+// - Terminal: attached to table (+0.6m)
+// - Roof: center (same as table)
+// - Siren: 8m away at heading +45°
+// - Lamp: 6m away at heading +135°
+
 // --- 2. CORE SUPPORT ASSETS ---
 MWF_FOB_Truck      = "B_Truck_01_Repair_F"; 
 MWF_FOB_Box        = "B_Slingload_01_Cargo_F"; 
