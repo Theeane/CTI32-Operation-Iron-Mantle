@@ -56,6 +56,10 @@ private _cleanupCode = {
     _allRespawns = _allRespawns select { !isNull _x && {_x != _veh} };
     missionNamespace setVariable ["MWF_allMobileRespawns", _allRespawns, true];
 
+    if (!isNil "MWF_fnc_unregisterLoadoutZone") then {
+        [_veh] call MWF_fnc_unregisterLoadoutZone;
+    };
+
     if (!isNil "MWF_fnc_refreshFOBMarkers") then {
         [] call MWF_fnc_refreshFOBMarkers;
     };
@@ -74,6 +78,8 @@ _vehicle addEventHandler ["Deleted", {
 if (!isNil "MWF_fnc_refreshFOBMarkers") then {
     [] call MWF_fnc_refreshFOBMarkers;
 };
+
+[_vehicle, 25, "MRU", objNull, true] call MWF_fnc_registerLoadoutZone;
 
 missionNamespace setVariable ["MWF_LastMobileRespawn", _vehicle, true];
 

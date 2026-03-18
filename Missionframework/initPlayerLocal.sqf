@@ -18,6 +18,10 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 // Setup player interactions
 [] call MWF_fnc_setupInteractions;
 
+// Initialize loadout + undercover client systems
+[] call MWF_fnc_initLoadoutSystem;
+[] spawn MWF_fnc_undercoverHandler;
+
 // Update resource display
 [] call MWF_fnc_updateResourceUI;
 

@@ -54,6 +54,17 @@ class CfgFunctions {
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
         };
 
+        class Loadout {
+            file = "Missionframework/functions/loadout";
+            class applyRespawnLoadout { file = "Missionframework/functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
+            class buildLoadoutCaches { file = "Missionframework/functions/loadout/MWF_fn_buildLoadoutCaches.sqf"; };
+            class initLoadoutSystem { file = "Missionframework/functions/loadout/MWF_fn_initLoadoutSystem.sqf"; };
+            class openLoadoutArsenal { file = "Missionframework/functions/loadout/MWF_fn_openLoadoutArsenal.sqf"; };
+            class registerLoadoutZone { file = "Missionframework/functions/loadout/MWF_fn_registerLoadoutZone.sqf"; };
+            class saveRespawnLoadout { file = "Missionframework/functions/loadout/MWF_fn_saveRespawnLoadout.sqf"; };
+            class unregisterLoadoutZone { file = "Missionframework/functions/loadout/MWF_fn_unregisterLoadoutZone.sqf"; };
+        };
+
         class Terminal {
             file = "Missionframework/functions/terminal";
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };

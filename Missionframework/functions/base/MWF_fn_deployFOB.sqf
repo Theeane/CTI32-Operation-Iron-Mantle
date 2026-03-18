@@ -117,6 +117,7 @@ _laptop setVariable ["MWF_AttachedLamp", _lamp, true];
 private _registration = [_laptop, _displayName, _originType, !_isRestore] call MWF_fnc_registerFOB;
 private _markerName = _registration param [0, ""];
 private _resolvedName = _registration param [1, "FOB"];
+[_laptop, 500, "FOB", objNull, false] call MWF_fnc_registerLoadoutZone;
 
 _laptop addEventHandler ["HandleDamage", {
     params ["_unit", "_selection", "_damage", "_source", "_projectile"];

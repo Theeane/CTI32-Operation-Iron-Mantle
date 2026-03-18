@@ -1,10 +1,12 @@
 /*
-    Author: Theeane / Gemini Guide
+    Author: OpenAI
     Function: MWF_fnc_checkUndercover
     Project: Military War Framework
-    Description: 
-    Checks if a player is wearing a blacklisted uniform (military gear).
-    If undercover, certain restrictions like loadout saving are toggled.
+
+    Description:
+    Central uniform-driven undercover check.
+    - OPFOR uniform: military disguise active and respawn-loadout saving blocked.
+    - Civilian uniform: civilian disguise only if no vest and no carried weapons.
 */
 
 params [
@@ -13,36 +15,27 @@ params [
 
 if (isNull _player) exitWith { false };
 
-// 1. Get current uniform
-private _currentUniform = uniform _player;
+[] call MWF_fnc_buildLoadoutCaches;
 
-// 2. Fetch blacklist (safely fallback to empty array if not defined)
-private _blacklist = missionNamespace getVariable ["MWF_Undercover_Blacklist", []];
+private _uniform = uniform _player;
+private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];
+private _civilianUniforms = missionNamespace getVariable ["MWF_CivilianUniformClasses", []];
 
-// 3. Determine status
-private _isDetected = (_currentUniform in _blacklist);
-private _saveEnabled = true;
+private _hasOpforUniform = _uniform in _opforUniforms;
+private _hasCivilianUniform = _uniform in _civilianUniforms;
+private _hasVest = (vest _player) != "";
+private _armed = (primaryWeapon _player) != "" || {(handgunWeapon _player) != ""} || {(secondaryWeapon _player) != ""};
 
-if (_isDetected) then {
-    // Player is wearing military gear - Not Undercover
-    _saveEnabled = false;
-    
-    // Optional: Notify player if they just changed into military gear
-    if (hasInterface && {player == _player}) then {
-        // hintSilent "Undercover status: Lost (Military uniform detected)";
-    };
+private _isUndercover = false;
+if (_hasOpforUniform) then {
+    _isUndercover = true;
 } else {
-    // Player is wearing civilian gear - Undercover
-    _saveEnabled = true;
+    if (_hasCivilianUniform && {!_hasVest} && {!_armed}) then {
+        _isUndercover = true;
+    };
 };
 
-// 4. Update and Broadcast status
-// We use a broadcasted variable so the server/other systems know the player's status
-_player setVariable ["MWF_isUndercover", !_isDetected, true];
+_player setVariable ["MWF_isUndercover", _isUndercover, true];
+missionNamespace setVariable ["MWF_SaveLoadout_Enabled", !_hasOpforUniform, true];
 
-// Handle Loadout Save restriction (Project specific rule)
-missionNamespace setVariable ["MWF_SaveLoadout_Enabled", _saveEnabled, true];
-
-diag_log format ["[MWF] Undercover Check: %1 (Uniform: %2) - Undercover: %3", name _player, _currentUniform, !_isDetected];
-
-!_isDetected
+_isUndercover

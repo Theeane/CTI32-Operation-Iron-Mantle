@@ -28,6 +28,12 @@ missionNamespace setVariable ["MWF_AuthenticatedPlayers", missionNamespace getVa
 missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false], true];
 
+missionNamespace setVariable ["MWF_LoadoutZones", missionNamespace getVariable ["MWF_LoadoutZones", []], true];
+
+if (!isNil "MWF_MOB_LoadoutTrigger" && {!isNull MWF_MOB_LoadoutTrigger}) then {
+    [objNull, 500, "MOB", MWF_MOB_LoadoutTrigger, false] call MWF_fnc_registerLoadoutZone;
+};
+
 missionNamespace setVariable ["MWF_WorldTier", missionNamespace getVariable ["MWF_WorldTier", 1], true];
 missionNamespace setVariable ["MWF_ProgressionState", missionNamespace getVariable ["MWF_ProgressionState", "opening"], true];
 missionNamespace setVariable ["MWF_WorldZoneCountTotal", missionNamespace getVariable ["MWF_WorldZoneCountTotal", 0], true];

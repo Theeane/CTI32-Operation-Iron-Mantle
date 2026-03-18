@@ -57,6 +57,10 @@ if (!(_matchPos isEqualTo [])) then {
 };
 missionNamespace setVariable ["MWF_FOB_Positions", _fobPosList, true];
 
+if (!isNull _target && {!isNil "MWF_fnc_unregisterLoadoutZone"}) then {
+    [_target] call MWF_fnc_unregisterLoadoutZone;
+};
+
 if (_requestSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {
     [] call MWF_fnc_requestDelayedSave;
 };

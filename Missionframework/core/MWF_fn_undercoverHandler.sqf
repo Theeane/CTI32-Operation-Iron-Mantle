@@ -1,199 +1,110 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI
     Function: MWF_fn_undercoverHandler
     Project: Military War Framework
 
     Description:
-    Handles undercover status, suspicion state, and detection logic for the player.
-    Supports both marker-based and object-based mission zones.
+    Uniform-driven undercover runtime.
+    - OPFOR uniforms provide military disguise everywhere.
+    - Civilian uniforms provide civilian disguise only when unarmed and without vest.
+    - Military disguise uses short-range inspection, with leaders inspecting further.
 */
 
 if (!hasInterface) exitWith {};
+if (missionNamespace getVariable ["MWF_UndercoverHandlerStarted", false]) exitWith {};
+missionNamespace setVariable ["MWF_UndercoverHandlerStarted", true];
 
-waitUntil {
-    !isNull player &&
-    {!isNil "MWF_cfg_civUniforms"} &&
-    {!isNil "MWF_cfg_enemyUniforms"} &&
-    {!isNil "MWF_cfg_enemyVests"} &&
-    {!isNil "MWF_cfg_enemyHeadgear"}
-};
+[] call MWF_fnc_buildLoadoutCaches;
 
 cutRsc ["MWF_Undercover_Eye", "PLAIN"];
 
 [] spawn {
     private _ctrl = controlNull;
 
-    while {alive player} do {
-        uiSleep 2;
+    while {true} do {
+        waitUntil { !isNull player };
+        uiSleep 1;
 
         if (isNull _ctrl) then {
             _ctrl = uiNamespace getVariable ["MWF_ctrl_eye", controlNull];
         };
 
-        private _civUniforms   = missionNamespace getVariable ["MWF_cfg_civUniforms", []];
-        private _enemyUniforms = missionNamespace getVariable ["MWF_cfg_enemyUniforms", []];
-        private _enemyVests    = missionNamespace getVariable ["MWF_cfg_enemyVests", []];
-        private _enemyHeadgear = missionNamespace getVariable ["MWF_cfg_enemyHeadgear", []];
-        private _contraband    = missionNamespace getVariable ["MWF_cfg_contrabandItems", []];
-        private _contrabandCat = missionNamespace getVariable ["MWF_cfg_contrabandCategories", []];
+        [] call MWF_fnc_checkUndercover;
 
-        private _isUndercover = true;
+        private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];
+        private _civilianUniforms = missionNamespace getVariable ["MWF_CivilianUniformClasses", []];
+        private _uniform = uniform player;
+        private _isOpfor = _uniform in _opforUniforms;
+        private _isCivilian = _uniform in _civilianUniforms;
+        private _hasVest = (vest player) != "";
+        private _armed = (primaryWeapon player) != "" || {(handgunWeapon player) != ""} || {(secondaryWeapon player) != ""};
+
+        private _isUndercover = false;
         private _isSuspicious = false;
-        private _eyeIcon = "media\icons\eye_green.paa";
+        private _eyeIcon = "media\icons\eye_red.paa";
 
-        private _hasEnemyUniform = uniform player in _enemyUniforms;
-        private _hasEnemyVest = vest player in _enemyVests;
-        private _hasEnemyHelmet = headgear player in _enemyHeadgear;
-        private _isCivilian = uniform player in _civUniforms;
-
-        if (_hasEnemyUniform) then {
-            if (_hasEnemyVest && _hasEnemyHelmet) then {
-                _isSuspicious = false;
-                _eyeIcon = "media\icons\eye_green.paa";
-            } else {
-                if (_hasEnemyVest || _hasEnemyHelmet) then {
-                    _isUndercover = false;
-                } else {
-                    _isSuspicious = true;
-                    _eyeIcon = "media\icons\eye_yellow.paa";
-                };
-            };
+        if (_isOpfor) then {
+            _isUndercover = true;
+            _eyeIcon = "media\icons\eye_green.paa";
 
             private _nearEnemies = allUnits select {
                 alive _x &&
                 {side _x == east} &&
-                {_x distance player < 5}
+                {_x distance player <= 8}
             };
 
+            private _inspectionActive = false;
             {
-                private _detectRange = if (rank _x in ["SERGEANT", "LIEUTENANT", "CAPTAIN", "MAJOR", "COLONEL"]) then {2.2} else {1.2};
-                if ((_x distance player) < _detectRange) exitWith {
+                private _observer = _x;
+                private _isLeader = (leader (group _observer) == _observer) || {rankId _observer >= 4};
+                private _suspiciousRange = if (_isLeader) then {5} else {2};
+                private _detectRange = if (_isLeader) then {3} else {1};
+                private _dist = _observer distance player;
+
+                if (_dist <= _suspiciousRange) then {
+                    _inspectionActive = true;
+                    _isSuspicious = true;
+                    _observer doWatch player;
+                    _observer doMove (getPosATL player);
+                };
+
+                if (_dist <= _detectRange) exitWith {
                     _isUndercover = false;
                 };
             } forEach _nearEnemies;
 
-            private _suspFactor = if (_hasEnemyVest && _hasEnemyHelmet) then {1} else {4};
-            private _staringUnits = allUnits select {
-                alive _x &&
-                {side _x == east} &&
-                {_x distance player < 15}
-            };
-
-            if (count _staringUnits > 0) then {
-                private _susp = player getVariable ["MWF_suspicionLevel", 0];
-                private _newSusp = _susp + _suspFactor;
-                player setVariable ["MWF_suspicionLevel", _newSusp];
-                if (_newSusp > 15) then {
+            private _inspectionTime = player getVariable ["MWF_InspectionExposure", 0];
+            if (_inspectionActive && {_isUndercover}) then {
+                _inspectionTime = _inspectionTime + 1;
+                player setVariable ["MWF_InspectionExposure", _inspectionTime];
+                if (_inspectionTime >= 10) then {
                     _isUndercover = false;
                 };
+            } else {
+                player setVariable ["MWF_InspectionExposure", 0 max (_inspectionTime - 2)];
             };
         } else {
-            if (_hasEnemyVest || _hasEnemyHelmet) then {
-                _isUndercover = false;
-            } else {
-                if (_isCivilian) then {
-                    if (currentWeapon player != "" && {currentWeapon player != binocular}) then {
-                        _isUndercover = false;
-                    } else {
-                        private _playerPos = getPosATL player;
-                        private _zones = missionNamespace getVariable ["MWF_all_mission_zones", []];
-                        private _uncapturedZones = [];
-
-                        {
-                            private _zoneRef = _x;
-
-                            if (_zoneRef isEqualType "") then {
-                                if (_zoneRef in allMapMarkers) then {
-                                    if !(missionNamespace getVariable [format ["MWF_zoneState_%1_MWF_isCaptured", _zoneRef], false]) then {
-                                        _uncapturedZones pushBack [getMarkerPos _zoneRef, (getMarkerSize _zoneRef) select 0];
-                                    };
-                                };
-                            } else {
-                                if (!isNull _zoneRef && {!(_zoneRef getVariable ["MWF_isCaptured", false])}) then {
-                                    _uncapturedZones pushBack [getPosWorld _zoneRef, _zoneRef getVariable ["MWF_zoneRange", 150]];
-                                };
-                            };
-                        } forEach _zones;
-
-                        {
-                            _x params ["_zonePos", "_zoneRange"];
-                            if ((_playerPos distance2D _zonePos) < (_zoneRange max 150)) exitWith {
-                                _isSuspicious = true;
-                                _eyeIcon = "media\icons\eye_yellow.paa";
-                                if ((_playerPos distance2D _zonePos) < 50) then {
-                                    _isUndercover = false;
-                                };
-                            };
-                        } forEach _uncapturedZones;
-                    };
-                } else {
-                    _isUndercover = false;
-                };
+            player setVariable ["MWF_InspectionExposure", 0];
+            if (_isCivilian && {!_hasVest} && {!_armed}) then {
+                _isUndercover = true;
+                _eyeIcon = "media\icons\eye_green.paa";
             };
         };
 
-        if (vehicle player != player && _isUndercover) then {
-            private _veh = vehicle player;
-            private _cargoItems = (weaponCargo _veh) + (magazineCargo _veh) + (itemCargo _veh);
-            private _hasContraband = false;
-
-            {
-                private _item = _x;
-                if (_item in _contraband) exitWith {
-                    _hasContraband = true;
-                };
-
-                if ({_item isKindOf _x} count _contrabandCat > 0) exitWith {
-                    _hasContraband = true;
-                };
-            } forEach _cargoItems;
-
-            if (_hasContraband) then {
-                _isSuspicious = true;
-                _eyeIcon = "media\icons\eye_yellow.paa";
-
-                if (count (allUnits select {
-                    alive _x &&
-                    {side _x == east} &&
-                    {_x distance _veh < 4}
-                }) > 0) then {
-                    _isUndercover = false;
-                };
-            };
-
-            private _checkpointGuards = allUnits select {
-                alive _x &&
-                {side _x == east} &&
-                {_x distance player < 25}
-            };
-
-            if (count _checkpointGuards > 0 && {speed player < 2}) then {
-                private _inspectTime = (player getVariable ["MWF_inspectTimer", 0]) + 1;
-                player setVariable ["MWF_inspectTimer", _inspectTime];
-
-                if (_inspectTime > 5) then {
-                    player setVariable ["MWF_suspicionLevel", -15];
-                    player setVariable ["MWF_inspectTimer", 0];
-                };
-            };
+        if (_isUndercover && {_isSuspicious}) then {
+            _eyeIcon = "media\icons\eye_yellow.paa";
         };
+
+        player setVariable ["MWF_isUndercover", _isUndercover, true];
 
         if (_isUndercover) then {
             if (!captive player) then {
                 [player, true] remoteExec ["setCaptive", 0];
             };
-
-            if (_isSuspicious) then {
-                _eyeIcon = "media\icons\eye_yellow.paa";
-            };
         } else {
             if (captive player) then {
                 [player, false] remoteExec ["setCaptive", 0];
             };
-
-            _eyeIcon = "media\icons\eye_red.paa";
-            player setVariable ["MWF_suspicionLevel", 0];
-            player setVariable ["MWF_inspectTimer", 0];
         };
 
         if (!isNull _ctrl) then {
@@ -201,36 +112,3 @@ cutRsc ["MWF_Undercover_Eye", "PLAIN"];
         };
     };
 };
-
-player addEventHandler ["Fired", {
-    params ["_unit"];
-    _unit setVariable ["MWF_firedRecently", true, true];
-    [_unit] spawn {
-        params ["_firingUnit"];
-        uiSleep 45;
-        _firingUnit setVariable ["MWF_firedRecently", false, true];
-    };
-}];
-
-player addEventHandler ["HandleDamage", {
-    params ["_unit", "_selection", "_damage", "_source", "_projectile", "_hitIndex", "_instigator"];
-
-    if (vehicle _unit != _unit && {_damage > 0.01}) then {
-        private _witnesses = allUnits select {
-            alive _x &&
-            {side _x == east} &&
-            {_x distance _unit < 100} &&
-            {([_x, "VIEW"] checkVisibility [getPosASL _x, getPosASL _unit]) > 0.6}
-        };
-
-        if (count _witnesses > 0) then {
-            private _investigator = [_witnesses, _unit] call BIS_fnc_nearestPosition;
-            _investigator doMove (getPos _unit);
-            player setVariable ["MWF_suspicionLevel", 10];
-        };
-    };
-
-    _damage
-}];
-
-diag_log "[MWF Undercover] Handler initialized for player.";
