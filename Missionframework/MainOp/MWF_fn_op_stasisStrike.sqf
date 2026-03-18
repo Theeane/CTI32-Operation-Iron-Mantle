@@ -83,16 +83,20 @@ switch (_state) do {
             [["NETWORK SILENCE", "400 Supplies and 200 Intel bonus awarded for flawless infiltration."], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         };
 
-        // TIER FREEZE LOGIC
-        missionNamespace setVariable ["MWF_TierFreeze_Active", true, true];
-        missionNamespace setVariable ["MWF_TierFreeze_EndTime", (serverTime + 3600), true]; // 60 Minutes
-        
+        private _impactProfile = ["main", "stasis_strike"] call MWF_fnc_getMissionImpactProfile;
+        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+
         [
-            ["OPFOR PROGRESSION FROZEN", "Enemy command is in disarray. Tier progression halted for 60 minutes."],
+            ["OPFOR PROGRESSION FROZEN", "Enemy command is in disarray. Tier progression and main-op threat progression halted for 60 minutes."],
             "success"
         ] remoteExec ["MWF_fnc_showNotification", 0];
-        
+
+        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+
         [] call MWF_fnc_saveGame;
-        diag_log "[MWF Grand Op] Stasis Strike: Operation Complete. Tier Frozen for 1 hour.";
+        diag_log "[MWF Grand Op] Stasis Strike: Operation Complete. Progression Frozen for 1 hour.";
     };
 };

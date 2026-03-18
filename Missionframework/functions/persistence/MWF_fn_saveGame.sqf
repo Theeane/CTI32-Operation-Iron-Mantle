@@ -87,6 +87,17 @@ profileNamespace setVariable ["MWF_Save_CapturedCapitalCount", missionNamespace 
 profileNamespace setVariable ["MWF_Save_CapturedFactoryCount", missionNamespace getVariable ["MWF_CapturedFactoryCount", 0]];
 profileNamespace setVariable ["MWF_Save_CapturedMilitaryCount", missionNamespace getVariable ["MWF_CapturedMilitaryCount", 0]];
 profileNamespace setVariable ["MWF_Save_MapControlPercent", missionNamespace getVariable ["MWF_MapControlPercent", 0]];
+profileNamespace setVariable ["MWF_Save_WorldTier", missionNamespace getVariable ["MWF_WorldTier", 1]];
+profileNamespace setVariable ["MWF_Save_WorldTierScore", missionNamespace getVariable ["MWF_WorldTierScore", 0]];
+profileNamespace setVariable ["MWF_Save_WorldTierProgress", missionNamespace getVariable ["MWF_WorldTierProgress", 0]];
+profileNamespace setVariable ["MWF_Save_WorldTierFloor", missionNamespace getVariable ["MWF_WorldTierFloor", 1]];
+profileNamespace setVariable ["MWF_Save_WorldTierHalfMapLock", missionNamespace getVariable ["MWF_WorldTierHalfMapLock", false]];
+profileNamespace setVariable ["MWF_Save_WorldTierProgressBlockedRemaining", ((missionNamespace getVariable ["MWF_WorldTierProgressBlockedUntil", 0]) - serverTime) max 0];
+profileNamespace setVariable ["MWF_Save_TierFreeze_Active", missionNamespace getVariable ["MWF_TierFreeze_Active", false]];
+profileNamespace setVariable ["MWF_Save_TierFreeze_Remaining", ((missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0]) - serverTime) max 0];
+profileNamespace setVariable ["MWF_Save_GlobalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0]];
+profileNamespace setVariable ["MWF_Save_MainOpThreatBlockedRemaining", ((missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0]) - serverTime) max 0];
+profileNamespace setVariable ["MWF_Save_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []]];
 profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
 profileNamespace setVariable ["MWF_Save_CivRep_State", _civRep];

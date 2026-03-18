@@ -103,6 +103,14 @@ switch (_state) do {
             "success"
         ] remoteExec ["MWF_fnc_showNotification", 0];
         
+        private _impactProfile = ["main", "apex_predator"] call MWF_fnc_getMissionImpactProfile;
+        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+
+        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+
         [] call MWF_fnc_saveGame;
         diag_log "[MWF Grand Op] Apex Predator: Operation Complete. Tier 5 Unlocked.";
     };

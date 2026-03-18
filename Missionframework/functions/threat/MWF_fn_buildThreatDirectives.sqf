@@ -4,8 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Converts threat state into gameplay-safe strategic directives.
-    Returns a hashMap that later systems can consume without duplicating logic.
+    Converts dynamic threat percent into gameplay-safe directives.
+    Patrols always exist, but density and search aggressiveness scale upward with threat.
 */
 
 params [
@@ -19,41 +19,27 @@ params [
     ["_priorityTargetCount", 0, [0]]
 ];
 
-private _mapControl = _worldSnapshot getOrDefault ["mapControlPercent", 0];
-private _contestedCount = _worldSnapshot getOrDefault ["contestedZoneCount", 0];
-private _underAttackCount = _worldSnapshot getOrDefault ["underAttackZoneCount", 0];
-private _worldTier = _worldSnapshot getOrDefault ["worldTier", 1];
 private _basePressure = _baseThreat getOrDefault ["basePressure", 0];
 private _baseAttackState = _baseThreat getOrDefault ["baseAttackState", "idle"];
+private _patrolDensity = (0.15 + (_pressureScore / 120)) min 1;
+private _qrfInterval = (1200 - (_pressureScore * 6) - (_priorityTargetCount * 30)) max 180;
+private _roadblockPressure = ((_pressureScore * 0.6) + (_destroyedRoadblockCount * 4)) min 100;
+private _hqPressure = ((_pressureScore * 0.7) + (_destroyedHQCount * 8)) min 100;
+private _missionEscalation = _globalThreatState;
 
-private _patrolDensity = (0.15 + (_globalThreatLevel * 0.10) + (_contestedCount * 0.03)) min 1;
-private _qrfInterval = (1200 - (_globalThreatLevel * 120) - (_priorityTargetCount * 45)) max 240;
-private _roadblockPressure = ((_globalThreatLevel * 10) + (_mapControl * 0.18) + (_destroyedRoadblockCount * 6)) min 100;
-private _hqPressure = ((_globalThreatLevel * 12) + (_mapControl * 0.25) + (_destroyedHQCount * 10)) min 100;
-private _missionEscalation = "low";
-
-switch (true) do {
-    case (_globalThreatLevel >= 5 || _pressureScore >= 130): { _missionEscalation = "war"; };
-    case (_globalThreatLevel >= 4 || _pressureScore >= 100): { _missionEscalation = "critical"; };
-    case (_globalThreatLevel >= 3 || _pressureScore >= 70): { _missionEscalation = "high"; };
-    case (_globalThreatLevel >= 2 || _pressureScore >= 40): { _missionEscalation = "medium"; };
-    default { _missionEscalation = "low"; };
-};
-
-private _enabledResponses = [];
-
-if (_patrolDensity >= 0.25) then { _enabledResponses pushBackUnique "patrol_surge"; };
-if (_globalThreatLevel >= 2 || _underAttackCount > 0) then { _enabledResponses pushBackUnique "qrf"; };
-if (_roadblockPressure >= 35) then { _enabledResponses pushBackUnique "roadblocks"; };
-if (_hqPressure >= 40) then { _enabledResponses pushBackUnique "hq_reinforcement"; };
+private _enabledResponses = ["patrols"];
+if (_pressureScore >= 20) then { _enabledResponses pushBackUnique "screening"; };
+if (_pressureScore >= 40) then { _enabledResponses pushBackUnique "search"; };
+if (_pressureScore >= 60) then { _enabledResponses pushBackUnique "qrf"; };
+if (_pressureScore >= 80) then { _enabledResponses pushBackUnique "hunt"; };
+if (_priorityTargetCount > 0 && _pressureScore >= 40) then { _enabledResponses pushBackUnique "priority_response"; };
 if (_basePressure >= 25) then { _enabledResponses pushBackUnique "base_search"; };
 if (_baseAttackState in ["hunt_window", "assault_window"]) then { _enabledResponses pushBackUnique "base_attack"; };
-if (_priorityTargetCount > 0 && _globalThreatLevel >= 2) then { _enabledResponses pushBackUnique "counterattack"; };
 
 createHashMapFromArray [
     ["globalThreatLevel", _globalThreatLevel],
     ["globalThreatState", _globalThreatState],
-    ["worldTier", _worldTier],
+    ["worldTier", _worldSnapshot getOrDefault ["worldTier", 1]],
     ["patrolDensity", _patrolDensity],
     ["qrfInterval", _qrfInterval],
     ["roadblockPressure", _roadblockPressure],

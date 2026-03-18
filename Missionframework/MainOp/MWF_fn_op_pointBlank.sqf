@@ -99,6 +99,14 @@ switch (_state) do {
         missionNamespace setVariable ["MWF_Unlock_Jets", true, true];
         
         [["STRATEGIC VICTORY", "Jet assets are now operational at the main airbase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+        private _impactProfile = ["main", "point_blank"] call MWF_fnc_getMissionImpactProfile;
+        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+
+        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+
         [] call MWF_fnc_saveGame;
         diag_log "[MWF Grand Op] Point Blank: Operation Complete. Jets Unlocked.";
     };

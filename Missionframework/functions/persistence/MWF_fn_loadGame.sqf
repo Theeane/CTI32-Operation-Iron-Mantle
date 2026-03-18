@@ -124,6 +124,17 @@ missionNamespace setVariable ["MWF_CapturedCapitalCount", [profileNamespace getV
 missionNamespace setVariable ["MWF_CapturedFactoryCount", [profileNamespace getVariable ["MWF_Save_CapturedFactoryCount", 0], 0, 100000, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_CapturedMilitaryCount", [profileNamespace getVariable ["MWF_Save_CapturedMilitaryCount", 0], 0, 100000, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_MapControlPercent", [profileNamespace getVariable ["MWF_Save_MapControlPercent", 0], 0, 100, 0] call _clampNumber, true];
+missionNamespace setVariable ["MWF_WorldTier", [profileNamespace getVariable ["MWF_Save_WorldTier", 1], 1, 5, 1] call _clampNumber, true];
+missionNamespace setVariable ["MWF_WorldTierScore", [profileNamespace getVariable ["MWF_Save_WorldTierScore", 0], 0, 499, 0] call _clampNumber, true];
+missionNamespace setVariable ["MWF_WorldTierProgress", [profileNamespace getVariable ["MWF_Save_WorldTierProgress", 0], 0, 100, 0] call _clampNumber, true];
+missionNamespace setVariable ["MWF_WorldTierFloor", [profileNamespace getVariable ["MWF_Save_WorldTierFloor", 1], 1, 5, 1] call _clampNumber, true];
+missionNamespace setVariable ["MWF_WorldTierHalfMapLock", profileNamespace getVariable ["MWF_Save_WorldTierHalfMapLock", false], true];
+missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierProgressBlockedRemaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_TierFreeze_Active", profileNamespace getVariable ["MWF_Save_TierFreeze_Active", false], true];
+missionNamespace setVariable ["MWF_TierFreeze_EndTime", serverTime + ([profileNamespace getVariable ["MWF_Save_TierFreeze_Remaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_GlobalThreatPercent", [profileNamespace getVariable ["MWF_Save_GlobalThreatPercent", 0], 0, 100, 0] call _clampNumber, true];
+missionNamespace setVariable ["MWF_MainOpThreatProgressBlockedUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_MainOpThreatBlockedRemaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_ThreatHotZones", profileNamespace getVariable ["MWF_Save_ThreatHotZones", []], true];
 missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVariable ["MWF_Save_ZoneData", []], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
 missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];

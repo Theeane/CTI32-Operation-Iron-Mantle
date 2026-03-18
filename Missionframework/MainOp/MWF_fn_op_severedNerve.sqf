@@ -95,15 +95,22 @@ switch (_state) do {
             [["GHOST OPERATIVES", "The enemy has no idea what hit them. 400 Supplies and 200 Intel bonus awarded."], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         };
 
-        // GLOBAL TIER REDUCTION LOGIC
-        private _currentTier = missionNamespace getVariable ["MWF_WorldTier", 1];
-        if (_currentTier > 1) then {
-            missionNamespace setVariable ["MWF_WorldTier", (_currentTier - 1), true];
+        private _impactProfile = ["main", "severed_nerve"] call MWF_fnc_getMissionImpactProfile;
+        private _impactResult = [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+
+        private _msg = if (_impactResult getOrDefault ["fallbackUsed", false]) then {
+            format ["Tier floor active. Operation converted to %1 Supplies / %2 Intel.", _impactResult getOrDefault ["suppliesGranted", 0], _impactResult getOrDefault ["intelGranted", 0]]
+        } else {
+            "Enemy presence has been reduced by one Tier across the region."
         };
-        
-        [["OPFOR DE-ESCALATION", "Enemy presence has been reduced by one Tier across the region."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
-        
+        [["OPFOR DE-ESCALATION", _msg], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+
+        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+
         [] call MWF_fnc_saveGame;
-        diag_log "[MWF Grand Op] Severed Nerve: Operation Complete. OPFOR Tier Reduced.";
+        diag_log "[MWF Grand Op] Severed Nerve: Operation Complete. OPFOR Tier Impact Applied.";
     };
 };

@@ -4,8 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Calculates a zone-local threat profile from global threat posture and zone status.
-    Returns a hashMap for future mission and response systems.
+    Calculates a zone-local threat profile from global dynamic threat posture, zone status,
+    and recent loud-operation priority markers.
 */
 
 params [
@@ -23,79 +23,65 @@ private _isCaptured = _zone getVariable ["MWF_isCaptured", false];
 private _isContested = _zone getVariable ["MWF_contested", false];
 private _isUnderAttack = _zone getVariable ["MWF_underAttack", false];
 
-private _zoneScore = (_globalThreatLevel * 12) + (_pressureScore * 0.10);
+private _hotZones = + (missionNamespace getVariable ["MWF_ThreatHotZones", []]);
+private _hotScore = 0;
+{
+    if (toLower (_x param [0, "", [""]]) isEqualTo _zoneId) exitWith {
+        _hotScore = _x param [2, 0, [0]];
+    };
+} forEach _hotZones;
 
-if (_isContested) then {
-    _zoneScore = _zoneScore + 12;
-};
-
-if (_isUnderAttack) then {
-    _zoneScore = _zoneScore + 15;
-};
-
-if (_isCaptured) then {
-    _zoneScore = _zoneScore + 4;
-} else {
-    _zoneScore = _zoneScore + 2;
-};
+private _zoneScore = (_pressureScore * 0.55) + (_globalThreatLevel * 6);
+if (_isContested) then { _zoneScore = _zoneScore + 8; };
+if (_isUnderAttack) then { _zoneScore = _zoneScore + 12; };
+if (_isCaptured) then { _zoneScore = _zoneScore + 5; };
+_zoneScore = _zoneScore + _hotScore;
 
 switch (_zoneType) do {
-    case "capital": {
-        _zoneScore = _zoneScore + 12;
-    };
-    case "military": {
-        _zoneScore = _zoneScore + 9;
-    };
-    case "factory": {
-        _zoneScore = _zoneScore + 8;
-    };
-    default {
-        _zoneScore = _zoneScore + 4;
-    };
+    case "capital": { _zoneScore = _zoneScore + 10; };
+    case "military": { _zoneScore = _zoneScore + 7; };
+    case "factory": { _zoneScore = _zoneScore + 6; };
+    default { _zoneScore = _zoneScore + 3; };
 };
 
 private _zoneThreatLevel = 0;
 private _zoneThreatState = "low";
-private _responseProfile = "monitor";
+private _responseProfile = "ambient_patrols";
 
 switch (true) do {
     case (_zoneScore >= 80): {
         _zoneThreatLevel = 5;
-        _zoneThreatState = "war";
-        _responseProfile = if (_isCaptured) then {"major_counterattack"} else {"fortified_hub"};
+        _zoneThreatState = "hunt";
+        _responseProfile = if (_hotScore > 0 || _isUnderAttack) then {"active_hunt"} else {"major_counterattack"};
     };
-    case (_zoneScore >= 65): {
+    case (_zoneScore >= 60): {
         _zoneThreatLevel = 4;
-        _zoneThreatState = "critical";
-        _responseProfile = if (_isCaptured) then {"counterattack"} else {"fortified_front"};
+        _zoneThreatState = "search";
+        _responseProfile = if (_hotScore > 0 || _isUnderAttack) then {"search_grid"} else {"counterattack"};
     };
-    case (_zoneScore >= 50): {
+    case (_zoneScore >= 40): {
         _zoneThreatLevel = 3;
-        _zoneThreatState = "high";
-        _responseProfile = if (_isCaptured) then {"pressure"} else {"reinforced_front"};
-    };
-    case (_zoneScore >= 35): {
-        _zoneThreatLevel = 2;
         _zoneThreatState = "active";
-        _responseProfile = "patrols";
+        _responseProfile = if (_hotScore > 0) then {"reinforced_search"} else {"reinforced_patrols"};
     };
     case (_zoneScore >= 20): {
-        _zoneThreatLevel = 1;
+        _zoneThreatLevel = 2;
         _zoneThreatState = "elevated";
-        _responseProfile = "screening";
+        _responseProfile = "patrols";
+    };
+    case (_zoneScore >= 5): {
+        _zoneThreatLevel = 1;
+        _zoneThreatState = "watch";
+        _responseProfile = "light_patrols";
     };
     default {
         _zoneThreatLevel = 0;
         _zoneThreatState = "low";
-        _responseProfile = "monitor";
+        _responseProfile = "ambient_patrols";
     };
 };
 
-private _priorityScore = _zoneScore;
-if (_isCaptured) then { _priorityScore = _priorityScore + 10; };
-if (_zoneType == "capital") then { _priorityScore = _priorityScore + 15; };
-if (_zoneType == "military") then { _priorityScore = _priorityScore + 8; };
-if (_zoneType == "factory") then { _priorityScore = _priorityScore + 6; };
+private _priorityScore = _zoneScore + (_hotScore * 2);
 
 createHashMapFromArray [
     ["zoneId", _zoneId],

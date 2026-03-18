@@ -45,16 +45,43 @@ if (_mode == "INIT") exitWith {
         missionNamespace setVariable [_supplyVar, _totalSupplies, true];
         missionNamespace setVariable ["MWF_Supplies", _totalSupplies, true];
 
-        if (!isNil "MWF_fnc_registerThreatIncident") then {
-            [
-                if (_normalizedType == "HQ") then {"hq_destroyed"} else {"roadblock_destroyed"},
-                "",
-                if (_normalizedType == "HQ") then {4} else {2},
-                format ["%1 destroyed", _normalizedType]
-            ] call MWF_fnc_registerThreatIncident;
+        if (!isNil "MWF_fnc_applyMissionImpact") then {
+            private _impactProfile = if (_normalizedType == "HQ") then {
+                createHashMapFromArray [
+                    ["kind", "world"],
+                    ["id", "hq_destroyed"],
+                    ["threatDelta", 10],
+                    ["tierDelta", 18],
+                    ["supplies", 0],
+                    ["intel", 40],
+                    ["fallbackSupplies", 0],
+                    ["fallbackIntel", 0]
+                ]
+            } else {
+                createHashMapFromArray [
+                    ["kind", "world"],
+                    ["id", "roadblock_destroyed"],
+                    ["threatDelta", 4],
+                    ["tierDelta", 6],
+                    ["supplies", 0],
+                    ["intel", 10],
+                    ["fallbackSupplies", 0],
+                    ["fallbackIntel", 0]
+                ]
+            };
+            [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
         } else {
-            if (!isNil "MWF_fnc_markThreatDirty") then {
-                ["infrastructure_destroyed"] call MWF_fnc_markThreatDirty;
+            if (!isNil "MWF_fnc_registerThreatIncident") then {
+                [
+                    if (_normalizedType == "HQ") then {"hq_destroyed"} else {"roadblock_destroyed"},
+                    "",
+                    if (_normalizedType == "HQ") then {4} else {2},
+                    format ["%1 destroyed", _normalizedType]
+                ] call MWF_fnc_registerThreatIncident;
+            } else {
+                if (!isNil "MWF_fnc_markThreatDirty") then {
+                    ["infrastructure_destroyed"] call MWF_fnc_markThreatDirty;
+                };
             };
         };
 

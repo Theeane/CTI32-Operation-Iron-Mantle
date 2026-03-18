@@ -28,13 +28,14 @@ missionNamespace setVariable ["MWF_AuthenticatedPlayers", missionNamespace getVa
 missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false], true];
 
-missionNamespace setVariable ["MWF_LoadoutZones", missionNamespace getVariable ["MWF_LoadoutZones", []], true];
-
-if (!isNil "MWF_MOB_LoadoutTrigger" && {!isNull MWF_MOB_LoadoutTrigger}) then {
-    [objNull, 500, "MOB", MWF_MOB_LoadoutTrigger, false] call MWF_fnc_registerLoadoutZone;
-};
-
 missionNamespace setVariable ["MWF_WorldTier", missionNamespace getVariable ["MWF_WorldTier", 1], true];
+missionNamespace setVariable ["MWF_WorldTierScore", missionNamespace getVariable ["MWF_WorldTierScore", 0], true];
+missionNamespace setVariable ["MWF_WorldTierProgress", missionNamespace getVariable ["MWF_WorldTierProgress", 0], true];
+missionNamespace setVariable ["MWF_WorldTierFloor", missionNamespace getVariable ["MWF_WorldTierFloor", 1], true];
+missionNamespace setVariable ["MWF_WorldTierHalfMapLock", missionNamespace getVariable ["MWF_WorldTierHalfMapLock", false], true];
+missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", missionNamespace getVariable ["MWF_WorldTierProgressBlockedUntil", 0], true];
+missionNamespace setVariable ["MWF_TierFreeze_Active", missionNamespace getVariable ["MWF_TierFreeze_Active", false], true];
+missionNamespace setVariable ["MWF_TierFreeze_EndTime", missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0], true];
 missionNamespace setVariable ["MWF_ProgressionState", missionNamespace getVariable ["MWF_ProgressionState", "opening"], true];
 missionNamespace setVariable ["MWF_WorldZoneCountTotal", missionNamespace getVariable ["MWF_WorldZoneCountTotal", 0], true];
 missionNamespace setVariable ["MWF_CapturedZoneCount", missionNamespace getVariable ["MWF_CapturedZoneCount", 0], true];
@@ -57,7 +58,13 @@ missionNamespace setVariable ["MWF_WorldRecalcRunning", missionNamespace getVari
 missionNamespace setVariable ["MWF_WorldLastRecalcAt", missionNamespace getVariable ["MWF_WorldLastRecalcAt", -1], false];
 
 missionNamespace setVariable ["MWF_GlobalThreatLevel", missionNamespace getVariable ["MWF_GlobalThreatLevel", 0], true];
+missionNamespace setVariable ["MWF_GlobalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0], true];
 missionNamespace setVariable ["MWF_GlobalThreatState", missionNamespace getVariable ["MWF_GlobalThreatState", "low"], true];
+missionNamespace setVariable ["MWF_MainOpThreatProgressBlockedUntil", missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0], true];
+missionNamespace setVariable ["MWF_ThreatDecayPerMinute", missionNamespace getVariable ["MWF_ThreatDecayPerMinute", 2], true];
+missionNamespace setVariable ["MWF_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []], true];
+missionNamespace setVariable ["MWF_ThreatHotspotDuration", missionNamespace getVariable ["MWF_ThreatHotspotDuration", 900], true];
+missionNamespace setVariable ["MWF_ThreatLastDecayAt", missionNamespace getVariable ["MWF_ThreatLastDecayAt", -1], true];
 missionNamespace setVariable ["MWF_ThreatPressureScore", missionNamespace getVariable ["MWF_ThreatPressureScore", 0], true];
 missionNamespace setVariable ["MWF_HighThreatZoneIDs", missionNamespace getVariable ["MWF_HighThreatZoneIDs", []], true];
 missionNamespace setVariable ["MWF_CriticalThreatZoneIDs", missionNamespace getVariable ["MWF_CriticalThreatZoneIDs", []], true];

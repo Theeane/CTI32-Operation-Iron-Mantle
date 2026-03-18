@@ -54,10 +54,49 @@ if ((_newOwner isEqualTo "player") && !(_previousOwner isEqualTo "player")) then
     [_supplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
     missionNamespace setVariable ["MWF_CivRep", _civRep, true];
 
+    if (!isNil "MWF_fnc_applyMissionImpact") then {
+        private _zoneThreatDelta = switch (_zoneType) do {
+            case "capital": { 10 };
+            case "factory": { 8 };
+            case "military": { 9 };
+            default { 6 };
+        };
+        private _zoneTierDelta = switch (_zoneType) do {
+            case "capital": { 20 };
+            case "factory": { 14 };
+            case "military": { 16 };
+            default { 10 };
+        };
+        private _profile = createHashMapFromArray [
+            ["kind", "world"],
+            ["id", format ["zone_capture_%1", _zoneType]],
+            ["threatDelta", _zoneThreatDelta],
+            ["tierDelta", _zoneTierDelta],
+            ["supplies", 0],
+            ["intel", 0],
+            ["fallbackSupplies", 0],
+            ["fallbackIntel", 0]
+        ];
+        [_profile, createHashMapFromArray [["zoneId", toLower (_zone getVariable ["MWF_zoneID", ""])], ["loud", true]]] call MWF_fnc_applyMissionImpact;
+    };
+
     [format ["%1 secured. %2", _zoneName, _reason]] remoteExec ["systemChat", 0];
 };
 
 if ((_newOwner isEqualTo "enemy") && !(_previousOwner isEqualTo "enemy")) then {
+    if (!isNil "MWF_fnc_applyMissionImpact") then {
+        private _profile = createHashMapFromArray [
+            ["kind", "world"],
+            ["id", format ["zone_loss_%1", _zoneType]],
+            ["threatDelta", -4],
+            ["tierDelta", -8],
+            ["supplies", 0],
+            ["intel", 0],
+            ["fallbackSupplies", 0],
+            ["fallbackIntel", 0]
+        ];
+        [_profile, createHashMapFromArray [["zoneId", toLower (_zone getVariable ["MWF_zoneID", ""])], ["loud", true]]] call MWF_fnc_applyMissionImpact;
+    };
     [format ["%1 lost. %2", _zoneName, _reason]] remoteExec ["systemChat", 0];
 };
 

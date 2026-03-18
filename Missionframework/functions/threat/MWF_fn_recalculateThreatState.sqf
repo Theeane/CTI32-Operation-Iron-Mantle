@@ -37,6 +37,10 @@ private _destroyedHQs = count (missionNamespace getVariable ["MWF_DestroyedHQs",
 private _destroyedRoadblocks = count (missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]);
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _incidentLog = + (missionNamespace getVariable ["MWF_ThreatIncidentLog", []]);
+private _threatPercent = (missionNamespace getVariable ["MWF_GlobalThreatPercent", 0]) max 0 min 100;
+private _hotZones = + (missionNamespace getVariable ["MWF_ThreatHotZones", []]);
+_hotZones = _hotZones select { (_x param [1, 0, [0]]) > serverTime };
+missionNamespace setVariable ["MWF_ThreatHotZones", _hotZones, true];
 
 private _incidentPressure = 0;
 {
@@ -173,6 +177,7 @@ private _responseQueueArray = [];
 
 private _directiveArray = [
     ["globalThreatLevel", _globalThreatLevel],
+    ["globalThreatPercent", _threatPercent],
     ["globalThreatState", _globalThreatState],
     ["patrolDensity", _directives getOrDefault ["patrolDensity", 0.2]],
     ["qrfInterval", _directives getOrDefault ["qrfInterval", 900]],
@@ -198,6 +203,7 @@ private _stateChanged = (
 );
 
 missionNamespace setVariable ["MWF_GlobalThreatLevel", _globalThreatLevel, true];
+missionNamespace setVariable ["MWF_GlobalThreatPercent", _threatPercent, true];
 missionNamespace setVariable ["MWF_GlobalThreatState", _globalThreatState, true];
 missionNamespace setVariable ["MWF_ThreatPressureScore", _pressureScore, true];
 missionNamespace setVariable ["MWF_HighThreatZoneIDs", _highThreatZoneIds, true];

@@ -37,6 +37,40 @@ missionNamespace setVariable ["MWF_ThreatLastRecalcAt", -1, false];
     missionNamespace setVariable ["MWF_ThreatSystemReady", true, true];
 
     while {true} do {
+        private _nowServer = serverTime;
+        if ((missionNamespace getVariable ["MWF_TierFreeze_Active", false]) && {_nowServer >= (missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0])}) then {
+            missionNamespace setVariable ["MWF_TierFreeze_Active", false, true];
+            missionNamespace setVariable ["MWF_TierFreeze_EndTime", 0, true];
+            missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", 0, true];
+            missionNamespace setVariable ["MWF_WorldStateDirty", true, false];
+        };
+
+        private _lastDecayAt = missionNamespace getVariable ["MWF_ThreatLastDecayAt", -1];
+        if (_lastDecayAt < 0) then {
+            missionNamespace setVariable ["MWF_ThreatLastDecayAt", diag_tickTime, true];
+            _lastDecayAt = diag_tickTime;
+        };
+
+        private _elapsed = (diag_tickTime - _lastDecayAt) max 0;
+        if (_elapsed >= 5) then {
+            private _decayPerMinute = (missionNamespace getVariable ["MWF_ThreatDecayPerMinute", 2]) max 0;
+            private _decayAmount = (_decayPerMinute / 60) * _elapsed;
+            private _currentThreat = missionNamespace getVariable ["MWF_GlobalThreatPercent", 0];
+            private _newThreat = (_currentThreat - _decayAmount) max 0;
+            if (abs (_newThreat - _currentThreat) >= 0.05) then {
+                missionNamespace setVariable ["MWF_GlobalThreatPercent", _newThreat, true];
+                missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
+            };
+            missionNamespace setVariable ["MWF_ThreatLastDecayAt", diag_tickTime, true];
+        };
+
+        private _hotZones = + (missionNamespace getVariable ["MWF_ThreatHotZones", []]);
+        private _prunedHotZones = _hotZones select { (_x param [1, 0, [0]]) > _nowServer };
+        if ((count _prunedHotZones) != (count _hotZones)) then {
+            missionNamespace setVariable ["MWF_ThreatHotZones", _prunedHotZones, true];
+            missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
+        };
+
         private _incidentLog = + (missionNamespace getVariable ["MWF_ThreatIncidentLog", []]);
         private _beforeCount = count _incidentLog;
         private _now = diag_tickTime;

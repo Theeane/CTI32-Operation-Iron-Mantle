@@ -54,6 +54,7 @@ private _responseQueue = [];
 
 createHashMapFromArray [
     ["globalThreatLevel", missionNamespace getVariable ["MWF_GlobalThreatLevel", 0]],
+    ["globalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0]],
     ["globalThreatState", missionNamespace getVariable ["MWF_GlobalThreatState", "low"]],
     ["threatPressureScore", missionNamespace getVariable ["MWF_ThreatPressureScore", 0]],
     ["highThreatZoneIds", + (missionNamespace getVariable ["MWF_HighThreatZoneIDs", []])],
@@ -65,6 +66,8 @@ createHashMapFromArray [
     ["priorityTargets", _priorityTargets],
     ["responseQueue", _responseQueue],
     ["incidentLog", + (missionNamespace getVariable ["MWF_ThreatIncidentLog", []])],
+    ["hotZones", + (missionNamespace getVariable ["MWF_ThreatHotZones", []])],
+    ["mainOpThreatProgressBlockedUntil", missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0]],
     ["basePressure", missionNamespace getVariable ["MWF_ThreatBasePressure", 0]],
     ["baseAttackState", missionNamespace getVariable ["MWF_ThreatBaseAttackState", "idle"]],
     ["roadblockPressure", missionNamespace getVariable ["MWF_ThreatRoadblockPressure", 0]],

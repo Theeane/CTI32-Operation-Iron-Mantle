@@ -5,12 +5,8 @@
 
     Description:
     Aggregates authoritative zone data into future-safe world progression values.
-    Designed as the layer above zones for threat, missions, and economy hooks.
-
-    Notes:
-    - Uses a lightweight mutex to avoid overlapping recalculations.
-    - Public variables are limited to simple Arma-safe values.
-    - Complex snapshots stay server-local and are rebuilt on demand.
+    Strategic tier progression is now score-driven and only uses map control for
+    milestone locks such as the permanent Tier 3 floor at 50% map control.
 */
 
 if (!isServer) exitWith {createHashMap};
@@ -47,7 +43,6 @@ private _underAttackZones = 0;
 
     if (_zone getVariable ["MWF_isCaptured", false]) then {
         _capturedZones pushBack _zone;
-
         if (_zoneId != "") then {
             _capturedZoneIds pushBackUnique _zoneId;
         };
@@ -65,13 +60,18 @@ private _totalZones = count _validZones;
 private _capturedCount = count _capturedZones;
 private _mapControl = if (_totalZones > 0) then { ((_capturedCount / _totalZones) * 100) min 100 } else { 0 };
 
-private _worldTier = [
-    _mapControl,
-    _capturedCount,
-    _capturedCapitals,
-    _capturedFactories,
-    _capturedMilitary
-] call MWF_fnc_determineWorldTier;
+private _halfMapLock = _mapControl >= 50;
+private _floorTier = if (_halfMapLock) then {3} else {1};
+private _floorScore = if (_halfMapLock) then {200} else {0};
+private _score = missionNamespace getVariable ["MWF_WorldTierScore", 0];
+if (_score < _floorScore) then {
+    _score = _floorScore;
+    missionNamespace setVariable ["MWF_WorldTierScore", _score, true];
+};
+
+private _worldTier = ((_score / 100) call BIS_fnc_floor) + 1;
+_worldTier = (_worldTier max _floorTier) min 5;
+private _worldTierProgress = if (_worldTier >= 5) then {100} else {_score mod 100};
 
 private _progressionState = [
     _mapControl,
@@ -81,14 +81,25 @@ private _progressionState = [
     _underAttackZones
 ] call MWF_fnc_determineProgressionState;
 
+private _tierBlockedUntil = missionNamespace getVariable ["MWF_WorldTierProgressBlockedUntil", 0];
+private _freezeActive = missionNamespace getVariable ["MWF_TierFreeze_Active", false];
+if (_freezeActive && {serverTime >= (missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0])}) then {
+    missionNamespace setVariable ["MWF_TierFreeze_Active", false, true];
+    missionNamespace setVariable ["MWF_TierFreeze_EndTime", 0, true];
+    missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", 0, true];
+    _tierBlockedUntil = 0;
+};
+
 private _milestonesArray = [
     ["hasFoothold", _capturedCount >= 1],
     ["hasSupplyNetwork", _capturedTowns >= 3 || _capturedFactories >= 1],
     ["hasStrategicIndustry", _capturedFactories >= 1],
     ["hasMilitaryPresence", _capturedMilitary >= 1],
     ["hasCapitalPressure", _capturedCapitals >= 1 || _mapControl >= 60],
-    ["mapHalfControlled", _mapControl >= 50],
-    ["campaignNearVictory", _mapControl >= 80 || _capturedCapitals >= 1]
+    ["mapHalfControlled", _halfMapLock],
+    ["campaignNearVictory", _mapControl >= 80 || _capturedCapitals >= 1],
+    ["tierFloorLocked", _halfMapLock],
+    ["tierProgressBlocked", _tierBlockedUntil > serverTime]
 ];
 private _milestones = createHashMapFromArray _milestonesArray;
 
@@ -96,11 +107,13 @@ private _previousTier = missionNamespace getVariable ["MWF_WorldTier", -1];
 private _previousState = missionNamespace getVariable ["MWF_ProgressionState", ""];
 private _previousMapControl = missionNamespace getVariable ["MWF_MapControlPercent", -1];
 private _previousCapturedIds = missionNamespace getVariable ["MWF_CapturedZoneIDs", []];
+private _previousFloorLock = missionNamespace getVariable ["MWF_WorldTierHalfMapLock", false];
 private _stateChanged = (
     _previousTier != _worldTier ||
     _previousState != _progressionState ||
     {abs (_previousMapControl - _mapControl) >= 0.01} ||
-    {!(_previousCapturedIds isEqualTo _capturedZoneIds)}
+    {!(_previousCapturedIds isEqualTo _capturedZoneIds)} ||
+    {_previousFloorLock != _halfMapLock}
 );
 
 missionNamespace setVariable ["MWF_captured_zones_list", _capturedZones, true];
@@ -116,6 +129,9 @@ missionNamespace setVariable ["MWF_WorldZoneCountTotal", _totalZones, true];
 missionNamespace setVariable ["MWF_ContestedZoneCount", _contestedZones, true];
 missionNamespace setVariable ["MWF_UnderAttackZoneCount", _underAttackZones, true];
 missionNamespace setVariable ["MWF_WorldTier", _worldTier, true];
+missionNamespace setVariable ["MWF_WorldTierProgress", _worldTierProgress, true];
+missionNamespace setVariable ["MWF_WorldTierFloor", _floorTier, true];
+missionNamespace setVariable ["MWF_WorldTierHalfMapLock", _halfMapLock, true];
 missionNamespace setVariable ["MWF_ProgressionState", _progressionState, true];
 missionNamespace setVariable ["MWF_ProgressionMilestonesArray", _milestonesArray, true];
 
@@ -134,11 +150,13 @@ missionNamespace setVariable ["MWF_ThreatStateDirty", true, false];
 
 if (_stateChanged) then {
     diag_log format [
-        "[MWF World] Recalculated | Zones: %1/%2 | Control: %3%% | Tier: %4 | State: %5",
+        "[MWF World] Recalculated | Zones: %1/%2 | Control: %3%% | Tier: %4 (%5%%) | Floor: T%6 | State: %7",
         _capturedCount,
         _totalZones,
         round _mapControl,
         _worldTier,
+        _worldTierProgress,
+        _floorTier,
         _progressionState
     ];
 };
