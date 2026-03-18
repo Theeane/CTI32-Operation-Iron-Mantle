@@ -54,6 +54,15 @@ class CfgFunctions {
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
         };
 
+
+        class DataUI {
+            file = "Missionframework/ui/datahub";
+            class dataHub { file = "Missionframework/ui/datahub/MWF_fn_dataHub.sqf"; };
+            class collectDataMapEntries { file = "Missionframework/ui/datahub/MWF_fn_collectDataMapEntries.sqf"; };
+            class collectRespawnPoints { file = "Missionframework/ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
+            class refreshDataMap { file = "Missionframework/ui/datahub/MWF_fn_refreshDataMap.sqf"; };
+        };
+
         class Terminal {
             file = "Missionframework/functions/terminal";
             class terminal_main { file = "Missionframework/functions/terminal/MWF_fnc_terminal_main.sqf"; };
@@ -132,20 +141,12 @@ class CfgFunctions {
             class undercoverTalk { file = "Missionframework/functions/economy/MWF_fn_undercoverTalk.sqf"; };
         };
 
-
-        class Progression {
-            file = "Missionframework/functions/progression";
-            class applyMissionImpact { file = "Missionframework/functions/progression/MWF_fn_applyMissionImpact.sqf"; };
-            class getMissionImpactProfile { file = "Missionframework/functions/progression/MWF_fn_getMissionImpactProfile.sqf"; };
-        };
-
         class Missions {
             file = "Missionframework/missions";
             class openMissionBoard { file = "Missionframework/missions/MWF_fn_openMissionBoard.sqf"; };
             class activateMissionBoardSlot { file = "Missionframework/missions/MWF_fn_activateMissionBoardSlot.sqf"; };
             class buildGrandOperationPlacements { file = "Missionframework/missions/MWF_fn_buildGrandOperationPlacements.sqf"; };
             class buildMissionSessionPlacements { file = "Missionframework/missions/MWF_fn_buildMissionSessionPlacements.sqf"; };
-            class completeSideMission { file = "Missionframework/missions/MWF_fn_completeSideMission.sqf"; };
             class discoverMissionTemplates { file = "Missionframework/missions/MWF_fn_discoverMissionTemplates.sqf"; };
             class executeMissionTemplate { file = "Missionframework/missions/MWF_fn_executeMissionTemplate.sqf"; };
             class generateInitialMission { file = "Missionframework/missions/MWF_fn_generateInitialMission.sqf"; };
