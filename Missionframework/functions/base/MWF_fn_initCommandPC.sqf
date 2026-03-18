@@ -16,25 +16,10 @@ if (isNull _laptop) exitWith {};
 _laptop allowDamage false;
 
 private _condOpenWar = "(missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR'";
-private _condTutorialLock = "(missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) != 'OPEN_WAR'";
-private _condPeace = _condOpenWar + " && !(missionNamespace getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condDamaged = _condOpenWar + " && (_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condIntel = _condOpenWar + " && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condAttack = _condOpenWar + " && (missionNamespace getVariable ['MWF_isUnderAttack', false])";
-private _condRepackAuthorize = _condOpenWar + " && !(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condRepackLock = _condOpenWar + " && (_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-
-_laptop addAction [
-    "<t color='#ffaa00'>[ TERMINAL LOCKED - COMPLETE MOB TUTORIAL TASK ]</t>",
-    {
-        [
-            ["COMMAND NETWORK", "FOB terminal access remains locked until the tutorial supply run is completed and OPEN_WAR is unlocked from the MOB terminal."],
-            "warning"
-        ] call MWF_fnc_showNotification;
-        systemChat "FOB terminal locked: Complete the tutorial supply run and unlock OPEN_WAR from the MOB terminal.";
-    },
-    nil, 12, true, true, "", _condTutorialLock, 5
-];
+private _condPeace = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(missionNamespace getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condDamaged = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condAttack = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (missionNamespace getVariable ['MWF_isUnderAttack', false])";
 
 _laptop addAction [
     "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>",
@@ -121,7 +106,7 @@ _laptop addAction [
         params ["_target", "_caller"];
         [_target, true] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", _condRepackAuthorize
+    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ];
 
 _laptop addAction [
@@ -130,7 +115,7 @@ _laptop addAction [
         params ["_target", "_caller"];
         [_target, false] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", _condRepackLock
+    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ];
 
 [_laptop] call MWF_fnc_packFOB;

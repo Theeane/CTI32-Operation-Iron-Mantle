@@ -9,6 +9,10 @@
 */
 
 if (!hasInterface) exitWith { false };
+if !((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") exitWith {
+    hint "Virtual Arsenal låses upp när OPEN_WAR har startat.";
+    false
+};
 
 [] call MWF_fnc_buildLoadoutCaches;
 private _arsenalItems = missionNamespace getVariable ["MWF_ArsenalItemClasses", []];

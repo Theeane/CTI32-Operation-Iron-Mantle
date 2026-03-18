@@ -57,6 +57,15 @@ switch (_stage) do {
         ] call BIS_fnc_taskCreate;
 
         missionNamespace setVariable ["MWF_current_stage", 2, true];
+
+        private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+        if (_campaignPhase isEqualTo "TUTORIAL") then {
+            if (!isNil "MWF_fnc_setCampaignPhase") then {
+                ["SUPPLY_RUN", "FOB Tutorial Complete"] call MWF_fnc_setCampaignPhase;
+            } else {
+                missionNamespace setVariable ["MWF_Campaign_Phase", "SUPPLY_RUN", true];
+            };
+        };
     };
 
     case 3: {

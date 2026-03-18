@@ -48,9 +48,10 @@ missionNamespace setVariable ["MWF_SavedRespawnProfile", profileNamespace getVar
             };
         } forEach _zones;
 
+        private _phaseAllowsLoadout = (missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR";
         private _hasActions = !((missionNamespace getVariable ["MWF_LoadoutActionIds", []]) isEqualTo []);
 
-        if (_insideZone && {!_hasActions}) then {
+        if (_insideZone && {_phaseAllowsLoadout} && {!_hasActions}) then {
             private _actionIds = [];
             _actionIds pushBack (
                 player addAction [
@@ -81,7 +82,7 @@ missionNamespace setVariable ["MWF_SavedRespawnProfile", profileNamespace getVar
             missionNamespace setVariable ["MWF_LoadoutActionIds", _actionIds];
         };
 
-        if (!_insideZone && {_hasActions}) then {
+        if ((!_insideZone || {!_phaseAllowsLoadout}) && {_hasActions}) then {
             {
                 player removeAction _x;
             } forEach (missionNamespace getVariable ["MWF_LoadoutActionIds", []]);

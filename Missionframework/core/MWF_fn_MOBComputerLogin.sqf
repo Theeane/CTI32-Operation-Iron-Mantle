@@ -75,6 +75,30 @@ missionNamespace setVariable ["MWF_system_active", false, true];
 
 switch (_campaignPhase) do {
     case "TUTORIAL": {
+        if (_currentStage >= 2) exitWith {
+            if (!isNil "MWF_fnc_setCampaignPhase") then {
+                ["SUPPLY_RUN", "Tutorial Stage Recovery"] remoteExecCall ["MWF_fnc_setCampaignPhase", 2];
+            } else {
+                missionNamespace setVariable ["MWF_Campaign_Phase", "SUPPLY_RUN", true];
+            };
+
+            if (_supplyRunDone) then {
+                [
+                    ["COMMAND NETWORK", "Complete the initial supply run to open the war and unlock the command terminal permanently."],
+                    "warning"
+                ] call MWF_fnc_showNotification;
+                systemChat "Terminal locked: Complete the initial supply run milestone.";
+            } else {
+                [2] call _requestInitialMission;
+                [
+                    ["COMMAND NETWORK", "Complete the initial supply run to open the war and unlock the command terminal permanently."],
+                    "warning"
+                ] call MWF_fnc_showNotification;
+                systemChat "Terminal locked: Complete the initial supply run milestone.";
+            };
+            false
+        };
+
         call _showPlayerUI;
 
         if (_currentStage != 1) then {

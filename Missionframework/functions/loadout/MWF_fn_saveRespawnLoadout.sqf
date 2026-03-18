@@ -9,6 +9,10 @@
 */
 
 if (!hasInterface) exitWith { false };
+if !((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") exitWith {
+    hint "Respawn-loadout kan sparas först när OPEN_WAR har startat.";
+    false
+};
 
 [] call MWF_fnc_buildLoadoutCaches;
 private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];

@@ -157,7 +157,7 @@ if (!_isRestore) then {
 
         private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
         if (_currentStage == 1) then {
-            [] call MWF_fnc_generateInitialMission;
+            [2] call MWF_fnc_generateInitialMission;
             diag_log "[MWF FOB] Tutorial mission advanced to post-deploy stage.";
         } else {
             diag_log format ["[MWF FOB] Tutorial mission post-deploy trigger skipped. Current stage: %1.", _currentStage];
