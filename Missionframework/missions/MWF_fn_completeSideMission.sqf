@@ -4,8 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Authoritative helper to finish a generated side mission, pay the current
-    fixed placeholder rewards, and update the active mission registry.
+    Authoritative helper to finish a generated side mission, apply per-mission
+    fixed rewards/impact from the active mission definition when available,
+    and update the active mission registry.
 
     Parameters:
     0: missionKey <STRING>
@@ -37,25 +38,86 @@ _mission params [
     ["_zoneId", "", [""]],
     ["_zoneName", "Unknown Area", [""]],
     ["_category", "disrupt", [""]],
-    ["_difficulty", "easy", [""]]
+    ["_difficulty", "easy", [""]],
+    ["_missionId", 0, [0]],
+    ["_state", "active", [""]],
+    ["_missionDefinition", [], [[]]]
 ];
 
-private _profile = [_category, _difficulty] call MWF_fnc_getSideMissionRewardProfile;
-_profile params ["_suppliesReward", "_intelReward", "_threatSeverity", "_bonusIntelIfUndercover"];
+private _getDefinitionValue = {
+    params ["_definition", "_key", "_default"];
+    if !(_definition isEqualType []) exitWith {_default};
+    private _index = _definition findIf {
+        (_x isEqualType []) && {(count _x) >= 2} && {((_x # 0) isEqualType "") && {(_x # 0) isEqualTo _key}}
+    };
+    if (_index < 0) exitWith { _default };
+    (_definition # _index) # 1
+};
 
-private _intelAward = _intelReward;
-if (_wasUndercover) then {
-    _intelAward = _intelAward + _bonusIntelIfUndercover;
-} else {
-    ["side_mission_loud", _zoneId, _threatSeverity, _resolvedMissionKey] call MWF_fnc_registerThreatIncident;
+private _usedPerMissionDefinition = false;
+private _suppliesReward = 0;
+private _intelAward = 0;
+private _appliedThreat = 0;
+private _appliedTier = 0;
+private _fallbackUsed = false;
+
+if (_missionDefinition isEqualType [] && {count _missionDefinition > 0} && {!isNil "MWF_fnc_applyMissionImpact"}) then {
+    private _rewardSupplies = [_missionDefinition, "rewardSupplies", -1] call _getDefinitionValue;
+    private _rewardIntel = [_missionDefinition, "rewardIntel", -1] call _getDefinitionValue;
+    private _rewardThreat = [_missionDefinition, "rewardThreat", 0] call _getDefinitionValue;
+    private _rewardTier = [_missionDefinition, "rewardTier", 0] call _getDefinitionValue;
+    private _rewardThreatUndercover = [_missionDefinition, "rewardThreatUndercover", 0] call _getDefinitionValue;
+    private _fallbackSupplies = [_missionDefinition, "fallbackSupplies", 0] call _getDefinitionValue;
+    private _fallbackIntel = [_missionDefinition, "fallbackIntel", 0] call _getDefinitionValue;
+
+    if (_rewardSupplies >= 0 && {_rewardIntel >= 0}) then {
+        private _profile = createHashMapFromArray [
+            ["kind", "side"],
+            ["id", _resolvedMissionKey],
+            ["supplies", _rewardSupplies],
+            ["intel", _rewardIntel],
+            ["threatDelta", if (_wasUndercover) then {_rewardThreatUndercover} else {_rewardThreat}],
+            ["tierDelta", _rewardTier],
+            ["fallbackSupplies", _fallbackSupplies],
+            ["fallbackIntel", _fallbackIntel],
+            ["note", _note]
+        ];
+
+        private _result = [_profile, createHashMapFromArray [
+            ["zoneId", _zoneId],
+            ["loud", !_wasUndercover]
+        ]] call MWF_fnc_applyMissionImpact;
+
+        _suppliesReward = _result getOrDefault ["suppliesGranted", _rewardSupplies];
+        _intelAward = _result getOrDefault ["intelGranted", _rewardIntel];
+        _appliedThreat = _result getOrDefault ["threatApplied", 0];
+        _appliedTier = _result getOrDefault ["tierApplied", 0];
+        _fallbackUsed = _result getOrDefault ["fallbackUsed", false];
+        _usedPerMissionDefinition = true;
+    };
+};
+
+if (!_usedPerMissionDefinition) then {
+    private _profile = [_category, _difficulty] call MWF_fnc_getSideMissionRewardProfile;
+    _profile params ["_legacySuppliesReward", "_legacyIntelReward", "_legacyThreatSeverity", "_legacyBonusIntelIfUndercover"];
+
+    _suppliesReward = _legacySuppliesReward;
+    _intelAward = _legacyIntelReward;
+
+    if (_wasUndercover) then {
+        _intelAward = _intelAward + _legacyBonusIntelIfUndercover;
+    } else {
+        _appliedThreat = _legacyThreatSeverity;
+        ["side_mission_loud", _zoneId, _legacyThreatSeverity, _resolvedMissionKey] call MWF_fnc_registerThreatIncident;
+    };
+
+    if (_suppliesReward > 0) then { [_suppliesReward, "SUPPLIES"] call MWF_fnc_addResource; };
+    if (_intelAward > 0) then { [_intelAward, "INTEL"] call MWF_fnc_addResource; };
 };
 
 if (_taskId != "") then {
     [_taskId, "SUCCEEDED", true] call BIS_fnc_taskSetState;
 };
-
-if (_suppliesReward > 0) then { [_suppliesReward, "SUPPLIES"] call MWF_fnc_addResource; };
-if (_intelAward > 0) then { [_intelAward, "INTEL"] call MWF_fnc_addResource; };
 
 _activeMissions deleteAt _missionIndex;
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
@@ -74,13 +136,17 @@ if (!isNil "MWF_fnc_requestDelayedSave") then {
 };
 
 diag_log format [
-    "[MWF Missions] Side mission completed | Key: %1 | Category: %2 | Difficulty: %3 | Supplies: +%4 | Intel: +%5 | Undercover: %6 | Note: %7",
+    "[MWF Missions] Side mission completed | Key: %1 | Category: %2 | Difficulty: %3 | Supplies: +%4 | Intel: +%5 | ThreatApplied: %6 | TierApplied: %7 | Undercover: %8 | PerMissionDefinition: %9 | FallbackUsed: %10 | Note: %11",
     _resolvedMissionKey,
     _category,
     _difficulty,
     _suppliesReward,
     _intelAward,
+    _appliedThreat,
+    _appliedTier,
     _wasUndercover,
+    _usedPerMissionDefinition,
+    _fallbackUsed,
     _note
 ];
 
