@@ -1,273 +1,190 @@
-# AI Mission Generation Instructions (_4–_99)
+AI Mission Generation Instructions (_4–_99)
 
-## Purpose
+Purpose
+These instructions apply only to community-created missions in the _4–_99 range.
+Core/internal missions _1–_3 are reserved and must not be overwritten, duplicated, or renamed.
 
-These instructions apply only to **community-created missions** in the `_4–_99` range.
-
-* Missions `_1–_3` are reserved for core/internal use.
-* Do NOT overwrite or duplicate `_1–_3`.
-
----
-
-## 1. Mission Categories
-
+1. Mission Categories
 Allowed mission categories:
+- DisruptMission
+- SupplyMission
+- IntelMission
+- MainOperation
 
-* DisruptMission
-* SupplyMission
-* IntelMission
-* MainOperation
+Each mission must be placed in the correct category folder inside the active content pack.
+Examples:
+- SideMissions/modern/DisruptMission/
+- SideMissions/modern/SupplyMission/
+- SideMissions/modern/IntelMission/
+- SideMissions/modern/MainOperation/
 
-Each mission must be placed in the correct category folder.
+2. Theme / Content Pack Structure
+Missions must be created inside the correct theme/content pack.
+Supported examples:
+- modern
+- gm
+- vietnam
+- ww2
+- custom community packs
+
+Suggested structure:
+- SideMissions/{theme}/DisruptMission/
+- SideMissions/{theme}/SupplyMission/
+- SideMissions/{theme}/IntelMission/
+- SideMissions/{theme}/MainOperation/
+- SideMissions/{theme}/compositions/
+
+3. Mission ID Rules (MANDATORY)
+Before creating a new mission, the AI must FIRST do one of the following:
+- ask which mission files already exist in the target folder, or
+- scan the target folder and list the existing mission files.
+
+The AI must then:
+1. identify all used numeric suffixes
+2. avoid duplicates
+3. choose the next free ID in the _4–_99 range
 
 Example:
+- if MissionSupply_4 already exists, do NOT create another MissionSupply_4
+- choose the next free ID instead
+
+4. Reserved Range
+- _1–_3 = reserved for official/internal missions
+- _4–_99 = community mission range
+
+Never modify _1–_3 when generating community missions.
+
+5. No Hardcoded Classnames
+Mission files must be mod agnostic.
+Do NOT hardcode:
+- unit classnames
+- vehicle classnames
+- object/prop classnames
+- faction-specific asset classnames
+
+6. Unit / Vehicle Source Rules
+Mission files describe intent only. Runtime asset selection comes from presets and progression systems.
+
+OPFOR
+- source: preset/opfor
+- scaled by: world tier
+
+BLUFOR
+- source: preset/blufor
+- scaled by: player base tier
+
+Civilians
+- source: preset/civilians
+
+Rebels
+- source: preset/resistance
+- scaled by: rebel tier
+- may depend on civilian/rebel reputation rules
+
+7. Composition Rules
+All mission layouts, props, and objective scenes must use composition keys.
+Mission files may reference composition keys only.
+Do NOT hardcode world objects directly in mission definitions.
+
+8. Mission Data Standard
+Each mission should define structured metadata, including at minimum:
+- missionId
+- title
+- description
+- category
+- difficulty
+- allowedZoneTypes
+- allowUndercover
+- usesOpfor
+- usesBluforSupport
+- usesCivilians
+- usesRebels
+- compositionKey
+- rewardSupplies
+- rewardIntel
+- rewardThreat
+- rewardTier
+- rewardThreatUndercover
+
+Optional fields may include:
+- requiresRoad
+- requiresSettlement
+- requiresMilitary
+- requiresCoast
+- minDistanceFromBase
+- maxDistanceFromBase
+- requiresRebelCooperation
+- minCivilianRep
+- minRebelRep
+- failIfRepTooLow
+- notes
+
+9. Reward Rules
+Rewards must be fixed per mission.
+Rewards may vary between individual missions, even inside the same category and difficulty.
+Do NOT randomize reward values.
+
+Undercover completions should use rewardThreatUndercover instead of normal rewardThreat.
+This is usually 0 or very low, depending on mission design.
+
+10. Difficulty Rules
+Allowed difficulty labels:
+- easy
+- medium
+- hard
+
+Difficulty should affect mission pressure, resistance, complexity, and reward tuning.
+Difficulty must not be implemented with hardcoded assets.
+
+11. Placement Rules
+Missions must be placed only in valid zones for the mission type.
+Always validate the selected zone before finalizing the mission.
+Examples of valid placement tags/types include:
+- town
+- military
+- factory
+- capital
+- roadside
+- rural
+- coastal
 
-* SideMissions/modern/DisruptMission/
-* SideMissions/modern/SupplyMission/
-
----
-
-## 2. Theme / Content Pack Structure
-
-Missions must be placed inside a valid theme pack:
-
-Examples:
-
-* modern
-* gm
-* vietnam
-* ww2
-* custom packs
-
-Structure:
-SideMissions/{theme}/DisruptMission/
-SideMissions/{theme}/SupplyMission/
-SideMissions/{theme}/IntelMission/
-SideMissions/{theme}/MainOperation/
-SideMissions/{theme}/compositions/
-
----
-
-## 3. Mission ID Rules (IMPORTANT)
-
-Before creating a mission, ALWAYS:
-
-1. Scan the target folder
-2. List existing mission IDs
-3. Find used numbers
-4. Select the next available ID between `_4–_99`
-
-Example:
-
-* If MissionSupply_4 exists → DO NOT create another _4
-* Use the next free ID (e.g., _5)
-
----
-
-## 4. Reserved Range
-
-* `_1–_3` → core/internal missions
-* `_4–_99` → community missions
-
-Never modify `_1–_3`.
-
----
-
-## 5. NO Hardcoded Classnames
-
-Mission files must be **mod agnostic**.
-
-DO NOT hardcode:
-
-* Units
-* Vehicles
-* Props
-* Objects
-* Factions
-
-❌ Example (NOT allowed):
-"O_Soldier_F", "B_Truck_01_transport_F"
-
----
-
-## 6. Unit / Vehicle Sources
-
-### OPFOR
-
-* Source: preset/opfor
-* Scaled by: world tier
-
-### BLUFOR
-
-* Source: preset/blufor
-* Scaled by: player base tier
-
-### Civilians
-
-* Source: preset/civ
-
-### Rebels
-
-* Source: preset/rebel
-* Scaled by: rebel tier
-* May depend on reputation
-
----
-
-## 7. Compositions (REQUIRED)
-
-All mission environments must use **composition keys**.
-
-Examples:
-
-* supply_cache_small
-* intel_meeting_site
-* roadblock_light
-* field_hq_medium
-
-DO NOT place objects manually.
-
----
-
-## 8. Mission Data Standard
-
-Each mission must define:
-
-* missionId
-
-* title
-
-* description
-
-* category
-
-* difficulty
-
-* allowedZoneTypes
-
-* allowUndercover
-
-* usesOpfor
-
-* usesBluforSupport
-
-* usesCivilians
-
-* usesRebels
-
-* compositionKey
-
-* rewardSupplies
-
-* rewardIntel
-
-* rewardThreat
-
-* rewardTier
-
-* rewardThreatUndercover
-
----
-
-## 9. Reward Rules
-
-* Rewards are **fixed per mission**
-* Rewards can vary between missions
-* Do NOT randomize rewards
-
-Undercover:
-
-* Uses rewardThreatUndercover (usually 0)
-
----
-
-## 10. Difficulty
-
-Allowed:
-
-* Easy
-* Medium
-* Hard
-
-Difficulty affects:
-
-* complexity
-* resistance
-* reward
-
-NOT classnames.
-
----
-
-## 11. Placement Rules
-
-Missions must spawn in valid zones only.
-
-Examples:
-
-* town
-* military
-* factory
-* capital
-* rural
-* roadside
-
----
-
-## 12. Rebel / Reputation Rules
-
+12. Rebel / Reputation Rules
 If a mission uses rebels:
+- rebel support may depend on rebel tier
+- access may depend on civilian/rebel reputation
+- missions may fail or be blocked if reputation is too low
 
-* May require reputation
-* May fail if reputation is too low
-* May restrict access
+13. Variety Rules
+Generate variety across:
+- category
+- difficulty
+- zone usage
+- stealth vs loud compatibility
+- civilian/rebel involvement
+- composition usage
 
----
+Do not generate structurally identical missions repeatedly.
 
-## 13. Variety
+14. Community Safety Rules
+Community missions in _4–_99 must NOT:
+- modify presets
+- modify economy systems
+- modify tier/threat systems
+- modify core mission framework logic
+- overwrite official missions
 
-Ensure variation in:
+15. Community Authoring Workflow (MANDATORY)
+1. choose the target theme/content pack
+2. choose the correct mission category folder
+3. ask which missions already exist in that folder, or scan the folder directly
+4. find the next free ID in _4–_99
+5. build the mission using structured mission metadata
+6. use no hardcoded classnames
+7. use composition keys for layouts
+8. rely on preset/tier systems for units and vehicles
+9. define fixed mission-specific rewards
+10. save the mission with a unique non-conflicting filename
 
-* category
-* difficulty
-* stealth vs loud
-* civilian presence
-
-Avoid repetition.
-
----
-
-## 14. Safety Rules
-
-Community missions must NOT:
-
-* modify presets
-* modify economy
-* modify tier/threat systems
-* modify core framework logic
-
----
-
-## 15. Generation Workflow (MANDATORY)
-
-1. Select theme
-2. Select category
-3. Scan existing missions
-4. Find free ID (_4–_99)
-5. Build mission data
-6. Use NO classnames
-7. Use compositions
-8. Use presets/tier systems
-9. Define fixed rewards
-10. Save mission
-
----
-
-## 16. Internal Scope
-
-* `_1–_3` → internal development only
-* `_4–_99` → community expansion
-
----
-
-END OF INSTRUCTIONS
+16. Internal Development Scope
+Official/internal workflow may update only the reserved _1–_3 missions directly.
+Community generation belongs in the _4–_99 range.

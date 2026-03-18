@@ -4,16 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Executes the generic placeholder behavior for a folder-driven mission template.
-    This is intentionally lightweight for pre-alpha system validation:
-    - validates board slot data
-    - creates a task from the selected template
-    - tracks the mission in the active mission registry
-    - marks the slot active without crashing on empty content wrappers
-
-    Notes:
-    This function is the shared runtime entrypoint for scaffold missions.
-    Unique mission content can later replace or extend this placeholder layer.
+    Executes the shared runtime behavior for structured mission templates.
+    Mission-specific identity, placement hints, reward values, and scenario flags
+    are supplied by the mission file as structured metadata rather than hardcoded assets.
 */
 
 if (!isServer) exitWith {};
@@ -23,10 +16,20 @@ params [
     ["_caller", objNull, [objNull]],
     ["_category", "", [""]],
     ["_difficulty", "", [""]],
-    ["_missionId", 0, [0]]
+    ["_missionId", 0, [0]],
+    ["_missionDefinition", [], [[]]]
 ];
 
 if (_slotData isEqualTo []) exitWith {};
+
+private _getDefinitionValue = {
+    params ["_definition", "_key", "_default"];
+    private _index = _definition findIf {
+        (_x isEqualType []) && {(count _x) >= 2} && {((_x # 0) isEqualType "") && {(_x # 0) isEqualTo _key}}
+    };
+    if (_index < 0) exitWith { _default };
+    (_definition # _index) # 1
+};
 
 _slotData params [
     ["_slotIndex", -1, [0]],
@@ -92,28 +95,44 @@ private _categoryLabel = switch (_category) do {
     };
 };
 
-private _taskId = format ["MWF_task_%1_%2_%3_%4", _category, _difficulty, _missionId, round serverTime];
-private _briefing = switch (_category) do {
-    case "disrupt": {
-        format ["Disrupt hostile operations near %1. This placeholder template keeps the board, slot activation, and runtime chain stable until the final authored mission replaces it.", _zoneName]
-    };
-    case "supply": {
-        format ["Move on a supply-related objective near %1. This placeholder template exists to validate the mission board chain before unique content is authored.", _zoneName]
-    };
-    case "intel": {
-        format ["Investigate an intelligence lead near %1. This placeholder template currently validates template execution and board integration.", _zoneName]
-    };
-    default {
-        format ["Execute mission template %1 near %2.", _missionId, _zoneName]
-    };
+private _missionTitle = [_missionDefinition, "title", format ["%1 Mission (%2)", _categoryLabel, _difficultyLabel]] call _getDefinitionValue;
+private _missionDescription = [_missionDefinition, "description", format ["Execute mission template %1 near %2.", _missionId, _zoneName]] call _getDefinitionValue;
+private _rewardSupplies = [_missionDefinition, "rewardSupplies", 0] call _getDefinitionValue;
+private _rewardIntel = [_missionDefinition, "rewardIntel", 0] call _getDefinitionValue;
+private _rewardThreat = [_missionDefinition, "rewardThreat", 0] call _getDefinitionValue;
+private _rewardTier = [_missionDefinition, "rewardTier", 0] call _getDefinitionValue;
+private _rewardThreatUndercover = [_missionDefinition, "rewardThreatUndercover", 0] call _getDefinitionValue;
+private _allowUndercover = [_missionDefinition, "allowUndercover", false] call _getDefinitionValue;
+private _compositionKey = [_missionDefinition, "compositionKey", ""] call _getDefinitionValue;
+private _zoneTypes = [_missionDefinition, "allowedZoneTypes", []] call _getDefinitionValue;
+private _briefingLines = [
+    _missionDescription,
+    "",
+    format ["Area: %1", _zoneName],
+    format ["Rewards: %1 Supplies / %2 Intel / %3 Threat / %4 Tier", _rewardSupplies, _rewardIntel, _rewardThreat, _rewardTier]
+];
+
+if (_allowUndercover) then {
+    _briefingLines pushBack format ["Undercover completion threat: %1", _rewardThreatUndercover];
 };
+
+if !(_compositionKey isEqualTo "") then {
+    _briefingLines pushBack format ["Composition key: %1", _compositionKey];
+};
+
+if !(_zoneTypes isEqualTo []) then {
+    _briefingLines pushBack format ["Zone profile: %1", _zoneTypes joinString ", "];
+};
+
+private _taskId = format ["MWF_task_%1_%2_%3_%4", _category, _difficulty, _missionId, round serverTime];
+private _briefing = _briefingLines joinString "<br/>";
 
 [
     west,
     _taskId,
     [
         _briefing,
-        format ["%1 Mission (%2)", _categoryLabel, _difficultyLabel],
+        _missionTitle,
         _position
     ],
     _position,
@@ -136,7 +155,8 @@ _activeMissions pushBack [
     _category,
     _difficulty,
     _missionId,
-    "active"
+    "active",
+    _missionDefinition
 ];
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
 
@@ -146,5 +166,5 @@ private _callerName = if (isNull _caller) then {"unknown"} else {name _caller};
 diag_log format ["[MWF Missions] Activated %1 (%2/%3/%4) by %5 at %6.", _missionKey, _category, _difficulty, _missionId, _callerName, _zoneName];
 
 if (!isNull _caller) then {
-    [format ["%1 mission activated near %2.", _categoryLabel, _zoneName]] remoteExec ["hint", owner _caller];
+    [format ["%1 activated near %2.", _missionTitle, _zoneName]] remoteExec ["hint", owner _caller];
 };

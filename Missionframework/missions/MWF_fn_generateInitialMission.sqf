@@ -57,21 +57,25 @@ switch (_stage) do {
         ] call BIS_fnc_taskCreate;
 
         missionNamespace setVariable ["MWF_current_stage", 2, true];
-
-        private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
-        if (_campaignPhase isEqualTo "TUTORIAL") then {
-            if (!isNil "MWF_fnc_setCampaignPhase") then {
-                ["SUPPLY_RUN", "FOB Tutorial Complete"] call MWF_fnc_setCampaignPhase;
-            } else {
-                missionNamespace setVariable ["MWF_Campaign_Phase", "SUPPLY_RUN", true];
-            };
-        };
     };
 
     case 3: {
         ["task_supply_run", "SUCCEEDED"] call BIS_fnc_taskSetState;
         missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
         missionNamespace setVariable ["MWF_current_stage", 3, true];
+
+        [100, "SUPPLIES"] call MWF_fnc_addResource;
+
+        private _participants = allPlayers select { alive _x };
+        private _undercoverCompletion = (_participants findIf { _x getVariable ["MWF_isUndercover", false] }) >= 0;
+
+        if (_undercoverCompletion) then {
+            [50] call MWF_fnc_addIntel;
+        } else {
+            if (!isNil "MWF_fnc_registerThreatIncident") then {
+                ["tutorial_supply_run", "", 1, "Tutorial supply run completed loudly."] call MWF_fnc_registerThreatIncident;
+            };
+        };
 
         if (!isNil "MWF_fnc_requestDelayedSave") then {
             [] call MWF_fnc_requestDelayedSave;
@@ -81,6 +85,9 @@ switch (_stage) do {
             };
         };
 
-        diag_log "[MWF Tutorial] Initial supply-run milestone complete. Waiting for MOB login to transition into OPEN_WAR.";
+        diag_log format [
+            "[MWF Tutorial] Initial supply-run milestone complete. Supplies +100 | Intel bonus: %1 | Waiting for MOB login to transition into OPEN_WAR.",
+            if (_undercoverCompletion) then {50} else {0}
+        ];
     };
 };
