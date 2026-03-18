@@ -117,8 +117,9 @@ switch (toUpper _mode) do {
             ["Invalid Main Operation selection."] remoteExecCall ["systemChat", _requestOwner];
         };
 
-        if (missionNamespace getVariable ["MWF_GrandOperationActive", false]) exitWith {
-            ["Main Operations locked during active operation."] remoteExecCall ["systemChat", _requestOwner];
+        private _check = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
+        if !(_check param [0, false]) exitWith {
+            [(_check param [1, "Main Operations unavailable."])] remoteExecCall ["systemChat", _requestOwner];
         };
 
         private _placements = missionNamespace getVariable ["MWF_GrandOperationSessionPlacements", []];
