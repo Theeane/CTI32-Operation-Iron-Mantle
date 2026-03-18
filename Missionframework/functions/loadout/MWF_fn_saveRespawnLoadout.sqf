@@ -9,8 +9,8 @@
 */
 
 if (!hasInterface) exitWith { false };
-if !((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") exitWith {
-    hint "Respawn-loadout kan sparas först när OPEN_WAR har startat.";
+if !(missionNamespace getVariable ["MWF_InLoadoutZone", false]) exitWith {
+    hint "Du måste vara i en loadout-zon nära MOB eller FOB för att spara respawn-loadout.";
     false
 };
 

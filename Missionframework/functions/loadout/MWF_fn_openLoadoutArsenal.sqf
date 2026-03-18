@@ -9,8 +9,8 @@
 */
 
 if (!hasInterface) exitWith { false };
-if !((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") exitWith {
-    hint "Virtual Arsenal låses upp när OPEN_WAR har startat.";
+if !(missionNamespace getVariable ["MWF_InLoadoutZone", false]) exitWith {
+    hint "Du måste vara i en loadout-zon nära MOB eller FOB för att öppna arsenalen.";
     false
 };
 
