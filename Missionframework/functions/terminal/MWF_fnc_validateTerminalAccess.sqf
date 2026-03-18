@@ -26,6 +26,12 @@ switch (toUpper _actionType) do {
         if (missionNamespace getVariable ["MWF_GrandOperationActive", false]) then {
             _allowed = false;
             _reason = "Main Operations locked during active operation.";
+        } else {
+            private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
+            if !(_activeSideMissions isEqualTo []) then {
+                _allowed = false;
+                _reason = "Main Operations locked while side missions are active.";
+            };
         };
     };
 
