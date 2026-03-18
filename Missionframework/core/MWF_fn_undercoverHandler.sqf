@@ -5,7 +5,7 @@
 
     Description:
     Uniform-driven undercover runtime.
-    - OPFOR uniforms provide military disguise everywhere.
+    - OPFOR uniforms provide military disguise everywhere unless the disguise has been blown.
     - Civilian uniforms provide civilian disguise only when unarmed and without vest.
     - Military disguise uses short-range inspection, with leaders inspecting further.
 */
@@ -29,22 +29,14 @@ cutRsc ["MWF_Undercover_Eye", "PLAIN"];
             _ctrl = uiNamespace getVariable ["MWF_ctrl_eye", controlNull];
         };
 
-        [] call MWF_fnc_checkUndercover;
+        [player] call MWF_fnc_checkUndercover;
 
-        private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];
-        private _civilianUniforms = missionNamespace getVariable ["MWF_CivilianUniformClasses", []];
-        private _uniform = uniform player;
-        private _isOpfor = _uniform in _opforUniforms;
-        private _isCivilian = _uniform in _civilianUniforms;
-        private _hasVest = (vest player) != "";
-        private _armed = (primaryWeapon player) != "" || {(handgunWeapon player) != ""} || {(secondaryWeapon player) != ""};
-
-        private _isUndercover = false;
+        private _undercoverState = player getVariable ["MWF_UndercoverState", "NONE"];
+        private _isUndercover = player getVariable ["MWF_isUndercover", false];
         private _isSuspicious = false;
         private _eyeIcon = "media\icons\eye_red.paa";
 
-        if (_isOpfor) then {
-            _isUndercover = true;
+        if (_undercoverState == "OPFOR") then {
             _eyeIcon = "media\icons\eye_green.paa";
 
             private _nearEnemies = allUnits select {
@@ -70,6 +62,7 @@ cutRsc ["MWF_Undercover_Eye", "PLAIN"];
 
                 if (_dist <= _detectRange) exitWith {
                     _isUndercover = false;
+                    player setVariable ["MWF_OpforDisguiseCompromised", true, true];
                 };
             } forEach _nearEnemies;
 
@@ -79,14 +72,14 @@ cutRsc ["MWF_Undercover_Eye", "PLAIN"];
                 player setVariable ["MWF_InspectionExposure", _inspectionTime];
                 if (_inspectionTime >= 10) then {
                     _isUndercover = false;
+                    player setVariable ["MWF_OpforDisguiseCompromised", true, true];
                 };
             } else {
                 player setVariable ["MWF_InspectionExposure", 0 max (_inspectionTime - 2)];
             };
         } else {
             player setVariable ["MWF_InspectionExposure", 0];
-            if (_isCivilian && {!_hasVest} && {!_armed}) then {
-                _isUndercover = true;
+            if (_undercoverState == "CIV") then {
                 _eyeIcon = "media\icons\eye_green.paa";
             };
         };

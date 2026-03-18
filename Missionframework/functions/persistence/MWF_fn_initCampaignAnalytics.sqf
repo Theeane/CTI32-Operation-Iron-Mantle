@@ -37,6 +37,17 @@ addMissionEventHandler ["EntityKilled", {
     if (_uid isEqualTo "") exitWith {};
 
     private _name = name _actor;
+    private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];
+    private _actorInOpforDisguise = (uniform _actor) in _opforUniforms;
+
+    private _markOpforDisguiseCompromised = {
+        params ["_unit", ["_reason", "you attacked a protected target", [""]]];
+        if (isNull _unit) exitWith {};
+        _unit setVariable ["MWF_OpforDisguiseCompromised", true, true];
+        if (isPlayer _unit) then {
+            [format ["Your OPFOR disguise is blown: %1.", _reason]] remoteExec ["systemChat", owner _unit];
+        };
+    };
 
     if (_killed isKindOf "CAManBase") then {
         if (_killed getVariable ["MWF_IsRebelLeader", false]) then {
@@ -48,15 +59,41 @@ addMissionEventHandler ["EntityKilled", {
         switch (side group _killed) do {
             case east: {
                 [_uid, _name, "OPFOR_KILLED", 1] call MWF_fnc_recordCampaignEvent;
+
+                if (_actorInOpforDisguise) then {
+                    [_actor, "you engaged OPFOR while disguised"] call _markOpforDisguiseCompromised;
+                };
             };
             case resistance: {
                 [_uid, _name, "REBELS_KILLED", 1] call MWF_fnc_recordCampaignEvent;
+
+                private _isAggressiveRebel =
+                    (_killed getVariable ["MWF_RebelAssaultUnit", false]) ||
+                    {(_killed getVariable ["MWF_IsRebelLeader", false])} ||
+                    {(combatMode _killed) in ["RED", "YELLOW"]} ||
+                    {(behaviour _killed) in ["AWARE", "COMBAT", "STEALTH"]} ||
+                    {((primaryWeapon _killed) != "") || {((secondaryWeapon _killed) != "")} || {((handgunWeapon _killed) != "")}};
+
+                if (_isAggressiveRebel) then {
+                    private _currentRep = missionNamespace getVariable ["MWF_CivRep", 0];
+                    if (_currentRep > 0 && {!isNil "MWF_fnc_civRep"}) then {
+                        private _penalty = _currentRep min 2;
+                        if (_penalty > 0) then {
+                            ["ADJUST", -_penalty] call MWF_fnc_civRep;
+                            [format ["Aggressive rebel killed. Civil reputation -%1.", _penalty]] remoteExec ["systemChat", owner _actor];
+                        };
+                    };
+                };
             };
             case civilian: {
                 [_uid, _name, "CIVILIANS_KILLED", 1] call MWF_fnc_recordCampaignEvent;
 
                 if (!isNil "MWF_fnc_handleCivilianCasualty") then {
                     [_killed, _actor, _uid, _name] call MWF_fnc_handleCivilianCasualty;
+                };
+
+                if (_actorInOpforDisguise) then {
+                    [_actor, "you killed a civilian while disguised"] call _markOpforDisguiseCompromised;
                 };
             };
         };
