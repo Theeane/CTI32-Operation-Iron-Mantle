@@ -11,34 +11,12 @@
 MWF_FOB_Terminal_Class = "RuggedTerminal_01_communications_F";    // Required for Respawn Truck & Tents
 MWF_Heli_Tower_Class   = "Land_TTowerSmall_1_F";                 // Unlocks Helicopter Category
 MWF_Jet_Control_Class  = "Land_TBox_F";                          // Unlocks Jet Category
-MWF_Preset_FOB_Center = "Land_Laptop_unfolded_F";
-MWF_Preset_FOB_Table = "Land_CampingTable_small_F";
-MWF_Preset_FOB_Light = "Land_Camping_Light_F";
-MWF_Preset_FOB_Siren = "Land_Loudspeakers_F";
-MWF_Preset_FOB_Spawn = "Land_HelipadEmpty_F";
-
-// --- FOB ASSET CONFIGURATION NOTES ---
-// These values are resolved by MWF_fn_initGlobals.sqf into the active FOB asset configuration.
-//
-// REQUIRED assets (always spawn):
-// - MWF_FOB_Asset_Table (camping table attachment point)
-// - MWF_FOB_Asset_Terminal (laptop / command PC)
-// - MWF_FOB_Asset_Siren (alarm / warning prop)
-//
-// OPTIONAL assets (spawn only if classname defined):
-// - MWF_FOB_Asset_Roof (set to "" to disable)
-// - MWF_FOB_Asset_Lamp (set to "" to disable)
-//
-// REMOVED:
-// - MWF_FOB_Asset_Locker (legacy system replaced by virtual arsenal / loadout flow)
-//
-// Asset positions relative to FOB center:
-// - Table: center (0m)
-// - Terminal: attached to table (+0.6m)
-// - Roof: center (same as table)
-// - Siren: 8m away at heading +45°
-// - Lamp: 6m away at heading +135°
-
+// --- 1A. FOB ASSET CONFIGURATION ---
+MWF_FOB_Asset_Roof = "";
+MWF_FOB_Asset_Table = "Land_CampingTable_small_F";
+MWF_FOB_Asset_Terminal = "Land_Laptop_unfolded_F";
+MWF_FOB_Asset_Siren = "Land_Loudspeakers_F";
+MWF_FOB_Asset_Lamp = "Land_Camping_Light_F";
 // --- 2. CORE SUPPORT ASSETS ---
 MWF_FOB_Truck      = "B_Truck_01_Repair_F"; 
 MWF_FOB_Box        = "B_Slingload_01_Cargo_F"; 
@@ -122,12 +100,7 @@ MWF_Rearm_Truck = ["B_Truck_01_Repair_F", 300, 5];
 
 // --- 7. SYNC & BROADCAST ---
 private _allVars = [
-    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class",
-    "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price",
-    "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck",
-    "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5",
-    "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets",
-    "MWF_Rearm_Truck", "MWF_Preset_FOB_Center", "MWF_Preset_FOB_Table", "MWF_Preset_FOB_Light", "MWF_Preset_FOB_Siren", "MWF_Preset_FOB_Spawn"
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
 ];
 
 { publicVariable _x; } forEach _allVars;

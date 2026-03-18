@@ -44,6 +44,18 @@ How To Create Your Own Custom Preset
 4. Keep the same variable names and general layout used by the framework.
 5. Save the file and select that slot in the lobby.
 
+
+FOB Asset Variables
+-------------------
+Custom BLUFOR presets now use the following FOB asset variables:
+- MWF_FOB_Asset_Roof
+- MWF_FOB_Asset_Table
+- MWF_FOB_Asset_Terminal
+- MWF_FOB_Asset_Siren
+- MWF_FOB_Asset_Lamp
+
+Legacy preset variables such as MWF_Preset_FOB_Center / Table / Light / Siren / Spawn should not be used in new custom files.
+
 Reference Preset Structure
 --------------------------
 Use these existing framework presets as reference for layout and naming:
