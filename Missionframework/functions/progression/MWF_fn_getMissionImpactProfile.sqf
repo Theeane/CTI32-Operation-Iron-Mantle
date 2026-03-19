@@ -6,7 +6,11 @@
     Description:
     Returns a deterministic impact profile for side missions and main operations.
     Side missions use fixed values by category/difficulty.
-    Main operations use fixed strategic profiles with explicit special-case support.
+    Main operations use fixed strategic profiles with explicit support for:
+    - tier reduction
+    - tier block / grace period
+    - main-op threat progression suppression
+    - fallback reward conversion
 */
 
 params [

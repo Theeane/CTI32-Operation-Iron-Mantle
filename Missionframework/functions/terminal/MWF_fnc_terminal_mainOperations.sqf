@@ -5,7 +5,7 @@
 
     Description:
     Lightweight terminal-backed launcher for Grand Operations.
-    Uses player actions for selection so a richer UI can be layered on later.
+    Uses the central main-operation registry so UI and runtime consume the same metadata.
 */
 
 params [
@@ -14,14 +14,7 @@ params [
     ["_arg2", 0, [0]]
 ];
 
-private _ops = [
-    ["SKY_GUARDIAN", "Sky Guardian", "Restore aerial detection control.", "MWF_fnc_op_skyGuardian"],
-    ["POINT_BLANK", "Point Blank", "Break the missile complex and unlock Jets.", "MWF_fnc_op_pointBlank"],
-    ["SEVERED_NERVE", "Severed Nerve", "Disrupt the enemy's operational nerve center.", "MWF_fnc_op_severedNerve"],
-    ["STASIS_STRIKE", "Stasis Strike", "Freeze enemy momentum with precision.", "MWF_fnc_op_stasisStrike"],
-    ["STEEL_RAIN", "Steel Rain", "Cripple enemy artillery and heavy support.", "MWF_fnc_op_steelRain"],
-    ["APEX_PREDATOR", "Apex Predator", "Final escalation toward Tier 5 dominance.", "MWF_fnc_op_apexPredator"]
-];
+private _ops = [] call MWF_fnc_getMainOperationRegistry;
 
 switch (toUpper _mode) do {
     case "OPEN": {
@@ -35,21 +28,33 @@ switch (toUpper _mode) do {
 
         ["CLOSE"] call MWF_fnc_terminal_mainOperations;
 
-        private _currentOp = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
         private _text = "Main Operations<br/>Select a grand operation from the action menu.<br/><br/>";
         {
             _x params ["_key", "_title", "_desc"];
-            private _status = ["READY", "ACTIVE"] select ((_currentOp isEqualTo _key) && {missionNamespace getVariable ["MWF_GrandOperationActive", false]});
-            _text = _text + format ["%1 [%2]<br/>%3<br/><br/>", toUpper _title, _status, _desc];
+            private _state = [_key, _x] call MWF_fnc_getMainOperationState;
+            _text = _text + format [
+                "%1 [%2]<br/>%3<br/><t size='0.85'>%4</t><br/><br/>",
+                toUpper _title,
+                toUpper (_state getOrDefault ["state", "unknown"]),
+                _desc,
+                _state getOrDefault ["tooltipText", ""]
+            ];
         } forEach _ops;
         hintSilent parseText format ["<t size='1.0'>%1</t>", _text];
 
         private _actionIds = [];
         {
             private _i = _forEachIndex;
-            _x params ["", "_title"];
+            _x params ["_key", "_title"];
+            private _state = [_key, _x] call MWF_fnc_getMainOperationState;
+            private _label = if (_state getOrDefault ["isAvailable", false]) then {
+                format ["<t color='#7CC8FF'>Start Grand Op: %1</t>", _title]
+            } else {
+                format ["<t color='#C8A070'>%1 (%2)</t>", _title, _state getOrDefault ["statusText", "Unavailable"]]
+            };
+
             private _id = player addAction [
-                format ["<t color='#7CC8FF'>Start Grand Op: %1</t>", _title],
+                _label,
                 { ["START", (_this select 3)] call MWF_fnc_terminal_mainOperations; },
                 _i,
                 (99 - _i),
@@ -122,6 +127,13 @@ switch (toUpper _mode) do {
             [(_check param [1, "Main Operations unavailable."])] remoteExecCall ["systemChat", _requestOwner];
         };
 
+        private _entry = _ops # _index;
+        _entry params ["_key", "_title", "_desc", "_fnName"];
+        private _state = [_key, _entry] call MWF_fnc_getMainOperationState;
+        if !(_state getOrDefault ["isAvailable", false]) exitWith {
+            [(_state getOrDefault ["tooltipText", "Operation unavailable."])] remoteExecCall ["systemChat", _requestOwner];
+        };
+
         private _placements = missionNamespace getVariable ["MWF_GrandOperationSessionPlacements", []];
         if (_placements isEqualTo []) then {
             _placements = [] call MWF_fnc_buildGrandOperationPlacements;
@@ -134,9 +146,6 @@ switch (toUpper _mode) do {
         private _placement = _placements # (_index mod (count _placements));
         _placement params ["_placementIndex", "_position", "_zoneId", "_zoneName"];
 
-        private _entry = _ops # _index;
-        _entry params ["_key", "_title", "_desc", "_fnName"];
-
         missionNamespace setVariable ["MWF_GrandOperationActive", true, true];
         missionNamespace setVariable ["MWF_CurrentGrandOperation", _key, true];
         missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", _title, true];
@@ -145,9 +154,9 @@ switch (toUpper _mode) do {
         private _fn = missionNamespace getVariable [_fnName, objNull];
         if (isNil "_fn" || {_fn isEqualTo objNull}) exitWith {
             missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-            missionNamespace setVariable ["MWF_CurrentGrandOperation", nil, true];
-            missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", nil, true];
-            missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", nil, true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
             [format ["Grand Operation function not found: %1", _fnName]] remoteExecCall ["systemChat", _requestOwner];
         };
 

@@ -10,6 +10,7 @@
     - temporary main-op threat progression blocks
     - temporary tier progression freezes
     - permanent Tier 3 floor after 50% map control
+    - no stacking for tier-block operations
 */
 
 if (!isServer) exitWith {createHashMap};
@@ -63,6 +64,8 @@ private _grantedIntel = _intel;
 private _fallbackUsed = false;
 private _effectiveThreatDelta = _threatDelta;
 private _effectiveTierDelta = _tierDelta;
+private _blockTierAlreadyActive = _blockTierProgressSeconds > 0 && {(_tierProgressBlockedUntil > _now) || (missionNamespace getVariable ["MWF_TierFreeze_Active", false])};
+private _blockMainThreatAlreadyActive = _blockMainOpThreatSeconds > 0 && {_mainOpThreatBlockedUntil > _now};
 
 if (_kind isEqualTo "main") then {
     if (_effectiveThreatDelta > 0 && {_mainOpThreatBlockedUntil > _now}) then {
@@ -70,6 +73,19 @@ if (_kind isEqualTo "main") then {
         _grantedSupplies = _grantedSupplies + _fallbackSupplies;
         _grantedIntel = _grantedIntel + _fallbackIntel;
         _fallbackUsed = true;
+    };
+
+    if (_blockTierAlreadyActive) then {
+        _blockTierProgressSeconds = 0;
+        _blockMainOpThreatSeconds = 0;
+        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+        _grantedIntel = _grantedIntel + _fallbackIntel;
+        _fallbackUsed = true;
+        _note = if (_note isEqualTo "") then {"Tier block already active."} else {format ["%1 Tier block already active.", _note]};
+    };
+
+    if (_blockMainThreatAlreadyActive && {_blockTierProgressSeconds > 0}) then {
+        _blockMainOpThreatSeconds = 0;
     };
 };
 
@@ -85,12 +101,14 @@ if (_effectiveTierDelta > 0 && {(_tierProgressBlockedUntil > _now) || (missionNa
 };
 
 if (_effectiveTierDelta < 0 && {_halfMapLock}) then {
-    private _targetScore = (_score + _effectiveTierDelta) max _floorScore;
-    if (_targetScore <= _floorScore) then {
+    if (_score <= _floorScore) then {
         _effectiveTierDelta = 0;
         _grantedSupplies = _grantedSupplies + _fallbackSupplies;
         _grantedIntel = _grantedIntel + _fallbackIntel;
         _fallbackUsed = true;
+    } else {
+        private _targetScore = (_score + _effectiveTierDelta) max _floorScore;
+        _effectiveTierDelta = _targetScore - _score;
     };
 };
 
@@ -160,4 +178,5 @@ _result set ["tierApplied", _effectiveTierDelta];
 _result set ["fallbackUsed", _fallbackUsed];
 _result set ["suppliesGranted", _grantedSupplies];
 _result set ["intelGranted", _grantedIntel];
+_result set ["note", _note];
 _result
