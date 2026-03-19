@@ -123,14 +123,6 @@ The upcoming milestone will focus on:
 
 ---
 
-## Repository
-
-Source code and development progress:
-
-https://github.com/Theeane/CTI32-Operation-Iron-Mantle
-
----
-
 ## Philosophy
 
 MWF was built around a simple idea:
