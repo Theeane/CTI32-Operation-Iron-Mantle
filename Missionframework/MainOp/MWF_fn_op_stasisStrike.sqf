@@ -91,12 +91,7 @@ switch (_state) do {
             "success"
         ] remoteExec ["MWF_fnc_showNotification", 0];
 
-        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-
-        [] call MWF_fnc_saveGame;
+        ["STASIS_STRIKE"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Stasis Strike: Operation Complete. Progression Frozen for 1 hour.";
     };
 };

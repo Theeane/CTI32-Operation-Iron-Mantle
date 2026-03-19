@@ -105,12 +105,7 @@ switch (_state) do {
         };
         [["OPFOR DE-ESCALATION", _msg], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 
-        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-
-        [] call MWF_fnc_saveGame;
+        ["SEVERED_NERVE"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Severed Nerve: Operation Complete. OPFOR Tier Impact Applied.";
     };
 };

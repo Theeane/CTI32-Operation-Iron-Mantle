@@ -102,12 +102,7 @@ switch (_state) do {
         private _impactProfile = ["main", "point_blank"] call MWF_fnc_getMissionImpactProfile;
         [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
 
-        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-
-        [] call MWF_fnc_saveGame;
+        ["POINT_BLANK"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Point Blank: Operation Complete. Jets Unlocked.";
     };
 };

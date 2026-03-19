@@ -109,12 +109,7 @@ switch (_state) do {
         private _impactProfile = ["main", "sky_guardian"] call MWF_fnc_getMissionImpactProfile;
         [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
 
-        missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-        missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-
-        [] call MWF_fnc_saveGame;
+        ["SKY_GUARDIAN"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Sky Guardian: Fully Completed.";
     };
 };
