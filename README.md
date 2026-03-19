@@ -74,9 +74,6 @@ Instead of stacking scripts endlessly, the framework focuses on:
 - optimized AI usage  
 - long-session server stability  
 
-> Not "script and pray".  
-> More like **script and hey — the server still runs.**
-
 ---
 
 ## Expansion-ready architecture
