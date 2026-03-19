@@ -84,6 +84,15 @@ class CfgFunctions {
             class op_apexPredator { file = "Missionframework/MainOp/MWF_fn_op_apexPredator.sqf"; };
         };
 
+        class Progression {
+            file = "Missionframework/functions/progression";
+            class getMissionImpactProfile { file = "Missionframework/functions/progression/MWF_fn_getMissionImpactProfile.sqf"; };
+            class applyMissionImpact { file = "Missionframework/functions/progression/MWF_fn_applyMissionImpact.sqf"; };
+            class getMainOperationRegistry { file = "Missionframework/functions/progression/MWF_fn_getMainOperationRegistry.sqf"; };
+            class getMainOperationState { file = "Missionframework/functions/progression/MWF_fn_getMainOperationState.sqf"; };
+            class finalizeMainOperation { file = "Missionframework/functions/progression/MWF_fn_finalizeMainOperation.sqf"; };
+        };
+
         class Base {
             file = "Missionframework/functions/base";
             class baseManager { file = "Missionframework/functions/base/MWF_fn_baseManager.sqf"; };
