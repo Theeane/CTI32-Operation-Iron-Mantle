@@ -1,0 +1,3 @@
+This folder is intentionally staged for future composition content.
+Modern land currently contains the migrated baseline compositions.
+Other era/domain folders are reserved for future compositions.

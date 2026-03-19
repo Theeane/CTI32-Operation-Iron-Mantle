@@ -189,6 +189,9 @@ missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true]
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
 missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
+if (isNil { missionNamespace getVariable "MWF_CompositionType" }) then {
+    missionNamespace setVariable ["MWF_CompositionType", "modern", true];
+};
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];

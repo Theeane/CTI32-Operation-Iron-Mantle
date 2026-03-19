@@ -1,68 +1,93 @@
-AI Mission / Operation Generation Instructions (_4–_99)
+AI Mission Generation Instructions (_4–_99)
 
 Purpose
-These instructions define how future LLM-generated content must be authored for Operation Iron Mantle.
-Official/internal missions _1–_3 are reserved in every side-mission domain/type/difficulty folder and must never be overwritten.
-Community-created content belongs in the _4–_99 range only.
+These instructions apply only to community-created missions in the _4–_99 range.
+Core/internal missions _1–_3 are reserved and must not be overwritten, duplicated, or renamed.
 
-1. Scope Split
-There are two different authoring targets:
-- Side Missions
-- Main Operations
+1. Mission Categories
+Allowed mission categories:
+- DisruptMission
+- SupplyMission
+- IntelMission
+- MainOperation
 
-Do not mix their structure.
-Side missions live under Missionframework/SideMissions/.
-Main operations live under Missionframework/MainOp/.
-
-2. Side Mission Folder Structure (MANDATORY)
-All side missions must be domain-aware.
-Valid domains:
-- land
-- naval
-- air
-
-Valid side mission types:
-- supply
-- intel
-- disrupt
-
-Valid difficulties:
-- easy
-- medium
-- hard
-
-Side mission path format:
-- Missionframework/SideMissions/{domain}/{type}/{difficulty}/Mission<TypePascal>_<id>.sqf
-
+Each mission must be placed in the correct category folder inside the active content pack.
 Examples:
-- Missionframework/SideMissions/land/supply/easy/MissionSupply_4.sqf
-- Missionframework/SideMissions/naval/intel/medium/MissionIntel_7.sqf
-- Missionframework/SideMissions/air/disrupt/hard/MissionDisrupt_12.sqf
+- SideMissions/modern/DisruptMission/
+- SideMissions/modern/SupplyMission/
+- SideMissions/modern/IntelMission/
+- SideMissions/modern/MainOperation/
 
-3. Reserved Range Rules (MANDATORY)
-Official/internal baseline files _1–_3 are reserved in every side mission folder.
-Examples:
-- MissionSupply_1..3
-- MissionIntel_1..3
-- MissionDisrupt_1..3
+2. Theme / Content Pack Structure
+Missions must be created inside the correct theme/content pack.
+Supported examples:
+- modern
+- gm
+- vietnam
+- ww2
+- custom community packs
 
-Community-generated side missions must use _4–_99 only.
-Never rename, overwrite, or duplicate _1–_3.
+Suggested structure:
+- SideMissions/{theme}/DisruptMission/
+- SideMissions/{theme}/SupplyMission/
+- SideMissions/{theme}/IntelMission/
+- SideMissions/{theme}/MainOperation/
+- SideMissions/{theme}/compositions/
 
-4. Side Mission ID Workflow (MANDATORY)
-Before creating a new side mission, the AI must first inspect the exact target folder.
-It must:
-1. scan the folder contents
-2. identify all used numeric suffixes
-3. select the next free ID in the _4–_99 range
-4. avoid duplicates
+3. Mission ID Rules (MANDATORY)
+Before creating a new mission, the AI must FIRST do one of the following:
+- ask which mission files already exist in the target folder, or
+- scan the target folder and list the existing mission files.
 
-Do not assume the next ID without scanning the actual folder.
-Do not scan the wrong domain/type/difficulty folder.
+The AI must then:
+1. identify all used numeric suffixes
+2. avoid duplicates
+3. choose the next free ID in the _4–_99 range
 
-5. Side Mission Definition Contract (MANDATORY)
-Each side mission file must remain mod agnostic and must define structured mission metadata.
-Required fields:
+Example:
+- if MissionSupply_4 already exists, do NOT create another MissionSupply_4
+- choose the next free ID instead
+
+4. Reserved Range
+- _1–_3 = reserved for official/internal missions
+- _4–_99 = community mission range
+
+Never modify _1–_3 when generating community missions.
+
+5. No Hardcoded Classnames
+Mission files must be mod agnostic.
+Do NOT hardcode:
+- unit classnames
+- vehicle classnames
+- object/prop classnames
+- faction-specific asset classnames
+
+6. Unit / Vehicle Source Rules
+Mission files describe intent only. Runtime asset selection comes from presets and progression systems.
+
+OPFOR
+- source: preset/opfor
+- scaled by: world tier
+
+BLUFOR
+- source: preset/blufor
+- scaled by: player base tier
+
+Civilians
+- source: preset/civilians
+
+Rebels
+- source: preset/resistance
+- scaled by: rebel tier
+- may depend on civilian/rebel reputation rules
+
+7. Composition Rules
+All mission layouts, props, and objective scenes must use composition keys.
+Mission files may reference composition keys only.
+Do NOT hardcode world objects directly in mission definitions.
+
+8. Mission Data Standard
+Each mission should define structured metadata, including at minimum:
 - missionId
 - title
 - description
@@ -75,20 +100,11 @@ Required fields:
 - usesCivilians
 - usesRebels
 - compositionKey
-- enemyTierSource
-- bluforTierSource
-- rebelTierSource
 - rewardSupplies
 - rewardIntel
 - rewardThreat
 - rewardTier
 - rewardThreatUndercover
-- requiresRebelCooperation
-- minCivilianRep
-- minRebelRep
-- failIfRepTooLow
-- notes
-- assetRules
 
 Optional fields may include:
 - requiresRoad
@@ -97,153 +113,78 @@ Optional fields may include:
 - requiresCoast
 - minDistanceFromBase
 - maxDistanceFromBase
-- fallbackSupplies
-- fallbackIntel
+- requiresRebelCooperation
+- minCivilianRep
+- minRebelRep
+- failIfRepTooLow
+- notes
 
-6. Side Mission Domain Rules
-The mission file must match the selected domain.
-Examples:
-- land missions should be authored for normal ground gameplay
-- naval missions must assume naval-safe anchor usage and maritime-compatible gameplay
-- air missions must assume air-capable flow and future air marker support
+9. Reward Rules
+Rewards must be fixed per mission.
+Rewards may vary between individual missions, even inside the same category and difficulty.
+Do NOT randomize reward values.
 
-Do not place a naval mission in a land folder.
-Do not place an air mission in a naval folder.
+Undercover completions should use rewardThreatUndercover instead of normal rewardThreat.
+This is usually 0 or very low, depending on mission design.
 
-7. Side Mission Reward Rules
-Rewards must be fixed per mission file.
-Do not randomize reward values.
-Undercover completions should use rewardThreatUndercover when relevant.
-If fallbackSupplies/fallbackIntel are defined, they must be fixed values.
+10. Difficulty Rules
+Allowed difficulty labels:
+- easy
+- medium
+- hard
 
-8. Side Mission Variety Rules
-When generating new side missions, vary:
-- domain
-- type
+Difficulty should affect mission pressure, resistance, complexity, and reward tuning.
+Difficulty must not be implemented with hardcoded assets.
+
+11. Placement Rules
+Missions must be placed only in valid zones for the mission type.
+Always validate the selected zone before finalizing the mission.
+Examples of valid placement tags/types include:
+- town
+- military
+- factory
+- capital
+- roadside
+- rural
+- coastal
+
+12. Rebel / Reputation Rules
+If a mission uses rebels:
+- rebel support may depend on rebel tier
+- access may depend on civilian/rebel reputation
+- missions may fail or be blocked if reputation is too low
+
+13. Variety Rules
+Generate variety across:
+- category
 - difficulty
-- allowedZoneTypes
-- civilian/rebel use
+- zone usage
 - stealth vs loud compatibility
+- civilian/rebel involvement
 - composition usage
 
-Avoid generating structurally identical missions repeatedly.
-Each mission needs a unique short identity so UI metadata does not feel duplicated.
+Do not generate structurally identical missions repeatedly.
 
-9. No Hardcoded Classnames (MANDATORY)
-Mission files must remain mod agnostic.
-Do NOT hardcode:
-- OPFOR unit classnames
-- BLUFOR unit classnames
-- civilian classnames
-- rebel classnames
-- vehicle classnames
-- aircraft classnames
-- boat classnames
-- prop/object classnames
+14. Community Safety Rules
+Community missions in _4–_99 must NOT:
+- modify presets
+- modify economy systems
+- modify tier/threat systems
+- modify core mission framework logic
+- overwrite official missions
 
-All runtime asset selection must come from active presets and framework systems.
+15. Community Authoring Workflow (MANDATORY)
+1. choose the target theme/content pack
+2. choose the correct mission category folder
+3. ask which missions already exist in that folder, or scan the folder directly
+4. find the next free ID in _4–_99
+5. build the mission using structured mission metadata
+6. use no hardcoded classnames
+7. use composition keys for layouts
+8. rely on preset/tier systems for units and vehicles
+9. define fixed mission-specific rewards
+10. save the mission with a unique non-conflicting filename
 
-10. Asset Source Rules
-Mission files describe intent only.
-Runtime asset selection comes from presets and progression systems.
-
-OPFOR
-- source: preset/opfor
-- scaled by: world tier / mission systems
-
-BLUFOR
-- source: preset/blufor
-- scaled by: player base tier
-
-Civilians
-- source: preset/civilians
-
-Rebels
-- source: preset/resistance
-- scaled by: rebel tier / reputation rules
-
-11. Composition Rules
-All layout, props, and scene dressing must use composition keys.
-Do not hardcode world objects directly into mission definitions.
-Mission files may reference composition keys only.
-
-12. Main Operations Scope
-Main operations are not stored in SideMissions.
-They live in Missionframework/MainOp/ and must use the existing operation naming pattern:
-- MWF_fn_op_<name>.sqf
-
-Main operations are strategic operations, not generic side missions.
-They must be authored to fit one of the approved operation effect models:
-- tier reduction
-- tier block
-- preset reduction
-
-13. Main Operation Metadata Expectations
-When adding or editing a main operation, the AI must provide or preserve:
-- unique operation key
-- display title
-- short description for UI panel use
-- effect type / effect summary
-- fallback summary
-- cooldown-aware behavior compatibility
-
-Main operations must be written so they can be described cleanly in UI with:
-- title
-- short description
-- effect/reward text
-- fallback text
-- status / cooldown state
-
-14. Tier / Fallback Rules for Operations
-Main operations must respect the current campaign rules:
-- tier reduction always attempts to reduce tier
-- after 50 percent map control, Tier 3 is the permanent floor
-- if reduction cannot go below Tier 3, fallback Supplies/Intel must be used instead
-- tier block operations can still apply after 50 percent map control
-- tier block currently targets a 60 minute grace period
-- if a tier block is already active, a new block effect must convert to fallback Supplies/Intel instead of stacking
-
-15. Domain-Aware Player Requests
-When a player asks for a mission, the AI must identify whether they want:
-- land
-- naval
-- air
-
-The AI must also identify:
-- side mission or main operation
-- supply / intel / disrupt if side mission
-- easy / medium / hard if side mission
-
-Do not assume land by default if the request clearly asks for naval or air.
-If the user does not specify a domain, preserve the requested framework rules or ask/inspect context before choosing.
-
-16. Community Safety Rules
-Community-generated content in the _4–_99 range must NOT:
-- modify presets directly
-- modify economy systems directly
-- modify tier/threat framework logic directly
-- modify core mission registry logic directly
-- overwrite official/internal _1–_3 files
-
-17. Authoring Workflow (MANDATORY)
-Side missions:
-1. identify domain
-2. identify type
-3. identify difficulty
-4. inspect the exact target folder
-5. find the next free _4–_99 ID
-6. create a mod-agnostic mission file using the side mission metadata contract
-7. keep rewards fixed
-8. use composition keys only
-9. ensure the mission fits its selected domain
-
-Main operations:
-1. identify the intended operation effect model
-2. preserve mod-agnostic preset behavior
-3. provide unique title/description/effect/fallback language
-4. ensure the operation fits the central cooldown and fallback rules
-5. save using the existing MainOp naming pattern
-
-18. Final Rule
-Never output generic content that ignores domain.
-Every generated mission or operation must clearly match the current Operation Iron Mantle framework structure.
+16. Internal Development Scope
+Official/internal workflow may update only the reserved _1–_3 missions directly.
+Community generation belongs in the _4–_99 range.
