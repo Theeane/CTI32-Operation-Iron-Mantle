@@ -114,7 +114,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','ZONES'] call MWF_fnc_dataHub;";
+            action = "[objNull] call MWF_fnc_enterBuildMode;";
         };
         class BtnBuild: RscButton {
             idc = 12211;
@@ -123,7 +123,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','ZONES'] call MWF_fnc_dataHub;";
+            action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
         };
         class BtnMainOps: RscButton {
             idc = 12212;
@@ -153,6 +153,16 @@ class MWF_RscDataHub {
             action = "['SET_MODE','ZONES'] call MWF_fnc_dataHub;";
         };
 
+        class InfoText: RscText {
+            idc = 12216;
+            text = "";
+            x = 0.61 * safezoneW + safezoneX;
+            y = 0.72 * safezoneH + safezoneY;
+            w = 0.245 * safezoneW;
+            h = 0.06 * safezoneH;
+            colorText[] = {0,0,0,1};
+        };
+
         class MapFrame: RscText {
             idc = 12204;
             x = 0.14 * safezoneW + safezoneX;
@@ -168,7 +178,7 @@ class MWF_RscDataHub {
             y = 0.22 * safezoneH + safezoneY;
             w = 0.71 * safezoneW;
             h = 0.49 * safezoneH;
-            onMouseButtonClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; };";
+            onMouseButtonClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; }; if ((_this select 1) isEqualTo 1) then { ['BACK'] call MWF_fnc_dataHub; };";
         };
 
         class StatusText: RscText {
@@ -176,38 +186,9 @@ class MWF_RscDataHub {
             text = "Mode: ZONES";
             x = 0.145 * safezoneW + safezoneX;
             y = 0.72 * safezoneH + safezoneY;
-            w = 0.46 * safezoneW;
+            w = 0.44 * safezoneW;
             h = 0.03 * safezoneH;
             colorText[] = {0,0,0,1};
-        };
-
-        class DetailBackground: RscText {
-            idc = 12208;
-            x = 0.41 * safezoneW + safezoneX;
-            y = 0.745 * safezoneH + safezoneY;
-            w = 0.325 * safezoneW;
-            h = 0.095 * safezoneH;
-            colorBackground[] = {0.08,0.08,0.08,0.72};
-        };
-
-        class DetailTitle: RscText {
-            idc = 12209;
-            text = "Select an entry";
-            x = 0.425 * safezoneW + safezoneX;
-            y = 0.752 * safezoneH + safezoneY;
-            w = 0.295 * safezoneW;
-            h = 0.022 * safezoneH;
-            colorText[] = {1,0.87,0.55,1};
-        };
-
-        class DetailText: RscStructuredText {
-            idc = 12216;
-            text = "Click a mission, main operation, or respawn marker on the map to inspect it.";
-            x = 0.425 * safezoneW + safezoneX;
-            y = 0.776 * safezoneH + safezoneY;
-            w = 0.295 * safezoneW;
-            h = 0.056 * safezoneH;
-            colorBackground[] = {0,0,0,0};
         };
 
         class BtnSideMissions: RscButton {
@@ -217,24 +198,14 @@ class MWF_RscDataHub {
             y = 0.76 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','SIDE_MISSIONS'] call MWF_fnc_dataHub;";
-        };
-
-        class BtnAccept: RscButton {
-            idc = 12217;
-            text = "Accept";
-            x = 0.745 * safezoneW + safezoneX;
-            y = 0.745 * safezoneH + safezoneY;
-            w = 0.11 * safezoneW;
-            h = 0.04 * safezoneH;
-            action = "['ACCEPT'] call MWF_fnc_dataHub;";
+            action = "['ACTION_SECONDARY'] call MWF_fnc_dataHub;";
         };
 
         class BtnAction: RscButton {
             idc = 12207;
             text = "Close";
             x = 0.745 * safezoneW + safezoneX;
-            y = 0.797 * safezoneH + safezoneY;
+            y = 0.76 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['ACTION'] call MWF_fnc_dataHub;";

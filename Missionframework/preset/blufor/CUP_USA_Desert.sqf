@@ -32,34 +32,48 @@ MWF_Tent_Price      = 10;                     // Cost of the tent system
 
 // --- 4. NPC SUPPORT GROUPS [Vehicle, [Units], Price, MinTier] ---
 
+// Group Type: Recon Squad
 MWF_Support_Group1 = [
     "CUP_LSV_01_armed_F",  // Armed light support vehicle from CUP
     ["CUP_B_USMC_Soldier_SL_DES", "CUP_B_USMC_Soldier_AR_DES", "CUP_B_USMC_Soldier_AR_DES"], 
     150, 2
 ];
 
+// Group Type: Rifle Squad
 MWF_Support_Group2 = [
     "CUP_Truck_01_transport_F",  // Transport truck from CUP
     ["CUP_B_USMC_Soldier_SL_DES", "CUP_B_USMC_Soldier_AR_DES", "CUP_B_USMC_Soldier_AR_DES", "CUP_B_USMC_Soldier_LAT_DES", "CUP_B_USMC_Soldier_Medic_DES"], 
     250, 3
 ];
 
+// Group Type: AT Team
 MWF_Support_Group3 = [
     "CUP_LSV_01_AT_F",  // Anti-tank light support vehicle from CUP
     ["CUP_B_USMC_Soldier_SL_DES", "CUP_B_USMC_Soldier_AT_DES", "CUP_B_USMC_Soldier_AT_DES", "CUP_B_USMC_Soldier_Medic_DES"], 
     300, 4
 ];
 
+// Group Type: Mechanized Squad
 MWF_Support_Group4 = [
     "CUP_APC_Wheeled_01_cannon_F",  // Wheeled APC from CUP
     ["CUP_B_USMC_Soldier_SL_DES", "CUP_B_USMC_Soldier_F_DES", "CUP_B_USMC_Soldier_M_DES", "CUP_B_USMC_Soldier_Engineer_DES"], 
     450, 5
 ];
 
+// Group Type: Air Assault Team
 MWF_Support_Group5 = [
     "CUP_Heli_Transport_01_F",  // Transport helicopter from CUP
     ["CUP_B_USMC_Soldier_TL_DES", "CUP_B_USMC_Soldier_F_DES", "CUP_B_USMC_Soldier_LAT_DES", "CUP_B_USMC_Soldier_M_DES"], 
     600, 5
+];
+
+
+MWF_Support_GroupMeta = [
+    ["MWF_Support_Group1", "Recon Squad"],
+    ["MWF_Support_Group2", "Rifle Squad"],
+    ["MWF_Support_Group3", "AT Team"],
+    ["MWF_Support_Group4", "Mechanized Squad"],
+    ["MWF_Support_Group5", "MWF_Support_GroupMeta", "Air Assault Team"]
 ];
 
 // --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
@@ -100,7 +114,7 @@ MWF_Rearm_Truck = ["CUP_B_Truck_01_Repair_F", 300, 5];  // Rearm truck from CUP
 
 // --- 7. SYNC & BROADCAST ---
 private _allVars = [
-    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Support_GroupMeta", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
 ];
 
 { publicVariable _x; } forEach _allVars;

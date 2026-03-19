@@ -68,4 +68,9 @@ openCuratorInterface;
     if (!isNull _group) then {
         deleteGroup _group;
     };
+    if (hasInterface) then {
+        cutText ["", "BLACK OUT", 0.25];
+        uiSleep 0.25;
+        cutText ["", "BLACK IN", 0.25];
+    };
 };

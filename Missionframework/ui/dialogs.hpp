@@ -27,22 +27,22 @@ class MWF_Terminal_Dialog {
             idc = 9102; text = "BASE";
             x = 0.27 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "hint 'Base';";
+            onButtonClick = "closeDialog 0; [objNull] call MWF_fnc_enterBuildMode;";
         };
         class Btn_Support: RscStandardButton {
             idc = 9103; text = "SUPPORT";
             x = 0.41 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "hint 'Support';";
+            onButtonClick = "closeDialog 0; ['OPEN', 'SUPPORT'] call MWF_fnc_dataHub;";
         };
         class Btn_Upgrades: RscStandardButton {
             idc = 9104; text = "UPGRADES";
             x = 0.55 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "hint 'Upgrades';";
+            onButtonClick = "closeDialog 0; ['OPEN', 'ZONES'] call MWF_fnc_dataHub;";
         };
         class Btn_Intel: RscStandardButton {
-            idc = 9105; text = "INTEL";
+            idc = 9105; text = "MAIN OPERATIONS";
             x = 0.69 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
             onButtonClick = "closeDialog 0; ['OPEN', 'MAIN_OPERATIONS'] call MWF_fnc_dataHub;";

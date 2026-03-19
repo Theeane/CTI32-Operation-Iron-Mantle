@@ -31,34 +31,48 @@ MWF_Tent_Object     = "Land_TentDome_F";
 MWF_Tent_Price      = 10;                    
 
 // --- 4. NPC SUPPORT GROUPS [Vehicle, [Units], Price, MinTier] ---
+// Group Type: Recon Squad
 MWF_Support_Group1 = [
     "B_LSV_01_armed_F", 
     ["B_recon_TL_F", "B_recon_M_F", "B_recon_F"], 
     150, 2
 ];
 
+// Group Type: Rifle Squad
 MWF_Support_Group2 = [
     "B_Truck_01_transport_F", 
     ["B_Soldier_SL_F", "B_Soldier_AR_F", "B_Soldier_AR_F", "B_soldier_LAT_F", "B_medic_F"], 
     250, 3
 ];
 
+// Group Type: AT Team
 MWF_Support_Group3 = [
     "B_LSV_01_AT_F", 
     ["B_Soldier_SL_F", "B_soldier_AT_F", "B_soldier_AT_F", "B_medic_F"], 
     300, 4
 ];
 
+// Group Type: Mechanized Squad
 MWF_Support_Group4 = [
     "B_APC_Wheeled_01_cannon_F", 
     ["B_Soldier_SL_F", "B_soldier_F", "B_soldier_M_F", "B_engineer_F"], 
     450, 5
 ];
 
+// Group Type: Air Assault Team
 MWF_Support_Group5 = [
     "B_Heli_Transport_01_F", 
     ["B_recon_TL_F", "B_recon_F", "B_recon_LAT_F", "B_recon_M_F"], 
     600, 5
+];
+
+
+MWF_Support_GroupMeta = [
+    ["MWF_Support_Group1", "Recon Squad"],
+    ["MWF_Support_Group2", "Rifle Squad"],
+    ["MWF_Support_Group3", "AT Team"],
+    ["MWF_Support_Group4", "Mechanized Squad"],
+    ["MWF_Support_Group5", "MWF_Support_GroupMeta", "Air Assault Team"]
 ];
 
 // --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
@@ -98,7 +112,7 @@ MWF_Rearm_Truck = ["B_Truck_01_Repair_F", 300, 5];
 
 // --- 7. SYNC & BROADCAST ---
 private _allVars = [
-    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Support_GroupMeta", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
 ];
 
 { publicVariable _x; } forEach _allVars;

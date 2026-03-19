@@ -30,6 +30,7 @@ MWF_Pilot = "gm_ge_army_pilot_p1_80_oli";                        // Default pilo
 // --- 3. NPC SUPPORT GROUPS (For Support UI Buttons 1-5) ---
 
 // Button 1: Recon Team
+// Group Type: Recon Squad
 MWF_Support_Group1 = [
     "gm_ge_army_iltis_m2",              // Iltis (M2)
     [
@@ -40,6 +41,7 @@ MWF_Support_Group1 = [
 ];
 
 // Button 2: Transport Team
+// Group Type: Rifle Squad
 MWF_Support_Group2 = [
     "gm_ge_army_mtz_451_repair",  // MTZ truck from GM
     [
@@ -51,6 +53,7 @@ MWF_Support_Group2 = [
 ];
 
 // Button 3: Armored Support
+// Group Type: AT Team
 MWF_Support_Group3 = [
     "gm_ge_army_marder_1a3",  // Marder APC from GM
     [
@@ -62,6 +65,7 @@ MWF_Support_Group3 = [
 ];
 
 // Button 4: Artillery Support
+// Group Type: Mechanized Squad
 MWF_Support_Group4 = [
     "gm_ge_army_pzh2000",  // PZH 2000 Artillery from GM
     [
@@ -73,6 +77,7 @@ MWF_Support_Group4 = [
 ];
 
 // Button 5: Helicopter Support
+// Group Type: Air Assault Team
 MWF_Support_Group5 = [
     "gm_ge_army_bo105",  // Helicopter from GM
     [
@@ -110,7 +115,7 @@ MWF_Rearm_Truck = ["gm_ge_army_u1300l_repair", 300, 5];  // Rearm truck from GM
 
 // --- 6. SYNC & BROADCAST ---
 private _allVars = [
-    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Support_GroupMeta", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
 ];
 
 { publicVariable _x; } forEach _allVars;

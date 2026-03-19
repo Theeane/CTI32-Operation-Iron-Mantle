@@ -27,11 +27,15 @@ uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", nil];
 
 private _statusCtrl = _display displayCtrl 12206;
 private _actionCtrl = _display displayCtrl 12207;
+private _infoCtrl = _display displayCtrl 12216;
 if (!isNull _statusCtrl) then {
     _statusCtrl ctrlSetText format ["Mode: %1 | Entries: %2", [_modeUpper, "_", " "] call BIS_fnc_replaceString, count _entries];
 };
+if (!isNull _infoCtrl) then { _infoCtrl ctrlSetText ""; };
+private _leftCtrl = _display displayCtrl 12215;
+if (!isNull _leftCtrl) then { _leftCtrl ctrlSetText (if (_modeUpper isEqualTo "SUPPORT") then {"Build Group"} else {"Missions"}); };
 if (!isNull _actionCtrl) then {
-    _actionCtrl ctrlSetText (if (_modeUpper isEqualTo "REDEPLOY") then {"Select Redeploy"} else {"Close"});
+    _actionCtrl ctrlSetText (switch _modeUpper do { case "REDEPLOY": {"Redeploy"}; case "SUPPORT": {"Build Unit"}; default {"Close"}; });
 };
 
 private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];
@@ -85,6 +89,13 @@ private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];
             _marker setMarkerShapeLocal "ICON";
             _marker setMarkerTypeLocal (if (_isActive) then {"mil_objective"} else {"mil_pickup"});
             _marker setMarkerColorLocal (if (_isActive) then {"ColorRed"} else {"ColorOrange"});
+            _marker setMarkerTextLocal _label;
+        };
+
+        case "SUPPORT": {
+            _marker setMarkerShapeLocal "ICON";
+            _marker setMarkerTypeLocal "mil_triangle";
+            _marker setMarkerColorLocal "ColorBLUFOR";
             _marker setMarkerTextLocal _label;
         };
 
