@@ -124,4 +124,4 @@ The upcoming milestone will focus on:
 
 MWF was built around a simple idea:
 
-> **A warfare mission should feel alive, adaptable, and community driven — not locked to one scenario.**
+> **A warfare mission should feel alive, adaptable, and community driven, not locked to one scenario.**
