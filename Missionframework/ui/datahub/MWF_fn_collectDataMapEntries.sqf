@@ -23,6 +23,7 @@ private _modeUpper = toUpper _mode;
 private _entries = [];
 
 switch (_modeUpper) do {
+    case "UPGRADES";
     case "ZONES": {
         {
             if (!isNull _x) then {

@@ -98,7 +98,7 @@ MWF_Support_GroupMeta = [
     ["MWF_Support_Group2", "Rifle Squad"],
     ["MWF_Support_Group3", "AT Team"],
     ["MWF_Support_Group4", "Mechanized Squad"],
-    ["MWF_Support_Group5", "MWF_Support_GroupMeta", "Air Assault Team"]
+    ["MWF_Support_Group5", "Air Assault Team"]
 ];
 
 // --- 5. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---

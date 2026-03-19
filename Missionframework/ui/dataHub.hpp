@@ -114,7 +114,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "[objNull] call MWF_fnc_enterBuildMode;";
+            action = "['CLOSE'] call MWF_fnc_dataHub; [objNull] call MWF_fnc_terminal_vehicleMenu;";
         };
         class BtnBuild: RscButton {
             idc = 12211;
@@ -123,7 +123,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
+            action = "['CLOSE'] call MWF_fnc_dataHub; [objNull] call MWF_fnc_enterBuildMode;";
         };
         class BtnMainOps: RscButton {
             idc = 12212;
@@ -141,7 +141,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','ZONES'] call MWF_fnc_dataHub;";
+            action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
         };
         class BtnUpgrades: RscButton {
             idc = 12214;
@@ -150,7 +150,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['SET_MODE','ZONES'] call MWF_fnc_dataHub;";
+            action = "['SET_MODE','UPGRADES'] call MWF_fnc_dataHub;";
         };
 
         class InfoText: RscText {
