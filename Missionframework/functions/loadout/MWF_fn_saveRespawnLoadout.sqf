@@ -1,11 +1,11 @@
 /*
-    Author: OpenAI
+    Author: OpenAI / ChatGPT
     Function: MWF_fnc_saveRespawnLoadout
     Project: Military War Framework
 
     Description:
     Saves the player's respawn loadout, face, voice and insignia. Saving is
-    blocked if an OPFOR uniform is currently worn.
+    blocked if any OPFOR-classified clothing item is currently worn.
 */
 
 if (!hasInterface) exitWith { false };
@@ -15,10 +15,23 @@ if !(missionNamespace getVariable ["MWF_InLoadoutZone", false]) exitWith {
 };
 
 [] call MWF_fnc_buildLoadoutCaches;
-private _opforUniforms = missionNamespace getVariable ["MWF_OpforUniformClasses", []];
+private _opforClothing = missionNamespace getVariable ["MWF_OpforClothingClasses", missionNamespace getVariable ["MWF_OpforUniformClasses", []]];
 
-if ((uniform player) in _opforUniforms) exitWith {
-    hint "Du kan inte spara respawn-loadout med OPFOR-uniform utrustad.";
+private _blockedItems = [];
+{
+    if !(_x isEqualTo "") then {
+        if (_x in _opforClothing) then {
+            _blockedItems pushBackUnique _x;
+        };
+    };
+} forEach [
+    uniform player,
+    vest player,
+    headgear player
+];
+
+if (_blockedItems isNotEqualTo []) exitWith {
+    hint format ["Du kan inte spara respawn-loadout med OPFOR-kläder utrustade (%1).", _blockedItems joinString ", "];
     false
 };
 

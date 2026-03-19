@@ -103,8 +103,16 @@ private _showSelectedEntry = {
             private _difficulty = toLower (_meta getOrDefault ["difficulty", "easy"]);
             private _zoneName = _meta getOrDefault ["zoneName", "Unknown Area"];
             private _state = toLower (_meta getOrDefault ["state", "available"]);
-            private _reward = [_category, _difficulty] call MWF_fnc_getSideMissionRewardProfile;
-            private _impact = ["side", _category, _difficulty] call MWF_fnc_getMissionImpactProfile;
+            private _rewardSupplies = _meta getOrDefault ["rewardSupplies", 0];
+            private _rewardIntel = _meta getOrDefault ["rewardIntel", 0];
+            private _rewardThreat = _meta getOrDefault ["rewardThreat", 0];
+            private _rewardTier = _meta getOrDefault ["rewardTier", 0];
+            private _rewardThreatUndercover = _meta getOrDefault ["rewardThreatUndercover", _rewardThreat];
+            private _fallbackSupplies = _meta getOrDefault ["fallbackSupplies", 0];
+            private _fallbackIntel = _meta getOrDefault ["fallbackIntel", 0];
+            private _allowUndercover = _meta getOrDefault ["allowUndercover", false];
+            private _notes = _meta getOrDefault ["notes", ""];
+            private _description = _meta getOrDefault ["description", ""];
             private _access = ["MISSION_HUB"] call MWF_fnc_validateTerminalAccess;
             private _isAvailable = (_state isEqualTo "available") && (_access param [0, false]);
             private _statusText = if (_state isEqualTo "active") then {
@@ -117,12 +125,32 @@ private _showSelectedEntry = {
                 _statusCtrl ctrlSetText format ["Selected Mission: %1 | %2", _label, _statusText];
             };
 
-            [_infoCtrl, [
+            private _lines = [
                 format ["<t size='1.05' color='#111111'>%1</t>", _label],
-                format ["<t color='#222222'>Area: %1 | Template: %2</t>", _zoneName, _meta getOrDefault ["missionId", "Unknown"]],
-                format ["<t color='#222222'>Rewards: %1 Supplies / %2 Intel | Progress: +%3 threat / +%4 tier</t>", _reward param [0, 0], _reward param [1, 0], _impact getOrDefault ["threatDelta", 0], _impact getOrDefault ["tierDelta", 0]],
-                format ["<t color='#222222'>Status: %1</t>", _statusText]
-            ]] call _setInfoText;
+                format ["<t color='#222222'>Area: %1 | Template: %2</t>", _zoneName, _meta getOrDefault ["missionId", "Unknown"]]
+            ];
+
+            if !(_description isEqualTo "") then {
+                _lines pushBack format ["<t color='#222222'>%1</t>", _description];
+            };
+
+            _lines pushBack format ["<t color='#222222'>Rewards: %1 Supplies / %2 Intel | Progress: +%3 threat / +%4 tier</t>", _rewardSupplies, _rewardIntel, _rewardThreat, _rewardTier];
+
+            if (_allowUndercover) then {
+                _lines pushBack format ["<t color='#222222'>Undercover threat: %1</t>", _rewardThreatUndercover];
+            };
+
+            if ((_fallbackSupplies > 0) || {_fallbackIntel > 0}) then {
+                _lines pushBack format ["<t color='#222222'>Fallback reward if progression effect is blocked: %1 Supplies / %2 Intel</t>", _fallbackSupplies, _fallbackIntel];
+            };
+
+            if !(_notes isEqualTo "") then {
+                _lines pushBack format ["<t color='#222222'>Notes: %1</t>", _notes];
+            };
+
+            _lines pushBack format ["<t color='#222222'>Status: %1</t>", _statusText];
+
+            [_infoCtrl, _lines] call _setInfoText;
 
             [_actionCtrl, "Accept", _isAvailable] call _setButtonState;
             [_leftCtrl, "Main Ops", true] call _setButtonState;

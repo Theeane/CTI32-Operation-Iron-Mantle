@@ -94,10 +94,6 @@ if (_assetLocker != "") then {
     _locker = createVehicle [_assetLocker, _lockerPos, [], 0, "NONE"];
     _locker setDir (_dir + 70);
     _locker allowDamage false;
-
-    if (!isNil "MWF_fnc_initFOBInventory") then {
-        [_locker] remoteExec ["MWF_fnc_initFOBInventory", 0, true];
-    };
 };
 
 private _lamp = objNull;

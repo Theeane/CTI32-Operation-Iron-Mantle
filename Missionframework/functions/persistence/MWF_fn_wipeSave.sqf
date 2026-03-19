@@ -5,7 +5,8 @@
 
     Description:
     Handles wipe save for the persistence system, including campaign-persistent lobby params,
-    locked faction selections, rebel escalation state, and damaged FOB timers.
+    locked faction selections, rebel escalation state, damaged FOB timers, and
+    per-operation main operation cooldowns.
 */
 
 if (!isServer) exitWith {};
@@ -29,6 +30,7 @@ private _keys = [
     "MWF_Save_TierFreeze_Remaining",
     "MWF_Save_GlobalThreatPercent",
     "MWF_Save_MainOpThreatBlockedRemaining",
+    "MWF_Save_MainOperationCooldowns",
     "MWF_Save_ThreatHotZones",
     "MWF_Save_Supplies",
     "MWF_Save_Intel",

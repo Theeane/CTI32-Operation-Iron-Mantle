@@ -4,44 +4,70 @@
     Project: Military War Framework
 
     Description:
-    Handles buy intel for the economy system.
+    Authoritative intel-spend helper using the current digital economy state.
+    Can also be used as a free reveal when _revealOnly is true.
 */
 
-private _cost = 50; // Cost to reveal a zone or group
-private _currentIntel = missionNamespace getVariable ["MWF_CurrentIntel", 0];
+params [
+    ["_cost", 50, [0]],
+    ["_revealOnly", false, [false]],
+    ["_requester", objNull, [objNull]]
+];
 
-// 1. Check if the team can afford it
-if (_currentIntel < _cost) exitWith {
-    ["TaskFailed", ["", format["Not enough Intel! Need %1.", _cost]]] call BIS_fnc_showNotification;
+if (!isServer) exitWith {
+    private _resolvedRequester = if (isNull _requester && {hasInterface && {!isNull player}}) then { player } else { _requester };
+    [_cost, _revealOnly, _resolvedRequester] remoteExecCall ["MWF_fnc_buyIntel", 2];
+    true
 };
 
-// 2. Deduct the cost
-MWF_CurrentIntel = MWF_CurrentIntel - _cost;
-publicVariable "MWF_CurrentIntel";
-
-// 3. The Reward: Reveal a random enemy group
-// (This is a placeholder logic until we have our spawn system tomorrow)
-private _allEnemyGroups = allGroups select { side _x == east || side _x == resistance };
-
-if (count _allEnemyGroups > 0) then {
-    private _targetGroup = selectRandom _allEnemyGroups;
-    private _pos = getPos (leader _targetGroup);
-    
-    // Create a temporary marker for the players
-    private _mkrName = format ["intel_reveal_%1", tickTime];
-    private _mkr = createMarker [_mkrName, _pos];
-    _mkr setMarkerType "hd_warning";
-    _mkr setMarkerColor "ColorRed";
-    _mkr setMarkerText "Estimated Enemy Position";
-    
-    ["TaskSucceeded", ["", "Enemy movements revealed on map!"]] call BIS_fnc_showNotification;
-    
-    // Remove marker after 5 minutes
-    [_mkr] spawn {
-        params ["_mkr"];
-        sleep 300;
-        deleteMarker _mkr;
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+if (!_revealOnly && {_cost > 0} && {_intel < _cost}) exitWith {
+    if (!isNull _requester) then {
+        [format ["Not enough Intel! Need %1.", _cost]] remoteExec ["hint", owner _requester];
     };
-} else {
-    ["TaskFailed", ["", "No enemy activity detected in the area."]] call BIS_fnc_showNotification;
+    ["TaskFailed", ["", format ["Not enough Intel! Need %1.", _cost]]] remoteExec ["BIS_fnc_showNotification", 0];
+    false
 };
+
+if (!_revealOnly && {_cost > 0}) then {
+    if (!isNil "MWF_fnc_syncEconomyState") then {
+        [-1, _intel - _cost, -1] call MWF_fnc_syncEconomyState;
+    } else {
+        missionNamespace setVariable ["MWF_res_intel", (_intel - _cost) max 0, true];
+        missionNamespace setVariable ["MWF_Intel", (_intel - _cost) max 0, true];
+    };
+};
+
+private _allEnemyGroups = allGroups select {
+    private _side = side _x;
+    (_side isEqualTo east) || {_side isEqualTo resistance}
+};
+
+if (_allEnemyGroups isEqualTo []) exitWith {
+    ["TaskFailed", ["", "No enemy activity detected in the area."]] remoteExec ["BIS_fnc_showNotification", 0];
+    false
+};
+
+private _targetGroup = selectRandom _allEnemyGroups;
+private _leader = leader _targetGroup;
+if (isNull _leader) exitWith {
+    ["TaskFailed", ["", "Enemy signal was lost before triangulation completed."]] remoteExec ["BIS_fnc_showNotification", 0];
+    false
+};
+
+private _pos = getPos _leader;
+private _mkrName = format ["intel_reveal_%1_%2", round serverTime, floor (random 100000)];
+private _mkr = createMarker [_mkrName, _pos];
+_mkr setMarkerType "hd_warning";
+_mkr setMarkerColor "ColorRed";
+_mkr setMarkerText "Estimated Enemy Position";
+
+["TaskSucceeded", ["", if (_revealOnly) then {"Enemy movements revealed on map!"} else {"Intel spent. Enemy movements revealed on map!"}]] remoteExec ["BIS_fnc_showNotification", 0];
+
+[_mkr] spawn {
+    params ["_markerName"];
+    sleep 300;
+    deleteMarker _markerName;
+};
+
+true

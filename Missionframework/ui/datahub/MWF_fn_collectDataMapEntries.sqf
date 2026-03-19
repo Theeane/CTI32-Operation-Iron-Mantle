@@ -22,6 +22,18 @@ params [
 private _modeUpper = toUpper _mode;
 private _entries = [];
 
+private _getDefinitionValue = {
+    params ["_definition", "_key", "_default"];
+    if !(_definition isEqualType []) exitWith { _default };
+
+    private _index = _definition findIf {
+        (_x isEqualType []) && {(count _x) >= 2} && {((_x # 0) isEqualType "") && {(_x # 0) isEqualTo _key}}
+    };
+
+    if (_index < 0) exitWith { _default };
+    (_definition # _index) # 1
+};
+
 switch (_modeUpper) do {
     case "UPGRADES";
     case "ZONES": {
@@ -54,25 +66,50 @@ switch (_modeUpper) do {
     };
 
     case "SIDE_MISSIONS": {
+        private _activeMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
+
         {
             _x params [
                 ["_slotIndex", 0, [0]],
                 ["_category", "", [""]],
                 ["_difficulty", "", [""]],
-                ["_missionId", "", [""]],
+                ["_missionId", 0, [0]],
                 ["_missionKey", "", [""]],
                 ["_missionPath", "", [""]],
                 ["_position", [0,0,0], [[]]],
                 ["_zoneId", "", [""]],
                 ["_zoneName", "Unknown Area", [""]],
                 ["_state", "available", [""]],
-                ["_domain", "land", [""]]
+                ["_domain", "land", [""]],
+                ["_slotMissionDefinition", [], [[]]]
             ];
 
             if (_position isEqualType [] && {(count _position) >= 2} && {!((_position # 0) == 0 && {(_position # 1) == 0})}) then {
+                private _activeMissionIndex = _activeMissions findIf { (_x # 0) isEqualTo _missionKey };
+                private _missionDefinition = if (_activeMissionIndex >= 0) then {
+                    (_activeMissions # _activeMissionIndex) param [11, _slotMissionDefinition, [[]]]
+                } else {
+                    _slotMissionDefinition
+                };
+
+                private _rewardProfile = [_category, _difficulty] call MWF_fnc_getSideMissionRewardProfile;
+                private _impactProfile = ["side", _category, _difficulty] call MWF_fnc_getMissionImpactProfile;
+
+                private _title = [_missionDefinition, "title", format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty]] call _getDefinitionValue;
+                private _description = [_missionDefinition, "description", ""] call _getDefinitionValue;
+                private _rewardSupplies = [_missionDefinition, "rewardSupplies", _rewardProfile param [0, 0]] call _getDefinitionValue;
+                private _rewardIntel = [_missionDefinition, "rewardIntel", _rewardProfile param [1, 0]] call _getDefinitionValue;
+                private _rewardThreat = [_missionDefinition, "rewardThreat", _impactProfile getOrDefault ["threatDelta", 0]] call _getDefinitionValue;
+                private _rewardTier = [_missionDefinition, "rewardTier", _impactProfile getOrDefault ["tierDelta", 0]] call _getDefinitionValue;
+                private _rewardThreatUndercover = [_missionDefinition, "rewardThreatUndercover", _rewardThreat] call _getDefinitionValue;
+                private _fallbackSupplies = [_missionDefinition, "fallbackSupplies", 0] call _getDefinitionValue;
+                private _fallbackIntel = [_missionDefinition, "fallbackIntel", 0] call _getDefinitionValue;
+                private _allowUndercover = [_missionDefinition, "allowUndercover", false] call _getDefinitionValue;
+                private _notes = [_missionDefinition, "notes", ""] call _getDefinitionValue;
+
                 _entries pushBack [
                     "SIDE_MISSION",
-                    format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty],
+                    _title,
                     _position,
                     createHashMapFromArray [
                         ["slotIndex", _slotIndex],
@@ -85,7 +122,18 @@ switch (_modeUpper) do {
                         ["zoneId", _zoneId],
                         ["zoneName", _zoneName],
                         ["state", _state],
-                        ["displayLabel", format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty]]
+                        ["displayLabel", _title],
+                        ["description", _description],
+                        ["missionDefinition", _missionDefinition],
+                        ["rewardSupplies", _rewardSupplies],
+                        ["rewardIntel", _rewardIntel],
+                        ["rewardThreat", _rewardThreat],
+                        ["rewardTier", _rewardTier],
+                        ["rewardThreatUndercover", _rewardThreatUndercover],
+                        ["fallbackSupplies", _fallbackSupplies],
+                        ["fallbackIntel", _fallbackIntel],
+                        ["allowUndercover", _allowUndercover],
+                        ["notes", _notes]
                     ]
                 ];
             };

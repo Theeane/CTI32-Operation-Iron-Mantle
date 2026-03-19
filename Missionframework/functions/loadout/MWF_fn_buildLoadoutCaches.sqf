@@ -1,12 +1,17 @@
 /*
-    Author: OpenAI
+    Author: OpenAI / ChatGPT
     Function: MWF_fnc_buildLoadoutCaches
     Project: Military War Framework
 
     Description:
-    Builds uniform classification caches used by the loadout/arsenal and
-    undercover systems. Uniforms are classified by the side of their linked
-    uniformClass vehicle definition.
+    Builds clothing classification caches used by the loadout/arsenal and
+    undercover systems.
+
+    Caches built:
+    - MWF_OpforUniformClasses      : all OPFOR-linked uniforms
+    - MWF_CivilianUniformClasses   : all civilian-linked uniforms
+    - MWF_ArsenalItemClasses       : Arsenal-visible non-OPFOR-uniform items
+    - MWF_OpforClothingClasses     : OPFOR uniform/vest/headgear classes sourced from the active OPFOR preset infantry
 */
 
 private _cached = missionNamespace getVariable ["MWF_LoadoutCachesBuilt", false];
@@ -14,13 +19,15 @@ if (_cached) exitWith {
     [
         missionNamespace getVariable ["MWF_OpforUniformClasses", []],
         missionNamespace getVariable ["MWF_CivilianUniformClasses", []],
-        missionNamespace getVariable ["MWF_ArsenalItemClasses", []]
+        missionNamespace getVariable ["MWF_ArsenalItemClasses", []],
+        missionNamespace getVariable ["MWF_OpforClothingClasses", []]
     ]
 };
 
 private _opforUniforms = [];
 private _civilianUniforms = [];
 private _arsenalItems = [];
+private _opforClothing = [];
 
 {
     private _cfg = _x;
@@ -50,13 +57,60 @@ private _arsenalItems = [];
     };
 } forEach ("true" configClasses (configFile >> "CfgWeapons"));
 
+private _isTrackedClothingItem = {
+    params ["_itemClass"];
+    if (_itemClass isEqualTo "") exitWith { false };
+    if !(isClass (configFile >> "CfgWeapons" >> _itemClass)) exitWith { false };
+
+    private _cfg = configFile >> "CfgWeapons" >> _itemClass;
+    if !(isClass (_cfg >> "ItemInfo")) exitWith { false };
+
+    private _uniformClass = getText (_cfg >> "ItemInfo" >> "uniformClass");
+    if !(_uniformClass isEqualTo "") exitWith { true };
+
+    private _itemType = getNumber (_cfg >> "ItemInfo" >> "type");
+    _itemType in [605, 701]
+};
+
+private _collectOpforClothingFromUnit = {
+    params ["_unitClass"];
+
+    if !(_unitClass isEqualType "") exitWith {};
+    if !(isClass (configFile >> "CfgVehicles" >> _unitClass)) exitWith {};
+
+    private _unitCfg = configFile >> "CfgVehicles" >> _unitClass;
+
+    private _uniformItem = getText (_unitCfg >> "uniformClass");
+    if !(_uniformItem isEqualTo "") then {
+        _opforClothing pushBackUnique _uniformItem;
+        _opforUniforms pushBackUnique _uniformItem;
+    };
+
+    {
+        if ([_x] call _isTrackedClothingItem) then {
+            _opforClothing pushBackUnique _x;
+        };
+    } forEach (getArray (_unitCfg >> "linkedItems"));
+};
+
+private _opforPreset = missionNamespace getVariable ["MWF_OPFOR_Preset", createHashMap];
+if (!isNil "_opforPreset" && {_opforPreset isEqualType createHashMap}) then {
+    {
+        {
+            [_x] call _collectOpforClothingFromUnit;
+        } forEach (_opforPreset getOrDefault [_x, []]);
+    } forEach ["Infantry_T1", "Infantry_T2", "Infantry_T3", "Infantry_T4", "Infantry_T5"];
+};
+
 missionNamespace setVariable ["MWF_OpforUniformClasses", _opforUniforms];
 missionNamespace setVariable ["MWF_CivilianUniformClasses", _civilianUniforms];
 missionNamespace setVariable ["MWF_ArsenalItemClasses", _arsenalItems];
+missionNamespace setVariable ["MWF_OpforClothingClasses", _opforClothing];
 missionNamespace setVariable ["MWF_LoadoutCachesBuilt", true];
 
 [
     _opforUniforms,
     _civilianUniforms,
-    _arsenalItems
+    _arsenalItems,
+    _opforClothing
 ]
