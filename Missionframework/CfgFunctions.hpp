@@ -37,6 +37,7 @@ class CfgFunctions {
             class MOBComputerLogin { file = "Missionframework/core/MWF_fn_MOBComputerLogin.sqf"; };
             class setCampaignPhase { file = "Missionframework/core/MWF_fn_setCampaignPhase.sqf"; };
             class syncEconomyState { file = "Missionframework/core/MWF_fn_syncEconomyState.sqf"; };
+            class enterBuildMode { file = "Missionframework/core/MWF_fn_enterBuildMode.sqf"; };
         };
 
         class Compatibility {
@@ -62,6 +63,10 @@ class CfgFunctions {
             class terminal_mainOperations { file = "Missionframework/functions/terminal/MWF_fnc_terminal_mainOperations.sqf"; };
             class terminal_redeploy { file = "Missionframework/functions/terminal/MWF_fnc_terminal_redeploy.sqf"; };
             class terminal_vehicleMenu { file = "Missionframework/functions/terminal/MWF_fnc_terminal_vehicleMenu.sqf"; };
+            class terminal_support { file = "Missionframework/functions/terminal/MWF_fnc_terminal_support.sqf"; };
+            class spawnSupportGroup { file = "Missionframework/functions/terminal/MWF_fnc_spawnSupportGroup.sqf"; };
+            class spawnSupportUnit { file = "Missionframework/functions/terminal/MWF_fnc_spawnSupportUnit.sqf"; };
+            class getSupportSpawnContext { file = "Missionframework/functions/terminal/MWF_fnc_getSupportSpawnContext.sqf"; };
             class beginVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_beginVehiclePlacement.sqf"; };
             class confirmVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_confirmVehiclePlacement.sqf"; };
             class cancelVehiclePlacement { file = "Missionframework/functions/terminal/MWF_fnc_cancelVehiclePlacement.sqf"; };
@@ -123,6 +128,15 @@ class CfgFunctions {
             class zoneHandler { file = "Missionframework/functions/zones/MWF_fn_zoneHandler.sqf"; };
         };
 
+        class Progression {
+            file = "Missionframework/functions/progression";
+            class applyMissionImpact { file = "Missionframework/functions/progression/MWF_fn_applyMissionImpact.sqf"; };
+            class finalizeMainOperation { file = "Missionframework/functions/progression/MWF_fn_finalizeMainOperation.sqf"; };
+            class getMainOperationRegistry { file = "Missionframework/functions/progression/MWF_fn_getMainOperationRegistry.sqf"; };
+            class getMainOperationState { file = "Missionframework/functions/progression/MWF_fn_getMainOperationState.sqf"; };
+            class getMissionImpactProfile { file = "Missionframework/functions/progression/MWF_fn_getMissionImpactProfile.sqf"; };
+        };
+
         class Economy {
             file = "Missionframework/functions/economy";
             class buyIntel { file = "Missionframework/functions/economy/MWF_fn_buyIntel.sqf"; };
@@ -152,6 +166,9 @@ class CfgFunctions {
             file = "Missionframework/ui";
             class initUI { file = "Missionframework/ui/MWF_fn_initUI.sqf"; };
             class updateResourceUI { file = "Missionframework/ui/MWF_fn_updateResourceUI.sqf"; };
+            class dataHub { file = "Missionframework/ui/datahub/MWF_fn_dataHub.sqf"; };
+            class collectDataMapEntries { file = "Missionframework/ui/datahub/MWF_fn_collectDataMapEntries.sqf"; };
+            class uiGoBack { file = "Missionframework/ui/datahub/MWF_fnc_uiGoBack.sqf"; };
         };
 
         class World {

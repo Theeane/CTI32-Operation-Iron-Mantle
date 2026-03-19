@@ -94,6 +94,14 @@ MWF_Support_Group5 = [
     600, 5
 ];
 
+MWF_Support_GroupMeta = [
+    ["MWF_Support_Group1", "Recon Squad"],
+    ["MWF_Support_Group2", "Rifle Squad"],
+    ["MWF_Support_Group3", "AT Team"],
+    ["MWF_Support_Group4", "Mechanized Squad"],
+    ["MWF_Support_Group5", "Air Assault Team"]
+];
+
 // --- 4. VEHICLE CATEGORIES [Classname, Cost, MinTier] ---
 
 MWF_Preset_Light = [
