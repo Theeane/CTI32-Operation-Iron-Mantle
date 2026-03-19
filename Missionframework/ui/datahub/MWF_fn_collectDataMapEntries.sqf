@@ -22,6 +22,50 @@ params [
 private _modeUpper = toUpper _mode;
 private _entries = [];
 
+private _categoryLabel = {
+    params [["_category", "", [""]]];
+    switch (toLower _category) do {
+        case "disrupt": {"Disrupt"};
+        case "supply": {"Supply"};
+        case "intel": {"Intel"};
+        default {
+            if (_category isEqualTo "") then {
+                "Mission"
+            } else {
+                toUpper (_category select [0, 1]) + (_category select [1])
+            }
+        };
+    }
+};
+
+private _extractStringValue = {
+    params ["_source", "_key", "_default"];
+    private _needle = format ['["%1", "', _key];
+    private _idx = _source find _needle;
+    if (_idx < 0) exitWith { _default };
+
+    private _start = _idx + count _needle;
+    private _tail = _source select [_start];
+    private _end = _tail find '"]';
+    if (_end < 0) exitWith { _default };
+    _tail select [0, _end]
+};
+
+private _extractNumberValue = {
+    params ["_source", "_key", "_default"];
+    private _needle = format ['["%1", ', _key];
+    private _idx = _source find _needle;
+    if (_idx < 0) exitWith { _default };
+
+    private _start = _idx + count _needle;
+    private _tail = _source select [_start];
+    private _end = _tail find ']';
+    if (_end < 0) exitWith { _default };
+
+    private _raw = [_tail select [0, _end], " ", ""] call BIS_fnc_replaceString;
+    parseNumber _raw
+};
+
 switch (_modeUpper) do {
     case "ZONES": {
         {
@@ -58,7 +102,7 @@ switch (_modeUpper) do {
                 ["_slotIndex", 0, [0]],
                 ["_category", "", [""]],
                 ["_difficulty", "", [""]],
-                ["_missionId", "", [""]],
+                ["_missionId", "", [0,""]],
                 ["_missionKey", "", [""]],
                 ["_missionPath", "", [""]],
                 ["_position", [0,0,0], [[]]],
@@ -69,9 +113,40 @@ switch (_modeUpper) do {
             ];
 
             if (_position isEqualType [] && {(count _position) >= 2} && {!((_position # 0) == 0 && {(_position # 1) == 0})}) then {
+                private _title = format ["%1 %2", toUpper _domain, [_category] call _categoryLabel];
+                private _description = format ["Accept a %1 %2 mission operating near %3.", _difficulty, [_category] call _categoryLabel, _zoneName];
+                private _rewardSupplies = 0;
+                private _rewardIntel = 0;
+                private _rewardThreat = 0;
+                private _rewardTier = 0;
+
+                if (_missionPath isNotEqualTo "" && {fileExists _missionPath}) then {
+                    private _source = loadFile _missionPath;
+                    if (_source isNotEqualTo "") then {
+                        _title = [_source, "title", _title] call _extractStringValue;
+                        _description = [_source, "description", _description] call _extractStringValue;
+                        _rewardSupplies = [_source, "rewardSupplies", 0] call _extractNumberValue;
+                        _rewardIntel = [_source, "rewardIntel", 0] call _extractNumberValue;
+                        _rewardThreat = [_source, "rewardThreat", 0] call _extractNumberValue;
+                        _rewardTier = [_source, "rewardTier", 0] call _extractNumberValue;
+                    };
+                };
+
+                private _rewardParts = [];
+                if (_rewardSupplies > 0) then { _rewardParts pushBack format ["%1 Supplies", _rewardSupplies]; };
+                if (_rewardIntel > 0) then { _rewardParts pushBack format ["%1 Intel", _rewardIntel]; };
+                if (_rewardThreat > 0) then { _rewardParts pushBack format ["%1 Threat", _rewardThreat]; };
+                if (_rewardTier > 0) then { _rewardParts pushBack format ["%1 Tier", _rewardTier]; };
+                private _rewardText = if (_rewardParts isEqualTo []) then {
+                    "Rewards vary by mission state."
+                } else {
+                    _rewardParts joinString " / "
+                };
+
+                private _displayLabel = format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty];
                 _entries pushBack [
                     "SIDE_MISSION",
-                    format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty],
+                    _displayLabel,
                     _position,
                     createHashMapFromArray [
                         ["slotIndex", _slotIndex],
@@ -84,7 +159,14 @@ switch (_modeUpper) do {
                         ["zoneId", _zoneId],
                         ["zoneName", _zoneName],
                         ["state", _state],
-                        ["displayLabel", format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty]]
+                        ["displayLabel", _displayLabel],
+                        ["title", _title],
+                        ["description", _description],
+                        ["rewardText", _rewardText],
+                        ["statusText", if (_state isEqualTo "active") then {"Active"} else {"Available"}],
+                        ["tooltipText", if (_state isEqualTo "active") then {format ["%1 is already active.", _title]} else {format ["Accept %1 near %2.", _title, _zoneName]}],
+                        ["acceptLabel", "Accept Mission"],
+                        ["isAvailable", !(_state isEqualTo "active")]
                     ]
                 ];
             };
@@ -120,6 +202,7 @@ switch (_modeUpper) do {
                     _title,
                     _pos,
                     createHashMapFromArray [
+                        ["registryIndex", _forEachIndex],
                         ["key", _key],
                         ["title", _title],
                         ["description", _desc],
@@ -138,7 +221,8 @@ switch (_modeUpper) do {
                         ["isCoolingDown", _state getOrDefault ["isCoolingDown", false]],
                         ["cooldownRemaining", _state getOrDefault ["cooldownRemaining", 0]],
                         ["readyAt", _state getOrDefault ["readyAt", 0]],
-                        ["active", _state getOrDefault ["isActive", false]]
+                        ["active", _state getOrDefault ["isActive", false]],
+                        ["acceptLabel", "Accept Operation"]
                     ]
                 ];
             };
@@ -154,7 +238,13 @@ switch (_modeUpper) do {
                 _pos,
                 createHashMapFromArray [
                     ["kind", _kind],
-                    ["source", _source]
+                    ["source", _source],
+                    ["title", _label],
+                    ["description", "Select this respawn point and then confirm redeploy."],
+                    ["statusText", "Selectable"],
+                    ["tooltipText", format ["Select %1 as your redeploy destination.", _label]],
+                    ["acceptLabel", "Select Redeploy"],
+                    ["isAvailable", true]
                 ]
             ];
         } forEach ([] call MWF_fnc_collectRespawnPoints);

@@ -68,3 +68,24 @@ class RscStandardButton : RscButton {
     text = "";
     url = "Missionframework\ui\button_bg.paa"; 
 };
+
+
+class RscStructuredText {
+    access = 0;
+    type = 13;
+    idc = -1;
+    style = ST_LEFT;
+    text = "";
+    x = 0; y = 0; w = 0; h = 0;
+    colorBackground[] = {0,0,0,0};
+    colorText[] = {1,1,1,1};
+    class Attributes {
+        font = "RobotoCondensed";
+        color = "#FFFFFF";
+        colorLink = "#D09B43";
+        align = "left";
+        shadow = 1;
+    };
+    size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 30) * 1)";
+    shadow = 1;
+};

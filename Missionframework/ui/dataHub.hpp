@@ -181,6 +181,35 @@ class MWF_RscDataHub {
             colorText[] = {0,0,0,1};
         };
 
+        class DetailBackground: RscText {
+            idc = 12208;
+            x = 0.41 * safezoneW + safezoneX;
+            y = 0.745 * safezoneH + safezoneY;
+            w = 0.325 * safezoneW;
+            h = 0.095 * safezoneH;
+            colorBackground[] = {0.08,0.08,0.08,0.72};
+        };
+
+        class DetailTitle: RscText {
+            idc = 12209;
+            text = "Select an entry";
+            x = 0.425 * safezoneW + safezoneX;
+            y = 0.752 * safezoneH + safezoneY;
+            w = 0.295 * safezoneW;
+            h = 0.022 * safezoneH;
+            colorText[] = {1,0.87,0.55,1};
+        };
+
+        class DetailText: RscStructuredText {
+            idc = 12216;
+            text = "Click a mission, main operation, or respawn marker on the map to inspect it.";
+            x = 0.425 * safezoneW + safezoneX;
+            y = 0.776 * safezoneH + safezoneY;
+            w = 0.295 * safezoneW;
+            h = 0.056 * safezoneH;
+            colorBackground[] = {0,0,0,0};
+        };
+
         class BtnSideMissions: RscButton {
             idc = 12215;
             text = "Missions";
@@ -191,11 +220,21 @@ class MWF_RscDataHub {
             action = "['SET_MODE','SIDE_MISSIONS'] call MWF_fnc_dataHub;";
         };
 
+        class BtnAccept: RscButton {
+            idc = 12217;
+            text = "Accept";
+            x = 0.745 * safezoneW + safezoneX;
+            y = 0.745 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+            action = "['ACCEPT'] call MWF_fnc_dataHub;";
+        };
+
         class BtnAction: RscButton {
             idc = 12207;
             text = "Close";
             x = 0.745 * safezoneW + safezoneX;
-            y = 0.76 * safezoneH + safezoneY;
+            y = 0.797 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['ACTION'] call MWF_fnc_dataHub;";
