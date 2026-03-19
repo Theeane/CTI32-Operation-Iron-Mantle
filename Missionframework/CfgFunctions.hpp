@@ -84,15 +84,6 @@ class CfgFunctions {
             class op_apexPredator { file = "Missionframework/MainOp/MWF_fn_op_apexPredator.sqf"; };
         };
 
-        class Progression {
-            file = "Missionframework/functions/progression";
-            class getMissionImpactProfile { file = "Missionframework/functions/progression/MWF_fn_getMissionImpactProfile.sqf"; };
-            class applyMissionImpact { file = "Missionframework/functions/progression/MWF_fn_applyMissionImpact.sqf"; };
-            class getMainOperationRegistry { file = "Missionframework/functions/progression/MWF_fn_getMainOperationRegistry.sqf"; };
-            class getMainOperationState { file = "Missionframework/functions/progression/MWF_fn_getMainOperationState.sqf"; };
-            class finalizeMainOperation { file = "Missionframework/functions/progression/MWF_fn_finalizeMainOperation.sqf"; };
-        };
-
         class Base {
             file = "Missionframework/functions/base";
             class baseManager { file = "Missionframework/functions/base/MWF_fn_baseManager.sqf"; };
@@ -161,6 +152,10 @@ class CfgFunctions {
             file = "Missionframework/ui";
             class initUI { file = "Missionframework/ui/MWF_fn_initUI.sqf"; };
             class updateResourceUI { file = "Missionframework/ui/MWF_fn_updateResourceUI.sqf"; };
+            class dataHub { file = "Missionframework/ui/datahub/MWF_fn_dataHub.sqf"; };
+            class refreshDataMap { file = "Missionframework/ui/datahub/MWF_fn_refreshDataMap.sqf"; };
+            class collectDataMapEntries { file = "Missionframework/ui/datahub/MWF_fn_collectDataMapEntries.sqf"; };
+            class collectRespawnPoints { file = "Missionframework/ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
         };
 
         class World {

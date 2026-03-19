@@ -21,7 +21,7 @@ class MWF_Terminal_Dialog {
             idc = 9101; text = "VEHICLES";
             x = 0.13 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "hint 'Vehicles';";
+            onButtonClick = "closeDialog 0; ['OPEN', objNull] call MWF_fnc_terminal_vehicleMenu;";
         };
         class Btn_Base: RscStandardButton {
             idc = 9102; text = "BASE";
@@ -45,7 +45,7 @@ class MWF_Terminal_Dialog {
             idc = 9105; text = "INTEL";
             x = 0.69 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "hint 'Intel';";
+            onButtonClick = "closeDialog 0; ['OPEN', 'MAIN_OPERATIONS'] call MWF_fnc_dataHub;";
         };
 
         // --- BOTTEN (MISSIONS & REDEPLOY) ---
@@ -53,13 +53,13 @@ class MWF_Terminal_Dialog {
             idc = 9106; text = "MISSIONS";
             x = 0.13 * safezoneW + safezoneX; y = 0.82 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.07 * safezoneH;
-            onButtonClick = "hint 'Missions';";
+            onButtonClick = "closeDialog 0; ['OPEN', 'SIDE_MISSIONS'] call MWF_fnc_dataHub;";
         };
         class Btn_Redeploy: RscStandardButton {
             idc = 9107; text = "REDEPLOY";
             x = 0.67 * safezoneW + safezoneX; y = 0.82 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.07 * safezoneH;
-            onButtonClick = "hint 'Redeploy';";
+            onButtonClick = "closeDialog 0; ['OPEN', 'REDEPLOY'] call MWF_fnc_dataHub;";
         };
     };
 };

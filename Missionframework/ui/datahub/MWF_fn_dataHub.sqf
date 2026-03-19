@@ -19,16 +19,30 @@ private _modeUpper = toUpper _mode;
 switch (_modeUpper) do {
     case "OPEN": {
         if (!hasInterface) exitWith { false };
+
+        private _initialMode = "ZONES";
+        if (_payload isEqualType "") then {
+            _initialMode = toUpper _payload;
+        } else {
+            if (_payload isEqualType []) then {
+                _initialMode = toUpper (_payload param [0, "ZONES", [""]]);
+            };
+        };
+
+        if !(_initialMode in ["ZONES", "SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY"]) then {
+            _initialMode = "ZONES";
+        };
+
         createDialog "MWF_RscDataHub";
         private _display = findDisplay 12200;
         if (isNull _display) exitWith { false };
 
         uiNamespace setVariable ["MWF_DataHub_Display", _display];
-        uiNamespace setVariable ["MWF_DataHub_Mode", "ZONES"];
+        uiNamespace setVariable ["MWF_DataHub_Mode", _initialMode];
         uiNamespace setVariable ["MWF_DataHub_Markers", []];
         uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", nil];
 
-        ["SET_MODE", "ZONES"] call MWF_fnc_dataHub;
+        ["SET_MODE", _initialMode] call MWF_fnc_dataHub;
         true
     };
 
