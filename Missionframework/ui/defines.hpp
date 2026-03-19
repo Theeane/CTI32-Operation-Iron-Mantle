@@ -1,103 +1,144 @@
 /*
-    Author: Theane / ChatGPT
-    Function: defines
+    Author: Theane / Gemini
     Project: Military War Framework
-
-    Description:
-    Defines the UI layout for defines.
+    Description: Terminal UI Layout based on Untitled1.png
 */
 
-// Standard Arma 3 UI Styles
-#define ST_LEFT           0x00
-#define ST_RIGHT          0x01
-#define ST_CENTER         0x02
-#define ST_PICTURE        0x30
+class MWF_Terminal_Dialog {
+    idd = 9000;
+    movingEnable = false;
+    enableSimulation = true;
 
-class RscText {
-    access = 0;
-    type = 0;
-    idc = -1;
-    colorBackground[] = {0,0,0,0};
-    colorText[] = {1,1,1,1};
-    text = "";
-    fixedWidth = 0;
-    x = 0; y = 0; w = 0; h = 0;
-    style = 0;
-    shadow = 1;
-    font = "RobotoCondensed";
-    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-};
+    // --- BAKGRUNDSLAGER ---
+    class ControlsBackground {
+        // Huvudramen för terminalen
+        class MainBackground: RscPicture {
+            idc = -1;
+            text = "Missionframework\ui\terminal_bg.paa";
+            x = 0.05 * safezoneW + safezoneX;
+            y = 0.05 * safezoneH + safezoneY;
+            w = 0.9 * safezoneW;
+            h = 0.9 * safezoneH;
+        };
 
-class RscButton {
-    access = 0;
-    type = 1;
-    text = "";
-    colorText[] = {1,1,1,1};
-    colorDisabled[] = {0.4,0.4,0.4,1};
-    colorBackground[] = {0,0,0,0.7};
-    colorBackgroundDisabled[] = {0,0,0,0.4};
-    colorBackgroundActive[] = {0,0,0,1};
-    colorFocused[] = {0,0,0,1};
-    colorShadow[] = {0,0,0,0};
-    colorBorder[] = {0,0,0,1};
-    soundEnter[] = {"\A3\ui_f\data\sound\RscButton\soundEnter",0.09,1};
-    soundPush[] = {"\A3\ui_f\data\sound\RscButton\soundPush",0.09,1};
-    soundClick[] = {"\A3\ui_f\data\sound\RscButton\soundClick",0.09,1};
-    soundEscape[] = {"\A3\ui_f\data\sound\RscButton\soundEscape",0.09,1};
-    style = 2;
-    x = 0; y = 0; w = 0; h = 0;
-    shadow = 2;
-    font = "RobotoCondensed";
-    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-    offsetX = 0.003; offsetY = 0.003;
-    offsetPressedX = 0.002; offsetPressedY = 0.002;
-    borderSize = 0;
-};
-
-class RscListBox {
-    access = 0;
-    type = 5;
-    style = 16;
-    w = 0.4; h = 0.4;
-    font = "RobotoCondensed";
-    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 25) * 1)";
-    colorFixed[] = {1,1,1,1};
-    colorText[] = {1,1,1,1};
-    colorScrollbar[] = {1,0,0,0};
-    colorSelect[] = {0,0,0,1};
-    colorSelect2[] = {0,0,0,1};
-    colorSelectBackground[] = {0.95,0.95,0.95,1};
-    colorSelectBackground2[] = {1,1,1,0.5};
-    colorBackground[] = {0,0,0,0.3};
-    soundSelect[] = {"\A3\ui_f\data\sound\RscListbox\soundSelect",0.09,1};
-    arrowFull = "\A3\ui_f\data\gui\cfg\scrollbar\arrowFull_ca.paa";
-    arrowEmpty = "\A3\ui_f\data\gui\cfg\scrollbar\arrowEmpty_ca.paa";
-    wholeHeight = 0.45;
-    rowHeight = 0.04;
-    maxHistorySize = 100;
-    class ListScrollBar {
-        color[] = {1,1,1,0.6};
-        width = 0;
-        autoScrollEnabled = 1;
+        // En mörk toning för kartytan i mitten
+        class MapAreaBackground: RscText {
+            idc = -1;
+            colorBackground[] = {0, 0, 0, 0.3};
+            x = 0.15 * safezoneW + safezoneX;
+            y = 0.22 * safezoneH + safezoneY;
+            w = 0.7 * safezoneW;
+            h = 0.56 * safezoneH;
+        };
     };
-};
 
-class RscActivePicture {
-    access = 0;
-    type = 11;
-    style = 48;
-    color[] = {1,1,1,0.7};
-    colorActive[] = {1,1,1,1};
-    colorDisabled[] = {1,1,1,0.3};
-    soundEnter[] = {"\A3\ui_f\data\sound\RscButton\soundEnter",0.09,1};
-    soundPush[] = {"\A3\ui_f\data\sound\RscButton\soundPush",0.09,1};
-    soundClick[] = {"\A3\ui_f\data\sound\RscButton\soundClick",0.09,1};
-    soundEscape[] = {"\A3\ui_f\data\sound\RscButton\soundEscape",0.09,1};
-    action = "";
-    x = 0; y = 0; w = 0; h = 0;
-    font = "RobotoCondensed";
-    sizeEx = 0;
-    tooltipColorText[] = {1,1,1,1};
-    tooltipColorBox[] = {1,1,1,1};
-    tooltipColorShade[] = {0,0,0,0.65};
+    // --- INTERAKTIVA KONTROLLER ---
+    class Controls {
+        // --- STATUS BAR (Toppen av terminalen) ---
+        class StatusInfo: RscText {
+            idc = 9200;
+            text = "SUPPLIES: 0 | INTEL: 0 | THREAT: 0%";
+            style = 0x02; // Center
+            colorText[] = {0.7, 0.9, 0.7, 1}; // Grönaktig militär text
+            x = 0.35 * safezoneW + safezoneX;
+            y = 0.07 * safezoneH + safezoneY;
+            w = 0.3 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
+        // --- TOPPARADEN (Logistik & Strategi) ---
+        class Btn_Vehicles: RscStandardButton {
+            idc = 9101; 
+            text = "VEHICLES";
+            x = 0.14 * safezoneW + safezoneX; 
+            y = 0.13 * safezoneH + safezoneY;
+            w = 0.12 * safezoneW; 
+            h = 0.06 * safezoneH;
+            onButtonClick = "hint 'Accessing Vehicle Logistics...';";
+        };
+
+        class Btn_Base: RscStandardButton {
+            idc = 9102; 
+            text = "BASE";
+            x = 0.28 * safezoneW + safezoneX; 
+            y = 0.13 * safezoneH + safezoneY;
+            w = 0.12 * safezoneW; 
+            h = 0.06 * safezoneH;
+            onButtonClick = "hint 'Accessing Base Operations...';";
+        };
+
+        class Btn_Support: RscStandardButton {
+            idc = 9103; 
+            text = "SUPPORT";
+            x = 0.42 * safezoneW + safezoneX; 
+            y = 0.13 * safezoneH + safezoneY;
+            w = 0.12 * safezoneW; 
+            h = 0.06 * safezoneH;
+            onButtonClick = "hint 'Requesting Tactical Support...';";
+        };
+
+        class Btn_Upgrades: RscStandardButton {
+            idc = 9104; 
+            text = "UPGRADES";
+            x = 0.56 * safezoneW + safezoneX; 
+            y = 0.13 * safezoneH + safezoneY;
+            w = 0.12 * safezoneW; 
+            h = 0.06 * safezoneH;
+            onButtonClick = "hint 'Technological Upgrades...';";
+        };
+
+        class Btn_Intel: RscStandardButton {
+            idc = 9105; 
+            text = "INTEL";
+            x = 0.70 * safezoneW + safezoneX; 
+            y = 0.13 * safezoneH + safezoneY;
+            w = 0.12 * safezoneW; 
+            h = 0.06 * safezoneH;
+            onButtonClick = "hint 'Analyzing Intelligence...';";
+        };
+
+        // --- MITTEN (KARTAN) ---
+        // Vi använder RscListBox som platshållare tills vi kopplar riktig karta
+        class MapPlaceholder: RscText {
+            idc = 9999;
+            text = "STRATEGIC MAP OVERLAY";
+            style = 0x02 + 0x10; // Center + Border
+            x = 0.15 * safezoneW + safezoneX;
+            y = 0.22 * safezoneH + safezoneY;
+            w = 0.7 * safezoneW;
+            h = 0.56 * safezoneH;
+        };
+
+        // --- BOTTENRADEN (Uppdrag & Förflyttning) ---
+        class Btn_Missions: RscStandardButton {
+            idc = 9106; 
+            text = "MISSIONS";
+            x = 0.14 * safezoneW + safezoneX; 
+            y = 0.82 * safezoneH + safezoneY;
+            w = 0.16 * safezoneW; 
+            h = 0.07 * safezoneH;
+            onButtonClick = "hint 'Opening Mission Board...';";
+        };
+
+        class Btn_Redeploy: RscStandardButton {
+            idc = 9107; 
+            text = "REDEPLOY";
+            x = 0.66 * safezoneW + safezoneX; 
+            y = 0.82 * safezoneH + safezoneY;
+            w = 0.16 * safezoneW; 
+            h = 0.07 * safezoneH;
+            onButtonClick = "hint 'Initiating Redeploy Sequence...';";
+        };
+
+        // Stäng-knapp (Liten knapp i hörnet)
+        class Btn_Close: RscButton {
+            text = "X";
+            x = 0.91 * safezoneW + safezoneX;
+            y = 0.06 * safezoneH + safezoneY;
+            w = 0.02 * safezoneW;
+            h = 0.03 * safezoneH;
+            colorBackground[] = {0.5, 0, 0, 0.8};
+            onButtonClick = "closeDialog 0;";
+        };
+    };
 };
