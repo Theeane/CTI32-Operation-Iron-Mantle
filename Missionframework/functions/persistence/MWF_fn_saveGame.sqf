@@ -127,6 +127,7 @@ profileNamespace setVariable ["MWF_Save_NotorietyMultiplier", missionNamespace g
 profileNamespace setVariable ["MWF_Save_BuildingMode", _buildingMode];
 profileNamespace setVariable ["MWF_Save_IncomeMultiplier", missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", 1]];
 profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable ["MWF_Locked_MaxFOBs", 5]];
+profileNamespace setVariable ["MWF_Save_CompositionType", missionNamespace getVariable ["MWF_Locked_CompositionTypeChoice", 0]];
 
 {
     private _prefix = _x;

@@ -198,6 +198,20 @@ class Params {
         default = 1;
     };
 
+
+
+    class MWF_Param_CompositionType {
+        title = "Composition Type";
+        values[] = {0, 1, 2, 3};
+        texts[] = {
+            "Modern",
+            "Vietnam",
+            "World War 2",
+            "Global Mobilization"
+        };
+        default = 0;
+    };
+
     class MWF_Param_StartSupplies {
         title = "Starting Supplies";
         values[] = {200, 400, 600, 800, 1100};

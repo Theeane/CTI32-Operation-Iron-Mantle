@@ -44,10 +44,20 @@ private _lockedNotorietyMult = ["MWF_Save_NotorietyMultiplier", "MWF_Param_Notor
 private _lockedBuildingMode = ["MWF_Save_BuildingMode", "MWF_Param_BuildingDamageMode", 0, "MWF_Locked_BuildingDamageMode", 0, 10] call _getPersistentValue;
 private _lockedIncomeMultiplier = ["MWF_Save_IncomeMultiplier", "MWF_Param_IncomeMultiplier", 1, "MWF_Locked_IncomeMultiplier", 0, 100] call _getPersistentValue;
 private _lockedMaxFOBs = ["MWF_Save_MaxFOBs", "MWF_Param_MaxFOBs", 5, "MWF_Locked_MaxFOBs", 0, 100] call _getPersistentValue;
+private _lockedCompositionTypeChoice = ["MWF_Save_CompositionType", "MWF_Param_CompositionType", 0, "MWF_Locked_CompositionTypeChoice", 0, 3] call _getPersistentValue;
 
 missionNamespace setVariable ["MWF_LockedBuildingMode", _lockedBuildingMode, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _lockedMaxFOBs, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _lockedIncomeMultiplier, true];
+missionNamespace setVariable ["MWF_Param_CompositionType", _lockedCompositionTypeChoice, true];
+
+private _compositionType = switch _lockedCompositionTypeChoice do {
+    case 1: {"vietnam"};
+    case 2: {"world_war_2"};
+    case 3: {"global_mobilization"};
+    default {"modern"};
+};
+missionNamespace setVariable ["MWF_CompositionType", _compositionType, true];
 
 private _loadFactionLock = {
     params ["_prefix", "_sourceParam", "_defaultParam", "_customParam", "_defaultChoice"];

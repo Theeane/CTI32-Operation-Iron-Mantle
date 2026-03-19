@@ -32,7 +32,7 @@ Suggested structure:
 - SideMissions/{theme}/SupplyMission/
 - SideMissions/{theme}/IntelMission/
 - SideMissions/{theme}/MainOperation/
-- SideMissions/{theme}/compositions/
+- Missionframework/preset/compositions/{composition_type}/{domain}/{mission_type}/
 
 3. Mission ID Rules (MANDATORY)
 Before creating a new mission, the AI must FIRST do one of the following:
@@ -188,3 +188,11 @@ Community missions in _4–_99 must NOT:
 16. Internal Development Scope
 Official/internal workflow may update only the reserved _1–_3 missions directly.
 Community generation belongs in the _4–_99 range.
+
+
+Composition structure rules:
+- composition_type must be one of: modern, vietnam, world_war_2, global_mobilization
+- domain must be one of: land, naval, air
+- mission_type must be one of: disrupt, intel, supply
+- default composition type is modern
+- if a requested composition type/domain is not yet populated, rely on resolver fallback to modern/land where needed
