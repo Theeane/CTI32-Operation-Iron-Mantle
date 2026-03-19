@@ -16,6 +16,157 @@ params [
 
 private _modeUpper = toUpper _mode;
 
+private _setInfoText = {
+    params [["_ctrl", controlNull, [controlNull]], ["_lines", [], [[]]]];
+    if (isNull _ctrl) exitWith {};
+    _ctrl ctrlSetStructuredText parseText (_lines joinString "<br/>");
+};
+
+private _setButtonState = {
+    params [["_ctrl", controlNull, [controlNull]], ["_text", "", [""]], ["_enabled", true, [true]]];
+    if (isNull _ctrl) exitWith {};
+    _ctrl ctrlSetText _text;
+    _ctrl ctrlEnable _enabled;
+};
+
+private _performRedeploy = {
+    params [["_selected", [], [[]]]];
+
+    if (_selected isEqualTo []) exitWith { [false, "Redeploy: select a respawn point on the map first."] };
+    if (!alive player) exitWith { [false, "Redeploy unavailable while incapacitated."] };
+    if (vehicle player != player) exitWith { [false, "Exit your vehicle before redeploying."] };
+
+    _selected params ["_kind", "_label", "_targetPos"];
+    private _teleportPos = [_targetPos, 3, 12, 2, 0, 0.25, 0] call BIS_fnc_findSafePos;
+    if (_teleportPos isEqualTo [] || {_teleportPos isEqualTo [0,0,0]}) then {
+        _teleportPos = _targetPos vectorAdd [3, 0, 0];
+    };
+
+    player setPosATL _teleportPos;
+    [["REDEPLOY COMPLETE", format ["Redeployed to %1.", _label]], "success"] call MWF_fnc_showNotification;
+    [true, format ["Redeployed to %1.", _label]]
+};
+
+private _showSelectedEntry = {
+    params [
+        ["_display", displayNull, [displayNull]],
+        ["_entry", [], [[]]],
+        ["_modeNow", "ZONES", [""]]
+    ];
+
+    if (isNull _display || {_entry isEqualTo []}) exitWith {};
+
+    private _statusCtrl = _display displayCtrl 12206;
+    private _infoCtrl = _display displayCtrl 12216;
+    private _actionCtrl = _display displayCtrl 12207;
+    private _leftCtrl = _display displayCtrl 12215;
+
+    private _label = _entry param [1, "Unknown"];
+    private _meta = _entry param [3, createHashMap, [createHashMap]];
+
+    switch (_modeNow) do {
+        case "SUPPORT": {
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Selected Support: %1", _label];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", "Support package."]],
+                "<t color='#222222'>Accept: Build Unit | Left button: Build Group</t>"
+            ]] call _setInfoText;
+
+            [_actionCtrl, "Build Unit", true] call _setButtonState;
+            [_leftCtrl, "Build Group", true] call _setButtonState;
+        };
+
+        case "REDEPLOY": {
+            private _kind = _meta getOrDefault ["kind", "FOB"];
+            private _canRedeploy = alive player && {vehicle player == player};
+
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Redeploy Target: %1", _label];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>Type: %1</t>", _kind],
+                format ["<t color='#222222'>Status: %1</t>", if (_canRedeploy) then {"Ready"} else {"Unavailable right now"}]
+            ]] call _setInfoText;
+
+            [_actionCtrl, "Redeploy", _canRedeploy] call _setButtonState;
+            [_leftCtrl, "Side Missions", true] call _setButtonState;
+        };
+
+        case "SIDE_MISSIONS": {
+            private _category = toLower (_meta getOrDefault ["category", "disrupt"]);
+            private _difficulty = toLower (_meta getOrDefault ["difficulty", "easy"]);
+            private _zoneName = _meta getOrDefault ["zoneName", "Unknown Area"];
+            private _state = toLower (_meta getOrDefault ["state", "available"]);
+            private _reward = [_category, _difficulty] call MWF_fnc_getSideMissionRewardProfile;
+            private _impact = ["side", _category, _difficulty] call MWF_fnc_getMissionImpactProfile;
+            private _access = ["MISSION_HUB"] call MWF_fnc_validateTerminalAccess;
+            private _isAvailable = (_state isEqualTo "available") && (_access param [0, false]);
+            private _statusText = if (_state isEqualTo "active") then {
+                "Active"
+            } else {
+                if (_access param [0, false]) then { "Available" } else { _access param [1, "Unavailable"] };
+            };
+
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Selected Mission: %1 | %2", _label, _statusText];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>Area: %1 | Template: %2</t>", _zoneName, _meta getOrDefault ["missionId", "Unknown"]],
+                format ["<t color='#222222'>Rewards: %1 Supplies / %2 Intel | Progress: +%3 threat / +%4 tier</t>", _reward param [0, 0], _reward param [1, 0], _impact getOrDefault ["threatDelta", 0], _impact getOrDefault ["tierDelta", 0]],
+                format ["<t color='#222222'>Status: %1</t>", _statusText]
+            ]] call _setInfoText;
+
+            [_actionCtrl, "Accept", _isAvailable] call _setButtonState;
+            [_leftCtrl, "Main Ops", true] call _setButtonState;
+        };
+
+        case "MAIN_OPERATIONS": {
+            private _key = _meta getOrDefault ["key", ""];
+            private _ops = [] call MWF_fnc_getMainOperationRegistry;
+            private _opIndex = _ops findIf { (_x # 0) isEqualTo _key };
+            private _state = if (_opIndex >= 0) then { [_key, _ops # _opIndex] call MWF_fnc_getMainOperationState } else { createHashMap };
+            private _access = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
+            private _statusText = if (_access param [0, false]) then {
+                _state getOrDefault ["statusText", "Unknown"]
+            } else {
+                _access param [1, "Unavailable"]
+            };
+            private _isAvailable = (_state getOrDefault ["isAvailable", false]) && (_access param [0, false]);
+            private _zoneName = _meta getOrDefault ["zoneName", "Unknown Area"];
+
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Selected Main Operation: %1 | %2", _label, _statusText];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>AO: %1</t>", _zoneName],
+                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", ""]],
+                format ["<t color='#222222'>Effect: %1</t>", _meta getOrDefault ["effectText", ""]],
+                format ["<t color='#222222'>Status: %1</t>", _statusText]
+            ]] call _setInfoText;
+
+            [_actionCtrl, "Accept", _isAvailable] call _setButtonState;
+            [_leftCtrl, "Side Missions", true] call _setButtonState;
+        };
+
+        default {
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Selected: %1", _label];
+            };
+            [_infoCtrl, [format ["<t size='1.05' color='#111111'>%1</t>", _label]]] call _setInfoText;
+        };
+    };
+};
+
 switch (_modeUpper) do {
     case "OPEN": {
         if (!hasInterface) exitWith { false };
@@ -40,7 +191,7 @@ switch (_modeUpper) do {
         uiNamespace setVariable ["MWF_DataHub_Display", _display];
         uiNamespace setVariable ["MWF_DataHub_Mode", _initialMode];
         uiNamespace setVariable ["MWF_DataHub_Markers", []];
-        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", nil];
+        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
         uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         _display displayAddEventHandler ["KeyDown", { params ["_display", "_dikCode"]; if (_dikCode isEqualTo 1) exitWith { if !(["BACK"] call MWF_fnc_dataHub) then { ["CLOSE"] call MWF_fnc_dataHub; }; true }; false }];
@@ -58,7 +209,7 @@ switch (_modeUpper) do {
 
         { deleteMarkerLocal _x; } forEach (uiNamespace getVariable ["MWF_DataHub_Markers", []]);
         uiNamespace setVariable ["MWF_DataHub_Markers", []];
-        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", nil];
+        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
         true
@@ -71,8 +222,14 @@ switch (_modeUpper) do {
         private _newMode = if (_payload isEqualType "") then { toUpper _payload } else { toUpper (_payload param [0, "", [""]]) };
         if !(_newMode in ["ZONES", "UPGRADES", "SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT"]) exitWith { false };
         private _currentMode = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
-        if !(_newMode isEqualTo _currentMode) then { private _stack = uiNamespace getVariable ["MWF_DataHub_ViewStack", []]; _stack pushBack _currentMode; uiNamespace setVariable ["MWF_DataHub_ViewStack", _stack]; };
+        if !(_newMode isEqualTo _currentMode) then {
+            private _stack = uiNamespace getVariable ["MWF_DataHub_ViewStack", []];
+            _stack pushBack _currentMode;
+            uiNamespace setVariable ["MWF_DataHub_ViewStack", _stack];
+        };
+
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
+        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
         [_display, _newMode] call MWF_fnc_refreshDataMap;
         true
     };
@@ -80,63 +237,67 @@ switch (_modeUpper) do {
     case "MAP_CLICK": {
         private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
         if (isNull _display) exitWith { false };
+
         private _mapCtrl = _display displayCtrl 12205;
         if (isNull _mapCtrl) exitWith { false };
+
         private _mouse = _payload;
         if !(_mouse isEqualType []) exitWith { false };
+
         private _worldPos = _mapCtrl ctrlMapScreenToWorld _mouse;
         private _entries = uiNamespace getVariable ["MWF_DataHub_Entries", []];
+        private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
         private _nearest = [];
         private _bestDistance = 999999;
-        private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
+
         {
             _x params ["_kind", "_label", "_pos", "_meta"];
             if ((_modeNow isEqualTo "REDEPLOY" && {_kind isEqualTo "RESPAWN"}) || (_modeNow isEqualTo "SIDE_MISSIONS" && {_kind isEqualTo "SIDE_MISSION"}) || (_modeNow isEqualTo "MAIN_OPERATIONS" && {_kind isEqualTo "MAIN_OPERATION"}) || (_modeNow isEqualTo "SUPPORT" && {_kind isEqualTo "SUPPORT"})) then {
                 private _dist = _worldPos distance2D _pos;
-                if (_dist < _bestDistance) then { _bestDistance = _dist; _nearest = _x; };
-            };
-        } forEach _entries;
-        if (_nearest isEqualTo [] || {_bestDistance > 75}) exitWith { false };
-        private _statusCtrl = _display displayCtrl 12206;
-        private _infoCtrl = _display displayCtrl 12216;
-        switch _modeNow do {
-            case "REDEPLOY": {
-                uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", _nearest];
-                if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText format ["Redeploy target selected: %1", _nearest param [1, "Unknown"]]; };
-            };
-            default {
-                uiNamespace setVariable ["MWF_DataHub_SelectedEntry", _nearest];
-                private _meta = _nearest param [3, createHashMap, [createHashMap]];
-                if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText format ["Selected: %1", _nearest param [1, "Unknown"]]; };
-                if (!isNull _infoCtrl) then {
-                    if (_modeNow isEqualTo "SUPPORT") then { _infoCtrl ctrlSetText format ["%1
-%2", _nearest param [1, "Support"], _meta getOrDefault ["description", ""]]; } else { _infoCtrl ctrlSetText format ["%1
-%2", _nearest param [1, "Entry"], _meta getOrDefault ["description", _meta getOrDefault ["effectText", ""]]]; };
+                if (_dist < _bestDistance) then {
+                    _bestDistance = _dist;
+                    _nearest = _x;
                 };
             };
+        } forEach _entries;
+
+        if (_nearest isEqualTo [] || {_bestDistance > 75}) exitWith { false };
+
+        if (_modeNow isEqualTo "REDEPLOY") then {
+            uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", _nearest];
+            uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
+        } else {
+            uiNamespace setVariable ["MWF_DataHub_SelectedEntry", _nearest];
+            uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
         };
+
+        [_display, _nearest, _modeNow] call _showSelectedEntry;
         true
     };
 
     case "BACK": {
         private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
         if (isNull _display) exitWith { false };
+
         private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-        if !(_selected isEqualTo []) exitWith {
+        private _selectedRespawn = uiNamespace getVariable ["MWF_DataHub_SelectedRespawn", []];
+        if !(_selected isEqualTo [] && {_selectedRespawn isEqualTo []}) exitWith {
             uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
-            private _statusCtrl = _display displayCtrl 12206;
-            private _infoCtrl = _display displayCtrl 12216;
-            if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText format ["Mode: %1", [uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"], "_", " "] call BIS_fnc_replaceString]; };
-            if (!isNull _infoCtrl) then { _infoCtrl ctrlSetText ""; };
+            uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
+            [_display, uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"]] call MWF_fnc_refreshDataMap;
             true
         };
+
         [] call MWF_fnc_uiGoBack
     };
 
     case "ACTION": {
         private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
         if (isNull _display) exitWith { false };
+
+        private _statusCtrl = _display displayCtrl 12206;
         private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
+
         if (_modeNow isEqualTo "SUPPORT") exitWith {
             private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
             if (_selected isEqualTo []) exitWith { false };
@@ -144,18 +305,93 @@ switch (_modeUpper) do {
             ["BUILD_UNIT", _meta getOrDefault ["index", 1], player] call MWF_fnc_terminal_support;
             true
         };
+
         if (_modeNow isEqualTo "REDEPLOY") exitWith {
             private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedRespawn", []];
-            if (_selected isEqualTo []) then {
-                private _statusCtrl = _display displayCtrl 12206;
-                if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText "Redeploy: select a respawn point on the map first."; };
-                false
-            } else {
-                private _statusCtrl = _display displayCtrl 12206;
-                if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText format ["Redeploy target ready for integration: %1", _selected param [1, "Unknown"]]; };
+            private _result = [_selected] call _performRedeploy;
+            if (_result param [0, false]) then {
+                ["CLOSE"] call MWF_fnc_dataHub;
                 true
+            } else {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText (_result param [1, "Redeploy failed."]);
+                };
+                false
             }
         };
+
+        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
+            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+            if (_selected isEqualTo []) exitWith { false };
+
+            private _meta = _selected param [3, createHashMap, [createHashMap]];
+            private _access = ["MISSION_HUB"] call MWF_fnc_validateTerminalAccess;
+            if !(_access param [0, false]) exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText (_access param [1, "Mission Hub unavailable."]);
+                };
+                false
+            };
+
+            private _state = toLower (_meta getOrDefault ["state", "available"]);
+            if !(_state isEqualTo "available") exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText format ["Mission not available: %1", _selected param [1, "Unknown"]];
+                };
+                false
+            };
+
+            private _slotIndex = _meta getOrDefault ["slotIndex", -1];
+            if (_slotIndex < 0) exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText "Mission slot metadata missing.";
+                };
+                false
+            };
+
+            ["CLOSE"] call MWF_fnc_dataHub;
+            [_slotIndex, player] remoteExecCall ["MWF_fnc_activateMissionBoardSlot", 2];
+            [["MISSION BOARD", format ["Requested mission: %1", _selected param [1, "Unknown"]]], "info"] call MWF_fnc_showNotification;
+            true
+        };
+
+        if (_modeNow isEqualTo "MAIN_OPERATIONS") exitWith {
+            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+            if (_selected isEqualTo []) exitWith { false };
+
+            private _meta = _selected param [3, createHashMap, [createHashMap]];
+            private _access = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
+            if !(_access param [0, false]) exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText (_access param [1, "Main Operations unavailable."]);
+                };
+                false
+            };
+
+            private _key = _meta getOrDefault ["key", ""];
+            private _ops = [] call MWF_fnc_getMainOperationRegistry;
+            private _opIndex = _ops findIf { (_x # 0) isEqualTo _key };
+            if (_opIndex < 0) exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText "Main operation metadata missing.";
+                };
+                false
+            };
+
+            private _state = [_key, _ops # _opIndex] call MWF_fnc_getMainOperationState;
+            if !(_state getOrDefault ["isAvailable", false]) exitWith {
+                if (!isNull _statusCtrl) then {
+                    _statusCtrl ctrlSetText (_state getOrDefault ["tooltipText", "Operation unavailable."]);
+                };
+                false
+            };
+
+            ["CLOSE"] call MWF_fnc_dataHub;
+            ["START_SERVER", _opIndex, clientOwner] remoteExecCall ["MWF_fnc_terminal_mainOperations", 2];
+            [["MAIN OPERATION", format ["Requested operation: %1", _selected param [1, "Unknown"]]], "info"] call MWF_fnc_showNotification;
+            true
+        };
+
         ["CLOSE"] call MWF_fnc_dataHub;
         true
     };
@@ -163,11 +399,23 @@ switch (_modeUpper) do {
     case "ACTION_SECONDARY": {
         private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
         if (isNull _display) exitWith { false };
-        if !((uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"]) isEqualTo "SUPPORT") exitWith { ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub; true };
-        private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-        if (_selected isEqualTo []) exitWith { false };
-        private _meta = _selected param [3, createHashMap, [createHashMap]];
-        ["BUILD_GROUP", _meta getOrDefault ["index", 1], player] call MWF_fnc_terminal_support;
+
+        private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
+
+        if (_modeNow isEqualTo "SUPPORT") exitWith {
+            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+            if (_selected isEqualTo []) exitWith { false };
+            private _meta = _selected param [3, createHashMap, [createHashMap]];
+            ["BUILD_GROUP", _meta getOrDefault ["index", 1], player] call MWF_fnc_terminal_support;
+            true
+        };
+
+        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
+            ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
+            true
+        };
+
+        ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
         true
     };
 

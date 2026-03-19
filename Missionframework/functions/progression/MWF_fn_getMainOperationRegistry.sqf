@@ -21,7 +21,7 @@ private _registry = [
         "MWF_fnc_op_skyGuardian",
         "sky_guardian",
         "progression",
-        "+14 threat / +16 tier progression.",
+        "+18 threat / +22 tier progression.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
         3600
     ],
@@ -32,7 +32,7 @@ private _registry = [
         "MWF_fnc_op_pointBlank",
         "point_blank",
         "progression",
-        "+18 threat / +22 tier progression and unlocks jet assets.",
+        "+22 threat / +28 tier progression and unlocks jet assets.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
         3600
     ],

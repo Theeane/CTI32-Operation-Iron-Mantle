@@ -23,19 +23,50 @@ _markerNames = [];
 private _entries = [_modeUpper] call MWF_fnc_collectDataMapEntries;
 uiNamespace setVariable ["MWF_DataHub_Entries", _entries];
 uiNamespace setVariable ["MWF_DataHub_Mode", _modeUpper];
-uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", nil];
+uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
+uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
 
 private _statusCtrl = _display displayCtrl 12206;
 private _actionCtrl = _display displayCtrl 12207;
 private _infoCtrl = _display displayCtrl 12216;
-if (!isNull _statusCtrl) then {
-    _statusCtrl ctrlSetText format ["Mode: %1 | Entries: %2", [_modeUpper, "_", " "] call BIS_fnc_replaceString, count _entries];
-};
-if (!isNull _infoCtrl) then { _infoCtrl ctrlSetText ""; };
 private _leftCtrl = _display displayCtrl 12215;
-if (!isNull _leftCtrl) then { _leftCtrl ctrlSetText (if (_modeUpper isEqualTo "SUPPORT") then {"Build Group"} else {"Missions"}); };
+
+if (!isNull _statusCtrl) then {
+    private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
+    private _statusText = format ["Mode: %1 | Entries: %2", _modeLabel, count _entries];
+    if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT"]) then {
+        _statusText = _statusText + " | Select a marker for details.";
+    };
+    _statusCtrl ctrlSetText _statusText;
+};
+
+if (!isNull _infoCtrl) then {
+    _infoCtrl ctrlSetStructuredText parseText "";
+};
+
+if (!isNull _leftCtrl) then {
+    private _leftText = switch (_modeUpper) do {
+        case "SUPPORT": {"Build Group"};
+        case "SIDE_MISSIONS": {"Main Ops"};
+        default {"Side Missions"};
+    };
+
+    _leftCtrl ctrlSetText _leftText;
+    _leftCtrl ctrlEnable true;
+};
+
 if (!isNull _actionCtrl) then {
-    _actionCtrl ctrlSetText (switch _modeUpper do { case "REDEPLOY": {"Redeploy"}; case "SUPPORT": {"Build Unit"}; default {"Close"}; });
+    private _actionText = switch (_modeUpper) do {
+        case "REDEPLOY": {"Redeploy"};
+        case "SUPPORT": {"Build Unit"};
+        case "SIDE_MISSIONS";
+        case "MAIN_OPERATIONS": {"Accept"};
+        default {"Close"};
+    };
+
+    private _actionEnabled = !(_modeUpper in ["REDEPLOY", "SUPPORT", "SIDE_MISSIONS", "MAIN_OPERATIONS"]);
+    _actionCtrl ctrlSetText _actionText;
+    _actionCtrl ctrlEnable _actionEnabled;
 };
 
 private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];

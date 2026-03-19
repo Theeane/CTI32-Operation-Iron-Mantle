@@ -38,6 +38,9 @@ class CfgFunctions {
             class setCampaignPhase { file = "Missionframework/core/MWF_fn_setCampaignPhase.sqf"; };
             class syncEconomyState { file = "Missionframework/core/MWF_fn_syncEconomyState.sqf"; };
             class enterBuildMode { file = "Missionframework/core/MWF_fn_enterBuildMode.sqf"; };
+            class handleBuildPlacement { file = "Missionframework/core/MWF_fn_handleBuildPlacement.sqf"; };
+            class isBuildAssetAllowed { file = "Missionframework/core/MWF_fn_isBuildAssetAllowed.sqf"; };
+            class getBuildAssetCost { file = "Missionframework/core/MWF_fn_getBuildAssetCost.sqf"; };
         };
 
         class Compatibility {
@@ -168,7 +171,20 @@ class CfgFunctions {
             class updateResourceUI { file = "Missionframework/ui/MWF_fn_updateResourceUI.sqf"; };
             class dataHub { file = "Missionframework/ui/datahub/MWF_fn_dataHub.sqf"; };
             class collectDataMapEntries { file = "Missionframework/ui/datahub/MWF_fn_collectDataMapEntries.sqf"; };
+            class collectRespawnPoints { file = "Missionframework/ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
+            class refreshDataMap { file = "Missionframework/ui/datahub/MWF_fn_refreshDataMap.sqf"; };
             class uiGoBack { file = "Missionframework/ui/datahub/MWF_fnc_uiGoBack.sqf"; };
+        };
+
+        class Loadout {
+            file = "Missionframework/functions/loadout";
+            class applyRespawnLoadout { file = "Missionframework/functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
+            class buildLoadoutCaches { file = "Missionframework/functions/loadout/MWF_fn_buildLoadoutCaches.sqf"; };
+            class initLoadoutSystem { file = "Missionframework/functions/loadout/MWF_fn_initLoadoutSystem.sqf"; };
+            class openLoadoutArsenal { file = "Missionframework/functions/loadout/MWF_fn_openLoadoutArsenal.sqf"; };
+            class registerLoadoutZone { file = "Missionframework/functions/loadout/MWF_fn_registerLoadoutZone.sqf"; };
+            class saveRespawnLoadout { file = "Missionframework/functions/loadout/MWF_fn_saveRespawnLoadout.sqf"; };
+            class unregisterLoadoutZone { file = "Missionframework/functions/loadout/MWF_fn_unregisterLoadoutZone.sqf"; };
         };
 
         class World {

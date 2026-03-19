@@ -153,7 +153,7 @@ class MWF_RscDataHub {
             action = "['SET_MODE','UPGRADES'] call MWF_fnc_dataHub;";
         };
 
-        class InfoText: RscText {
+        class InfoText: RscStructuredText {
             idc = 12216;
             text = "";
             x = 0.61 * safezoneW + safezoneX;
@@ -161,6 +161,7 @@ class MWF_RscDataHub {
             w = 0.245 * safezoneW;
             h = 0.06 * safezoneH;
             colorText[] = {0,0,0,1};
+            size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
         };
 
         class MapFrame: RscText {
