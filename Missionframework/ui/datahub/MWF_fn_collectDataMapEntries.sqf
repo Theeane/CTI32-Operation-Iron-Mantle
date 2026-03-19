@@ -64,16 +64,18 @@ switch (_modeUpper) do {
                 ["_position", [0,0,0], [[]]],
                 ["_zoneId", "", [""]],
                 ["_zoneName", "Unknown Area", [""]],
-                ["_state", "available", [""]]
+                ["_state", "available", [""]],
+                ["_domain", "land", [""]]
             ];
 
             if (_position isEqualType [] && {(count _position) >= 2} && {!((_position # 0) == 0 && {(_position # 1) == 0})}) then {
                 _entries pushBack [
                     "SIDE_MISSION",
-                    format ["%1 (%2)", _zoneName, toUpper _difficulty],
+                    format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty],
                     _position,
                     createHashMapFromArray [
                         ["slotIndex", _slotIndex],
+                        ["domain", _domain],
                         ["category", _category],
                         ["difficulty", _difficulty],
                         ["missionId", _missionId],
@@ -81,7 +83,8 @@ switch (_modeUpper) do {
                         ["missionPath", _missionPath],
                         ["zoneId", _zoneId],
                         ["zoneName", _zoneName],
-                        ["state", _state]
+                        ["state", _state],
+                        ["displayLabel", format ["%1 | %2 | %3", toUpper _domain, toUpper _category, toUpper _difficulty]]
                     ]
                 ];
             };

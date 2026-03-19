@@ -41,7 +41,8 @@ _slotData params [
     ["_position", [0, 0, 0], [[]]],
     ["_zoneId", "", [""]],
     ["_zoneName", "Unknown Area", [""]],
-    ["_state", "available", [""]]
+    ["_state", "available", [""]],
+    ["_domain", "land", [""]]
 ];
 
 if (_category isEqualTo "") then { _category = _slotCategory; };
@@ -82,6 +83,8 @@ private _difficultyLabel = if (_difficulty isEqualTo "") then {
     toUpper (_difficulty select [0, 1]) + (_difficulty select [1])
 };
 
+private _domainLabel = toUpper _domain;
+
 private _categoryLabel = switch (_category) do {
     case "disrupt": {"Disrupt"};
     case "supply": {"Supply"};
@@ -95,7 +98,7 @@ private _categoryLabel = switch (_category) do {
     };
 };
 
-private _missionTitle = [_missionDefinition, "title", format ["%1 Mission (%2)", _categoryLabel, _difficultyLabel]] call _getDefinitionValue;
+private _missionTitle = [_missionDefinition, "title", format ["%1 %2 Mission (%3)", _domainLabel, _categoryLabel, _difficultyLabel]] call _getDefinitionValue;
 private _missionDescription = [_missionDefinition, "description", format ["Execute mission template %1 near %2.", _missionId, _zoneName]] call _getDefinitionValue;
 private _rewardSupplies = [_missionDefinition, "rewardSupplies", 0] call _getDefinitionValue;
 private _rewardIntel = [_missionDefinition, "rewardIntel", 0] call _getDefinitionValue;
@@ -108,6 +111,7 @@ private _zoneTypes = [_missionDefinition, "allowedZoneTypes", []] call _getDefin
 private _briefingLines = [
     _missionDescription,
     "",
+    format ["Domain: %1", _domainLabel],
     format ["Area: %1", _zoneName],
     format ["Rewards: %1 Supplies / %2 Intel / %3 Threat / %4 Tier", _rewardSupplies, _rewardIntel, _rewardThreat, _rewardTier]
 ];
@@ -156,7 +160,8 @@ _activeMissions pushBack [
     _difficulty,
     _missionId,
     "active",
-    _missionDefinition
+    _missionDefinition,
+    _domain
 ];
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
 

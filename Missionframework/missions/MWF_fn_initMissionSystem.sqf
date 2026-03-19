@@ -89,7 +89,7 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                         _failedRestores pushBack _missionData;
                     } else {
                         private _template = + (_registry # _templateIndex);
-                        _template params ["_missionKey", "_category", "_difficulty", "_missionId", "_missionPath"];
+                        _template params ["_missionKey", "_category", "_difficulty", "_missionId", "_missionPath", ["_domain", "land", [""]]];
 
                         private _placements = + (missionNamespace getVariable ["MWF_MissionSessionPlacements", []]);
                         private _placementIndex = _placements findIf { (_x # 0) isEqualTo _missionKey };
@@ -99,7 +99,7 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                             _failedRestores pushBack _missionData;
                         } else {
                             private _placement = + (_placements # _placementIndex);
-                            _placement params ["_placementMissionKey", "_position", "_zoneId", "_zoneName"];
+                            _placement params ["_placementMissionKey", "_position", "_zoneId", "_zoneName", ["_placementDomain", _domain, [""]]];
 
                             private _boardSlots = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
                             private _slotIndex = -1;
@@ -118,7 +118,8 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                                 _position,
                                 _zoneId,
                                 _zoneName,
-                                "active"
+                                "active",
+                                _domain
                             ];
 
                             [_slotData, objNull, _category, _difficulty, _missionId] call MWF_fnc_executeMissionTemplate;

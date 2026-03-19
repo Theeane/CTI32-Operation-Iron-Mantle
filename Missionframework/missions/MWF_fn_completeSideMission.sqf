@@ -41,7 +41,8 @@ _mission params [
     ["_difficulty", "easy", [""]],
     ["_missionId", 0, [0]],
     ["_state", "active", [""]],
-    ["_missionDefinition", [], [[]]]
+    ["_missionDefinition", [], [[]]],
+    ["_domain", "land", [""]]
 ];
 
 private _getDefinitionValue = {
@@ -136,8 +137,9 @@ if (!isNil "MWF_fnc_requestDelayedSave") then {
 };
 
 diag_log format [
-    "[MWF Missions] Side mission completed | Key: %1 | Category: %2 | Difficulty: %3 | Supplies: +%4 | Intel: +%5 | ThreatApplied: %6 | TierApplied: %7 | Undercover: %8 | PerMissionDefinition: %9 | FallbackUsed: %10 | Note: %11",
+    "[MWF Missions] Side mission completed | Key: %1 | Domain: %2 | Category: %3 | Difficulty: %4 | Supplies: +%5 | Intel: +%6 | ThreatApplied: %7 | TierApplied: %8 | Undercover: %9 | PerMissionDefinition: %10 | FallbackUsed: %11 | Note: %12",
     _resolvedMissionKey,
+    _domain,
     _category,
     _difficulty,
     _suppliesReward,
