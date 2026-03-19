@@ -92,21 +92,12 @@ switch (_modeUpper) do {
     };
 
     case "MAIN_OPERATIONS": {
-        private _ops = [
-            ["SKY_GUARDIAN", "Sky Guardian", "Restore aerial detection control."],
-            ["POINT_BLANK", "Point Blank", "Break the missile complex and unlock Jets."],
-            ["SEVERED_NERVE", "Severed Nerve", "Disrupt the enemy's operational nerve center."],
-            ["STASIS_STRIKE", "Stasis Strike", "Freeze enemy momentum with precision."],
-            ["STEEL_RAIN", "Steel Rain", "Cripple enemy artillery and heavy support."],
-            ["APEX_PREDATOR", "Apex Predator", "Final escalation toward Tier 5 dominance."]
-        ];
-
+        private _ops = [] call MWF_fnc_getMainOperationRegistry;
         private _placements = + (missionNamespace getVariable ["MWF_GrandOperationSessionPlacements", []]);
-        private _currentKey = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
-        private _active = missionNamespace getVariable ["MWF_GrandOperationActive", false];
 
         {
-            _x params ["_key", "_title", "_desc"];
+            private _entry = _x;
+            _entry params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText", "_cooldownSeconds"];
             private _placement = if (_placements isEqualTo []) then {
                 []
             } else {
@@ -123,6 +114,7 @@ switch (_modeUpper) do {
             };
 
             if (_pos isEqualType [] && {(count _pos) >= 2} && {!((_pos # 0) == 0 && {(_pos # 1) == 0})}) then {
+                private _state = [_key, _entry] call MWF_fnc_getMainOperationState;
                 _entries pushBack [
                     "MAIN_OPERATION",
                     _title,
@@ -133,7 +125,20 @@ switch (_modeUpper) do {
                         ["description", _desc],
                         ["zoneId", _zoneId],
                         ["zoneName", _zoneName],
-                        ["active", _active && {_currentKey isEqualTo _key}]
+                        ["impactId", _impactId],
+                        ["effectType", _effectType],
+                        ["effectText", _effectText],
+                        ["fallbackText", _fallbackText],
+                        ["cooldownSeconds", _cooldownSeconds],
+                        ["status", _state getOrDefault ["state", "unknown"]],
+                        ["statusText", _state getOrDefault ["statusText", "Unknown"]],
+                        ["tooltipText", _state getOrDefault ["tooltipText", ""]],
+                        ["isAvailable", _state getOrDefault ["isAvailable", false]],
+                        ["isActive", _state getOrDefault ["isActive", false]],
+                        ["isCoolingDown", _state getOrDefault ["isCoolingDown", false]],
+                        ["cooldownRemaining", _state getOrDefault ["cooldownRemaining", 0]],
+                        ["readyAt", _state getOrDefault ["readyAt", 0]],
+                        ["active", _state getOrDefault ["isActive", false]]
                     ]
                 ];
             };
