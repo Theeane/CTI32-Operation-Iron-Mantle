@@ -8,7 +8,7 @@
 */
 
 class MWF_ResourceBar {
-    idd = 9000;
+    idd = 9010;
     duration = 1e+011;
     onLoad = "uiNamespace setVariable ['MWF_ctrl_resBar', _this select 0]";
 

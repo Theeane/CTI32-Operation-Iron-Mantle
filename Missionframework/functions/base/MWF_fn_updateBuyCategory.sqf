@@ -10,7 +10,10 @@
 params ["_category"];
 disableSerialization;
 
-private _display = findDisplay 9000;
+private _display = findDisplay 9060;
+if (isNull _display) then {
+    _display = findDisplay 9000;
+};
 if (isNull _display) exitWith {};
 
 private _listBox = _display displayCtrl 9002;

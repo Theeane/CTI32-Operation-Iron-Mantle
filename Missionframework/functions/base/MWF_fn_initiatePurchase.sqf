@@ -8,7 +8,10 @@
 */
 
 disableSerialization;
-private _display = findDisplay 9000;
+private _display = findDisplay 9060;
+if (isNull _display) then {
+    _display = findDisplay 9000;
+};
 if (isNull _display) exitWith { hint "Buy menu unavailable."; };
 
 private _listBox = _display displayCtrl 9002;
@@ -20,14 +23,22 @@ if (_selectedIndex == -1) exitWith { hint "No item selected."; };
 
 private _classname = _listBox lbData _selectedIndex;
 private _cost = _listBox lbValue _selectedIndex;
-private _isFobAsset = (_classname == MWF_FOB_Truck || _classname == MWF_FOB_Box_Transport);
+private _fobTruckClass = missionNamespace getVariable ["MWF_FOB_Truck", "B_Truck_01_Repair_F"];
+private _fobBoxClass = missionNamespace getVariable ["MWF_FOB_Box", "B_Slingload_01_Cargo_F"];
+private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
+private _mobFobPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
+private _isFobAsset = (_classname == _fobTruckClass || _classname == _fobBoxClass);
 
 if (_isFobAsset) then {
-    if (player distance MWF_MainBase > 100) exitWith {
+    if (isNull _mainBase || {player distance _mainBase > 100}) exitWith {
         hint parseText "<t color='#ff0000'>Restricted Area</t><br/>FOB assets can only be purchased at the MOB.";
     };
 
-    private _spawnPadPos = getPosATL MWF_MOB_FobPad;
+    if (isNull _mobFobPad) exitWith {
+        hint parseText "<t color='#ff0000'>Spawn Pad Missing</t><br/>No MOB FOB pad could be resolved for this purchase.";
+    };
+
+    private _spawnPadPos = getPosATL _mobFobPad;
     if ((count (nearestObjects [_spawnPadPos, ["Car", "Air", "Container"], 5])) > 0) exitWith {
         hint parseText "<t color='#ff0000'>Pad Occupied</t><br/>Clear the MOB spawn pad before purchasing a new FOB asset.";
     };
@@ -47,7 +58,7 @@ if (["CAN_DEPLOY"] call MWF_fnc_baseManager && { _currentSupplies >= _cost }) th
     [_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
 
     private _spawnPos = if (_isFobAsset) then {
-        getPosATL MWF_MOB_FobPad
+        getPosATL _mobFobPad
     } else {
         private _pads = nearestObjects [player, ["Land_HelipadEmpty_F"], 50];
         if ((count _pads) == 0) exitWith {
@@ -60,7 +71,9 @@ if (["CAN_DEPLOY"] call MWF_fnc_baseManager && { _currentSupplies >= _cost }) th
     if ((count _spawnPos) == 0) exitWith {};
 
     private _vehicle = createVehicle [_classname, _spawnPos, [], 0, "NONE"];
-    _vehicle setDir (getDir MWF_MOB_FobPad);
+    if (!isNull _mobFobPad) then {
+        _vehicle setDir (getDir _mobFobPad);
+    };
 
     hint format ["Asset delivered: %1", getText (configFile >> "CfgVehicles" >> _classname >> "displayName")];
     [] spawn MWF_fnc_updateBuyCategory;

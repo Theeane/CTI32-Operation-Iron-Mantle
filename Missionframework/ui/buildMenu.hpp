@@ -9,7 +9,7 @@
     and purchase callbacks instead of pointing at removed legacy handlers.
 */
 
-#define IDD_BUILD_MENU 9000
+#define IDD_BUILD_MENU 9060
 #define IDC_SUPPLY_COUNT 9001
 #define IDC_ITEM_LIST 9002
 
