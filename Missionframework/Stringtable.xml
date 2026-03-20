@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project name="CTI32 - Operation Iron Mantle">
+    <Package name="MWF">
+        <Container name="Meta">
+            <Key ID="STR_MWF_MISSION_TITLE">
+                <Original>Operation Iron Mantle</Original>
+                <English>Operation Iron Mantle</English>
+            </Key>
+            <Key ID="STR_MWF_MISSION_SUBTITLE">
+                <Original>Military War Framework</Original>
+                <English>Military War Framework</English>
+            </Key>
+            <Key ID="STR_MWF_MISSION_VERSION">
+                <Original>0.01 Alpha</Original>
+                <English>0.01 Alpha</English>
+            </Key>
+        </Container>
+    </Package>
+</Project>

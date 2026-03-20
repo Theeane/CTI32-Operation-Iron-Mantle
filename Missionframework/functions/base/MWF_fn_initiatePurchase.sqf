@@ -9,7 +9,11 @@
 
 disableSerialization;
 private _display = findDisplay 9000;
+if (isNull _display) exitWith { hint "Buy menu unavailable."; };
+
 private _listBox = _display displayCtrl 9002;
+if (isNull _listBox) exitWith { hint "Buy menu unavailable."; };
+
 private _selectedIndex = lbCurSel _listBox;
 
 if (_selectedIndex == -1) exitWith { hint "No item selected."; };

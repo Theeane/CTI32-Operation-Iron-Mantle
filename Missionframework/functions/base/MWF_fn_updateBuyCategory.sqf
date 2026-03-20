@@ -15,6 +15,7 @@ if (isNull _display) exitWith {};
 
 private _listBox = _display displayCtrl 9002;
 private _currencyText = _display displayCtrl 9001;
+if (isNull _listBox || {isNull _currencyText}) exitWith {};
 
 // 1. Update the authoritative Supplies display
 private _currentCurrency = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];

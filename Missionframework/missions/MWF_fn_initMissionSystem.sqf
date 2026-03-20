@@ -108,6 +108,11 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                                 _slotIndex = (_boardSlots # _slotEntryIndex) # 0;
                             };
 
+                            private _savedMissionDefinition = + (_missionData param [11, [], [[]]]);
+                            if (_savedMissionDefinition isEqualTo [] && {_slotEntryIndex >= 0}) then {
+                                _savedMissionDefinition = + ((_boardSlots # _slotEntryIndex) param [11, [], [[]]]);
+                            };
+
                             private _slotData = [
                                 _slotIndex,
                                 _category,
