@@ -62,6 +62,21 @@ if ((_attackState param [0, "idle"]) isEqualTo "active") then {
     };
 };
 
+private _respawnState = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
+private _savedLeaderRespawnState = [];
+if ((_respawnState param [0, ""]) isEqualTo "pending") then {
+    private _remaining = ((_respawnState param [4, -1]) - diag_tickTime) max 0;
+    if (_remaining > 0) then {
+        _savedLeaderRespawnState = [
+            "pending",
+            _respawnState param [1, []],
+            _respawnState param [2, ""],
+            _respawnState param [3, ""],
+            _remaining
+        ];
+    };
+};
+
 private _mainOperationState = [];
 private _currentGrandOperation = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
 private _mainOpRuntimeMap = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
