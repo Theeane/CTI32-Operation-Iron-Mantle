@@ -61,6 +61,7 @@ missionNamespace setVariable ["MWF_GlobalThreatLevel", missionNamespace getVaria
 missionNamespace setVariable ["MWF_GlobalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0], true];
 missionNamespace setVariable ["MWF_GlobalThreatState", missionNamespace getVariable ["MWF_GlobalThreatState", "low"], true];
 missionNamespace setVariable ["MWF_MainOpThreatProgressBlockedUntil", missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0], true];
+missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0], true];
 missionNamespace setVariable ["MWF_ThreatDecayPerMinute", missionNamespace getVariable ["MWF_ThreatDecayPerMinute", 2], true];
 missionNamespace setVariable ["MWF_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []], true];
 missionNamespace setVariable ["MWF_ThreatHotspotDuration", missionNamespace getVariable ["MWF_ThreatHotspotDuration", 900], true];
@@ -101,6 +102,16 @@ missionNamespace setVariable ["MWF_MissionBoardExpiresAt", missionNamespace getV
 missionNamespace setVariable ["MWF_ActiveSideMissions", missionNamespace getVariable ["MWF_ActiveSideMissions", []], true];
 missionNamespace setVariable ["MWF_MissionSystemReady", missionNamespace getVariable ["MWF_MissionSystemReady", false], true];
 missionNamespace setVariable ["MWF_MissionSystemStarted", missionNamespace getVariable ["MWF_MissionSystemStarted", false], true];
+missionNamespace setVariable ["MWF_MainOperationCooldowns", missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap], true];
+missionNamespace setVariable ["MWF_GrandOperationActive", missionNamespace getVariable ["MWF_GrandOperationActive", false], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperation", missionNamespace getVariable ["MWF_CurrentGrandOperation", ""], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", missionNamespace getVariable ["MWF_CurrentGrandOperationTitle", ""], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", missionNamespace getVariable ["MWF_CurrentGrandOperationPlacement", []], true];
+missionNamespace setVariable ["MWF_Unlock_Heli", missionNamespace getVariable ["MWF_Unlock_Heli", false], true];
+missionNamespace setVariable ["MWF_Unlock_Jets", missionNamespace getVariable ["MWF_Unlock_Jets", false], true];
+missionNamespace setVariable ["MWF_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false], true];
+missionNamespace setVariable ["MWF_Unlock_Tier5", missionNamespace getVariable ["MWF_Unlock_Tier5", false], true];
+missionNamespace setVariable ["MWF_Perk_HeliDiscount", missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1], true];
 
 missionNamespace setVariable ["MWF_CivilianCasualties", missionNamespace getVariable ["MWF_CivilianCasualties", 0], true];
 missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", missionNamespace getVariable ["MWF_RebelLeaderSettlementCount", 0], true];
@@ -115,6 +126,7 @@ missionNamespace setVariable ["MWF_PendingFOBAttackState", missionNamespace getV
 missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", missionNamespace getVariable ["MWF_PendingRebelLeaderRespawnState", []], true];
 missionNamespace setVariable ["MWF_PendingDamagedFOBs", missionNamespace getVariable ["MWF_PendingDamagedFOBs", []], true];
 missionNamespace setVariable ["MWF_isUnderAttack", missionNamespace getVariable ["MWF_isUnderAttack", false], true];
+missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];
 
 setTimeMultiplier (["MWF_Param_TimeMultiplier", 1] call BIS_fnc_getParamValue);
 

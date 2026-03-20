@@ -140,6 +140,7 @@ missionNamespace setVariable ["MWF_WorldTierProgress", [profileNamespace getVari
 missionNamespace setVariable ["MWF_WorldTierFloor", [profileNamespace getVariable ["MWF_Save_WorldTierFloor", 1], 1, 5, 1] call _clampNumber, true];
 missionNamespace setVariable ["MWF_WorldTierHalfMapLock", profileNamespace getVariable ["MWF_Save_WorldTierHalfMapLock", false], true];
 missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierProgressBlockedRemaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierBlockImmuneRemaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_TierFreeze_Active", profileNamespace getVariable ["MWF_Save_TierFreeze_Active", false], true];
 missionNamespace setVariable ["MWF_TierFreeze_EndTime", serverTime + ([profileNamespace getVariable ["MWF_Save_TierFreeze_Remaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_GlobalThreatPercent", [profileNamespace getVariable ["MWF_Save_GlobalThreatPercent", 0], 0, 100, 0] call _clampNumber, true];
@@ -148,8 +149,19 @@ missionNamespace setVariable ["MWF_ThreatHotZones", profileNamespace getVariable
 missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVariable ["MWF_Save_ZoneData", []], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
 missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];
+missionNamespace setVariable ["MWF_MainOperationCooldowns", profileNamespace getVariable ["MWF_Save_MainOperationCooldowns", createHashMap], true];
 missionNamespace setVariable ["MWF_Campaign_Phase", profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false], true];
+missionNamespace setVariable ["MWF_GrandOperationActive", profileNamespace getVariable ["MWF_Save_GrandOperationActive", false], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperation", profileNamespace getVariable ["MWF_Save_CurrentGrandOperation", ""], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", profileNamespace getVariable ["MWF_Save_CurrentGrandOperationTitle", ""], true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", profileNamespace getVariable ["MWF_Save_CurrentGrandOperationPlacement", []], true];
+missionNamespace setVariable ["MWF_Unlock_Heli", profileNamespace getVariable ["MWF_Save_Unlock_Heli", false], true];
+missionNamespace setVariable ["MWF_Unlock_Jets", profileNamespace getVariable ["MWF_Save_Unlock_Jets", false], true];
+missionNamespace setVariable ["MWF_Unlock_Armor", profileNamespace getVariable ["MWF_Save_Unlock_Armor", false], true];
+missionNamespace setVariable ["MWF_Unlock_Tier5", profileNamespace getVariable ["MWF_Save_Unlock_Tier5", false], true];
+missionNamespace setVariable ["MWF_Perk_HeliDiscount", profileNamespace getVariable ["MWF_Save_Perk_HeliDiscount", 1], true];
+missionNamespace setVariable ["MWF_Campaign_Analytics", profileNamespace getVariable ["MWF_Save_CampaignAnalytics", []], true];
 missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", [profileNamespace getVariable ["MWF_Save_RebelLeaderSettlementCount", 0], 0, 100000, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_PendingRebelLeaderContext", profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []], true];
 missionNamespace setVariable ["MWF_PendingFOBAttackState", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];

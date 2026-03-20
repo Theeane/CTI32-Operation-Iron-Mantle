@@ -19,6 +19,20 @@ diag_log "[MWF] INFO: Server-side initialization started.";
 
 [] call MWF_fnc_initGlobals;
 
+private _mobObject = missionNamespace getVariable ["MWF_MOB", objNull];
+missionNamespace setVariable ["MWF_MainBase", _mobObject, true];
+missionNamespace setVariable ["MWF_MOB_Object", _mobObject, true];
+
+private _mobPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
+if (isNull _mobPad) then {
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "respawn_west" };
+    private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
+    if !(_pads isEqualTo []) then {
+        _mobPad = _pads # 0;
+    };
+};
+missionNamespace setVariable ["MWF_MOB_FobPad", _mobPad, true];
+
 private _mainRespawnMarker = "respawn_west";
 if (markerColor _mainRespawnMarker isNotEqualTo "") then {
     private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
@@ -45,6 +59,19 @@ if (markerColor _mainRespawnMarker isNotEqualTo "") then {
 [] call MWF_fnc_threatManager;
 [] spawn MWF_fnc_economy;
 [] call MWF_fnc_initMissionSystem;
+
+if (!isNil "MWF_fnc_infrastructureManager") then {
+    [] spawn MWF_fnc_infrastructureManager;
+};
+if (!isNil "MWF_fnc_spawnManager") then {
+    [] spawn MWF_fnc_spawnManager;
+};
+if (!isNil "MWF_fnc_intelManager") then {
+    [] spawn MWF_fnc_intelManager;
+};
+if (!isNil "MWF_fnc_cityMonitor") then {
+    [] spawn MWF_fnc_cityMonitor;
+};
 
 if (!isNil "MWF_fnc_rebelLeaderSystem") then {
     ["RESTORE_PENDING"] call MWF_fnc_rebelLeaderSystem;

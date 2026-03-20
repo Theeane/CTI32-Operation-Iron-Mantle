@@ -6,7 +6,7 @@ class MWF_Terminal_Dialog {
     class ControlsBackground {
         class MainBackground: RscPicture {
             // HÄR ÄR DEN NYA SÖKVÄGEN
-            text = "Missionframework\ui\terminal_bg.paa";
+            text = "ui\terminal_bg.paa";
             x = 0.05 * safezoneW + safezoneX;
             y = 0.05 * safezoneH + safezoneY;
             w = 0.9 * safezoneW;

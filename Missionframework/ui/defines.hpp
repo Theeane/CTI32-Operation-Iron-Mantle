@@ -66,7 +66,7 @@ class RscStandardButton : RscButton {
     colorBackground[] = {0,0,0,0};
     colorBackgroundActive[] = {1,1,1,0.1};
     text = "";
-    url = "Missionframework\ui\button_bg.paa"; 
+    url = "ui\button_bg.paa"; 
 };
 
 

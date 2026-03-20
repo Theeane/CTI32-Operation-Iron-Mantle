@@ -6,7 +6,7 @@
     Description:
     Resolves a composition key against the staged era/domain/type composition structure.
     Patch 3A introduces the new layout:
-    Missionframework/preset/compositions/{era}/{domain}/{type}/...
+    preset/compositions/{era}/{domain}/{type}/...
 
     Runtime rules in 3A:
     - composition era defaults to modern
@@ -77,7 +77,7 @@ private _suffix = switch (_difficulty) do {
 
 private _buildRoot = {
     params ["_useEra", "_useDomain", "_useCategory"];
-    format ["Missionframework/preset/compositions/%1/%2/%3", _useEra, _useDomain, _useCategory]
+    format ["preset/compositions/%1/%2/%3", _useEra, _useDomain, _useCategory]
 };
 
 private _candidates = [];
