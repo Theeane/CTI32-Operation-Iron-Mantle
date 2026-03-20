@@ -7,10 +7,10 @@
     Handles rebel retaliation assaults against FOBs when the rebel leader is killed.
 
     Modes:
-    - START          : start a live FOB assault
-    - HANDLE_DAMAGE  : damage interception for the FOB computer
-    - TERMINAL_DESTROYED : convert lethal damage into damaged-state gameplay
-    - RESTORE_PENDING: restore a saved active attack after load
+    - START               : start a live FOB assault
+    - HANDLE_DAMAGE       : damage interception for the FOB computer
+    - TERMINAL_DESTROYED  : convert lethal damage into damaged-state gameplay
+    - RESTORE_PENDING     : restore a saved active attack and/or delayed leader respawn after load
 */
 
 params [
@@ -116,6 +116,77 @@ private _spawnWave = {
     _groupsSpawned
 };
 
+private _launchRespawnTimerFromState = {
+    params ["_state"];
+
+    if !(_state isEqualType [] && {count _state >= 5} && {(_state param [0, ""]) isEqualTo "pending"}) exitWith {};
+
+    missionNamespace setVariable ["MWF_RebelLeaderRespawnState", _state, true];
+
+    [_state] spawn {
+        params ["_initialState"];
+        private _deadline = _initialState param [4, -1];
+
+        waitUntil {
+            uiSleep 5;
+            private _state = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
+            if !(_state isEqualType [] && {count _state >= 5} && {(_state param [0, ""]) isEqualTo "pending"}) exitWith {true};
+            if ((_state param [4, -1]) != _deadline) exitWith {true};
+            diag_tickTime >= _deadline
+        };
+
+        private _state = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
+        if !(_state isEqualType [] && {count _state >= 5} && {(_state param [0, ""]) isEqualTo "pending"}) exitWith {};
+        if (diag_tickTime < (_state param [4, -1])) exitWith {};
+
+        missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+
+        if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) exitWith {
+            if (!isNil "MWF_fnc_requestDelayedSave") then {
+                [] call MWF_fnc_requestDelayedSave;
+            };
+            diag_log "[MWF Rebel] Scheduled leader respawn skipped because another rebel leader is already active.";
+        };
+
+        private _preferredPosASL = _state param [1, [], [[]]];
+        private _preferredName = _state param [2, "", [""]];
+        private _preferredMarker = _state param [3, "", [""]];
+
+        if (!isNil "MWF_fnc_rebelLeaderSystem") then {
+            ["RESPAWN_REPLACEMENT", [_preferredPosASL, _preferredName, _preferredMarker], "POST_ATTACK_RESPAWN"] call MWF_fnc_rebelLeaderSystem;
+        };
+
+        if (!isNil "MWF_fnc_requestDelayedSave") then {
+            [] call MWF_fnc_requestDelayedSave;
+        };
+    };
+};
+
+private _scheduleLeaderRespawn = {
+    params ["_preferredPosASL", "_preferredName", "_preferredMarker"];
+
+    private _delay = missionNamespace getVariable ["MWF_RebelLeaderRespawnDelay", 900];
+    private _state = [
+        "pending",
+        _preferredPosASL,
+        _preferredName,
+        _preferredMarker,
+        diag_tickTime + _delay
+    ];
+
+    [_state] call _launchRespawnTimerFromState;
+
+    if (!isNil "MWF_fnc_requestDelayedSave") then {
+        [] call MWF_fnc_requestDelayedSave;
+    };
+
+    diag_log format [
+        "[MWF Rebel] Replacement leader scheduled. Delay: %1s | Anchor: %2 | Marker: %3",
+        _delay,
+        _preferredName,
+        _preferredMarker
+    ];
+};
 
 if (_mode == "SPAWN_WAVE") exitWith {
     if (!isServer) exitWith {0};
@@ -155,7 +226,7 @@ if (_mode == "TERMINAL_DESTROYED") exitWith {
     private _deadline = diag_tickTime + (missionNamespace getVariable ["MWF_FOBDespawnGraceSeconds", 900]);
     private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
     private _repairPercent = missionNamespace getVariable ["MWF_FOBRepairCostPercent", 0.20];
-    private _repairCost = (ceil (_supplies * _repairPercent)) max 20;
+    private _repairCost = ceil (_supplies * _repairPercent);
 
     _terminal setVariable ["MWF_FOB_IsDamaged", true, true];
     _terminal setVariable ["MWF_FOB_RepairCost", _repairCost, true];
@@ -181,6 +252,8 @@ if (_mode == "TERMINAL_DESTROYED") exitWith {
     private _msg = format ["%1 terminal knocked offline. Repair it before the FOB collapses.", _displayName];
     [_msg] remoteExec ["systemChat", 0];
 
+    [getPosASL _terminal, _displayName, _marker] call _scheduleLeaderRespawn;
+
     if (!isNil "MWF_fnc_requestDelayedSave") then {
         [] call MWF_fnc_requestDelayedSave;
     };
@@ -192,53 +265,161 @@ if (_mode == "RESTORE_PENDING") exitWith {
     if (!isServer) exitWith {};
 
     private _pending = missionNamespace getVariable ["MWF_PendingFOBAttackState", []];
-    if !(_pending isEqualType [] && {count _pending >= 5}) exitWith {};
+    if (_pending isEqualType [] && {count _pending >= 5}) then {
+        missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
 
-    missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+        private _targetPosASL = _pending param [1, [], [[]]];
+        private _targetName = _pending param [2, "", [""]];
+        private _targetMarker = _pending param [3, "", [""]];
+        private _remaining = _pending param [4, 0, [0]];
 
-    private _targetPosASL = _pending param [1, [], [[]]];
-    private _targetName = _pending param [2, "", [""]];
-    private _targetMarker = _pending param [3, "", [""]];
-    private _remaining = _pending param [4, 0, [0]];
-
-    if (_remaining <= 0) exitWith {};
-
-    private _targetTerminal = [objNull, _targetPosASL] call _resolveTargetTerminal;
-    if (isNull _targetTerminal) then {
-        private _registry = missionNamespace getVariable ["MWF_FOB_Registry", []];
-        {
-            private _obj = _x param [1, objNull];
-            private _name = _x param [2, ""];
-            private _marker = _x param [0, ""];
-            if (!isNull _obj && {(_name isEqualTo _targetName) || (_marker isEqualTo _targetMarker)}) exitWith {
-                _targetTerminal = _obj;
+        if (_remaining > 0) then {
+            private _targetTerminal = [objNull, _targetPosASL] call _resolveTargetTerminal;
+            if (isNull _targetTerminal) then {
+                private _registry = missionNamespace getVariable ["MWF_FOB_Registry", []];
+                {
+                    private _obj = _x param [1, objNull];
+                    private _name = _x param [2, ""];
+                    private _marker = _x param [0, ""];
+                    if (!isNull _obj && {(_name isEqualTo _targetName) || (_marker isEqualTo _targetMarker)}) exitWith {
+                        _targetTerminal = _obj;
+                    };
+                } forEach _registry;
             };
-        } forEach _registry;
+
+            if (isNull _targetTerminal) then {
+                missionNamespace setVariable ["MWF_PendingFOBAttackState", _pending, true];
+                diag_log "[MWF Rebel] Pending FOB attack restore deferred because target FOB was not available yet.";
+            } else {
+                _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
+                _targetTerminal allowDamage true;
+                missionNamespace setVariable ["MWF_isUnderAttack", true, true];
+                missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _targetName, _targetMarker, diag_tickTime + _remaining], true];
+
+                [_targetTerminal] spawn {
+                    params ["_terminal"];
+                    if (isNull _terminal) exitWith {};
+
+                    private _initialGroups = ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
+                    diag_log format ["[MWF Rebel] Restored FOB attack with %1 initial wave group(s).", _initialGroups];
+
+                    while {
+                        !isNull _terminal &&
+                        alive _terminal &&
+                        !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
+                        _terminal getVariable ["MWF_isUnderAttack", false] &&
+                        ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]]) param [0, "idle"]) isEqualTo "active" &&
+                        diag_tickTime < ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle", [], "", "", -1]]) param [4, -1])
+                    } do {
+                        uiSleep 180;
+                        if (
+                            !isNull _terminal &&
+                            alive _terminal &&
+                            !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
+                            _terminal getVariable ["MWF_isUnderAttack", false]
+                        ) then {
+                            ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
+                        };
+                    };
+
+                    if (
+                        !isNull _terminal &&
+                        alive _terminal &&
+                        !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
+                        _terminal getVariable ["MWF_isUnderAttack", false]
+                    ) then {
+                        _terminal setVariable ["MWF_isUnderAttack", false, true];
+                        _terminal allowDamage false;
+                        missionNamespace setVariable ["MWF_isUnderAttack", false, true];
+                        missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
+                        [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
+                        ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
+                    };
+                };
+            };
+        };
     };
 
-    if (isNull _targetTerminal) exitWith {
-        missionNamespace setVariable ["MWF_PendingFOBAttackState", _pending, true];
-        diag_log "[MWF Rebel] Pending FOB attack restore deferred because target FOB was not available yet.";
+    private _pendingRespawn = missionNamespace getVariable ["MWF_PendingRebelLeaderRespawnState", []];
+    if (_pendingRespawn isEqualType [] && {count _pendingRespawn >= 5} && {(_pendingRespawn param [0, ""]) isEqualTo "pending"}) then {
+        missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+        private _remainingRespawn = _pendingRespawn param [4, 0, [0]];
+        if (_remainingRespawn > 0) then {
+            private _restoredState = [
+                "pending",
+                _pendingRespawn param [1, [], [[]]],
+                _pendingRespawn param [2, "", [""]],
+                _pendingRespawn param [3, "", [""]],
+                diag_tickTime + _remainingRespawn
+            ];
+            [_restoredState] call _launchRespawnTimerFromState;
+            diag_log format ["[MWF Rebel] Restored delayed leader respawn with %1 seconds remaining.", _remainingRespawn];
+        };
     };
+};
+
+if (!isServer) exitWith {};
+
+if (_mode == "START") then {
+    private _leader = _arg1;
+
+    private _killer = _arg2;
+    if (isNull _leader) exitWith {};
+    if (_leader getVariable ["MWF_RebelLeaderResolved", false]) exitWith {};
+    if (((missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]]) param [0, "idle"]) isEqualTo "active") exitWith {};
+
+    ["REMOVE", _leader] remoteExec ["MWF_fnc_rebelLeaderDialogue", 0];
+    missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+
+    private _campfire = _leader getVariable ["MWF_RebelCampfire", objNull];
+    if (!isNull _campfire) then {
+        deleteVehicle _campfire;
+    };
+
+    private _targetTerminal = [_leader, (_leader getVariable ["MWF_RebelTargetFOBPosASL", []])] call _resolveTargetTerminal;
+    if (isNull _targetTerminal) exitWith {
+        _leader setVariable ["MWF_RebelLeaderResolved", true, true];
+        deleteVehicle _leader;
+        missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+        missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+        missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+        diag_log "[MWF Rebel] Rebel leader killed but no valid FOB target could be resolved.";
+    };
+
+    private _displayName = _targetTerminal getVariable ["MWF_FOB_DisplayName", "FOB"];
+    private _marker = _targetTerminal getVariable ["MWF_FOB_Marker", ""];
+    private _attackDuration = missionNamespace getVariable ["MWF_RebelLeaderAttackDuration", 900];
+    private _attackEndAt = diag_tickTime + _attackDuration;
+
+    _leader setVariable ["MWF_RebelLeaderResolved", true, true];
+    missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+    missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+    missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
 
     _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
     _targetTerminal allowDamage true;
     missionNamespace setVariable ["MWF_isUnderAttack", true, true];
-    missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _targetName, _targetMarker, diag_tickTime + _remaining], true];
+    missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _displayName, _marker, _attackEndAt], true];
+
+    private _startMsg = format ["Rebel cells are assaulting %1 after the leader was killed. Defend the FOB for 15 minutes.", _displayName];
+    [_startMsg] remoteExec ["systemChat", 0];
+
+    if (!isNil "MWF_fnc_requestDelayedSave") then {
+        [] call MWF_fnc_requestDelayedSave;
+    };
 
     [_targetTerminal] spawn {
         params ["_terminal"];
         if (isNull _terminal) exitWith {};
 
-        private _initialGroups = ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
-        diag_log format ["[MWF Rebel] Restored FOB attack with %1 initial wave group(s).", _initialGroups];
+        private _groups = ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
+        diag_log format ["[MWF Rebel] FOB assault started on %1 with %2 initial wave group(s).", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _groups];
 
         while {
             !isNull _terminal &&
             alive _terminal &&
             !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
             _terminal getVariable ["MWF_isUnderAttack", false] &&
-            ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]]) param [0, "idle"]) isEqualTo "active" &&
             diag_tickTime < ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle", [], "", "", -1]]) param [4, -1])
         } do {
             uiSleep 180;
@@ -246,7 +427,8 @@ if (_mode == "RESTORE_PENDING") exitWith {
                 !isNull _terminal &&
                 alive _terminal &&
                 !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
-                _terminal getVariable ["MWF_isUnderAttack", false]
+                _terminal getVariable ["MWF_isUnderAttack", false] &&
+                diag_tickTime < ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle", [], "", "", -1]]) param [4, -1])
             ) then {
                 ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
             };
@@ -263,92 +445,21 @@ if (_mode == "RESTORE_PENDING") exitWith {
             missionNamespace setVariable ["MWF_isUnderAttack", false, true];
             missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
             [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
-        };
-    };
-};
 
-if (!isServer) exitWith {};
-if (_mode != "START") exitWith {};
+            if (!isNil "MWF_fnc_requestDelayedSave") then {
+                [] call MWF_fnc_requestDelayedSave;
+            };
 
-private _leader = _arg1;
-private _killer = _arg2;
-
-if (isNull _leader) exitWith {};
-if (_leader getVariable ["MWF_RebelLeaderResolved", false]) exitWith {};
-if (((missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]]) param [0, "idle"]) isEqualTo "active") exitWith {};
-
-private _targetTerminal = [_leader, (_leader getVariable ["MWF_RebelTargetFOBPosASL", []])] call _resolveTargetTerminal;
-if (isNull _targetTerminal) exitWith {
-    _leader setVariable ["MWF_RebelLeaderResolved", true, true];
-    deleteVehicle _leader;
-    missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
-    missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
-    missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
-    diag_log "[MWF Rebel] Rebel leader killed but no valid FOB target could be resolved.";
-};
-
-private _displayName = _targetTerminal getVariable ["MWF_FOB_DisplayName", "FOB"];
-private _marker = _targetTerminal getVariable ["MWF_FOB_Marker", ""];
-private _attackDuration = missionNamespace getVariable ["MWF_RebelLeaderAttackDuration", 900];
-private _attackEndAt = diag_tickTime + _attackDuration;
-
-_leader setVariable ["MWF_RebelLeaderResolved", true, true];
-missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
-missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
-missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
-
-_targetTerminal setVariable ["MWF_isUnderAttack", true, true];
-_targetTerminal allowDamage true;
-missionNamespace setVariable ["MWF_isUnderAttack", true, true];
-missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _displayName, _marker, _attackEndAt], true];
-
-private _startMsg = format ["Rebel cells are assaulting %1 after the leader was killed. Defend the FOB for 15 minutes.", _displayName];
-[_startMsg] remoteExec ["systemChat", 0];
-
-if (!isNil "MWF_fnc_requestDelayedSave") then {
-    [] call MWF_fnc_requestDelayedSave;
-};
-
-[_targetTerminal] spawn {
-    params ["_terminal"];
-    if (isNull _terminal) exitWith {};
-
-    private _groups = ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
-    diag_log format ["[MWF Rebel] FOB assault started on %1 with %2 initial wave group(s).", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _groups];
-
-    while {
-        !isNull _terminal &&
-        alive _terminal &&
-        !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
-        _terminal getVariable ["MWF_isUnderAttack", false] &&
-        diag_tickTime < ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle", [], "", "", -1]]) param [4, -1])
-    } do {
-        uiSleep 180;
-        if (
-            !isNull _terminal &&
-            alive _terminal &&
-            !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
-            _terminal getVariable ["MWF_isUnderAttack", false] &&
-            diag_tickTime < ((missionNamespace getVariable ["MWF_FOBAttackState", ["idle", [], "", "", -1]]) param [4, -1])
-        ) then {
-            ["SPAWN_WAVE", _terminal] call MWF_fnc_fobAttackSystem;
+            ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
         };
     };
 
-    if (
-        !isNull _terminal &&
-        alive _terminal &&
-        !(_terminal getVariable ["MWF_FOB_IsDamaged", false]) &&
-        _terminal getVariable ["MWF_isUnderAttack", false]
-    ) then {
-        _terminal setVariable ["MWF_isUnderAttack", false, true];
-        _terminal allowDamage false;
-        missionNamespace setVariable ["MWF_isUnderAttack", false, true];
-        missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
-        [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
+    exitWith {};
+};
 
-        if (!isNil "MWF_fnc_requestDelayedSave") then {
-            [] call MWF_fnc_requestDelayedSave;
-        };
-    };
+if (_mode == "SCHEDULE_RESPAWN") exitWith {
+    private _preferredPosASL = if (_arg1 isEqualType [] && {count _arg1 >= 2}) then { _arg1 } else { [] };
+    private _preferredName = if (_arg2 isEqualType "") then { _arg2 } else { "" };
+    private _preferredMarker = if (_arg3 isEqualType "") then { _arg3 } else { "" };
+    [_preferredPosASL, _preferredName, _preferredMarker] call _scheduleLeaderRespawn;
 };

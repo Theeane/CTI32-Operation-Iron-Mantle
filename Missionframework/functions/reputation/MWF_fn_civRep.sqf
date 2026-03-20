@@ -34,7 +34,7 @@ if (_mode == "ADJUST") exitWith {
         {!missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]}
     ) then {
         if (!isNil "MWF_fnc_rebelLeaderSystem") then {
-            ["TRIGGER", "CIV_REP_THRESHOLD"] spawn MWF_fnc_rebelLeaderSystem;
+            ["TRIGGER", [], "CIV_REP_THRESHOLD"] spawn MWF_fnc_rebelLeaderSystem;
         };
     };
 
@@ -46,10 +46,10 @@ if (_mode == "ADJUST") exitWith {
 };
 
 if (_mode == "GET_BRIBE_COST") exitWith {
-    private _penalties = missionNamespace getVariable ["MWF_RepPenaltyCount", 0];
-    private _baseCost = 100;
-    private _totalCost = _baseCost + (_penalties * 10);
-    _totalCost
+    private _penalties = (missionNamespace getVariable ["MWF_RepPenaltyCount", 0]) max 0;
+    private _baseCost = missionNamespace getVariable ["MWF_RebelLeaderCost_Base", 30];
+    private _maxCost = missionNamespace getVariable ["MWF_RebelLeaderCost_Max", 1000];
+    (_baseCost * (2 ^ _penalties)) min _maxCost
 };
 
 if (_mode == "RESET") exitWith {

@@ -5,8 +5,7 @@
 
     Description:
     Saves strategic campaign state, normalized zone progression data, campaign-persistent
-    lobby params, economy state, rebel escalation state, damaged FOB timers, and
-    per-operation main operation cooldowns.
+    lobby params, economy state, rebel escalation state, and damaged FOB timers.
 */
 
 if (!isServer) exitWith {};
@@ -63,6 +62,21 @@ if ((_attackState param [0, "idle"]) isEqualTo "active") then {
     };
 };
 
+private _respawnState = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
+private _savedRespawnState = [];
+if ((_respawnState param [0, "idle"]) isEqualTo "pending") then {
+    private _remaining = ((_respawnState param [4, -1]) - diag_tickTime) max 0;
+    if (_remaining > 0) then {
+        _savedRespawnState = [
+            "pending",
+            _respawnState param [1, []],
+            _respawnState param [2, ""],
+            _respawnState param [3, ""],
+            _remaining
+        ];
+    };
+};
+
 private _damagedFOBs = [];
 {
     _x params [
@@ -79,18 +93,6 @@ private _damagedFOBs = [];
         _damagedFOBs pushBack [_posASL, _displayName, _marker, _remaining, _repairCost, _originType];
     };
 } forEach (missionNamespace getVariable ["MWF_DamagedFOBs", []]);
-
-private _mainOpCooldowns = [];
-private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap];
-if (!isNil "_cooldownMap" && {_cooldownMap isEqualType createHashMap}) then {
-    {
-        private _key = _x;
-        private _remaining = ((_cooldownMap getOrDefault [_key, 0]) - serverTime) max 0;
-        if (_remaining > 0) then {
-            _mainOpCooldowns pushBack [_key, _remaining];
-        };
-    } forEach keys _cooldownMap;
-};
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];
@@ -110,7 +112,6 @@ profileNamespace setVariable ["MWF_Save_TierFreeze_Active", missionNamespace get
 profileNamespace setVariable ["MWF_Save_TierFreeze_Remaining", ((missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0]) - serverTime) max 0];
 profileNamespace setVariable ["MWF_Save_GlobalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0]];
 profileNamespace setVariable ["MWF_Save_MainOpThreatBlockedRemaining", ((missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0]) - serverTime) max 0];
-profileNamespace setVariable ["MWF_Save_MainOperationCooldowns", _mainOpCooldowns];
 profileNamespace setVariable ["MWF_Save_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []]];
 profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
@@ -132,6 +133,7 @@ profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespac
 profileNamespace setVariable ["MWF_Save_RebelLeaderContext", _leaderContext];
 profileNamespace setVariable ["MWF_Save_RebelLeaderSettlementCount", missionNamespace getVariable ["MWF_RebelLeaderSettlementCount", 0]];
 profileNamespace setVariable ["MWF_Save_FOBAttackState", _savedAttackState];
+profileNamespace setVariable ["MWF_Save_RebelLeaderRespawnState", _savedRespawnState];
 profileNamespace setVariable ["MWF_Save_DamagedFOBs", _damagedFOBs];
 
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
@@ -152,14 +154,21 @@ profileNamespace setVariable ["MWF_Save_CompositionType", missionNamespace getVa
     profileNamespace setVariable [format ["MWF_Save_%1File", _prefix], missionNamespace getVariable [format ["MWF_Locked_%1File", _prefix], ""]];
 } forEach ["Blufor", "Opfor", "Resistance", "Civs"];
 
+private _zoneCount = count _zoneSaveData;
+private _vehicleCount = count _boughtVehicles;
+private _missionCount = count _activeSideMissions;
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF PERSISTENCE] Game saved (%1). Zones: %2 | SideMissions: %3 | BoughtVehicles: %4 | DamagedFOBs: %5 | MainOpCooldowns: %6",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Missions: %5 | Leader Active: %6 | Damaged FOBs: %7 | Est. Payload: ~%8KB.",
     _reason,
-    count _zoneSaveData,
-    count _activeSideMissions,
-    count _boughtVehicles,
+    missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
+    _zoneCount,
+    _vehicleCount,
+    _missionCount,
+    !(_leaderContext isEqualTo []),
     count _damagedFOBs,
-    count _mainOpCooldowns
+    round (_estimatedTotalBytes / 1024)
 ];

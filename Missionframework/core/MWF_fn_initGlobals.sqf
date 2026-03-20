@@ -142,6 +142,11 @@ missionNamespace setVariable [
     true
 ];
 missionNamespace setVariable [
+    "MWF_RebelLeaderRespawnDelay",
+    missionNamespace getVariable ["MWF_RebelLeaderRespawnDelay", 900],
+    true
+];
+missionNamespace setVariable [
     "MWF_FOBDespawnGraceSeconds",
     missionNamespace getVariable ["MWF_FOBDespawnGraceSeconds", 900],
     true
@@ -162,6 +167,9 @@ if (isNil { missionNamespace getVariable "MWF_RebelLeaderContext" }) then {
 if (isNil { missionNamespace getVariable "MWF_FOBAttackState" }) then {
     missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
 };
+if (isNil { missionNamespace getVariable "MWF_RebelLeaderRespawnState" }) then {
+    missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+};
 if (isNil { missionNamespace getVariable "MWF_DamagedFOBs" }) then {
     missionNamespace setVariable ["MWF_DamagedFOBs", [], true];
 };
@@ -174,6 +182,9 @@ if (isNil { missionNamespace getVariable "MWF_PendingRebelLeaderContext" }) then
 };
 if (isNil { missionNamespace getVariable "MWF_PendingFOBAttackState" }) then {
     missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_PendingRebelLeaderRespawnState" }) then {
+    missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
 };
 if (isNil { missionNamespace getVariable "MWF_PendingDamagedFOBs" }) then {
     missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];

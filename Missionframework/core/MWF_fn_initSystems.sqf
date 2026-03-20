@@ -108,9 +108,11 @@ missionNamespace setVariable ["MWF_RebelLeaderEventActive", missionNamespace get
 missionNamespace setVariable ["MWF_ActiveRebelLeader", missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull], true];
 missionNamespace setVariable ["MWF_RebelLeaderContext", missionNamespace getVariable ["MWF_RebelLeaderContext", []], true];
 missionNamespace setVariable ["MWF_FOBAttackState", missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]], true];
+missionNamespace setVariable ["MWF_RebelLeaderRespawnState", missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []], true];
 missionNamespace setVariable ["MWF_DamagedFOBs", missionNamespace getVariable ["MWF_DamagedFOBs", []], true];
 missionNamespace setVariable ["MWF_PendingRebelLeaderContext", missionNamespace getVariable ["MWF_PendingRebelLeaderContext", []], true];
 missionNamespace setVariable ["MWF_PendingFOBAttackState", missionNamespace getVariable ["MWF_PendingFOBAttackState", []], true];
+missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", missionNamespace getVariable ["MWF_PendingRebelLeaderRespawnState", []], true];
 missionNamespace setVariable ["MWF_PendingDamagedFOBs", missionNamespace getVariable ["MWF_PendingDamagedFOBs", []], true];
 missionNamespace setVariable ["MWF_isUnderAttack", missionNamespace getVariable ["MWF_isUnderAttack", false], true];
 

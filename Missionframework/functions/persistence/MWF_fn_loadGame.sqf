@@ -6,7 +6,7 @@
     Description:
     Restores strategic campaign state and all campaign-persistent lobby params.
     Also restores saved rebel escalation state, damaged FOB timers, civilian casualty counters,
-    production bonus state, and per-operation main operation cooldowns.
+    and production bonus state.
 */
 
 if (!isServer) exitWith {};
@@ -150,53 +150,37 @@ missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getV
 missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];
 missionNamespace setVariable ["MWF_Campaign_Phase", profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false], true];
-missionNamespace setVariable ["MWF_RebelLeaderContext", profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []], true];
 missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", [profileNamespace getVariable ["MWF_Save_RebelLeaderSettlementCount", 0], 0, 100000, 0] call _clampNumber, true];
-missionNamespace setVariable ["MWF_FOBAttackState", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];
+missionNamespace setVariable ["MWF_PendingRebelLeaderContext", profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []], true];
+missionNamespace setVariable ["MWF_PendingFOBAttackState", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];
+missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", profileNamespace getVariable ["MWF_Save_RebelLeaderRespawnState", []], true];
+missionNamespace setVariable ["MWF_PendingDamagedFOBs", profileNamespace getVariable ["MWF_Save_DamagedFOBs", []], true];
+missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
+missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
 missionNamespace setVariable ["MWF_DamagedFOBs", [], true];
-
-private _mainOpCooldownMap = createHashMap;
-{
-    _x params [
-        ["_key", "", [""]],
-        ["_remaining", 0, [0]]
-    ];
-
-    if !(_key isEqualTo "") then {
-        _mainOpCooldownMap set [_key, serverTime + ([_remaining, 0, 86400, 0] call _clampNumber)];
-    };
-} forEach (profileNamespace getVariable ["MWF_Save_MainOperationCooldowns", []]);
-missionNamespace setVariable ["MWF_MainOperationCooldowns", _mainOpCooldownMap, true];
-
-private _savedDamagedFOBs = profileNamespace getVariable ["MWF_Save_DamagedFOBs", []];
-{
-    _x params [
-        ["_posASL", [], [[]]],
-        ["_displayName", "", [""]],
-        ["_marker", "", [""]],
-        ["_remaining", 0, [0]],
-        ["_repairCost", 0, [0]],
-        ["_originType", "TRUCK", [""]]
-    ];
-
-    if (_remaining > 0) then {
-        private _deadline = diag_tickTime + _remaining;
-        private _damagedFOBs = + (missionNamespace getVariable ["MWF_DamagedFOBs", []]);
-        _damagedFOBs pushBack [_posASL, _displayName, _marker, _deadline, _repairCost, _originType];
-        missionNamespace setVariable ["MWF_DamagedFOBs", _damagedFOBs, true];
-    };
-} forEach _savedDamagedFOBs;
-
-missionNamespace setVariable ["MWF_PendingFOBAttackRestore", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];
+missionNamespace setVariable ["MWF_isUnderAttack", false, true];
+missionNamespace setVariable ["MWF_SessionVehiclesRestored", false, true];
 missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", false, true];
 
+if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
+    missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
+    missionNamespace setVariable ["MWF_current_stage", 3, true];
+};
+
+profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF PERSISTENCE] Campaign state restored. Zones pending: %1 | BoughtVehicles pending: %2 | ActiveSideMissions pending: %3 | DamagedFOBs: %4 | MainOpCooldowns: %5",
+    "[MWF] Campaign state restored. Phase: %1 | Pending saved zones: %2 | Pending vehicles: %3 | Pending missions: %4 | Pending leader: %5 | Pending attack: %6 | Pending leader respawn: %7 | Pending damaged FOBs: %8.",
+    missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]),
     count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]),
     count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]),
-    count (missionNamespace getVariable ["MWF_DamagedFOBs", []]),
-    count keys _mainOpCooldownMap
+    count (missionNamespace getVariable ["MWF_PendingRebelLeaderContext", []]),
+    count (missionNamespace getVariable ["MWF_PendingFOBAttackState", []]),
+    count (missionNamespace getVariable ["MWF_PendingRebelLeaderRespawnState", []]),
+    count (missionNamespace getVariable ["MWF_PendingDamagedFOBs", []])
 ];
