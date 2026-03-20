@@ -13,12 +13,13 @@ if (!isServer) exitWith {};
 
 while {alive _unit} do {
     // Look for ANY player within 15 meters
-    private _targetPlayer = (allPlayers select {
-        _x distance _unit < 15 && 
-        currentWeapon _x == "" // Player must have weapon lowered to be signaled
-    }) # 0;
+    private _candidates = allPlayers select {
+        _x distance _unit < 15 &&
+        currentWeapon _x == ""
+    };
+    private _targetPlayer = if (_candidates isEqualTo []) then { objNull } else { _candidates # 0 };
 
-    if (!isNil "_targetPlayer") then {
+    if (!isNull _targetPlayer) then {
         // Play wave animation
         [_unit, "GestureHi"] remoteExec ["playActionNow", 0];
         
