@@ -7,16 +7,16 @@
     Upgrades the base tier using the authoritative Supplies pool.
 */
 
-if (!isServer) exitWith { [_this select 0, _this select 1] remoteExecCall ["MWF_fnc_upgradeBaseTier", 2]; };
+if (!isServer) exitWith {};
 
 private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 
-private _upgradeCosts = [0, 1500, 3500];
+private _upgradeCosts = [0, 1500, 3500, 6500, 10000];
 private _nextTier = _currentTier + 1;
 
-if (_currentTier >= 3) exitWith {
-    ["TaskFailed", ["", "Base is already at Maximum Tier (3)."]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
+if (_currentTier >= 5) exitWith {
+    ["TaskFailed", ["", "Base is already at Maximum Tier (5)."]] remoteExec ["BIS_fnc_showNotification", remoteExecutedOwner];
 };
 
 private _cost = _upgradeCosts select _currentTier;
@@ -40,6 +40,9 @@ if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSa
 
 if (_nextTier == 3) then {
     diag_log "[MWF] Economy: Strategic Assets (Tier 3) are now online.";
+};
+if (_nextTier == 5) then {
+    diag_log "[MWF] Economy: Tier 5 base access is now online.";
 };
 
 if (!isNil "MWF_fnc_updateBuyCategory") then {

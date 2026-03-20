@@ -293,3 +293,18 @@ missionNamespace setVariable ["MWF_FactionPresets", _factionMap, true];
 saveProfileNamespace;
 
 diag_log "[MWF] Preset manager initialized.";
+
+
+// Optional Tier 5 vehicle categories. Keep them empty by default so presets can opt in cleanly.
+{
+    if (isNil { missionNamespace getVariable _x }) then {
+        missionNamespace setVariable [_x, [], true];
+    };
+} forEach [
+    "MWF_Preset_Light_T5",
+    "MWF_Preset_APC_T5",
+    "MWF_Preset_Armor_T5",
+    "MWF_Preset_Tanks_T5",
+    "MWF_Preset_Helis_T5",
+    "MWF_Preset_Jets_T5"
+];

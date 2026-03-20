@@ -16,7 +16,9 @@ params [
     ["_minTier", 1, [0]],
     ["_posASL", [0, 0, 0], [[]]],
     ["_dir", 0, [0]],
-    ["_surfaceRule", "LAND", [""]]
+    ["_surfaceRule", "LAND", [""]],
+    ["_requiredUnlock", "", [""]],
+    ["_isTier5", false, [false]]
 ];
 
 if (hasInterface && {_className isEqualTo ""}) exitWith {
@@ -34,7 +36,9 @@ if (hasInterface && {_className isEqualTo ""}) exitWith {
         missionNamespace getVariable ["MWF_VehiclePlacement_MinTier", 1],
         missionNamespace getVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player],
         missionNamespace getVariable ["MWF_VehiclePlacement_LastDir", getDir player],
-        (missionNamespace getVariable ["MWF_VehiclePlacement_Profile", ["LAND", "LAND"]]) param [1, "LAND"]
+        (missionNamespace getVariable ["MWF_VehiclePlacement_Profile", ["LAND", "LAND"]]) param [1, "LAND"],
+        missionNamespace getVariable ["MWF_VehiclePlacement_RequiredUnlock", ""],
+        missionNamespace getVariable ["MWF_VehiclePlacement_IsTier5", false]
     ];
 
     [] call MWF_fnc_cleanupVehiclePlacement;
@@ -48,6 +52,17 @@ if (_className isEqualTo "") exitWith { false };
 
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+
+private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
+    case "HELI": { missionNamespace getVariable ["MWF_Unlock_Heli", false] };
+    case "JETS": { missionNamespace getVariable ["MWF_Unlock_Jets", false] };
+    case "ARMOR": { missionNamespace getVariable ["MWF_Unlock_Armor", false] };
+    default { true };
+};
+if !_unlockSatisfied exitWith {
+    [format ["Vehicle purchase failed. %1 unlock required.", if (_requiredUnlock isEqualTo "") then {"category"} else {_requiredUnlock}]] remoteExec ["systemChat", remoteExecutedOwner];
+    false
+};
 
 if (_supplies < _cost) exitWith {
     [format ["Vehicle purchase failed. Need %1 supplies.", _cost]] remoteExec ["systemChat", remoteExecutedOwner];
@@ -88,7 +103,7 @@ if (_respawnTruckClass isNotEqualTo "" && {_className isEqualTo _respawnTruckCla
 };
 
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-private _notoriety = missionNamespace getVariable ["MWF_notoriety", 0];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _newSupplies = (_supplies - _cost) max 0;
 
 if (!isNil "MWF_fnc_syncEconomyState") then {

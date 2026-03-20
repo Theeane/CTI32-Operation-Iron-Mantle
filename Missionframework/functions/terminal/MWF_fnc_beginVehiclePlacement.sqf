@@ -24,21 +24,23 @@ _entry params [
     ["_cost", 0, [0]],
     ["_minTier", 1, [0]],
     ["_displayName", "", [""]],
-    ["_category", "", [""]],
-    ["_lockReason", "", [""]]
+    ["_requiredUnlock", "", [""]],
+    ["_isTier5", false, [false]]
 ];
 
 if (_className isEqualTo "") exitWith { false };
 
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-private _currentTier = missionNamespace getVariable ["MWF_PlayerBaseTier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
+private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 
-if (_lockReason isNotEqualTo "") exitWith {
-    systemChat _lockReason;
-    [
-        ["VEHICLE LOCKED", _lockReason],
-        "warning"
-    ] call MWF_fnc_showNotification;
+private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
+    case "HELI": { missionNamespace getVariable ["MWF_Unlock_Heli", false] };
+    case "JETS": { missionNamespace getVariable ["MWF_Unlock_Jets", false] };
+    case "ARMOR": { missionNamespace getVariable ["MWF_Unlock_Armor", false] };
+    default { true };
+};
+if !_unlockSatisfied exitWith {
+    systemChat format ["Vehicle locked: %1 unlock required.", if (_requiredUnlock isEqualTo "") then {"category"} else {_requiredUnlock}];
     false
 };
 
@@ -67,6 +69,8 @@ missionNamespace setVariable ["MWF_VehiclePlacement_Class", _className];
 missionNamespace setVariable ["MWF_VehiclePlacement_Cost", _cost];
 missionNamespace setVariable ["MWF_VehiclePlacement_MinTier", _minTier];
 missionNamespace setVariable ["MWF_VehiclePlacement_Name", _displayName];
+missionNamespace setVariable ["MWF_VehiclePlacement_RequiredUnlock", _requiredUnlock];
+missionNamespace setVariable ["MWF_VehiclePlacement_IsTier5", _isTier5];
 missionNamespace setVariable ["MWF_VehiclePlacement_Profile", _profile];
 missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", getDir player];
 missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
