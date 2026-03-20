@@ -21,6 +21,45 @@ params [
     ["_reason", "", [""]]
 ];
 
+private _getSpawnExclusionCenters = {
+    private _centers = [];
+    private _mobObj = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+    if (!isNull _mobObj) then {
+        _centers pushBack (getPosATL _mobObj);
+    } else {
+        _centers pushBack (getMarkerPos "respawn_west");
+    };
+    {
+        private _obj = _x param [1, objNull];
+        if (!isNull _obj) then { _centers pushBack (getPosATL _obj); };
+    } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
+    _centers
+};
+
+private _findLeaderSpawnPos = {
+    params ["_anchorPosATL"];
+    private _centers = call _getSpawnExclusionCenters;
+    private _exclusion = 500;
+    private _candidate = [];
+    for "_i" from 0 to 31 do {
+        private _bearing = random 360;
+        private _distance = 520 + random 180;
+        private _probe = [_anchorPosATL, _distance, _bearing] call BIS_fnc_relPos;
+        private _safe = [_probe, 0, 20, 2, 0, 0.4, 0] call BIS_fnc_findSafePos;
+        if (_safe isEqualType [] && {count _safe >= 2}) then {
+            private _ok = ({_x distance2D _safe >= _exclusion} count _centers) isEqualTo (count _centers);
+            if (_ok) exitWith { _candidate = _safe; };
+        };
+    };
+    if (_candidate isEqualTo []) then {
+        _candidate = [_anchorPosATL, 520, 700, 2, 0, 0.4, 0] call BIS_fnc_findSafePos;
+    };
+    if (_candidate isEqualTo []) then {
+        _candidate = _anchorPosATL;
+    };
+    _candidate
+};
+
 private _cleanupLeader = {
     private _leader = missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull];
     if (!isNull _leader) then {
@@ -180,7 +219,7 @@ private _buildReplacementContext = {
         private _displayName = _selected param [2, "FOB"];
         private _marker = _selected param [0, ""];
         private _anchorPos = if (!isNull _fobObj) then { getPosATL _fobObj } else { getMarkerPos "respawn_west" };
-        private _safePos = [_anchorPos, 4, 18, 2, 0, 0.5, 0] call BIS_fnc_findSafePos;
+        private _safePos = [_anchorPos] call _findLeaderSpawnPos;
         [
             "FOB",
             ATLToASL _safePos,
@@ -193,8 +232,9 @@ private _buildReplacementContext = {
         ]
     } else {
         private _mobName = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
-        private _mobPosATL = getMarkerPos "respawn_west";
-        private _safePos = [_mobPosATL, 4, 18, 2, 0, 0.5, 0] call BIS_fnc_findSafePos;
+        private _mobObj = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+        private _mobPosATL = if (!isNull _mobObj) then { getPosATL _mobObj } else { getMarkerPos "respawn_west" };
+        private _safePos = [_mobPosATL] call _findLeaderSpawnPos;
         [
             "MOB",
             ATLToASL _safePos,
@@ -307,7 +347,7 @@ private _spawnLabel = "";
 
 if (_spawnMode isEqualTo "FOB") then {
     private _anchorPos = if (!isNull _targetFobObj) then { getPosATL _targetFobObj } else { getMarkerPos "respawn_west" };
-    private _safePos = [_anchorPos, 4, 18, 2, 0, 0.5, 0] call BIS_fnc_findSafePos;
+    private _safePos = [_anchorPos] call _findLeaderSpawnPos;
     _spawnPosASL = ATLToASL _safePos;
     _spawnDir = random 360;
     _spawnLabel = _targetFobName;
@@ -323,13 +363,13 @@ if (_spawnMode isEqualTo "FOB") then {
     } forEach _enemyZones;
 
     if (isNull _bestZone) then {
-        private _safePos = [(getMarkerPos "respawn_west"), 25, 60, 2, 0, 0.4, 0] call BIS_fnc_findSafePos;
+        private _safePos = [getMarkerPos "respawn_west"] call _findLeaderSpawnPos;
         _spawnPosASL = ATLToASL _safePos;
         _spawnLabel = "Enemy Territory";
     } else {
         private _zonePos = getPosATL _bestZone;
         private _zoneRange = ((_bestZone getVariable ["MWF_zoneRange", 300]) * 0.55) max 60;
-        private _safePos = [_zonePos, 20, _zoneRange, 2, 0, 0.4, 0] call BIS_fnc_findSafePos;
+        private _safePos = [_zonePos] call _findLeaderSpawnPos;
         _spawnPosASL = ATLToASL _safePos;
         _spawnLabel = _bestZone getVariable ["MWF_zoneName", "Enemy Zone"];
     };

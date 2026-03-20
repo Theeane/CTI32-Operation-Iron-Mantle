@@ -82,12 +82,19 @@ private _progressionState = [
 ] call MWF_fnc_determineProgressionState;
 
 private _tierBlockedUntil = missionNamespace getVariable ["MWF_WorldTierProgressBlockedUntil", 0];
+private _tierBlockImmuneUntil = missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0];
 private _freezeActive = missionNamespace getVariable ["MWF_TierFreeze_Active", false];
 if (_freezeActive && {serverTime >= (missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0])}) then {
     missionNamespace setVariable ["MWF_TierFreeze_Active", false, true];
     missionNamespace setVariable ["MWF_TierFreeze_EndTime", 0, true];
     missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", 0, true];
     _tierBlockedUntil = 0;
+    _tierBlockImmuneUntil = serverTime + 1800;
+    missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", _tierBlockImmuneUntil, true];
+};
+if (_tierBlockImmuneUntil < serverTime) then {
+    _tierBlockImmuneUntil = 0;
+    missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", 0, true];
 };
 
 private _milestonesArray = [
@@ -99,7 +106,8 @@ private _milestonesArray = [
     ["mapHalfControlled", _halfMapLock],
     ["campaignNearVictory", _mapControl >= 80 || _capturedCapitals >= 1],
     ["tierFloorLocked", _halfMapLock],
-    ["tierProgressBlocked", _tierBlockedUntil > serverTime]
+    ["tierProgressBlocked", _tierBlockedUntil > serverTime],
+    ["tierBlockImmunityActive", _tierBlockImmuneUntil > serverTime]
 ];
 private _milestones = createHashMapFromArray _milestonesArray;
 

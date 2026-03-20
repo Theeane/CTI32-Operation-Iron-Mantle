@@ -56,6 +56,7 @@ private _score = missionNamespace getVariable ["MWF_WorldTierScore", 0];
 private _halfMapLock = missionNamespace getVariable ["MWF_WorldTierHalfMapLock", false];
 private _floorScore = if (_halfMapLock) then {200} else {0};
 private _tierProgressBlockedUntil = missionNamespace getVariable ["MWF_WorldTierProgressBlockedUntil", 0];
+private _tierBlockImmuneUntil = missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0];
 private _mainOpThreatBlockedUntil = missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0];
 private _threatPercent = missionNamespace getVariable ["MWF_GlobalThreatPercent", 0];
 
@@ -73,6 +74,15 @@ if (_kind isEqualTo "main") then {
         _grantedSupplies = _grantedSupplies + _fallbackSupplies;
         _grantedIntel = _grantedIntel + _fallbackIntel;
         _fallbackUsed = true;
+    };
+
+    if (_blockTierProgressSeconds > 0 && {_tierBlockImmuneUntil > _now}) then {
+        _blockTierProgressSeconds = 0;
+        _blockMainOpThreatSeconds = 0;
+        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+        _grantedIntel = _grantedIntel + _fallbackIntel;
+        _fallbackUsed = true;
+        _note = if (_note isEqualTo "") then {"Tier block immunity active."} else {format ["%1 Tier block immunity active.", _note]};
     };
 
     if (_blockTierAlreadyActive) then {
