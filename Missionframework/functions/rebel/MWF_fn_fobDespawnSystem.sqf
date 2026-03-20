@@ -68,6 +68,21 @@ if (_mode == "DESPAWN") exitWith {
 
     deleteVehicle _terminal;
 
+    private _garageRegistry = missionNamespace getVariable ["MWF_GarageRegistry", []];
+    private _baseKey = format ["FOB:%1", _displayName];
+    {
+        private _garageObj = _x param [0, objNull];
+        private _garageKey = _x param [1, "", [""]];
+        if (!isNull _garageObj && {_garageKey isEqualTo _baseKey}) then {
+            deleteVehicle _garageObj;
+        };
+    } forEach _garageRegistry;
+    missionNamespace setVariable ["MWF_GarageRegistry", _garageRegistry select {
+        private _garageObj = _x param [0, objNull];
+        private _garageKey = _x param [1, "", [""]];
+        (!isNull _garageObj) && {!(_garageKey isEqualTo _baseKey)}
+    }, true];
+
     private _damaged = missionNamespace getVariable ["MWF_DamagedFOBs", []];
     _damaged = _damaged select {
         private _savedPos = _x param [0, []];
@@ -77,13 +92,6 @@ if (_mode == "DESPAWN") exitWith {
     missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
     missionNamespace setVariable ["MWF_isUnderAttack", false, true];
 
-    [
-        [
-            "FOB LOST",
-            format ["%1 collapsed and has been lost. Any build assets at that FOB are gone.", _displayName]
-        ],
-        "warning"
-    ] remoteExec ["MWF_fnc_showNotification", 0];
     [format ["%1 has collapsed and has been lost.", _displayName]] remoteExec ["systemChat", 0];
 
     private _remainingFOBs = (missionNamespace getVariable ["MWF_FOB_Registry", []]) select { !isNull (_x param [1, objNull]) };

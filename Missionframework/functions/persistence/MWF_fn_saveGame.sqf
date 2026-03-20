@@ -154,6 +154,7 @@ profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariabl
 profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
+profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
@@ -202,17 +203,24 @@ profileNamespace setVariable ["MWF_Save_CompositionType", missionNamespace getVa
 
 private _zoneCount = count _zoneSaveData;
 private _vehicleCount = count _boughtVehicles;
+private _garageVehicleCount = 0;
+{
+    if (_x isEqualType [] && {count _x >= 2}) then {
+        _garageVehicleCount = _garageVehicleCount + count (_x param [1, [], [[]]]);
+    };
+} forEach (missionNamespace getVariable ["MWF_GarageStoredVehicles", []]);
 private _missionCount = count _activeSideMissions;
-private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Missions: %5 | Leader Active: %6 | Damaged FOBs: %7 | Est. Payload: ~%8KB.",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Garage Stored: %5 | Missions: %6 | Leader Active: %7 | Damaged FOBs: %8 | Est. Payload: ~%9KB.",
     _reason,
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     _zoneCount,
     _vehicleCount,
+    _garageVehicleCount,
     _missionCount,
     !(_leaderContext isEqualTo []),
     count _damagedFOBs,

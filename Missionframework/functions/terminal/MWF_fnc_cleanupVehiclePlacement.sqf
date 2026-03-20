@@ -38,5 +38,8 @@ missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", -1];
 missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", -1];
+if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then {
+    missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
+};
 
 true

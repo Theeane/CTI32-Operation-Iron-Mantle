@@ -33,7 +33,7 @@ private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
 private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
 private _isHeliUpgrade = (_heliClass isNotEqualTo "") && {_className isEqualTo _heliClass};
 private _isJetUpgrade = (_jetClass isNotEqualTo "") && {_className isEqualTo _jetClass};
-private _isVirtualGarage = (_garageClass isNotEqualTo "") && {_className isEqualTo _garageClass};
+private _isGarageUpgrade = (_garageClass isNotEqualTo "") && {_className isEqualTo _garageClass};
 
 if (_isHeliUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Heli", false])}) exitWith {
     deleteVehicle _entity;
@@ -56,6 +56,26 @@ if ((_isHeliUpgrade || _isJetUpgrade) && {(_entity distance2D _mainBasePos) > 12
     };
 };
 
+if (_isGarageUpgrade) then {
+    private _canAttach = false;
+    if ((_entity distance2D _mainBasePos) <= 120) then {
+        _canAttach = true;
+    } else {
+        private _fobRegistry = missionNamespace getVariable ["MWF_FOB_Registry", []];
+        _canAttach = (_fobRegistry findIf {
+            private _fobObj = _x param [1, objNull];
+            !isNull _fobObj && {(_entity distance2D _fobObj) <= 120}
+        }) > -1;
+    };
+
+    if (!_canAttach) exitWith {
+        deleteVehicle _entity;
+        if (!isNull _builder) then {
+            ["Virtual Garage can only be built at the MOB or an active FOB."] remoteExec ["systemChat", owner _builder];
+        };
+    };
+};
+
 private _current = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 
 if (_current < _cost) exitWith {
@@ -67,9 +87,6 @@ if (_current < _cost) exitWith {
 
 [(_cost * -1), "SUPPLIES"] call MWF_fnc_addResource;
 _entity setVariable ["MWF_BuildCost", _cost, true];
-if (_isVirtualGarage) then {
-    _entity setVariable ["MWF_isVirtualGarage", true, true];
-};
 
 if (!isNull _builder) then {
     [format ["Asset deployed: -%1 Supplies", _cost]] remoteExec ["systemChat", owner _builder];
@@ -81,10 +98,6 @@ if (_isHeliUpgrade) then {
 
 if (_isJetUpgrade) then {
     [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
-};
-
-if (_isVirtualGarage) then {
-    [["BASE UPGRADE ONLINE", "Virtual garage marker constructed."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 };
 
 diag_log format ["[MWF BaseBuild] %1 placed by %2 for %3 supplies.", _className, _builder, _cost];

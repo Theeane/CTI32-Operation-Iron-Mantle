@@ -20,6 +20,8 @@ missionNamespace setVariable ["MWF_DestroyedRoadblocks", missionNamespace getVar
 missionNamespace setVariable ["MWF_FOB_Positions", missionNamespace getVariable ["MWF_FOB_Positions", []], true];
 missionNamespace setVariable ["MWF_FOB_Registry", missionNamespace getVariable ["MWF_FOB_Registry", []], true];
 missionNamespace setVariable ["MWF_FOBsRestored", missionNamespace getVariable ["MWF_FOBsRestored", false], true];
+missionNamespace setVariable ["MWF_GarageRegistry", missionNamespace getVariable ["MWF_GarageRegistry", []], true];
+missionNamespace setVariable ["MWF_GarageStoredVehicles", missionNamespace getVariable ["MWF_GarageStoredVehicles", []], true];
 missionNamespace setVariable ["MWF_FixedInfrastructure", missionNamespace getVariable ["MWF_FixedInfrastructure", []], true];
 missionNamespace setVariable ["MWF_completedMissions", missionNamespace getVariable ["MWF_completedMissions", []], true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", missionNamespace getVariable ["MWF_RepPenaltyCount", 0], true];

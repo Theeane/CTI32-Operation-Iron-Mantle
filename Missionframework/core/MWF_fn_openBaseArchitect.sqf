@@ -37,6 +37,7 @@ _curator addEventHandler ["CuratorObjectPlaced", {
     [_entity, player] remoteExec ["MWF_fnc_handleBuildPlacement", 2];
 }];
 
+missionNamespace setVariable ["MWF_BaseArchitect_Active", true];
 openCuratorInterface;
 [format ["ARCHITECT MODE ACTIVE | Construction Area: %1m radius", _maxRange], "info"] call MWF_fnc_showNotification;
 
@@ -68,6 +69,7 @@ openCuratorInterface;
     if (!isNull _group) then {
         deleteGroup _group;
     };
+    missionNamespace setVariable ["MWF_BaseArchitect_Active", false];
     if (hasInterface) then {
         cutText ["", "BLACK OUT", 0.25];
         uiSleep 0.25;

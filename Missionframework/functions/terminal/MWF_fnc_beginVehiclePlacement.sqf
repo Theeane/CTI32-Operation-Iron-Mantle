@@ -87,6 +87,7 @@ _ghost setAlpha 0.45;
 _ghost disableCollisionWith player;
 
 missionNamespace setVariable ["MWF_VehiclePlacement_Active", true];
+missionNamespace setVariable ["MWF_SensitiveInteraction_Type", "VEHICLE_PLACEMENT"];
 missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", _ghost];
 missionNamespace setVariable ["MWF_VehiclePlacement_Class", _className];
 missionNamespace setVariable ["MWF_VehiclePlacement_Cost", _cost];

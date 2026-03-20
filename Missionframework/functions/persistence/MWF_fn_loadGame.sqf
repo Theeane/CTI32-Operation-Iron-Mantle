@@ -148,6 +148,7 @@ missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", serverTime + ([pr
 missionNamespace setVariable ["MWF_ThreatHotZones", profileNamespace getVariable ["MWF_Save_ThreatHotZones", []], true];
 missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVariable ["MWF_Save_ZoneData", []], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
+missionNamespace setVariable ["MWF_GarageStoredVehicles", profileNamespace getVariable ["MWF_Save_GarageStoredVehicles", []], true];
 missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];
 missionNamespace setVariable ["MWF_Campaign_Phase", profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false], true];
@@ -206,19 +207,6 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
-
-missionNamespace setVariable [
-    "MWF_LastLoadSummary",
-    [
-        missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
-        count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]),
-        count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]),
-        count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]),
-        count (missionNamespace getVariable ["MWF_PendingDamagedFOBs", []]),
-        missionNamespace getVariable ["MWF_GrandOperationActive", false]
-    ],
-    true
-];
 
 diag_log format [
     "[MWF] Campaign state restored. Phase: %1 | Pending saved zones: %2 | Pending vehicles: %3 | Pending missions: %4 | Pending leader: %5 | Pending attack: %6 | Pending damaged FOBs: %7.",

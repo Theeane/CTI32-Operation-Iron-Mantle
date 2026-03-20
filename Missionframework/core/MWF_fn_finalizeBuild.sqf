@@ -33,5 +33,12 @@ if (_className == "B_Slingload_01_Cargo_F") then {
     [_vehicle] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
 };
 
+private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
+if (_garageClass isNotEqualTo "" && {_className isEqualTo _garageClass}) then {
+    _vehicle setVariable ["MWF_isVirtualGarage", true, true];
+    _vehicle allowDamage false;
+    ["REGISTER_BUILD", _vehicle, objNull, 0] call MWF_fnc_garageSystem;
+};
+
 
 diag_log format ["[MWF Build] %1 spawned at %2 for %3 supplies.", _className, _pos, _price];

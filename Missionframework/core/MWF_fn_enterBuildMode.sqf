@@ -15,10 +15,7 @@ cutText ["", "BLACK OUT", 0.25];
     params ["_buildPos", "_terminal"];
 
     uiSleep 0.25;
-    player allowDamage false;
     player setPosATL _buildPos;
     [_terminal] call MWF_fnc_openBaseArchitect;
     cutText ["", "BLACK IN", 0.25];
-    uiSleep 1;
-    player allowDamage true;
 };
