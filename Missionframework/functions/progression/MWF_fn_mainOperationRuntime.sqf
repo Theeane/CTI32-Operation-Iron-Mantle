@@ -128,6 +128,38 @@ switch (toUpper _mode) do {
         true
     };
 
+    case "RESTORE": {
+        _arg1 params [
+            ["_key", "", [""]],
+            ["_fnName", "", [""]],
+            ["_title", "", [""]],
+            ["_position", [0,0,0], [[]]],
+            ["_phaseIndex", 0, [0]],
+            ["_startedAt", serverTime, [0]]
+        ];
+
+        if (_key isEqualTo "" || {_fnName isEqualTo ""}) exitWith { false };
+
+        private _sequence = [_key] call _buildSequence;
+        if (_sequence isEqualTo []) exitWith { false };
+
+        private _record = createHashMapFromArray [
+            ["key", _key],
+            ["functionName", _fnName],
+            ["title", _title],
+            ["position", _position],
+            ["sequence", _sequence],
+            ["phaseIndex", (_phaseIndex max 0) min (((count _sequence) - 1) max 0)],
+            ["active", true],
+            ["startedAt", _startedAt]
+        ];
+
+        _runtimeMap set [_key, _record];
+        missionNamespace setVariable ["MWF_MainOperationRuntime", _runtimeMap, true];
+        ["MONITOR", _key] spawn MWF_fnc_mainOperationRuntime;
+        true
+    };
+
     case "MONITOR": {
         private _key = _arg1;
         if (_key isEqualTo "") exitWith { false };

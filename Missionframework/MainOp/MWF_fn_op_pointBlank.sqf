@@ -13,6 +13,8 @@ params [
 
 if (!isServer) exitWith {};
 
+private _isRestore = missionNamespace getVariable ["MWF_MainOperationRestoreMode", false];
+
 switch (_state) do {
     case "START": {
         // --- PHASE: START (Insertion) ---
@@ -52,12 +54,14 @@ switch (_state) do {
         ["Task_PointBlank_S2", "SUCCEEDED"] call BIS_fnc_taskSetState;
 
         // STEALTH REWARD CHECK
-        if !(missionNamespace getVariable ["MWF_Op_Detected", false]) then {
-            [400, "SUPPLIES"] call MWF_fnc_addResource;
-            [200, "INTEL"] call MWF_fnc_addResource;
-            [["STEALTH MASTERED", "400 Supplies and 200 Intel secured from the internal vault."], "info"] remoteExec ["MWF_fnc_showNotification", 0];
-        } else {
-            [["ENEMIES ALERTED", "Strategic bonus data was encrypted before recovery."], "warning"] remoteExec ["MWF_fnc_showNotification", 0];
+        if !(_isRestore) then {
+            if !(missionNamespace getVariable ["MWF_Op_Detected", false]) then {
+                [400, "SUPPLIES"] call MWF_fnc_addResource;
+                [200, "INTEL"] call MWF_fnc_addResource;
+                [["STEALTH MASTERED", "400 Supplies and 200 Intel secured from the internal vault."], "info"] remoteExec ["MWF_fnc_showNotification", 0];
+            } else {
+                [["ENEMIES ALERTED", "Strategic bonus data was encrypted before recovery."], "warning"] remoteExec ["MWF_fnc_showNotification", 0];
+            };
         };
 
         [
@@ -99,8 +103,6 @@ switch (_state) do {
         private _impactProfile = ["main", "point_blank"] call MWF_fnc_getMissionImpactProfile;
         private _alreadyUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
 
-        private _impactContext = createHashMapFromArray [["loud", true]];
-
         if (_alreadyUnlocked) then {
             private _fallbackSupplies = _impactProfile getOrDefault ["fallbackSupplies", 0];
             private _fallbackIntel = _impactProfile getOrDefault ["fallbackIntel", 0];
@@ -108,15 +110,13 @@ switch (_state) do {
             if (_fallbackSupplies > 0) then { [_fallbackSupplies, "SUPPLIES"] call MWF_fnc_addResource; };
             if (_fallbackIntel > 0) then { [_fallbackIntel, "INTEL"] call MWF_fnc_addResource; };
 
-            _impactContext set ["suppressFallbackRewards", true];
-
             [["STRATEGIC CACHE SECURED", format ["Jet unlock already secured. Operation converted to %1 Supplies and %2 Intel.", _fallbackSupplies, _fallbackIntel]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         } else {
             missionNamespace setVariable ["MWF_Unlock_Jets", true, true];
-            [["STRATEGIC VICTORY", "Aircraft Control can now be built at the MOB."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+            [["STRATEGIC VICTORY", "Jet assets are now operational at the main airbase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         };
 
-        private _impactResult = [_impactProfile, _impactContext] call MWF_fnc_applyMissionImpact;
+        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
 
         ["POINT_BLANK"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Point Blank: Operation Complete. Jets Unlocked.";

@@ -62,17 +62,28 @@ if ((_attackState param [0, "idle"]) isEqualTo "active") then {
     };
 };
 
-private _leaderRespawnState = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
-private _savedLeaderRespawnState = [];
-if ((_leaderRespawnState param [0, ""]) isEqualTo "pending") then {
-    private _remainingRespawn = ((_leaderRespawnState param [4, -1]) - diag_tickTime) max 0;
-    if (_remainingRespawn > 0) then {
-        _savedLeaderRespawnState = [
-            "pending",
-            _leaderRespawnState param [1, []],
-            _leaderRespawnState param [2, ""],
-            _leaderRespawnState param [3, ""],
-            _remainingRespawn
+private _mainOperationState = [];
+private _currentGrandOperation = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
+private _mainOpRuntimeMap = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
+if (
+    (missionNamespace getVariable ["MWF_GrandOperationActive", false]) &&
+    {_currentGrandOperation isNotEqualTo ""} &&
+    {_mainOpRuntimeMap isEqualType createHashMap}
+) then {
+    private _runtimeRecord = _mainOpRuntimeMap getOrDefault [_currentGrandOperation, createHashMap];
+    if (_runtimeRecord isEqualType createHashMap) then {
+        private _runtimeStartedAt = _runtimeRecord getOrDefault ["startedAt", serverTime];
+        _mainOperationState = [
+            _currentGrandOperation,
+            missionNamespace getVariable ["MWF_CurrentGrandOperationTitle", ""],
+            + (missionNamespace getVariable ["MWF_CurrentGrandOperationPlacement", []]),
+            _runtimeRecord getOrDefault ["functionName", ""],
+            + (_runtimeRecord getOrDefault ["position", [0, 0, 0]]),
+            _runtimeRecord getOrDefault ["phaseIndex", 0],
+            (serverTime - _runtimeStartedAt) max 0,
+            missionNamespace getVariable ["MWF_Op_Detected", false],
+            missionNamespace getVariable ["MWF_SkyGuardian_RadarsDestroyed", 0],
+            missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1]
         ];
     };
 };
@@ -112,6 +123,7 @@ profileNamespace setVariable ["MWF_Save_TierFreeze_Active", missionNamespace get
 profileNamespace setVariable ["MWF_Save_TierFreeze_Remaining", ((missionNamespace getVariable ["MWF_TierFreeze_EndTime", 0]) - serverTime) max 0];
 profileNamespace setVariable ["MWF_Save_GlobalThreatPercent", missionNamespace getVariable ["MWF_GlobalThreatPercent", 0]];
 profileNamespace setVariable ["MWF_Save_MainOpThreatBlockedRemaining", ((missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0]) - serverTime) max 0];
+profileNamespace setVariable ["MWF_Save_WorldTierBlockImmuneRemaining", ((missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0]) - serverTime) max 0];
 profileNamespace setVariable ["MWF_Save_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []]];
 profileNamespace setVariable ["MWF_Save_Supplies", _supplies];
 profileNamespace setVariable ["MWF_Save_Intel", _intel];
@@ -139,10 +151,19 @@ profileNamespace setVariable ["MWF_Save_Unlock_Heli", missionNamespace getVariab
 profileNamespace setVariable ["MWF_Save_Unlock_Jets", missionNamespace getVariable ["MWF_Unlock_Jets", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Tier5", missionNamespace getVariable ["MWF_Unlock_Tier5", false]];
+profileNamespace setVariable ["MWF_Save_Perk_HeliDiscount", missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1]];
+profileNamespace setVariable ["MWF_Save_GrandOperationState", _mainOperationState];
+profileNamespace setVariable ["MWF_Save_CampaignAnalytics", + (missionNamespace getVariable ["MWF_Campaign_Analytics", []])];
+profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []])];
 private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap];
 private _cooldownPairs = [];
 if (_cooldownMap isEqualType createHashMap) then {
-    { _cooldownPairs pushBack [_x, _cooldownMap getOrDefault [_x, 0]]; } forEach keys _cooldownMap;
+    {
+        private _remainingCooldown = ((_cooldownMap getOrDefault [_x, 0]) - serverTime) max 0;
+        if (_remainingCooldown > 0) then {
+            _cooldownPairs pushBack [_x, _remainingCooldown];
+        };
+    } forEach keys _cooldownMap;
 };
 profileNamespace setVariable ["MWF_Save_MainOperationCooldowns", _cooldownPairs];
 

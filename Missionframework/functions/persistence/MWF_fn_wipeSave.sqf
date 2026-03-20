@@ -61,7 +61,15 @@ private _keys = [
     "MWF_Save_NotorietyMultiplier",
     "MWF_Save_BuildingMode",
     "MWF_Save_IncomeMultiplier",
-    "MWF_Save_MaxFOBs"
+    "MWF_Save_MaxFOBs",
+    "MWF_Save_MainOperationCooldowns",
+    "MWF_Save_Unlock_Heli",
+    "MWF_Save_Unlock_Jets",
+    "MWF_Save_Unlock_Armor",
+    "MWF_Save_Unlock_Tier5",
+    "MWF_Save_Perk_HeliDiscount",
+    "MWF_Save_GrandOperationState",
+    "MWF_Save_CompositionType"
 ];
 
 {

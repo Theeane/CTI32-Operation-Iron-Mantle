@@ -144,6 +144,7 @@ missionNamespace setVariable ["MWF_TierFreeze_Active", profileNamespace getVaria
 missionNamespace setVariable ["MWF_TierFreeze_EndTime", serverTime + ([profileNamespace getVariable ["MWF_Save_TierFreeze_Remaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_GlobalThreatPercent", [profileNamespace getVariable ["MWF_Save_GlobalThreatPercent", 0], 0, 100, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_MainOpThreatProgressBlockedUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_MainOpThreatBlockedRemaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierBlockImmuneRemaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_ThreatHotZones", profileNamespace getVariable ["MWF_Save_ThreatHotZones", []], true];
 missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVariable ["MWF_Save_ZoneData", []], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
@@ -168,10 +169,35 @@ missionNamespace setVariable ["MWF_Unlock_Heli", profileNamespace getVariable ["
 missionNamespace setVariable ["MWF_Unlock_Jets", profileNamespace getVariable ["MWF_Save_Unlock_Jets", false], true];
 missionNamespace setVariable ["MWF_Unlock_Armor", profileNamespace getVariable ["MWF_Save_Unlock_Armor", false], true];
 missionNamespace setVariable ["MWF_Unlock_Tier5", profileNamespace getVariable ["MWF_Save_Unlock_Tier5", false], true];
+missionNamespace setVariable ["MWF_Perk_HeliDiscount", [profileNamespace getVariable ["MWF_Save_Perk_HeliDiscount", 1], 0.01, 10, 1] call _clampNumber, true];
+missionNamespace setVariable ["MWF_Campaign_Analytics", profileNamespace getVariable ["MWF_Save_CampaignAnalytics", []], true];
+missionNamespace setVariable ["MWF_AuthenticatedPlayers", profileNamespace getVariable ["MWF_Save_AuthenticatedPlayers", []], true];
 private _cooldownPairs = profileNamespace getVariable ["MWF_Save_MainOperationCooldowns", []];
 private _cooldownMap = createHashMap;
-{ if (_x isEqualType [] && {count _x >= 2}) then { _cooldownMap set [_x # 0, _x # 1]; }; } forEach _cooldownPairs;
+{
+    if (_x isEqualType [] && {count _x >= 2}) then {
+        private _cooldownKey = _x param [0, "", [""]];
+        private _cooldownRemaining = [_x param [1, 0, [0]], 0, 86400, 0] call _clampNumber;
+        if (_cooldownKey isNotEqualTo "" && {_cooldownRemaining > 0}) then {
+            _cooldownMap set [_cooldownKey, serverTime + _cooldownRemaining];
+        };
+    };
+} forEach _cooldownPairs;
 missionNamespace setVariable ["MWF_MainOperationCooldowns", _cooldownMap, true];
+
+private _grandOperationState = profileNamespace getVariable ["MWF_Save_GrandOperationState", []];
+missionNamespace setVariable ["MWF_PendingGrandOperationState", _grandOperationState, true];
+if (_grandOperationState isEqualType [] && {count _grandOperationState >= 3}) then {
+    missionNamespace setVariable ["MWF_GrandOperationActive", true, true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperation", _grandOperationState param [0, "", [""]], true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", _grandOperationState param [1, "", [""]], true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", + (_grandOperationState param [2, [], [[]]]), true];
+} else {
+    missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+};
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];

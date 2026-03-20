@@ -107,6 +107,8 @@ missionNamespace setVariable ["MWF_GrandOperationActive", missionNamespace getVa
 missionNamespace setVariable ["MWF_CurrentGrandOperation", missionNamespace getVariable ["MWF_CurrentGrandOperation", ""], true];
 missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", missionNamespace getVariable ["MWF_CurrentGrandOperationTitle", ""], true];
 missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", missionNamespace getVariable ["MWF_CurrentGrandOperationPlacement", []], true];
+missionNamespace setVariable ["MWF_PendingGrandOperationState", missionNamespace getVariable ["MWF_PendingGrandOperationState", []], true];
+missionNamespace setVariable ["MWF_MainOperationRuntime", missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap], true];
 missionNamespace setVariable ["MWF_Unlock_Heli", missionNamespace getVariable ["MWF_Unlock_Heli", false], true];
 missionNamespace setVariable ["MWF_Unlock_Jets", missionNamespace getVariable ["MWF_Unlock_Jets", false], true];
 missionNamespace setVariable ["MWF_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false], true];
