@@ -98,6 +98,17 @@ switch (_state) do {
         ] remoteExec ["MWF_fnc_showNotification", 0];
 
         ["STASIS_STRIKE"] call MWF_fnc_finalizeMainOperation;
-        diag_log "[MWF Grand Op] Stasis Strike: Operation Complete. Progression Frozen for 1 hour.";
+
+        private _logMessage = if (_impactResult getOrDefault ["fallbackUsed", false]) then {
+            format [
+                "[MWF Grand Op] Stasis Strike: Operation Complete. Fallback applied (%1 Supplies / %2 Intel).",
+                _impactResult getOrDefault ["suppliesGranted", 0],
+                _impactResult getOrDefault ["intelGranted", 0]
+            ]
+        } else {
+            "[MWF Grand Op] Stasis Strike: Operation Complete. Progression Frozen for 1 hour."
+        };
+
+        diag_log _logMessage;
     };
 };

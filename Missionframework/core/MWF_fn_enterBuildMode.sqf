@@ -11,9 +11,14 @@ private _buildPos = _anchorPos vectorAdd [0,-6,0];
 private _found = _buildPos findEmptyPosition [1, 15, typeOf player];
 if !(_found isEqualTo []) then { _buildPos = _found; };
 cutText ["", "BLACK OUT", 0.25];
-sleep 0.25;
-player setPosATL _buildPos;
-[player] allowDamage false;
-[_terminal] call MWF_fnc_openBaseArchitect;
-cutText ["", "BLACK IN", 0.25];
-[player] spawn { sleep 1; _this allowDamage true; };
+[_buildPos, _terminal] spawn {
+    params ["_buildPos", "_terminal"];
+
+    uiSleep 0.25;
+    player allowDamage false;
+    player setPosATL _buildPos;
+    [_terminal] call MWF_fnc_openBaseArchitect;
+    cutText ["", "BLACK IN", 0.25];
+    uiSleep 1;
+    player allowDamage true;
+};

@@ -27,7 +27,7 @@ class MWF_Terminal_Dialog {
             idc = 9102; text = "BASE";
             x = 0.27 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "closeDialog 0; [objNull] call MWF_fnc_enterBuildMode;";
+            onButtonClick = "closeDialog 0; [objNull] spawn MWF_fnc_enterBuildMode;";
         };
         class Btn_Support: RscStandardButton {
             idc = 9103; text = "SUPPORT";

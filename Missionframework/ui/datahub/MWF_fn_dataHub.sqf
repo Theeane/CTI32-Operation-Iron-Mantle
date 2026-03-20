@@ -402,7 +402,7 @@ switch (_modeUpper) do {
                 case "BASE_BUILDING": {
                     [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    [objNull] call MWF_fnc_enterBuildMode;
+                    [objNull] spawn MWF_fnc_enterBuildMode;
                     true
                 };
                 case "TIER5_INFO": {
