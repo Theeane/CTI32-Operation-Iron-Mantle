@@ -21,6 +21,9 @@ MWF_FOB_Truck = "rhsusf_M1083A1P2_B_D_repair_fmtv_usarmy";       // M1083A1 Repa
 MWF_FOB_Box = "B_Slingload_01_Cargo_F"; 
 MWF_Arsenal_Box = "B_supplyCrate_F";                             // Standard Arsenal box
 MWF_Respawn_Truck = "rhsusf_M1083A1P2_B_D_fmtv_usarmy";          // M1083A1 Transport as Respawn (Fixed 100 S)
+MWF_Respawn_Heli   = "rhsusf_CH53E"; 
+MWF_Virtual_Garage = "Land_HelipadSquare_F"; 
+
 MWF_Crewman = "rhsusf_army_ocp_combatcrewman";                   // Default crew
 MWF_Pilot = "rhsusf_army_ocp_helipilot";                         // Default pilot
 
@@ -118,6 +121,7 @@ MWF_Preset_Tanks = [
 ];
 
 MWF_Preset_Helis = [
+    [MWF_Respawn_Heli, 150, 3],
     ["rhsusf_CH53E", 300, 5],  // CH-53E from RHS
     ["rhsusf_UH60M", 250, 3]   // UH-60M from RHS
 ];
@@ -152,7 +156,7 @@ MWF_Rearm_Truck = ["rhsusf_M1083A1P2_B_D_repair_fmtv_usarmy", 300, 5];  // Rearm
 
 // --- 6. SYNC & BROADCAST ---
 private _allVars = [
-    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Support_GroupMeta", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Preset_Light_T5", "MWF_Preset_Armor_T5", "MWF_Preset_Helis_T5", "MWF_Preset_Jets_T5", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
+    "MWF_FOB_Terminal_Class", "MWF_Heli_Tower_Class", "MWF_Jet_Control_Class", "MWF_Tent_Backpack", "MWF_Tent_Object", "MWF_Tent_Price", "MWF_FOB_Truck", "MWF_FOB_Box", "MWF_Arsenal_Box", "MWF_Respawn_Truck", "MWF_Respawn_Heli", "MWF_Virtual_Garage", "MWF_Crewman", "MWF_Pilot", "MWF_Support_Group1", "MWF_Support_Group2", "MWF_Support_Group3", "MWF_Support_Group4", "MWF_Support_Group5", "MWF_Support_GroupMeta", "MWF_Preset_Light", "MWF_Preset_APC", "MWF_Preset_Tanks", "MWF_Preset_Helis", "MWF_Preset_Jets", "MWF_Preset_Light_T5", "MWF_Preset_Armor_T5", "MWF_Preset_Helis_T5", "MWF_Preset_Jets_T5", "MWF_Rearm_Truck", "MWF_FOB_Asset_Roof", "MWF_FOB_Asset_Table", "MWF_FOB_Asset_Terminal", "MWF_FOB_Asset_Siren", "MWF_FOB_Asset_Lamp"
 ];
 
 { publicVariable _x; } forEach _allVars;

@@ -30,8 +30,10 @@ private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespa
 private _mainBasePos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
 private _heliClass = missionNamespace getVariable ["MWF_Heli_Tower_Class", ""];
 private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
+private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
 private _isHeliUpgrade = (_heliClass isNotEqualTo "") && {_className isEqualTo _heliClass};
 private _isJetUpgrade = (_jetClass isNotEqualTo "") && {_className isEqualTo _jetClass};
+private _isVirtualGarage = (_garageClass isNotEqualTo "") && {_className isEqualTo _garageClass};
 
 if (_isHeliUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Heli", false])}) exitWith {
     deleteVehicle _entity;
@@ -65,6 +67,9 @@ if (_current < _cost) exitWith {
 
 [(_cost * -1), "SUPPLIES"] call MWF_fnc_addResource;
 _entity setVariable ["MWF_BuildCost", _cost, true];
+if (_isVirtualGarage) then {
+    _entity setVariable ["MWF_isVirtualGarage", true, true];
+};
 
 if (!isNull _builder) then {
     [format ["Asset deployed: -%1 Supplies", _cost]] remoteExec ["systemChat", owner _builder];
@@ -76,6 +81,10 @@ if (_isHeliUpgrade) then {
 
 if (_isJetUpgrade) then {
     [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+};
+
+if (_isVirtualGarage) then {
+    [["BASE UPGRADE ONLINE", "Virtual garage marker constructed."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 };
 
 diag_log format ["[MWF BaseBuild] %1 placed by %2 for %3 supplies.", _className, _builder, _cost];
