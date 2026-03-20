@@ -5,6 +5,7 @@
 
     Description:
     Initializes the FOB command PC action set.
+    The command computer is the authoritative UX entry for missions, upgrades and support.
 */
 
 params [["_laptop", objNull, [objNull]]];
@@ -27,58 +28,61 @@ _laptop addAction [
         params ["_target", "_caller"];
         [_target, _caller] spawn MWF_fnc_openBuyMenu;
     },
-    nil, 6, true, true, "", _condPeace
+    nil, 10, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#66CCFF'>[ OPEN MISSION MAP ]</t>",
+    {
+        ["OPEN"] call MWF_fnc_dataHub;
+        ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
+    },
+    nil, 9, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#FFCC66'>[ OPEN MAIN OPERATIONS MAP ]</t>",
+    {
+        ["OPEN"] call MWF_fnc_dataHub;
+        ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
+    },
+    nil, 8.5, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#99DDFF'>[ OPEN REDEPLOY MAP ]</t>",
+    {
+        ["OPEN"] call MWF_fnc_dataHub;
+        ["SET_MODE", "REDEPLOY"] call MWF_fnc_dataHub;
+    },
+    nil, 8, true, true, "", _condPeace
+];
+
+_laptop addAction [
+    "<t color='#66FFCC'>[ OPEN SUPPORT MAP ]</t>",
+    {
+        ["OPEN"] call MWF_fnc_dataHub;
+        ["SET_MODE", "SUPPORT"] call MWF_fnc_dataHub;
+    },
+    nil, 7.5, true, true, "", _condPeace
 ];
 
 _laptop addAction [
     "<t color='#00FFFF'>[ UPLOAD SECURED INTEL ]</t>",
     {
         params ["_target", "_caller"];
-        [_target, _caller] call MWF_fnc_depositIntel;
+        [_target, _caller] remoteExecCall ["MWF_fnc_depositIntel", 2];
     },
-    nil, 10, true, true, "", _condIntel
+    nil, 7, true, true, "", _condIntel
 ];
 
 _laptop addAction [
     "<t color='#FFFF00'>[ UPGRADE BASE TIER ]</t>",
     {
         params ["_target", "_caller"];
-        [_target, _caller] call MWF_fnc_upgradeBaseTier;
+        [_target, _caller] remoteExecCall ["MWF_fnc_upgradeBaseTier", 2];
     },
-    nil, 5, true, true, "", _condPeace
-];
-
-_laptop addAction [
-    "<t color='#66CCFF'>[ OPEN MISSION BOARD ]</t>",
-    { [] spawn MWF_fnc_openMissionBoard; },
-    nil, 7, true, true, "", _condPeace
-];
-
-_laptop addAction [
-    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 1 ]</t>",
-    {
-        params ["_target", "_caller"];
-        [0, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
-    },
-    nil, 7, true, true, "", _condPeace
-];
-
-_laptop addAction [
-    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 2 ]</t>",
-    {
-        params ["_target", "_caller"];
-        [1, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
-    },
-    nil, 7, true, true, "", _condPeace
-];
-
-_laptop addAction [
-    "<t color='#99DDFF'>[ ACCEPT MISSION SLOT 3 ]</t>",
-    {
-        params ["_target", "_caller"];
-        [2, _caller] remoteExec ["MWF_fnc_activateMissionBoardSlot", 2];
-    },
-    nil, 7, true, true, "", _condPeace
+    nil, 6.5, true, true, "", _condPeace
 ];
 
 _laptop addAction [

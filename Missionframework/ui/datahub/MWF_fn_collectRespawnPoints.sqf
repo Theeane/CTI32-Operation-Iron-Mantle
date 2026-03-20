@@ -33,7 +33,7 @@ private _pushEntry = {
     };
 };
 
-private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
+private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
 private _mobLabel = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
 private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
 ["MOB", _mobLabel, _mobPos, _mainBase] call _pushEntry;
@@ -51,7 +51,7 @@ private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { get
         {_x getVariable ["MWF_isMobileRespawn", false]} &&
         {_x getVariable ["MWF_respawnAvailable", false]}
     ) then {
-        private _label = _x getVariable ["MWF_respawnLabel", "Mobile Respawn Unit"];
+        private _label = _x getVariable ["MWF_MRU_DisplayName", _x getVariable ["MWF_respawnLabel", "Mobile Respawn Unit"]];
         ["MRU", _label, getPosATL _x, _x] call _pushEntry;
     };
 } forEach vehicles;

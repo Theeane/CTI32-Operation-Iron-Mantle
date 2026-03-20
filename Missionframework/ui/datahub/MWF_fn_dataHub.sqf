@@ -65,6 +65,38 @@ private _showSelectedEntry = {
     private _meta = _entry param [3, createHashMap, [createHashMap]];
 
     switch (_modeNow) do {
+
+        case "UPGRADES": {
+            private _statusText = _meta getOrDefault ["statusText", "Locked"];
+            private _tooltipText = _meta getOrDefault ["tooltipText", ""];
+            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Base Upgrade: %1", _label];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", "Base upgrade."]],
+                format ["<t color='#222222'>Status: %1</t>", _statusText],
+                format ["<t color='#222222'>%1</t>", _tooltipText]
+            ]] call _setInfoText;
+
+            switch (_actionMode) do {
+                case "VEHICLE_MENU": {
+                    [_actionCtrl, "Vehicle Menu", true] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                };
+                case "BASE_BUILDING": {
+                    [_actionCtrl, "Base Building", true] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                };
+                default {
+                    [_actionCtrl, "Locked", false] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                };
+            };
+        };
+
         case "SUPPORT": {
             if (!isNull _statusCtrl) then {
                 _statusCtrl ctrlSetText format ["Selected Support: %1", _label];
@@ -280,7 +312,7 @@ switch (_modeUpper) do {
 
         {
             _x params ["_kind", "_label", "_pos", "_meta"];
-            if ((_modeNow isEqualTo "REDEPLOY" && {_kind isEqualTo "RESPAWN"}) || (_modeNow isEqualTo "SIDE_MISSIONS" && {_kind isEqualTo "SIDE_MISSION"}) || (_modeNow isEqualTo "MAIN_OPERATIONS" && {_kind isEqualTo "MAIN_OPERATION"}) || (_modeNow isEqualTo "SUPPORT" && {_kind isEqualTo "SUPPORT"})) then {
+            if ((_modeNow isEqualTo "REDEPLOY" && {_kind isEqualTo "RESPAWN"}) || (_modeNow isEqualTo "SIDE_MISSIONS" && {_kind isEqualTo "SIDE_MISSION"}) || (_modeNow isEqualTo "MAIN_OPERATIONS" && {_kind isEqualTo "MAIN_OPERATION"}) || (_modeNow isEqualTo "SUPPORT" && {_kind isEqualTo "SUPPORT"}) || (_modeNow isEqualTo "UPGRADES" && {_kind isEqualTo "UPGRADE"})) then {
                 private _dist = _worldPos distance2D _pos;
                 if (_dist < _bestDistance) then {
                     _bestDistance = _dist;
@@ -346,6 +378,36 @@ switch (_modeUpper) do {
                 };
                 false
             }
+        };
+
+
+        if (_modeNow isEqualTo "UPGRADES") exitWith {
+            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+            if (_selected isEqualTo []) exitWith { false };
+
+            private _meta = _selected param [3, createHashMap, [createHashMap]];
+            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
+            private _tooltipText = _meta getOrDefault ["tooltipText", "Upgrade locked."];
+
+            switch (_actionMode) do {
+                case "VEHICLE_MENU": {
+                    ["CLOSE"] call MWF_fnc_dataHub;
+                    [objNull] call MWF_fnc_terminal_vehicleMenu;
+                    true
+                };
+                case "BASE_BUILDING": {
+                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    ["CLOSE"] call MWF_fnc_dataHub;
+                    [objNull] call MWF_fnc_enterBuildMode;
+                    true
+                };
+                default {
+                    if (!isNull _statusCtrl) then {
+                        _statusCtrl ctrlSetText _tooltipText;
+                    };
+                    false
+                };
+            };
         };
 
         if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
@@ -438,7 +500,42 @@ switch (_modeUpper) do {
             true
         };
 
+
+        if (_modeNow isEqualTo "UPGRADES") exitWith {
+            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+            if (_selected isEqualTo []) exitWith { false };
+
+            private _meta = _selected param [3, createHashMap, [createHashMap]];
+            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
+            private _tooltipText = _meta getOrDefault ["tooltipText", "Upgrade locked."];
+
+            switch (_actionMode) do {
+                case "VEHICLE_MENU": {
+                    ["CLOSE"] call MWF_fnc_dataHub;
+                    [objNull] call MWF_fnc_terminal_vehicleMenu;
+                    true
+                };
+                case "BASE_BUILDING": {
+                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    ["CLOSE"] call MWF_fnc_dataHub;
+                    [objNull] call MWF_fnc_enterBuildMode;
+                    true
+                };
+                default {
+                    if (!isNull _statusCtrl) then {
+                        _statusCtrl ctrlSetText _tooltipText;
+                    };
+                    false
+                };
+            };
+        };
+
         if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
+            ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
+            true
+        };
+
+        if (_modeNow isEqualTo "UPGRADES") exitWith {
             ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
             true
         };

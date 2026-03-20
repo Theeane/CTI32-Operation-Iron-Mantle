@@ -11,11 +11,11 @@ if ((missionNamespace getVariable ["MWF_GrandOperationActive", false]) && {!(_ma
 };
 
 private _activeSideMissions = (missionNamespace getVariable ["MWF_MissionBoardSlots", []]) select {
-    toLower (_x param [8, "available", [""]]) isEqualTo "active"
+    toLower (_x param [9, "available", [""]]) isEqualTo "active"
 };
 if (_activeSideMissions isNotEqualTo []) exitWith {
     private _picked = selectRandom _activeSideMissions;
-    createHashMapFromArray [["label", _picked param [7, "Mission", [""]]],["position", _picked param [6, getPosATL _buyer, [[]]]],["mode","SIDE_MISSION"]]
+    createHashMapFromArray [["label", _picked param [8, "Mission", [""]]],["position", _picked param [6, getPosATL _buyer, [[]]]],["mode","SIDE_MISSION"]]
 };
 
 private _mobPos = if !((getMarkerPos "respawn_west") isEqualTo [0,0,0]) then { getMarkerPos "respawn_west" } else { getPosATL _buyer };

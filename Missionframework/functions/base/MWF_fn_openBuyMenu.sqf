@@ -4,25 +4,22 @@
     Project: Military War Framework
 
     Description:
-    Opens the procurement UI against the authoritative digital economy.
-    Supplies are used for procurement, while Intel remains a separate strategic pool.
+    Command Network entry point.
+    The legacy buy menu is retired in favor of the unified Data Hub / Base Upgrades flow.
 */
 
-disableSerialization;
+if (!hasInterface) exitWith {false};
 
-createDialog "IronMantle_BuyMenu";
-if !(dialog) exitWith {
-    diag_log "[MWF Error] Master UI could not be opened.";
-};
+params [
+    ["_terminal", objNull, [objNull]],
+    ["_caller", objNull, [objNull]]
+];
 
-private _display = findDisplay 9000;
-if (isNull _display) exitWith {};
+missionNamespace setVariable ["MWF_CommandTerminal_Object", _terminal];
+missionNamespace setVariable ["MWF_CommandTerminal_User", _caller];
 
-private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+["OPEN"] call MWF_fnc_dataHub;
+["SET_MODE", "UPGRADES"] call MWF_fnc_dataHub;
 
-(_display displayCtrl 9001) ctrlSetText format ["Supplies: %1 | Intel: %2", _supplies, _intel];
-
-["Infantry"] spawn MWF_fnc_updateBuyCategory;
-
-diag_log "[MWF] Master Command Map opened. Digital economy initialized.";
+diag_log "[MWF] Command Network opened via unified Data Hub.";
+true

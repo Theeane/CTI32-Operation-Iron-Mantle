@@ -34,7 +34,7 @@ private _leftCtrl = _display displayCtrl 12215;
 if (!isNull _statusCtrl) then {
     private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
     private _statusText = format ["Mode: %1 | Entries: %2", _modeLabel, count _entries];
-    if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT"]) then {
+    if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "UPGRADES"]) then {
         _statusText = _statusText + " | Select a marker for details.";
     };
     _statusCtrl ctrlSetText _statusText;
@@ -48,6 +48,7 @@ if (!isNull _leftCtrl) then {
     private _leftText = switch (_modeUpper) do {
         case "SUPPORT": {"Build Group"};
         case "SIDE_MISSIONS": {"Main Ops"};
+        case "UPGRADES": {"Main Ops"};
         default {"Side Missions"};
     };
 
@@ -59,12 +60,13 @@ if (!isNull _actionCtrl) then {
     private _actionText = switch (_modeUpper) do {
         case "REDEPLOY": {"Redeploy"};
         case "SUPPORT": {"Build Unit"};
+        case "UPGRADES": {"Inspect"};
         case "SIDE_MISSIONS";
         case "MAIN_OPERATIONS": {"Accept"};
         default {"Close"};
     };
 
-    private _actionEnabled = !(_modeUpper in ["REDEPLOY", "SUPPORT", "SIDE_MISSIONS", "MAIN_OPERATIONS"]);
+    private _actionEnabled = !(_modeUpper in ["REDEPLOY", "SUPPORT", "SIDE_MISSIONS", "MAIN_OPERATIONS", "UPGRADES"]);
     _actionCtrl ctrlSetText _actionText;
     _actionCtrl ctrlEnable _actionEnabled;
 };
@@ -128,6 +130,15 @@ private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];
             _marker setMarkerTypeLocal "mil_triangle";
             _marker setMarkerColorLocal "ColorBLUFOR";
             _marker setMarkerTextLocal _label;
+        };
+
+        case "UPGRADE": {
+            private _statusText = toUpper (_meta getOrDefault ["statusText", "LOCKED"]);
+            private _isUnlocked = _meta getOrDefault ["isUnlocked", false];
+            _marker setMarkerShapeLocal "ICON";
+            _marker setMarkerTypeLocal "mil_box";
+            _marker setMarkerColorLocal (if (_isUnlocked) then {"ColorGreen"} else {"ColorOrange"});
+            _marker setMarkerTextLocal format ["%1 [%2]", _label, _statusText];
         };
 
         case "RESPAWN": {

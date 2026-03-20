@@ -35,7 +35,67 @@ private _getDefinitionValue = {
 };
 
 switch (_modeUpper) do {
-    case "UPGRADES";
+    case "UPGRADES": {
+        private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+        private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
+        private _heliClass = missionNamespace getVariable ["MWF_Heli_Tower_Class", ""];
+        private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
+        private _heliBuilt = (_heliClass isNotEqualTo "") && {({ typeOf _x isEqualTo _heliClass } count (nearestObjects [_mobPos, [_heliClass], 120])) > 0};
+        private _jetBuilt = (_jetClass isNotEqualTo "") && {({ typeOf _x isEqualTo _jetClass } count (nearestObjects [_mobPos, [_jetClass], 120])) > 0};
+        private _heliUnlocked = missionNamespace getVariable ["MWF_Unlock_Heli", false];
+        private _jetUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
+        private _tier5Unlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
+
+        private _upgradeEntries = [
+            [
+                "Helicopter Uplink",
+                [(_mobPos # 0) - 22, (_mobPos # 1) + 8, 0],
+                createHashMapFromArray [
+                    ["upgradeId", "HELI"],
+                    ["requiredOperation", "Sky Guardian"],
+                    ["description", "Unlocks helicopter logistics through a MOB-only upgrade structure."],
+                    ["isUnlocked", _heliUnlocked],
+                    ["isBuilt", _heliBuilt],
+                    ["statusText", if (!_heliUnlocked) then {"Locked"} else {if (_heliBuilt) then {"Ready"} else {"Unlocked - Build Required"}}],
+                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the helicopter uplink."}}},
+                    ["actionMode", if (!_heliUnlocked) then {"LOCKED"} else {if (_heliBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}}]
+                ]
+            ],
+            [
+                "Aircraft Control",
+                [(_mobPos # 0) + 22, (_mobPos # 1) + 8, 0],
+                createHashMapFromArray [
+                    ["upgradeId", "JET"],
+                    ["requiredOperation", "Point Blank"],
+                    ["description", "Unlocks fixed-wing strike logistics through a MOB-only upgrade structure."],
+                    ["isUnlocked", _jetUnlocked],
+                    ["isBuilt", _jetBuilt],
+                    ["statusText", if (!_jetUnlocked) then {"Locked"} else {if (_jetBuilt) then {"Ready"} else {"Unlocked - Build Required"}}],
+                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the aircraft control building."}}},
+                    ["actionMode", if (!_jetUnlocked) then {"LOCKED"} else {if (_jetBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}}]
+                ]
+            ],
+            [
+                "Base Tier 5",
+                [(_mobPos # 0), (_mobPos # 1) + 28, 0],
+                createHashMapFromArray [
+                    ["upgradeId", "TIER5"],
+                    ["requiredOperation", "Apex Predator"],
+                    ["description", "Extends the player base progression path to Tier 5. Vehicle presets may place special Tier 5 assets at the bottom of their categories."],
+                    ["isUnlocked", _tier5Unlocked],
+                    ["isBuilt", _tier5Unlocked],
+                    ["statusText", if (_tier5Unlocked) then {"Unlocked"} else {"Locked"}],
+                    ["tooltipText", if (_tier5Unlocked) then {"Base Tier 5 progression is unlocked."} else {"Requires main operation: Apex Predator."}],
+                    ["actionMode", if (_tier5Unlocked) then {"VEHICLE_MENU"} else {"LOCKED"}]
+                ]
+            ]
+        ];
+
+        {
+            _entries pushBack ["UPGRADE", _x # 0, _x # 1, _x # 2];
+        } forEach _upgradeEntries;
+    };
+
     case "ZONES": {
         {
             if (!isNull _x) then {

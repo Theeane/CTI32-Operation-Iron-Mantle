@@ -23,13 +23,24 @@ _entry params [
     ["_className", "", [""]],
     ["_cost", 0, [0]],
     ["_minTier", 1, [0]],
-    ["_displayName", "", [""]]
+    ["_displayName", "", [""]],
+    ["_category", "", [""]],
+    ["_lockReason", "", [""]]
 ];
 
 if (_className isEqualTo "") exitWith { false };
 
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+private _currentTier = missionNamespace getVariable ["MWF_PlayerBaseTier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
+
+if (_lockReason isNotEqualTo "") exitWith {
+    systemChat _lockReason;
+    [
+        ["VEHICLE LOCKED", _lockReason],
+        "warning"
+    ] call MWF_fnc_showNotification;
+    false
+};
 
 if (_supplies < _cost) exitWith {
     [format ["Insufficient Supplies: %1 needed.", _cost]] call BIS_fnc_showSubtitle;
