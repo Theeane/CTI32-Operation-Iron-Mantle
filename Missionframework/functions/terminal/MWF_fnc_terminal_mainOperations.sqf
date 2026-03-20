@@ -22,24 +22,32 @@ switch (toUpper _mode) do {
 
         private _check = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
         if !(_check param [0, false]) exitWith {
-            systemChat (_check param [1, "Main Operations unavailable."]);
-            [["MAIN OPERATIONS", (_check param [1, "Main Operations unavailable."])], "warning"] call MWF_fnc_showNotification;
+            private _reason = _check param [1, "Main Operations unavailable."];
+            systemChat _reason;
+            [["MAIN OPERATIONS", _reason], "warning"] call MWF_fnc_showNotification;
         };
 
         ["CLOSE"] call MWF_fnc_terminal_mainOperations;
 
         private _text = "Main Operations<br/>Select a grand operation from the action menu.<br/><br/>";
         {
-            _x params ["_key", "_title", "_desc"];
+            _x params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText"];
             private _state = [_key, _x] call MWF_fnc_getMainOperationState;
+            private _detailLine = format ["<t size='0.85'>Effect: %1</t>", _effectText];
+            if !(_fallbackText isEqualTo "") then {
+                _detailLine = _detailLine + format ["<br/><t size='0.85'>Fallback: %1</t>", _fallbackText];
+            };
+
             _text = _text + format [
-                "%1 [%2]<br/>%3<br/><t size='0.85'>%4</t><br/><br/>",
+                "%1 [%2]<br/>%3<br/>%4<br/><t size='0.85'>%5</t><br/><br/>",
                 toUpper _title,
                 toUpper (_state getOrDefault ["state", "unknown"]),
                 _desc,
+                _detailLine,
                 _state getOrDefault ["tooltipText", ""]
             ];
         } forEach _ops;
+
         hintSilent parseText format ["<t size='1.0'>%1</t>", _text];
 
         private _actionIds = [];
@@ -79,7 +87,7 @@ switch (toUpper _mode) do {
         _actionIds pushBack _closeId;
 
         missionNamespace setVariable ["MWF_Terminal_MainOps_ActionIds", _actionIds];
-        systemChat "Main Operations ready. Use the action menu to start an operation.";
+        [["MAIN OPERATIONS", "Action menu ready. Locked entries show cooldown or availability reasons."], "info"] call MWF_fnc_showNotification;
     };
 
     case "CLOSE": {
@@ -102,13 +110,23 @@ switch (toUpper _mode) do {
 
         private _check = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
         if !(_check param [0, false]) exitWith {
-            systemChat (_check param [1, "Main Operations unavailable."]);
-            [["MAIN OPERATIONS", (_check param [1, "Main Operations unavailable."])], "warning"] call MWF_fnc_showNotification;
+            private _reason = _check param [1, "Main Operations unavailable."];
+            systemChat _reason;
+            [["MAIN OPERATIONS", _reason], "warning"] call MWF_fnc_showNotification;
+        };
+
+        private _entry = _ops # _index;
+        _entry params ["_key", "_title"];
+        private _state = [_key, _entry] call MWF_fnc_getMainOperationState;
+        if !(_state getOrDefault ["isAvailable", false]) exitWith {
+            private _reason = _state getOrDefault ["tooltipText", "Operation unavailable."];
+            systemChat _reason;
+            [["MAIN OPERATIONS", _reason], "warning"] call MWF_fnc_showNotification;
         };
 
         ["CLOSE"] call MWF_fnc_terminal_mainOperations;
         ["START_SERVER", _index, clientOwner] remoteExecCall ["MWF_fnc_terminal_mainOperations", 2];
-        systemChat "Main Operations request sent to command.";
+        [["MAIN OPERATIONS", format ["Request sent: %1", _title]], "info"] call MWF_fnc_showNotification;
     };
 
     case "START_SERVER": {

@@ -26,6 +26,31 @@ uiNamespace setVariable ["MWF_DataHub_Mode", _modeUpper];
 uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
 uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
 
+private _terminalStatusCtrl = _display displayCtrl 12218;
+private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _carriedIntel = player getVariable ["MWF_carriedIntelValue", 0];
+private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
+private _baseTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+private _phase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+private _debugText = if (missionNamespace getVariable ["MWF_DebugMode", false]) then {
+    "<t color='#FFD27A'> | DEBUG</t>"
+} else {
+    ""
+};
+if (!isNull _terminalStatusCtrl) then {
+    _terminalStatusCtrl ctrlSetStructuredText parseText format [
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>%7",
+        _supplies,
+        _intel,
+        _carriedIntel,
+        _worldTier,
+        _baseTier,
+        _phase,
+        _debugText
+    ];
+};
+
 private _statusCtrl = _display displayCtrl 12206;
 private _actionCtrl = _display displayCtrl 12207;
 private _infoCtrl = _display displayCtrl 12216;
@@ -35,7 +60,7 @@ if (!isNull _statusCtrl) then {
     private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
     private _statusText = format ["Mode: %1 | Entries: %2", _modeLabel, count _entries];
     if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "UPGRADES"]) then {
-        _statusText = _statusText + " | Select a marker for details.";
+        _statusText = _statusText + " | Left click marker for details | Right click / Esc = back.";
     };
     _statusCtrl ctrlSetText _statusText;
 };

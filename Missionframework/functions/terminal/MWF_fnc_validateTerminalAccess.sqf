@@ -25,12 +25,12 @@ switch (toUpper _actionType) do {
     case "MAIN_OPERATIONS": {
         if (missionNamespace getVariable ["MWF_GrandOperationActive", false]) then {
             _allowed = false;
-            _reason = "Main Operations locked during active operation.";
+            _reason = "Main operation unavailable: another main operation is already active.";
         } else {
             private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
             if !(_activeSideMissions isEqualTo []) then {
                 _allowed = false;
-                _reason = "Main Operations locked while side missions are active.";
+                _reason = "Main operation unavailable: active side mission in progress.";
             };
         };
     };
@@ -39,7 +39,7 @@ switch (toUpper _actionType) do {
         private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
         if !(_activeSideMissions isEqualTo []) then {
             _allowed = false;
-            _reason = "Mission Hub locked while missions are active.";
+            _reason = "Mission Hub unavailable: side mission already active.";
         };
     };
 };

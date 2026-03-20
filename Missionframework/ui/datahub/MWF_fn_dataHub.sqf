@@ -23,10 +23,47 @@ private _setInfoText = {
 };
 
 private _setButtonState = {
-    params [["_ctrl", controlNull, [controlNull]], ["_text", "", [""]], ["_enabled", true, [true]]];
+    params [
+        ["_ctrl", controlNull, [controlNull]],
+        ["_text", "", [""]],
+        ["_enabled", true, [true]],
+        ["_tooltip", "", [""]]
+    ];
     if (isNull _ctrl) exitWith {};
     _ctrl ctrlSetText _text;
     _ctrl ctrlEnable _enabled;
+    _ctrl ctrlSetTooltip (if (_tooltip isEqualTo "") then { _text } else { _tooltip });
+};
+
+private _syncTerminalStatus = {
+    params [["_display", displayNull, [displayNull]]];
+    if (isNull _display) exitWith {};
+
+    private _ctrl = _display displayCtrl 12218;
+    if (isNull _ctrl) exitWith {};
+
+    private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+    private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+    private _carriedIntel = player getVariable ["MWF_carriedIntelValue", 0];
+    private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
+    private _baseTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+    private _phase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+    private _debugText = if (missionNamespace getVariable ["MWF_DebugMode", false]) then {
+        "<t color='#FFD27A'> | DEBUG</t>"
+    } else {
+        ""
+    };
+
+    _ctrl ctrlSetStructuredText parseText format [
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>%7",
+        _supplies,
+        _intel,
+        _carriedIntel,
+        _worldTier,
+        _baseTier,
+        _phase,
+        _debugText
+    ];
 };
 
 private _performRedeploy = {
@@ -56,6 +93,8 @@ private _showSelectedEntry = {
 
     if (isNull _display || {_entry isEqualTo []}) exitWith {};
 
+    [_display] call _syncTerminalStatus;
+
     private _statusCtrl = _display displayCtrl 12206;
     private _infoCtrl = _display displayCtrl 12216;
     private _actionCtrl = _display displayCtrl 12207;
@@ -71,7 +110,7 @@ private _showSelectedEntry = {
             private _tooltipText = _meta getOrDefault ["tooltipText", ""];
             private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
             if (!isNull _statusCtrl) then {
-                _statusCtrl ctrlSetText format ["Base Upgrade: %1", _label];
+                _statusCtrl ctrlSetText format ["Base Upgrade: %1 | %2", _label, _statusText];
             };
 
             [_infoCtrl, [
@@ -83,20 +122,20 @@ private _showSelectedEntry = {
 
             switch (_actionMode) do {
                 case "VEHICLE_MENU": {
-                    [_actionCtrl, "Vehicle Menu", true] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                    [_actionCtrl, "Vehicle Menu", true, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 case "BASE_BUILDING": {
-                    [_actionCtrl, "Base Building", true] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                    [_actionCtrl, "Base Building", true, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 case "TIER5_INFO": {
-                    [_actionCtrl, "Tier 5 Info", true] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                    [_actionCtrl, "Tier 5 Info", true, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 default {
-                    [_actionCtrl, "Locked", false] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                    [_actionCtrl, "Locked", false, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
             };
         };
@@ -112,26 +151,27 @@ private _showSelectedEntry = {
                 "<t color='#222222'>Accept: Build Unit | Left button: Build Group</t>"
             ]] call _setInfoText;
 
-            [_actionCtrl, "Build Unit", true] call _setButtonState;
-            [_leftCtrl, "Build Group", true] call _setButtonState;
+            [_actionCtrl, "Build Unit", true, "Build a single support unit from this entry."] call _setButtonState;
+            [_leftCtrl, "Build Group", true, "Build the support group linked to this entry."] call _setButtonState;
         };
 
         case "REDEPLOY": {
             private _kind = _meta getOrDefault ["kind", "FOB"];
             private _canRedeploy = alive player && {vehicle player == player};
+            private _statusText = if (_canRedeploy) then {"Ready"} else {"Unavailable right now"};
 
             if (!isNull _statusCtrl) then {
-                _statusCtrl ctrlSetText format ["Redeploy Target: %1", _label];
+                _statusCtrl ctrlSetText format ["Redeploy Target: %1 | %2", _label, _statusText];
             };
 
             [_infoCtrl, [
                 format ["<t size='1.05' color='#111111'>%1</t>", _label],
                 format ["<t color='#222222'>Type: %1</t>", _kind],
-                format ["<t color='#222222'>Status: %1</t>", if (_canRedeploy) then {"Ready"} else {"Unavailable right now"}]
+                format ["<t color='#222222'>Status: %1</t>", _statusText]
             ]] call _setInfoText;
 
-            [_actionCtrl, "Redeploy", _canRedeploy] call _setButtonState;
-            [_leftCtrl, "Side Missions", true] call _setButtonState;
+            [_actionCtrl, "Redeploy", _canRedeploy, "Redeploy to the selected spawn point."] call _setButtonState;
+            [_leftCtrl, "Side Missions", true, "Switch to side missions."] call _setButtonState;
         };
 
         case "SIDE_MISSIONS": {
@@ -156,6 +196,11 @@ private _showSelectedEntry = {
             } else {
                 if (_access param [0, false]) then { "Available" } else { _access param [1, "Unavailable"] };
             };
+            private _acceptTooltip = if (_isAvailable) then {
+                "Accept this side mission."
+            } else {
+                _statusText
+            };
 
             if (!isNull _statusCtrl) then {
                 _statusCtrl ctrlSetText format ["Selected Mission: %1 | %2", _label, _statusText];
@@ -163,7 +208,7 @@ private _showSelectedEntry = {
 
             private _lines = [
                 format ["<t size='1.05' color='#111111'>%1</t>", _label],
-                format ["<t color='#222222'>Area: %1 | Template: %2</t>", _zoneName, _meta getOrDefault ["missionId", "Unknown"]]
+                format ["<t color='#222222'>Area: %1 | Template: %2 | %3 | %4</t>", _zoneName, _meta getOrDefault ["missionId", "Unknown"], toUpper (_meta getOrDefault ["domain", "land"]), toUpper _difficulty]
             ];
 
             if !(_description isEqualTo "") then {
@@ -177,7 +222,7 @@ private _showSelectedEntry = {
             };
 
             if ((_fallbackSupplies > 0) || {_fallbackIntel > 0}) then {
-                _lines pushBack format ["<t color='#222222'>Fallback reward if progression effect is blocked: %1 Supplies / %2 Intel</t>", _fallbackSupplies, _fallbackIntel];
+                _lines pushBack format ["<t color='#222222'>Fallback if progression is blocked: %1 Supplies / %2 Intel</t>", _fallbackSupplies, _fallbackIntel];
             };
 
             if !(_notes isEqualTo "") then {
@@ -188,8 +233,8 @@ private _showSelectedEntry = {
 
             [_infoCtrl, _lines] call _setInfoText;
 
-            [_actionCtrl, "Accept", _isAvailable] call _setButtonState;
-            [_leftCtrl, "Main Ops", true] call _setButtonState;
+            [_actionCtrl, "Accept", _isAvailable, _acceptTooltip] call _setButtonState;
+            [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
         };
 
         case "MAIN_OPERATIONS": {
@@ -205,21 +250,42 @@ private _showSelectedEntry = {
             };
             private _isAvailable = (_state getOrDefault ["isAvailable", false]) && (_access param [0, false]);
             private _zoneName = _meta getOrDefault ["zoneName", "Unknown Area"];
+            private _tooltipText = if (_access param [0, false]) then {
+                _state getOrDefault ["tooltipText", "Operation unavailable."]
+            } else {
+                _access param [1, "Operation unavailable."]
+            };
+            private _readyClockText = _state getOrDefault ["readyClockText", "--:--"];
+            private _cooldownRemaining = _state getOrDefault ["cooldownRemaining", 0];
+            private _cooldownInfo = if (_cooldownRemaining > 0) then {
+                format ["<t color='#222222'>Cooldown: %1 sec remaining | ETA %2</t>", _cooldownRemaining, _readyClockText]
+            } else {
+                ""
+            };
 
             if (!isNull _statusCtrl) then {
                 _statusCtrl ctrlSetText format ["Selected Main Operation: %1 | %2", _label, _statusText];
             };
 
-            [_infoCtrl, [
+            private _lines = [
                 format ["<t size='1.05' color='#111111'>%1</t>", _label],
                 format ["<t color='#222222'>AO: %1</t>", _zoneName],
                 format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", ""]],
                 format ["<t color='#222222'>Effect: %1</t>", _meta getOrDefault ["effectText", ""]],
+                format ["<t color='#222222'>Fallback Reward: %1</t>", _meta getOrDefault ["fallbackText", ""]],
                 format ["<t color='#222222'>Status: %1</t>", _statusText]
-            ]] call _setInfoText;
+            ];
 
-            [_actionCtrl, "Accept", _isAvailable] call _setButtonState;
-            [_leftCtrl, "Side Missions", true] call _setButtonState;
+            if !(_cooldownInfo isEqualTo "") then {
+                _lines pushBack _cooldownInfo;
+            };
+
+            _lines pushBack format ["<t color='#222222'>%1</t>", _tooltipText];
+
+            [_infoCtrl, _lines] call _setInfoText;
+
+            [_actionCtrl, "Accept", _isAvailable, _tooltipText] call _setButtonState;
+            [_leftCtrl, "Side Missions", true, "Switch to side missions."] call _setButtonState;
         };
 
         default {

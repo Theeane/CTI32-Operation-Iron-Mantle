@@ -41,6 +41,7 @@ if (_record isEqualTo []) exitWith {
         ["isCoolingDown", false],
         ["cooldownRemaining", 0],
         ["readyAt", 0],
+        ["readyClockText", "--:--"],
         ["statusText", "Unknown"],
         ["tooltipText", "Operation metadata unavailable."]
     ]
@@ -72,6 +73,32 @@ private _isCoolingDown = (!_isActive) && {_cooldownRemaining > 0};
 private _state = "available";
 private _statusText = "Available";
 private _tooltip = format ["%1 is ready to accept.", _title];
+private _readyClockText = "--:--";
+
+if (_isCoolingDown) then {
+    private _minutes = (_cooldownRemaining / 60) call BIS_fnc_floor;
+    private _seconds = _cooldownRemaining mod 60;
+    private _hours = (_minutes / 60) call BIS_fnc_floor;
+    private _displayMinutes = _minutes mod 60;
+    private _remainingText = if (_hours > 0) then {
+        format ["%1h %2m", _hours, _displayMinutes]
+    } else {
+        format ["%1m %2s", _displayMinutes, _seconds]
+    };
+
+    private _clockHoursTotal = daytime + (_cooldownRemaining / 3600);
+    private _dayOffset = floor (_clockHoursTotal / 24);
+    private _clockHours = _clockHoursTotal mod 24;
+    private _clockHour = floor _clockHours;
+    private _clockMinute = floor (((_clockHours - _clockHour) * 60) max 0 min 59);
+    _readyClockText = format ["%1:%2", [_clockHour, 2] call BIS_fnc_padNumber, [_clockMinute, 2] call BIS_fnc_padNumber];
+    if (_dayOffset > 0) then {
+        _readyClockText = format ["%1 (+%2d)", _readyClockText, _dayOffset];
+    };
+
+    _statusText = format ["Cooldown | Ready in %1 | ETA %2", _remainingText, _readyClockText];
+    _tooltip = format ["%1 is on cooldown. Ready again in %2 at %3.", _title, _remainingText, _readyClockText];
+};
 
 if (_isActive) then {
     _state = "active";
@@ -80,18 +107,6 @@ if (_isActive) then {
 } else {
     if (_isCoolingDown) then {
         _state = "cooldown";
-        private _minutes = (_cooldownRemaining / 60) call BIS_fnc_floor;
-        private _seconds = _cooldownRemaining mod 60;
-        private _hours = (_minutes / 60) call BIS_fnc_floor;
-        private _displayMinutes = _minutes mod 60;
-        private _remainingText = if (_hours > 0) then {
-            format ["%1h %2m", _hours, _displayMinutes]
-        } else {
-            format ["%1m %2s", _displayMinutes, _seconds]
-        };
-
-        _statusText = format ["Cooldown - Ready in %1", _remainingText];
-        _tooltip = format ["%1 is on cooldown. Ready again in %2.", _title, _remainingText];
     };
 };
 
@@ -110,6 +125,7 @@ createHashMapFromArray [
     ["isCoolingDown", _isCoolingDown],
     ["cooldownRemaining", _cooldownRemaining],
     ["readyAt", _readyAt],
+    ["readyClockText", _readyClockText],
     ["statusText", _statusText],
     ["tooltipText", _tooltip]
 ]

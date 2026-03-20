@@ -107,11 +107,29 @@ class MWF_RscDataHub {
             colorBackground[] = {0.72, 0.72, 0.72, 0.92};
         };
 
+        class TerminalStatusBG: RscText {
+            idc = 12217;
+            x = 0.145 * safezoneW + safezoneX;
+            y = 0.155 * safezoneH + safezoneY;
+            w = 0.71 * safezoneW;
+            h = 0.03 * safezoneH;
+            colorBackground[] = {0.12, 0.12, 0.12, 0.88};
+        };
+
+        class TerminalStatusText: RscStructuredText {
+            idc = 12218;
+            text = "";
+            x = 0.151 * safezoneW + safezoneX;
+            y = 0.158 * safezoneH + safezoneY;
+            w = 0.70 * safezoneW;
+            h = 0.024 * safezoneH;
+        };
+
         class BtnVehicle: RscButton {
             idc = 12210;
             text = "Vehicle Menu";
             x = 0.185 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
+            y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['CLOSE'] call MWF_fnc_dataHub; ['OPEN', objNull] call MWF_fnc_terminal_vehicleMenu;";
@@ -120,7 +138,7 @@ class MWF_RscDataHub {
             idc = 12211;
             text = "Base Building";
             x = 0.298 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
+            y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['CLOSE'] call MWF_fnc_dataHub; [objNull] spawn MWF_fnc_enterBuildMode;";
@@ -129,7 +147,7 @@ class MWF_RscDataHub {
             idc = 12212;
             text = "Main Operations";
             x = 0.411 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
+            y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['SET_MODE','MAIN_OPERATIONS'] call MWF_fnc_dataHub;";
@@ -138,7 +156,7 @@ class MWF_RscDataHub {
             idc = 12213;
             text = "Build Support";
             x = 0.524 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
+            y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
@@ -147,38 +165,27 @@ class MWF_RscDataHub {
             idc = 12214;
             text = "Base Upgrades";
             x = 0.637 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
+            y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['SET_MODE','UPGRADES'] call MWF_fnc_dataHub;";
         };
 
-        class InfoText: RscStructuredText {
-            idc = 12216;
-            text = "";
-            x = 0.61 * safezoneW + safezoneX;
-            y = 0.72 * safezoneH + safezoneY;
-            w = 0.245 * safezoneW;
-            h = 0.06 * safezoneH;
-            colorText[] = {0,0,0,1};
-            size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
-        };
-
         class MapFrame: RscText {
             idc = 12204;
             x = 0.14 * safezoneW + safezoneX;
-            y = 0.215 * safezoneH + safezoneY;
+            y = 0.245 * safezoneH + safezoneY;
             w = 0.72 * safezoneW;
-            h = 0.50 * safezoneH;
+            h = 0.47 * safezoneH;
             colorBackground[] = {0,0,0,0.2};
         };
 
         class WorldMap: RscMapControl {
             idc = 12205;
             x = 0.145 * safezoneW + safezoneX;
-            y = 0.22 * safezoneH + safezoneY;
+            y = 0.25 * safezoneH + safezoneY;
             w = 0.71 * safezoneW;
-            h = 0.49 * safezoneH;
+            h = 0.46 * safezoneH;
             onMouseButtonClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; }; if ((_this select 1) isEqualTo 1) then { ['BACK'] call MWF_fnc_dataHub; };";
         };
 
@@ -192,11 +199,22 @@ class MWF_RscDataHub {
             colorText[] = {0,0,0,1};
         };
 
+        class InfoText: RscStructuredText {
+            idc = 12216;
+            text = "";
+            x = 0.60 * safezoneW + safezoneX;
+            y = 0.72 * safezoneH + safezoneY;
+            w = 0.255 * safezoneW;
+            h = 0.08 * safezoneH;
+            colorText[] = {0,0,0,1};
+            size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
+        };
+
         class BtnSideMissions: RscButton {
             idc = 12215;
             text = "Missions";
             x = 0.155 * safezoneW + safezoneX;
-            y = 0.76 * safezoneH + safezoneY;
+            y = 0.77 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['ACTION_SECONDARY'] call MWF_fnc_dataHub;";
@@ -206,10 +224,11 @@ class MWF_RscDataHub {
             idc = 12207;
             text = "Close";
             x = 0.745 * safezoneW + safezoneX;
-            y = 0.76 * safezoneH + safezoneY;
+            y = 0.77 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['ACTION'] call MWF_fnc_dataHub;";
         };
     };
 };
+
