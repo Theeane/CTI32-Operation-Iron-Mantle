@@ -104,6 +104,7 @@ switch (_state) do {
 
         private _impactProfile = ["main", "sky_guardian"] call MWF_fnc_getMissionImpactProfile;
         private _alreadyUnlocked = missionNamespace getVariable ["MWF_Unlock_Heli", false];
+        private _impactContext = createHashMapFromArray [["loud", true]];
 
         if (_alreadyUnlocked) then {
             private _fallbackSupplies = _impactProfile getOrDefault ["fallbackSupplies", 0];
@@ -112,15 +113,27 @@ switch (_state) do {
             if (_fallbackSupplies > 0) then { [_fallbackSupplies, "SUPPLIES"] call MWF_fnc_addResource; };
             if (_fallbackIntel > 0) then { [_fallbackIntel, "INTEL"] call MWF_fnc_addResource; };
 
+            _impactContext set ["suppressFallbackRewards", true];
+
             [["AIRFIELD CACHE SECURED", format ["Helicopter unlock already secured. Operation converted to %1 Supplies and %2 Intel.", _fallbackSupplies, _fallbackIntel]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         } else {
             missionNamespace setVariable ["MWF_Unlock_Heli", true, true];
             [["OPERATION SUCCESSFUL", "Airfield secured. Helicopter assets are now available for purchase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         };
 
-        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+        private _impactResult = [_impactProfile, _impactContext] call MWF_fnc_applyMissionImpact;
 
         ["SKY_GUARDIAN"] call MWF_fnc_finalizeMainOperation;
-        diag_log "[MWF Grand Op] Sky Guardian: Fully Completed.";
+
+        private _logMessage = if (_alreadyUnlocked || {_impactResult getOrDefault ["fallbackUsed", false]}) then {
+            format [
+                "[MWF Grand Op] Sky Guardian: Replay completed. Fallback payout applied (%1 Supplies / %2 Intel).",
+                _impactResult getOrDefault ["suppliesGranted", 0],
+                _impactResult getOrDefault ["intelGranted", 0]
+            ]
+        } else {
+            "[MWF Grand Op] Sky Guardian: Fully Completed. Helicopters unlocked."
+        };
+        diag_log _logMessage;
     };
 };
