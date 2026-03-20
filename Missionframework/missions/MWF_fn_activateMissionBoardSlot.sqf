@@ -25,9 +25,15 @@ if (_entryIndex < 0) exitWith {
 };
 
 private _slotData = + (_boardSlots # _entryIndex);
-if ((_slotData # 9) isEqualTo "active") exitWith {
+private _currentState = toLower (_slotData # 9);
+if (_currentState isEqualTo "active") exitWith {
     if (!isNull _caller) then {
         [format ["Mission slot %1 is already active.", _slotIndex + 1]] remoteExec ["hint", owner _caller];
+    };
+};
+if (_currentState isEqualTo "completed") exitWith {
+    if (!isNull _caller) then {
+        [format ["Mission slot %1 has already been completed this rotation.", _slotIndex + 1]] remoteExec ["hint", owner _caller];
     };
 };
 

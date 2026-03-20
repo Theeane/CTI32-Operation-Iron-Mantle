@@ -5,24 +5,15 @@
 
     Description:
     Refreshes the side mission board with a domain-aware mission layout.
-    Default target layout:
-    - land: 9 missions (3 categories x 3 difficulties)
-    - naval: 9 missions if supported
-    - air: 9 missions if supported
-
-    Minimal mode fallback:
-    If the board cannot maintain at least 100m separation, reduce to one Supply,
-    one Intel, and one Disrupt mission across any supported domain/difficulty.
-
-    Return:
-    Array of mission board slot records:
-    [slotIndex, category, difficulty, missionId, missionKey, missionPath, positionATL, areaId, areaName, state, domain, missionDefinition]
+    Preserves active/completed slot state for matching mission keys across board rotations.
 */
 
 if (!isServer) exitWith {[]};
 
 private _registry = + (missionNamespace getVariable ["MWF_MissionTemplateRegistry", []]);
 private _placements = + (missionNamespace getVariable ["MWF_MissionSessionPlacements", []]);
+private _previousBoard = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
+
 private _supportedDomains = [];
 if (missionNamespace getVariable ["MWF_MissionDomainSupported_Land", false]) then { _supportedDomains pushBack "land"; };
 if (missionNamespace getVariable ["MWF_MissionDomainSupported_Naval", false]) then { _supportedDomains pushBack "naval"; };
@@ -70,9 +61,7 @@ private _readMissionDefinition = {
                 } else {
                     if (_ch isEqualTo "]") then {
                         _depth = _depth - 1;
-                        if (_depth <= 0) exitWith {
-                            _end = _i;
-                        };
+                        if (_depth <= 0) exitWith { _end = _i; };
                     };
                 };
             };
@@ -84,7 +73,6 @@ private _readMissionDefinition = {
     private _arrayText = _raw select [_start, (_end - _start) + 1];
     private _definition = call compile _arrayText;
     if !(_definition isEqualType []) exitWith { [] };
-
     _definition
 };
 
@@ -123,9 +111,7 @@ private _buildSlots = {
             !((_entry # 0) in _usedMissionKeys)
         };
 
-        if (_pool isEqualTo []) exitWith {
-            _failed = true;
-        };
+        if (_pool isEqualTo []) exitWith { _failed = true; };
 
         private _shuffledPool = +_pool;
         _shuffledPool = _shuffledPool call BIS_fnc_arrayShuffle;
@@ -144,9 +130,7 @@ private _buildSlots = {
 
                 {
                     private _existingPos = _x # 6;
-                    if ((_position distance2D _existingPos) < _minDistance) exitWith {
-                        _ok = false;
-                    };
+                    if ((_position distance2D _existingPos) < _minDistance) exitWith { _ok = false; };
                 } forEach _slots;
 
                 if (_ok) exitWith {
@@ -156,9 +140,7 @@ private _buildSlots = {
             };
         } forEach _shuffledPool;
 
-        if (_chosenTemplate isEqualTo [] || {_chosenPlacement isEqualTo []}) exitWith {
-            _failed = true;
-        };
+        if (_chosenTemplate isEqualTo [] || {_chosenPlacement isEqualTo []}) exitWith { _failed = true; };
 
         _chosenTemplate params ["_missionKey", "_templateCategory", "_templateDifficulty", "_missionId", "_missionPath", ["_templateDomain", "land", [""]]];
         _chosenPlacement params ["_placementMissionKey", "_position", "_areaId", "_areaName", ["_placementDomain", _templateDomain, [""]]];
@@ -211,9 +193,7 @@ if (_slots isEqualTo []) then {
                 (_entryDomain isEqualTo _domain) && {(_entry # 1) isEqualTo _category}
             }) >= 0;
 
-            if (_hasCategory) exitWith {
-                _foundDomain = _domain;
-            };
+            if (_hasCategory) exitWith { _foundDomain = _domain; };
         } forEach _supportedDomains;
 
         if !(_foundDomain isEqualTo "") then {
@@ -230,6 +210,40 @@ if (_slots isEqualTo []) then {
         _slots = [_minimalSpecs, 0, true] call _buildSlots;
     };
 };
+
+private _previousStateMap = createHashMap;
+{
+    private _missionKey = _x param [4, ""];
+    if (_missionKey isNotEqualTo "") then {
+        _previousStateMap set [_missionKey, +_x];
+    };
+} forEach _previousBoard;
+
+{
+    private _missionKey = _x param [4, ""];
+    private _previous = _previousStateMap getOrDefault [_missionKey, []];
+    if !(_previous isEqualTo []) then {
+        private _previousState = toLower (_previous param [9, "available", [""]]);
+        if (_previousState in ["active", "completed", "missing"]) then {
+            _x set [9, _previousState];
+        };
+        if ((_x param [11, [], [[]]]) isEqualTo []) then {
+            _x set [11, _previous param [11, [], [[]]]];
+        };
+    };
+} forEach _slots;
+
+{
+    private _previousKey = _x param [4, ""];
+    private _previousState = toLower (_x param [9, "available", [""]]);
+    if (
+        (_previousKey isNotEqualTo "") &&
+        {_previousState in ["active", "completed"]} &&
+        {(_slots findIf { (_x # 4) isEqualTo _previousKey }) < 0}
+    ) then {
+        _slots pushBack (+_x);
+    };
+} forEach _previousBoard;
 
 {
     _x set [0, _forEachIndex];

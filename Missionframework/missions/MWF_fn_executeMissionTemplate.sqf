@@ -31,6 +31,49 @@ private _getDefinitionValue = {
     (_definition # _index) # 1
 };
 
+private _readMissionDefinition = {
+    params ["_missionPath"];
+    if !fileExists _missionPath exitWith { [] };
+
+    private _raw = loadFile _missionPath;
+    if (_raw isEqualTo "") exitWith { [] };
+
+    private _marker = "private _missionDefinition = ";
+    private _markerPos = _raw find _marker;
+    if (_markerPos < 0) exitWith { [] };
+
+    private _afterMarker = _markerPos + (count _marker);
+    private _tail = _raw select [_afterMarker];
+    private _localOpen = _tail find "[";
+    if (_localOpen < 0) exitWith { [] };
+
+    private _start = _afterMarker + _localOpen;
+    private _depth = 0;
+    private _inString = false;
+    private _end = -1;
+
+    for "_i" from _start to ((count _raw) - 1) do {
+        private _ch = _raw select [_i, 1];
+        if (_ch isEqualTo (toString [34])) then {
+            _inString = !_inString;
+        } else {
+            if (!_inString) then {
+                if (_ch isEqualTo "[") then { _depth = _depth + 1; };
+                if (_ch isEqualTo "]") then {
+                    _depth = _depth - 1;
+                    if (_depth <= 0) exitWith { _end = _i; };
+                };
+            };
+        };
+    };
+
+    if (_end < _start) exitWith { [] };
+    private _arrayText = _raw select [_start, (_end - _start) + 1];
+    private _definition = call compile _arrayText;
+    if !(_definition isEqualType []) exitWith { [] };
+    _definition
+};
+
 _slotData params [
     ["_slotIndex", -1, [0]],
     ["_slotCategory", "", [""]],
@@ -48,6 +91,10 @@ _slotData params [
 if (_category isEqualTo "") then { _category = _slotCategory; };
 if (_difficulty isEqualTo "") then { _difficulty = _slotDifficulty; };
 if (_missionId <= 0) then { _missionId = _slotMissionId; };
+
+if (_missionDefinition isEqualTo [] && {_missionPath isNotEqualTo ""}) then {
+    _missionDefinition = [_missionPath] call _readMissionDefinition;
+};
 
 if (_missionKey isEqualTo "") exitWith {
     diag_log "[MWF Missions] executeMissionTemplate received invalid slot data without a mission key.";
