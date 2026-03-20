@@ -116,6 +116,7 @@ private _showSelectedEntry = {
             [_infoCtrl, [
                 format ["<t size='1.05' color='#111111'>%1</t>", _label],
                 format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", "Base upgrade."]],
+                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["baseContextText", ""]],
                 format ["<t color='#222222'>Status: %1</t>", _statusText],
                 format ["<t color='#222222'>%1</t>", _tooltipText]
             ]] call _setInfoText;
@@ -127,6 +128,14 @@ private _showSelectedEntry = {
                 };
                 case "BASE_BUILDING": {
                     [_actionCtrl, "Base Building", true, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                };
+                case "GARAGE_BUILD": {
+                    [_actionCtrl, "Build Garage", true, _tooltipText] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                };
+                case "GARAGE_INFO": {
+                    [_actionCtrl, "Garage Ready", true, _tooltipText] call _setButtonState;
                     [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 case "TIER5_INFO": {
@@ -314,6 +323,12 @@ switch (_modeUpper) do {
             _initialMode = "ZONES";
         };
 
+        private _contextTerminal = missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull];
+        if (isNull _contextTerminal || {_contextTerminal distance2D player > 25}) then {
+            _contextTerminal = objNull;
+        };
+        uiNamespace setVariable ["MWF_DataHub_ContextTerminal", _contextTerminal];
+
         createDialog "MWF_RscDataHub";
         private _display = findDisplay 12200;
         if (isNull _display) exitWith { false };
@@ -342,6 +357,7 @@ switch (_modeUpper) do {
         uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
+        uiNamespace setVariable ["MWF_DataHub_ContextTerminal", objNull];
         true
     };
 
@@ -461,15 +477,31 @@ switch (_modeUpper) do {
 
             switch (_actionMode) do {
                 case "VEHICLE_MENU": {
+                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    ["OPEN", objNull] call MWF_fnc_terminal_vehicleMenu;
+                    ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu;
                     true
                 };
                 case "BASE_BUILDING": {
+                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
                     [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    [objNull] spawn MWF_fnc_enterBuildMode;
+                    [_terminal] spawn MWF_fnc_enterBuildMode;
                     true
+                };
+                case "GARAGE_BUILD": {
+                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
+                    [["VIRTUAL GARAGE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    ["CLOSE"] call MWF_fnc_dataHub;
+                    [_terminal] spawn MWF_fnc_enterBuildMode;
+                    true
+                };
+                case "GARAGE_INFO": {
+                    [["VIRTUAL GARAGE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    if (!isNull _statusCtrl) then {
+                        _statusCtrl ctrlSetText _tooltipText;
+                    };
+                    false
                 };
                 case "TIER5_INFO": {
                     [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;

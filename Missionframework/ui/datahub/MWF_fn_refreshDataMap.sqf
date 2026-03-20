@@ -159,10 +159,23 @@ private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];
 
         case "UPGRADE": {
             private _statusText = toUpper (_meta getOrDefault ["statusText", "LOCKED"]);
-            private _isUnlocked = _meta getOrDefault ["isUnlocked", false];
+            private _isBuilt = _meta getOrDefault ["isBuilt", false];
+            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
+            private _color = "ColorOrange";
+            if ((_statusText find "ATTACK") > -1 || {(_statusText find "OFFLINE") > -1} || {(_statusText find "UNAVAILABLE") > -1}) then {
+                _color = "ColorRed";
+            } else {
+                if (_isBuilt) then {
+                    _color = "ColorGreen";
+                } else {
+                    if (_actionMode in ["BASE_BUILDING", "GARAGE_BUILD"]) then {
+                        _color = "ColorBlue";
+                    };
+                };
+            };
             _marker setMarkerShapeLocal "ICON";
             _marker setMarkerTypeLocal "mil_box";
-            _marker setMarkerColorLocal (if (_isUnlocked) then {"ColorGreen"} else {"ColorOrange"});
+            _marker setMarkerColorLocal _color;
             _marker setMarkerTextLocal format ["%1 [%2]", _label, _statusText];
         };
 

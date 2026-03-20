@@ -132,7 +132,7 @@ class MWF_RscDataHub {
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['CLOSE'] call MWF_fnc_dataHub; ['OPEN', objNull] call MWF_fnc_terminal_vehicleMenu;";
+            action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', _terminal] call MWF_fnc_terminal_vehicleMenu;";
         };
         class BtnBuild: RscButton {
             idc = 12211;
@@ -141,7 +141,7 @@ class MWF_RscDataHub {
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['CLOSE'] call MWF_fnc_dataHub; [objNull] spawn MWF_fnc_enterBuildMode;";
+            action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; [_terminal] spawn MWF_fnc_enterBuildMode;";
         };
         class BtnMainOps: RscButton {
             idc = 12212;

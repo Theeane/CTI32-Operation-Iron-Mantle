@@ -34,6 +34,8 @@ _laptop addAction [
 _laptop addAction [
     "<t color='#66CCFF'>[ OPEN MISSION MAP ]</t>",
     {
+        missionNamespace setVariable ['MWF_CommandTerminal_Object', _target];
+        missionNamespace setVariable ['MWF_CommandTerminal_User', _caller];
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
     },
@@ -43,6 +45,8 @@ _laptop addAction [
 _laptop addAction [
     "<t color='#FFCC66'>[ OPEN MAIN OPERATIONS MAP ]</t>",
     {
+        missionNamespace setVariable ['MWF_CommandTerminal_Object', _target];
+        missionNamespace setVariable ['MWF_CommandTerminal_User', _caller];
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
     },
@@ -52,6 +56,8 @@ _laptop addAction [
 _laptop addAction [
     "<t color='#99DDFF'>[ OPEN REDEPLOY MAP ]</t>",
     {
+        missionNamespace setVariable ['MWF_CommandTerminal_Object', _target];
+        missionNamespace setVariable ['MWF_CommandTerminal_User', _caller];
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "REDEPLOY"] call MWF_fnc_dataHub;
     },
@@ -61,6 +67,8 @@ _laptop addAction [
 _laptop addAction [
     "<t color='#66FFCC'>[ OPEN SUPPORT MAP ]</t>",
     {
+        missionNamespace setVariable ['MWF_CommandTerminal_Object', _target];
+        missionNamespace setVariable ['MWF_CommandTerminal_User', _caller];
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "SUPPORT"] call MWF_fnc_dataHub;
     },
