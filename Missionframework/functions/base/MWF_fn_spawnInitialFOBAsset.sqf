@@ -4,14 +4,21 @@
     Project: Military War Framework
 
     Description:
-    Spawns the initial deployable FOB asset at the MOB spawn pad on fresh campaigns.
+    Spawns the deployable FOB asset at the MOB spawn pad.
+    Fresh campaigns always get the initial asset. Saved campaigns only get a fallback asset
+    if no live FOB terminals currently exist.
     Asset type is driven by the lobby parameter MWF_Param_InitialFOBType.
 */
 
 if (!isServer) exitWith { objNull };
 
-if (missionNamespace getVariable ["MWF_HasCampaignSave", false]) exitWith {
-    diag_log "[MWF FOB] Initial FOB asset spawn skipped because campaign save already exists.";
+private _hasCampaignSave = missionNamespace getVariable ["MWF_HasCampaignSave", false];
+private _liveFOBs = (missionNamespace getVariable ["MWF_FOB_Registry", []]) select {
+    !isNull (_x param [1, objNull])
+};
+
+if (_hasCampaignSave && {(count _liveFOBs) > 0}) exitWith {
+    diag_log "[MWF FOB] Initial FOB asset spawn skipped because saved campaign already has live FOBs.";
     objNull
 };
 
@@ -93,7 +100,8 @@ missionNamespace setVariable ["MWF_InitialFOBAssetRef", _asset, true];
 [_asset] call MWF_fnc_initFOB;
 
 diag_log format [
-    "[MWF FOB] Initial FOB asset spawned: %1 (%2) at %3.",
+    "[MWF FOB] %1 FOB asset spawned: %2 (%3) at %4.",
+    if (_hasCampaignSave) then {"Saved-campaign fallback"} else {"Initial"},
     if (_paramValue == 1) then {"BOX"} else {"TRUCK"},
     _assetClass,
     _spawnPos
