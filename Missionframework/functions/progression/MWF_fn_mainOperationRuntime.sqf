@@ -1,0 +1,185 @@
+/*
+    Author: OpenAI / ChatGPT
+    Function: MWF_fnc_mainOperationRuntime
+    Project: Military War Framework
+
+    Description:
+    Server-side runtime coordinator for main operations.
+    It bridges the gap between START-only launch and later phase callbacks by
+    monitoring the currently active phase task and advancing the operation when
+    that task is marked succeeded.
+
+    Modes:
+    - START   : initialize runtime state and start monitoring
+    - MONITOR : monitor current phase task until it advances
+    - STOP    : clear runtime state for a specific operation
+*/
+
+if (!isServer) exitWith { false };
+
+params [
+    ["_mode", "START", [""]],
+    ["_arg1", "", ["", createHashMap]],
+    ["_arg2", [], [[], [0,0,0]]],
+    ["_arg3", "", [""]]
+];
+
+private _buildSequence = {
+    params [["_key", "", [""]]];
+    switch (toUpper _key) do {
+        case "SKY_GUARDIAN": {
+            [
+                ["Task_SkyGuardian_S1", "MID_1"],
+                ["Task_SkyGuardian_S2", "END"],
+                ["Task_SkyGuardian_S3", "COMPLETE"]
+            ]
+        };
+        case "POINT_BLANK": {
+            [
+                ["Task_PointBlank_S1", "MID_1"],
+                ["Task_PointBlank_S2", "MID_2"],
+                ["Task_PointBlank_S3", "MID_3"],
+                ["Task_PointBlank_S4", "END"],
+                ["Task_PointBlank_S5", "COMPLETE"]
+            ]
+        };
+        case "SEVERED_NERVE": {
+            [
+                ["Task_SeveredNerve_S1", "MID_1"],
+                ["Task_SeveredNerve_S2", "MID_2"],
+                ["Task_SeveredNerve_S3", "MID_3"],
+                ["Task_SeveredNerve_S4", "END"],
+                ["Task_SeveredNerve_S5", "COMPLETE"]
+            ]
+        };
+        case "STASIS_STRIKE": {
+            [
+                ["Task_StasisStrike_S1", "MID_1"],
+                ["Task_StasisStrike_S2", "MID_2"],
+                ["Task_StasisStrike_S3", "END"],
+                ["Task_StasisStrike_S4", "COMPLETE"]
+            ]
+        };
+        case "STEEL_RAIN": {
+            [
+                ["Task_SteelRain_S1", "MID"],
+                ["Task_SteelRain_S2", "END"],
+                ["Task_SteelRain_S3", "COMPLETE"]
+            ]
+        };
+        case "APEX_PREDATOR": {
+            [
+                ["Task_Apex_S1", "MID_1"],
+                ["Task_Apex_S2", "MID_2"],
+                ["Task_Apex_S3", "MID_3"],
+                ["Task_Apex_S4", "END"],
+                ["Task_Apex_S5", "COMPLETE"]
+            ]
+        };
+        default { [] };
+    };
+};
+
+private _runtimeMap = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
+if (isNil "_runtimeMap" || { !(_runtimeMap isEqualType createHashMap) }) then {
+    _runtimeMap = createHashMap;
+};
+
+switch (toUpper _mode) do {
+    case "START": {
+        _arg1 params [
+            ["_key", "", [""]],
+            ["_fnName", "", [""]],
+            ["_title", "", [""]],
+            ["_position", [0,0,0], [[]]],
+            ["_requestOwner", 0, [0]]
+        ];
+
+        if (_key isEqualTo "" || {_fnName isEqualTo ""}) exitWith { false };
+
+        private _sequence = [_key] call _buildSequence;
+        if (_sequence isEqualTo []) exitWith {
+            [format ["Main operation runtime sequence missing for %1.", _key]] remoteExecCall ["systemChat", _requestOwner];
+            false
+        };
+
+        private _fn = missionNamespace getVariable [_fnName, objNull];
+        if (isNil "_fn" || {_fn isEqualTo objNull}) exitWith {
+            [format ["Main operation function not found: %1", _fnName]] remoteExecCall ["systemChat", _requestOwner];
+            false
+        };
+
+        private _record = createHashMapFromArray [
+            ["key", _key],
+            ["functionName", _fnName],
+            ["title", _title],
+            ["position", _position],
+            ["sequence", _sequence],
+            ["phaseIndex", 0],
+            ["active", true],
+            ["startedAt", serverTime]
+        ];
+
+        _runtimeMap set [_key, _record];
+        missionNamespace setVariable ["MWF_MainOperationRuntime", _runtimeMap, true];
+
+        ["START", _position] call _fn;
+        ["MONITOR", _key] spawn MWF_fnc_mainOperationRuntime;
+        true
+    };
+
+    case "MONITOR": {
+        private _key = _arg1;
+        if (_key isEqualTo "") exitWith { false };
+
+        while {true} do {
+            private _allRuntime = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
+            if (isNil "_allRuntime" || { !(_allRuntime isEqualType createHashMap) }) exitWith { false };
+
+            private _record = _allRuntime getOrDefault [_key, createHashMap];
+            if !(_record isEqualType createHashMap) exitWith { false };
+            if !(_record getOrDefault ["active", false]) exitWith { true };
+            if !((missionNamespace getVariable ["MWF_CurrentGrandOperation", ""]) isEqualTo _key) exitWith { true };
+
+            private _sequence = _record getOrDefault ["sequence", []];
+            private _phaseIndex = _record getOrDefault ["phaseIndex", 0];
+            if (_phaseIndex >= count _sequence) exitWith {
+                _record set ["active", false];
+                _allRuntime set [_key, _record];
+                missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                true
+            };
+
+            private _phaseData = _sequence # _phaseIndex;
+            _phaseData params ["_taskId", "_nextState"];
+            private _taskState = [_taskId] call BIS_fnc_taskState;
+            if (_taskState isEqualTo "SUCCEEDED") then {
+                private _fnName = _record getOrDefault ["functionName", ""];
+                private _position = _record getOrDefault ["position", [0,0,0]];
+                private _fn = missionNamespace getVariable [_fnName, objNull];
+                if (!(isNil "_fn") && {!(_fn isEqualTo objNull)}) then {
+                    [_nextState, _position] call _fn;
+                };
+
+                _record set ["phaseIndex", _phaseIndex + 1];
+                if (_nextState isEqualTo "COMPLETE") then {
+                    _record set ["active", false];
+                };
+                _allRuntime set [_key, _record];
+                missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+            };
+
+            sleep 2;
+        };
+    };
+
+    case "STOP": {
+        private _key = _arg1;
+        if !(_key isEqualType "") exitWith { false };
+        _runtimeMap deleteAt _key;
+        missionNamespace setVariable ["MWF_MainOperationRuntime", _runtimeMap, true];
+        true
+    };
+
+    default { false };
+};

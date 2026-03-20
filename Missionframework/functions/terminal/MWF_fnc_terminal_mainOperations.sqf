@@ -160,7 +160,15 @@ switch (toUpper _mode) do {
             [format ["Grand Operation function not found: %1", _fnName]] remoteExecCall ["systemChat", _requestOwner];
         };
 
-        ["START", _position] call _fn;
+        if (isNil "MWF_fnc_mainOperationRuntime") exitWith {
+            missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+            ["Main operation runtime bridge is unavailable."] remoteExecCall ["systemChat", _requestOwner];
+        };
+
+        ["START", [_key, _fnName, _title, _position, _requestOwner]] call MWF_fnc_mainOperationRuntime;
 
         [["MAIN OPERATION", format ["%1 launched in %2.", _title, _zoneName]], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         [format ["Grand Operation started: %1", _title]] remoteExecCall ["systemChat", _requestOwner];
