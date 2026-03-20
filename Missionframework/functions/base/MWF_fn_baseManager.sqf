@@ -13,7 +13,9 @@ params [
     ["_data", nil]
 ];
 
-if (!isServer) exitWith {};
+private _modeUpper = toUpper _mode;
+
+if (!isServer && {!(_modeUpper in ["CAN_DEPLOY", "GET_REDEPLOY_LIST", "GET_ACTIVE"])}) exitWith {};
 
 if (isNil "MWF_FOB_Registry") then {
     missionNamespace setVariable ["MWF_FOB_Registry", [], true];
@@ -22,7 +24,7 @@ if (isNil "MWF_FOB_Registry") then {
 private _registry = missionNamespace getVariable ["MWF_FOB_Registry", []];
 private _mobName = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
 
-switch (toUpper _mode) do {
+switch (_modeUpper) do {
     case "CAN_DEPLOY": {
         _data params [["_pos", [], [[]]]];
 
@@ -32,7 +34,8 @@ switch (toUpper _mode) do {
         private _mobMinDist = 1000;
 
         if (_currentCount >= _maxFOBs) exitWith {
-            [format ["Logistical Limit Reached: %1/%2 FOBs active.", _currentCount, _maxFOBs]] remoteExec ["systemChat", remoteExecutedOwner];
+            private _msg = format ["Logistical Limit Reached: %1/%2 FOBs active.", _currentCount, _maxFOBs];
+            if (isServer) then { [_msg] remoteExec ["systemChat", remoteExecutedOwner]; } else { systemChat _msg; };
             false
         };
 
@@ -44,7 +47,7 @@ switch (toUpper _mode) do {
         };
 
         if ((_pos distance _mobPos) < _mobMinDist) exitWith {
-            ["Deployment Failed: Must be 1000m from MOB to deploy FOB."] remoteExec ["systemChat", remoteExecutedOwner];
+            if (isServer) then { ["Deployment Failed: Must be 1000m from MOB to deploy FOB."] remoteExec ["systemChat", remoteExecutedOwner]; } else { systemChat "Deployment Failed: Must be 1000m from MOB to deploy FOB."; };
             false
         };
 
@@ -62,7 +65,8 @@ switch (toUpper _mode) do {
 
         private _tooClose = _allBases findIf { _x distance _pos < _minDist } > -1;
         if (_tooClose) exitWith {
-            [format ["Deployment Failed: Too close to another base! (Min %1m)", _minDist]] remoteExec ["systemChat", remoteExecutedOwner];
+            private _msg = format ["Deployment Failed: Too close to another base! (Min %1m)", _minDist];
+            if (isServer) then { [_msg] remoteExec ["systemChat", remoteExecutedOwner]; } else { systemChat _msg; };
             false
         };
 
@@ -91,7 +95,7 @@ switch (toUpper _mode) do {
         {
             _x params ["_marker", "_obj", ["_name", "FOB", [""]]];
             if (!isNull _obj) then {
-                private _status = _obj getVariable ["MWF_AttackStatus", "SAFE"];
+                private _status = if (_obj getVariable ["MWF_FOB_IsDamaged", false]) then {"DAMAGED"} else {if (_obj getVariable ["MWF_isUnderAttack", false]) then {"UNDER ATTACK"} else {"SAFE"}};
                 _list pushBack [getPosATL _obj, _name, _status];
             };
         } forEach _registry;

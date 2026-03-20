@@ -7,7 +7,7 @@
     Upgrades the base tier using the authoritative Supplies pool.
 */
 
-if (!isServer) exitWith {};
+if (!isServer) exitWith { [_this select 0, _this select 1] remoteExecCall ["MWF_fnc_upgradeBaseTier", 2]; };
 
 private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];

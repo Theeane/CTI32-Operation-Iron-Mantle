@@ -89,12 +89,6 @@ if (_assetSiren != "") then {
 };
 
 private _locker = objNull;
-if (_assetLocker != "") then {
-    private _lockerPos = [ASLToATL _posAsl, 4, _dir - 110] call BIS_fnc_relPos;
-    _locker = createVehicle [_assetLocker, _lockerPos, [], 0, "NONE"];
-    _locker setDir (_dir + 70);
-    _locker allowDamage false;
-};
 
 private _lamp = objNull;
 if (_assetLamp != "") then {

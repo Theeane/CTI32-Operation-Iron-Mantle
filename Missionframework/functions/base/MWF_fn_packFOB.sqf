@@ -25,7 +25,7 @@ _actionIds pushBack ([
     {},
     {
         params ["_target", "_caller"];
-        [_target, "TRUCK"] remoteExec ["MWF_fnc_executeRepack", 2];
+        [_target, "TRUCK"] remoteExec ["MWF_fnc_repackFOB", 2];
     },
     {},
     [],
@@ -46,7 +46,7 @@ _actionIds pushBack ([
     {},
     {
         params ["_target", "_caller"];
-        [_target, "BOX"] remoteExec ["MWF_fnc_executeRepack", 2];
+        [_target, "BOX"] remoteExec ["MWF_fnc_repackFOB", 2];
     },
     {},
     [],

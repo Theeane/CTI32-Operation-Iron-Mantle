@@ -9,6 +9,7 @@
 
 params [["_laptop", objNull, [objNull]], ["_caller", objNull, [objNull]]];
 
+if (!isServer) exitWith { [_laptop, _caller] remoteExecCall ["MWF_fnc_depositIntel", 2]; };
 if (isNull _caller) exitWith {};
 
 private _tempIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
@@ -19,10 +20,9 @@ if (_tempIntel <= 0) exitWith {
 
 private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _newIntel = _currentIntel + _tempIntel;
-
-missionNamespace setVariable ["MWF_res_intel", _newIntel, true];
-missionNamespace setVariable ["MWF_Intel", _newIntel, true];
-missionNamespace setVariable ["MWF_Currency", (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + _newIntel, true];
+private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+[_supplies, _newIntel, _notoriety] call MWF_fnc_syncEconomyState;
 
 _caller setVariable ["MWF_carriedIntelValue", 0, true];
 _caller setVariable ["MWF_carryingIntel", false, true];
