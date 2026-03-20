@@ -25,6 +25,7 @@ private _keys = [
     "MWF_Save_WorldTierFloor",
     "MWF_Save_WorldTierHalfMapLock",
     "MWF_Save_WorldTierProgressBlockedRemaining",
+    "MWF_Save_WorldTierBlockImmuneRemaining",
     "MWF_Save_TierFreeze_Active",
     "MWF_Save_TierFreeze_Remaining",
     "MWF_Save_GlobalThreatPercent",

@@ -33,6 +33,19 @@ if (_className isEqualTo "") exitWith { false };
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 
+private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
+private _hasRequiredUpgradeStructure = {
+    params [["_requiredUnlockLocal", "", [""]]];
+    private _structureClass = switch (toUpper _requiredUnlockLocal) do {
+        case "HELI": { missionNamespace getVariable ["MWF_Heli_Tower_Class", ""] };
+        case "JETS": { missionNamespace getVariable ["MWF_Jet_Control_Class", ""] };
+        default { "" };
+    };
+    if (_structureClass isEqualTo "") exitWith { false };
+    ({ typeOf _x isEqualTo _structureClass } count (nearestObjects [_mobPos, [_structureClass], 120])) > 0
+};
+
 private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
     case "HELI": { missionNamespace getVariable ["MWF_Unlock_Heli", false] };
     case "JETS": { missionNamespace getVariable ["MWF_Unlock_Jets", false] };
@@ -41,6 +54,16 @@ private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
 };
 if !_unlockSatisfied exitWith {
     systemChat format ["Vehicle locked: %1 unlock required.", if (_requiredUnlock isEqualTo "") then {"category"} else {_requiredUnlock}];
+    false
+};
+
+if (_isTier5 && {!(missionNamespace getVariable ["MWF_Unlock_Tier5", false])}) exitWith {
+    systemChat "Vehicle locked: complete Apex Predator first.";
+    false
+};
+
+if ((toUpper _requiredUnlock) in ["HELI", "JETS"] && {!([_requiredUnlock] call _hasRequiredUpgradeStructure)}) exitWith {
+    systemChat format ["Vehicle locked: build the %1 structure at the MOB first.", if ((toUpper _requiredUnlock) isEqualTo "HELI") then {"Helicopter Uplink"} else {"Aircraft Control"}];
     false
 };
 

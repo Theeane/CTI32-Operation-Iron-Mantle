@@ -140,6 +140,7 @@ missionNamespace setVariable ["MWF_WorldTierProgress", [profileNamespace getVari
 missionNamespace setVariable ["MWF_WorldTierFloor", [profileNamespace getVariable ["MWF_Save_WorldTierFloor", 1], 1, 5, 1] call _clampNumber, true];
 missionNamespace setVariable ["MWF_WorldTierHalfMapLock", profileNamespace getVariable ["MWF_Save_WorldTierHalfMapLock", false], true];
 missionNamespace setVariable ["MWF_WorldTierProgressBlockedUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierProgressBlockedRemaining", 0], 0, 86400, 0] call _clampNumber), true];
+missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", serverTime + ([profileNamespace getVariable ["MWF_Save_WorldTierBlockImmuneRemaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_TierFreeze_Active", profileNamespace getVariable ["MWF_Save_TierFreeze_Active", false], true];
 missionNamespace setVariable ["MWF_TierFreeze_EndTime", serverTime + ([profileNamespace getVariable ["MWF_Save_TierFreeze_Remaining", 0], 0, 86400, 0] call _clampNumber), true];
 missionNamespace setVariable ["MWF_GlobalThreatPercent", [profileNamespace getVariable ["MWF_Save_GlobalThreatPercent", 0], 0, 100, 0] call _clampNumber, true];

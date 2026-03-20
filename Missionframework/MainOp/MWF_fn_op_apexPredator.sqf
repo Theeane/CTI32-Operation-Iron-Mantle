@@ -99,6 +99,8 @@ switch (_state) do {
         private _impactProfile = ["main", "apex_predator"] call MWF_fnc_getMissionImpactProfile;
         private _alreadyUnlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
 
+        private _impactContext = createHashMapFromArray [["loud", true]];
+
         if (_alreadyUnlocked) then {
             private _fallbackSupplies = _impactProfile getOrDefault ["fallbackSupplies", 0];
             private _fallbackIntel = _impactProfile getOrDefault ["fallbackIntel", 0];
@@ -106,13 +108,15 @@ switch (_state) do {
             if (_fallbackSupplies > 0) then { [_fallbackSupplies, "SUPPLIES"] call MWF_fnc_addResource; };
             if (_fallbackIntel > 0) then { [_fallbackIntel, "INTEL"] call MWF_fnc_addResource; };
 
+            _impactContext set ["suppressFallbackRewards", true];
+
             [["RESEARCH CACHE SECURED", format ["Tier 5 unlock already secured. Operation converted to %1 Supplies and %2 Intel.", _fallbackSupplies, _fallbackIntel]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         } else {
             missionNamespace setVariable ["MWF_Unlock_Tier5", true, true];
             [["MAXIMUM TIER UNLOCKED", "Tier 5 Base Upgrades are now available. The peak of technology is ours."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         };
 
-        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+        private _impactResult = [_impactProfile, _impactContext] call MWF_fnc_applyMissionImpact;
 
         ["APEX_PREDATOR"] call MWF_fnc_finalizeMainOperation;
         diag_log "[MWF Grand Op] Apex Predator: Operation Complete. Tier 5 Unlocked.";

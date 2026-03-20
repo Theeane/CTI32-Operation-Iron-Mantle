@@ -396,7 +396,7 @@ switch (_modeUpper) do {
             switch (_actionMode) do {
                 case "VEHICLE_MENU": {
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    [objNull] call MWF_fnc_terminal_vehicleMenu;
+                    ["OPEN", objNull] call MWF_fnc_terminal_vehicleMenu;
                     true
                 };
                 case "BASE_BUILDING": {
@@ -511,49 +511,12 @@ switch (_modeUpper) do {
             true
         };
 
-
         if (_modeNow isEqualTo "UPGRADES") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
-            private _tooltipText = _meta getOrDefault ["tooltipText", "Upgrade locked."];
-
-            switch (_actionMode) do {
-                case "VEHICLE_MENU": {
-                    ["CLOSE"] call MWF_fnc_dataHub;
-                    [objNull] call MWF_fnc_terminal_vehicleMenu;
-                    true
-                };
-                case "BASE_BUILDING": {
-                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    ["CLOSE"] call MWF_fnc_dataHub;
-                    [objNull] call MWF_fnc_enterBuildMode;
-                    true
-                };
-                case "TIER5_INFO": {
-                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    if (!isNull _statusCtrl) then {
-                        _statusCtrl ctrlSetText _tooltipText;
-                    };
-                    false
-                };
-                default {
-                    if (!isNull _statusCtrl) then {
-                        _statusCtrl ctrlSetText _tooltipText;
-                    };
-                    false
-                };
-            };
-        };
-
-        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
             ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
             true
         };
 
-        if (_modeNow isEqualTo "UPGRADES") exitWith {
+        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
             ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
             true
         };

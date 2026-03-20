@@ -39,7 +39,7 @@ class MWF_Terminal_Dialog {
             idc = 9104; text = "UPGRADES";
             x = 0.55 * safezoneW + safezoneX; y = 0.15 * safezoneH + safezoneY;
             w = 0.12 * safezoneW; h = 0.06 * safezoneH;
-            onButtonClick = "closeDialog 0; ['OPEN', 'ZONES'] call MWF_fnc_dataHub;";
+            onButtonClick = "closeDialog 0; ['OPEN', 'UPGRADES'] call MWF_fnc_dataHub;";
         };
         class Btn_Intel: RscStandardButton {
             idc = 9105; text = "MAIN OPERATIONS";

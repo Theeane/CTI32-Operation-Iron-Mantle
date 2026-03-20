@@ -84,10 +84,16 @@ switch (_state) do {
         };
 
         private _impactProfile = ["main", "stasis_strike"] call MWF_fnc_getMissionImpactProfile;
-        [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+        private _impactResult = [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
+
+        private _freezeMessage = if (_impactResult getOrDefault ["fallbackUsed", false]) then {
+            format ["Freeze effect unavailable. Operation converted to %1 Supplies and %2 Intel.", _impactResult getOrDefault ["suppliesGranted", 0], _impactResult getOrDefault ["intelGranted", 0]]
+        } else {
+            "Enemy command is in disarray. Tier progression and main-op threat progression halted for 60 minutes."
+        };
 
         [
-            ["OPFOR PROGRESSION FROZEN", "Enemy command is in disarray. Tier progression and main-op threat progression halted for 60 minutes."],
+            ["OPFOR PROGRESSION FROZEN", _freezeMessage],
             "success"
         ] remoteExec ["MWF_fnc_showNotification", 0];
 

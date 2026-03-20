@@ -114,7 +114,7 @@ class MWF_RscDataHub {
             y = 0.155 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
-            action = "['CLOSE'] call MWF_fnc_dataHub; [objNull] call MWF_fnc_terminal_vehicleMenu;";
+            action = "['CLOSE'] call MWF_fnc_dataHub; ['OPEN', objNull] call MWF_fnc_terminal_vehicleMenu;";
         };
         class BtnBuild: RscButton {
             idc = 12211;

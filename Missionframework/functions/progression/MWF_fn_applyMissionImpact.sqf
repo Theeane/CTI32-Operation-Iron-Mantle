@@ -33,6 +33,7 @@ private _fallbackIntel = _profile getOrDefault ["fallbackIntel", 100];
 private _blockTierProgressSeconds = _profile getOrDefault ["blockTierProgressSeconds", 0];
 private _blockMainOpThreatSeconds = _profile getOrDefault ["blockMainOpThreatSeconds", 0];
 private _note = _profile getOrDefault ["note", ""];
+private _suppressFallbackRewards = _context getOrDefault ["suppressFallbackRewards", false];
 
 private _result = createHashMapFromArray [
     ["kind", _kind],
@@ -72,8 +73,10 @@ if (_kind isEqualTo "main") then {
     if ((_effectiveThreatDelta > 0 || {_effectiveTierDelta > 0}) && {_mainOpThreatBlockedUntil > _now}) then {
         _effectiveThreatDelta = 0;
         _effectiveTierDelta = 0;
-        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
-        _grantedIntel = _grantedIntel + _fallbackIntel;
+        if (!_suppressFallbackRewards) then {
+            _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+            _grantedIntel = _grantedIntel + _fallbackIntel;
+        };
         _fallbackUsed = true;
         _note = if (_note isEqualTo "") then {"Main-op strategic progression blocked."} else {format ["%1 Main-op strategic progression blocked.", _note]};
     };
@@ -81,8 +84,10 @@ if (_kind isEqualTo "main") then {
     if (_blockTierProgressSeconds > 0 && {_tierBlockImmuneUntil > _now}) then {
         _blockTierProgressSeconds = 0;
         _blockMainOpThreatSeconds = 0;
-        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
-        _grantedIntel = _grantedIntel + _fallbackIntel;
+        if (!_suppressFallbackRewards) then {
+            _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+            _grantedIntel = _grantedIntel + _fallbackIntel;
+        };
         _fallbackUsed = true;
         _note = if (_note isEqualTo "") then {"Tier block immunity active."} else {format ["%1 Tier block immunity active.", _note]};
     };
@@ -90,8 +95,10 @@ if (_kind isEqualTo "main") then {
     if (_blockTierAlreadyActive) then {
         _blockTierProgressSeconds = 0;
         _blockMainOpThreatSeconds = 0;
-        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
-        _grantedIntel = _grantedIntel + _fallbackIntel;
+        if (!_suppressFallbackRewards) then {
+            _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+            _grantedIntel = _grantedIntel + _fallbackIntel;
+        };
         _fallbackUsed = true;
         _note = if (_note isEqualTo "") then {"Tier block already active."} else {format ["%1 Tier block already active.", _note]};
     };
@@ -107,16 +114,20 @@ if (!_loud && {_effectiveThreatDelta > 0}) then {
 
 if (_effectiveTierDelta > 0 && {(_tierProgressBlockedUntil > _now) || (missionNamespace getVariable ["MWF_TierFreeze_Active", false])}) then {
     _effectiveTierDelta = 0;
-    _grantedSupplies = _grantedSupplies + _fallbackSupplies;
-    _grantedIntel = _grantedIntel + _fallbackIntel;
+    if (!_suppressFallbackRewards) then {
+        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+        _grantedIntel = _grantedIntel + _fallbackIntel;
+    };
     _fallbackUsed = true;
 };
 
 if (_effectiveTierDelta < 0 && {_halfMapLock}) then {
     if (_score <= _floorScore) then {
         _effectiveTierDelta = 0;
-        _grantedSupplies = _grantedSupplies + _fallbackSupplies;
-        _grantedIntel = _grantedIntel + _fallbackIntel;
+        if (!_suppressFallbackRewards) then {
+            _grantedSupplies = _grantedSupplies + _fallbackSupplies;
+            _grantedIntel = _grantedIntel + _fallbackIntel;
+        };
         _fallbackUsed = true;
     } else {
         private _targetScore = (_score + _effectiveTierDelta) max _floorScore;
