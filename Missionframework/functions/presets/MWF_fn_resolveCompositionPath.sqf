@@ -46,12 +46,37 @@ private _resolvedDomain = [_domain, "land"] call _normalize;
 private _resolvedCategory = [_category, ""] call _normalize;
 private _key = toLower _compositionKey;
 
+private _normalizeEra = {
+    params ["_value"];
+    switch (toLower _value) do {
+        case "ww2";
+        case "worldwar2";
+        case "world_war2";
+        case "world_war_2": { "world_war_2" };
+        case "gm";
+        case "globalmobilization";
+        case "global_mobilization": { "global_mobilization" };
+        default { toLower _value };
+    };
+};
+
+private _normalizeCategory = {
+    params ["_value"];
+    switch (toLower _value) do {
+        case "leaderhq";
+        case "leader_hq": { "leader_hq" };
+        default { toLower _value };
+    };
+};
+
+_era = [_era] call _normalizeEra;
 private _parts = _key splitString "_";
 if (_resolvedCategory isEqualTo "") then {
     if ((count _parts) > 0) then {
         _resolvedCategory = _parts # 0;
     };
 };
+_resolvedCategory = [_resolvedCategory] call _normalizeCategory;
 
 if !(_resolvedCategory in ["disrupt", "intel", "supply", "tutorial", "leader_hq"]) exitWith {""};
 if !(_resolvedDomain in ["land", "naval", "air"]) then {

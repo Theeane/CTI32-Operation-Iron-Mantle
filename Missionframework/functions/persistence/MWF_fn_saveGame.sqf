@@ -123,6 +123,8 @@ profileNamespace setVariable ["MWF_Save_Unlock_Heli", missionNamespace getVariab
 profileNamespace setVariable ["MWF_Save_Unlock_Jets", missionNamespace getVariable ["MWF_Unlock_Jets", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Tier5", missionNamespace getVariable ["MWF_Unlock_Tier5", false]];
+profileNamespace setVariable ["MWF_Save_CampaignAnalytics", + (missionNamespace getVariable ["MWF_Campaign_Analytics", []])];
+profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []])];
 private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap];
 private _cooldownPairs = [];
 if (_cooldownMap isEqualType createHashMap) then {

@@ -52,6 +52,8 @@ private _keys = [
     "MWF_Save_FOBAttackState",
     "MWF_Save_RebelLeaderRespawnState",
     "MWF_Save_DamagedFOBs",
+    "MWF_Save_CampaignAnalytics",
+    "MWF_Save_AuthenticatedPlayers",
     "MWF_Save_StartSupplies",
     "MWF_Save_SupplyTimer",
     "MWF_Save_CivReputation",

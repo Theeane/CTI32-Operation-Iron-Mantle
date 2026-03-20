@@ -295,16 +295,13 @@ saveProfileNamespace;
 diag_log "[MWF] Preset manager initialized.";
 
 
-// Optional Tier 5 vehicle categories. Keep them empty by default so presets can opt in cleanly.
+// Optional Tier 5 vehicle categories. Always normalize + broadcast them after the
+// active BLUFOR preset has loaded so clients never inherit stale arrays.
 {
-    if (isNil { missionNamespace getVariable _x }) then {
-        missionNamespace setVariable [_x, [], true];
-    };
+    missionNamespace setVariable [_x, + (missionNamespace getVariable [_x, []]), true];
 } forEach [
     "MWF_Preset_Light_T5",
-    "MWF_Preset_APC_T5",
     "MWF_Preset_Armor_T5",
-    "MWF_Preset_Tanks_T5",
     "MWF_Preset_Helis_T5",
     "MWF_Preset_Jets_T5"
 ];

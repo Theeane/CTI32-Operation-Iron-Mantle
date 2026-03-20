@@ -26,6 +26,34 @@ if !(_check # 0) exitWith {
 };
 
 private _cost = [_className] call MWF_fnc_getBuildAssetCost;
+private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+private _mainBasePos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
+private _heliClass = missionNamespace getVariable ["MWF_Heli_Tower_Class", ""];
+private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
+private _isHeliUpgrade = (_heliClass isNotEqualTo "") && {_className isEqualTo _heliClass};
+private _isJetUpgrade = (_jetClass isNotEqualTo "") && {_className isEqualTo _jetClass};
+
+if (_isHeliUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Heli", false])}) exitWith {
+    deleteVehicle _entity;
+    if (!isNull _builder) then {
+        ["Helicopter Uplink is locked. Complete Sky Guardian first."] remoteExec ["systemChat", owner _builder];
+    };
+};
+
+if (_isJetUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Jets", false])}) exitWith {
+    deleteVehicle _entity;
+    if (!isNull _builder) then {
+        ["Aircraft Control is locked. Complete Point Blank first."] remoteExec ["systemChat", owner _builder];
+    };
+};
+
+if ((_isHeliUpgrade || _isJetUpgrade) && {(_entity distance2D _mainBasePos) > 120}) exitWith {
+    deleteVehicle _entity;
+    if (!isNull _builder) then {
+        ["This upgrade structure can only be built at the MOB."] remoteExec ["systemChat", owner _builder];
+    };
+};
+
 private _current = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
 
 if (_current < _cost) exitWith {
@@ -40,6 +68,14 @@ _entity setVariable ["MWF_BuildCost", _cost, true];
 
 if (!isNull _builder) then {
     [format ["Asset deployed: -%1 Supplies", _cost]] remoteExec ["systemChat", owner _builder];
+};
+
+if (_isHeliUpgrade) then {
+    [["BASE UPGRADE ONLINE", "Helicopter uplink constructed. Helicopters are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+};
+
+if (_isJetUpgrade) then {
+    [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 };
 
 diag_log format ["[MWF BaseBuild] %1 placed by %2 for %3 supplies.", _className, _builder, _cost];

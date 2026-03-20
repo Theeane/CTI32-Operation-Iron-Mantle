@@ -45,6 +45,7 @@ switch (_modeUpper) do {
         private _heliUnlocked = missionNamespace getVariable ["MWF_Unlock_Heli", false];
         private _jetUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
         private _tier5Unlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
+        private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
 
         private _upgradeEntries = [
             [
@@ -83,10 +84,10 @@ switch (_modeUpper) do {
                     ["requiredOperation", "Apex Predator"],
                     ["description", "Extends the player base progression path to Tier 5. Vehicle presets may place special Tier 5 assets at the bottom of their categories."],
                     ["isUnlocked", _tier5Unlocked],
-                    ["isBuilt", _tier5Unlocked],
-                    ["statusText", if (_tier5Unlocked) then {"Unlocked"} else {"Locked"}],
-                    ["tooltipText", if (_tier5Unlocked) then {"Base Tier 5 progression is unlocked."} else {"Requires main operation: Apex Predator."}],
-                    ["actionMode", if (_tier5Unlocked) then {"VEHICLE_MENU"} else {"LOCKED"}]
+                    ["isBuilt", _tier5Unlocked && {_currentTier >= 5}],
+                    ["statusText", if (!_tier5Unlocked) then {"Locked"} else {if (_currentTier >= 5) then {"Complete"} else {"Ready"}}],
+                    ["tooltipText", if (!_tier5Unlocked) then {"Requires main operation: Apex Predator."} else {if (_currentTier >= 5) then {"Tier 5 base progression is active. Tier 5 preset entries now appear at the bottom of the vehicle menu categories."} else {"Use [ UPGRADE BASE TIER ] at the Command Network to advance from Tier 4 to Tier 5."}}],
+                    ["actionMode", if (_tier5Unlocked) then {"TIER5_INFO"} else {"LOCKED"}]
                 ]
             ]
         ];

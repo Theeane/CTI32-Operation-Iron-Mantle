@@ -90,6 +90,10 @@ private _showSelectedEntry = {
                     [_actionCtrl, "Base Building", true] call _setButtonState;
                     [_leftCtrl, "Main Ops", true] call _setButtonState;
                 };
+                case "TIER5_INFO": {
+                    [_actionCtrl, "Tier 5 Info", true] call _setButtonState;
+                    [_leftCtrl, "Main Ops", true] call _setButtonState;
+                };
                 default {
                     [_actionCtrl, "Locked", false] call _setButtonState;
                     [_leftCtrl, "Main Ops", true] call _setButtonState;
@@ -401,6 +405,13 @@ switch (_modeUpper) do {
                     [objNull] call MWF_fnc_enterBuildMode;
                     true
                 };
+                case "TIER5_INFO": {
+                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    if (!isNull _statusCtrl) then {
+                        _statusCtrl ctrlSetText _tooltipText;
+                    };
+                    false
+                };
                 default {
                     if (!isNull _statusCtrl) then {
                         _statusCtrl ctrlSetText _tooltipText;
@@ -520,6 +531,13 @@ switch (_modeUpper) do {
                     ["CLOSE"] call MWF_fnc_dataHub;
                     [objNull] call MWF_fnc_enterBuildMode;
                     true
+                };
+                case "TIER5_INFO": {
+                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
+                    if (!isNull _statusCtrl) then {
+                        _statusCtrl ctrlSetText _tooltipText;
+                    };
+                    false
                 };
                 default {
                     if (!isNull _statusCtrl) then {
