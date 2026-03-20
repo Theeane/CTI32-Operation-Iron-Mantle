@@ -122,6 +122,9 @@ if (_taskId != "") then {
 
 _activeMissions deleteAt _missionIndex;
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
+if (!isNil "MWF_fnc_sideMissionRuntime") then {
+    ["CLEANUP", _resolvedMissionKey] call MWF_fnc_sideMissionRuntime;
+};
 
 private _boardSlots = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
 private _slotEntryIndex = _boardSlots findIf { (_x # 4) isEqualTo _resolvedMissionKey };

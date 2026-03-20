@@ -108,12 +108,6 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                                 _slotIndex = (_boardSlots # _slotEntryIndex) # 0;
                             };
 
-                            private _boardSlots = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
-                            private _slotMissionDefinition = [];
-                            if (_slotEntryIndex >= 0) then {
-                                _slotMissionDefinition = (_boardSlots # _slotEntryIndex) param [11, [], [[]]];
-                            };
-
                             private _slotData = [
                                 _slotIndex,
                                 _category,
@@ -125,11 +119,10 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
                                 _zoneId,
                                 _zoneName,
                                 "active",
-                                _domain,
-                                _slotMissionDefinition
+                                _domain
                             ];
 
-                            [_slotData, objNull, _category, _difficulty, _missionId, _slotMissionDefinition] call MWF_fnc_executeMissionTemplate;
+                            [_slotData, objNull, _category, _difficulty, _missionId, _savedMissionDefinition] call MWF_fnc_executeMissionTemplate;
 
                             private _missionRestored = ((missionNamespace getVariable ["MWF_ActiveSideMissions", []]) findIf {
                                 (_x # 0) isEqualTo _missionKey

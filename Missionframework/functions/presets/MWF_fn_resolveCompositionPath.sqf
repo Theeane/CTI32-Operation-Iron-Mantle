@@ -6,7 +6,7 @@
     Description:
     Resolves a composition key against the staged era/domain/type composition structure.
     Patch 3A introduces the new layout:
-    preset/compositions/{era}/{domain}/{type}/...
+    Missionframework/preset/compositions/{era}/{domain}/{type}/...
 
     Runtime rules in 3A:
     - composition era defaults to modern
@@ -53,7 +53,7 @@ if (_resolvedCategory isEqualTo "") then {
     };
 };
 
-if !(_resolvedCategory in ["disrupt", "intel", "supply"]) exitWith {""};
+if !(_resolvedCategory in ["disrupt", "intel", "supply", "tutorial", "leader_hq"]) exitWith {""};
 if !(_resolvedDomain in ["land", "naval", "air"]) then {
     _resolvedDomain = "land";
 };
