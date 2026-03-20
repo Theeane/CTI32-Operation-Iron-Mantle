@@ -76,14 +76,22 @@ switch (_state) do {
         };
 
         // REWARD LOGIC
-        missionNamespace setVariable ["MWF_Unlock_Armor", true, true];
-        
-        [
-            ["ARMORED ASSETS ONLINE", "Heavy armor and APCs are now available for purchase."],
-            "success"
-        ] remoteExec ["MWF_fnc_showNotification", 0];
-        
         private _impactProfile = ["main", "steel_rain"] call MWF_fnc_getMissionImpactProfile;
+        private _alreadyUnlocked = missionNamespace getVariable ["MWF_Unlock_Armor", false];
+
+        if (_alreadyUnlocked) then {
+            private _fallbackSupplies = _impactProfile getOrDefault ["fallbackSupplies", 0];
+            private _fallbackIntel = _impactProfile getOrDefault ["fallbackIntel", 0];
+
+            if (_fallbackSupplies > 0) then { [_fallbackSupplies, "SUPPLIES"] call MWF_fnc_addResource; };
+            if (_fallbackIntel > 0) then { [_fallbackIntel, "INTEL"] call MWF_fnc_addResource; };
+
+            [["DEPOT STOCKPILES SECURED", format ["Armor unlock already secured. Operation converted to %1 Supplies and %2 Intel.", _fallbackSupplies, _fallbackIntel]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+        } else {
+            missionNamespace setVariable ["MWF_Unlock_Armor", true, true];
+            [["ARMORED ASSETS ONLINE", "Heavy armor and APCs are now available for purchase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+        };
+
         [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
 
         ["STEEL_RAIN"] call MWF_fnc_finalizeMainOperation;

@@ -1,4 +1,3 @@
-sqf
 // Author: Theane / ChatGPT
 // Project: Mission War Framework
 

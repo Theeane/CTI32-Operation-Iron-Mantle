@@ -69,11 +69,13 @@ private _blockTierAlreadyActive = _blockTierProgressSeconds > 0 && {(_tierProgre
 private _blockMainThreatAlreadyActive = _blockMainOpThreatSeconds > 0 && {_mainOpThreatBlockedUntil > _now};
 
 if (_kind isEqualTo "main") then {
-    if (_effectiveThreatDelta > 0 && {_mainOpThreatBlockedUntil > _now}) then {
+    if ((_effectiveThreatDelta > 0 || {_effectiveTierDelta > 0}) && {_mainOpThreatBlockedUntil > _now}) then {
         _effectiveThreatDelta = 0;
+        _effectiveTierDelta = 0;
         _grantedSupplies = _grantedSupplies + _fallbackSupplies;
         _grantedIntel = _grantedIntel + _fallbackIntel;
         _fallbackUsed = true;
+        _note = if (_note isEqualTo "") then {"Main-op strategic progression blocked."} else {format ["%1 Main-op strategic progression blocked.", _note]};
     };
 
     if (_blockTierProgressSeconds > 0 && {_tierBlockImmuneUntil > _now}) then {

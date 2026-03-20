@@ -96,10 +96,22 @@ switch (_state) do {
         ["Task_PointBlank_S5", "SUCCEEDED"] call BIS_fnc_taskSetState;
         ["Task_PointBlank_Parent", "SUCCEEDED"] call BIS_fnc_taskSetState;
 
-        missionNamespace setVariable ["MWF_Unlock_Jets", true, true];
-        
-        [["STRATEGIC VICTORY", "Jet assets are now operational at the main airbase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
         private _impactProfile = ["main", "point_blank"] call MWF_fnc_getMissionImpactProfile;
+        private _alreadyUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
+
+        if (_alreadyUnlocked) then {
+            private _fallbackSupplies = _impactProfile getOrDefault ["fallbackSupplies", 0];
+            private _fallbackIntel = _impactProfile getOrDefault ["fallbackIntel", 0];
+
+            if (_fallbackSupplies > 0) then { [_fallbackSupplies, "SUPPLIES"] call MWF_fnc_addResource; };
+            if (_fallbackIntel > 0) then { [_fallbackIntel, "INTEL"] call MWF_fnc_addResource; };
+
+            [["STRATEGIC CACHE SECURED", format ["Jet unlock already secured. Operation converted to %1 Supplies and %2 Intel.", _fallbackSupplies, _fallbackIntel]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+        } else {
+            missionNamespace setVariable ["MWF_Unlock_Jets", true, true];
+            [["STRATEGIC VICTORY", "Jet assets are now operational at the main airbase."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+        };
+
         [_impactProfile, createHashMapFromArray [["loud", true]]] call MWF_fnc_applyMissionImpact;
 
         ["POINT_BLANK"] call MWF_fnc_finalizeMainOperation;
