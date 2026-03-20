@@ -77,6 +77,13 @@ if (_mode == "DESPAWN") exitWith {
     missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
     missionNamespace setVariable ["MWF_isUnderAttack", false, true];
 
+    [
+        [
+            "FOB LOST",
+            format ["%1 collapsed and has been lost. Any build assets at that FOB are gone.", _displayName]
+        ],
+        "warning"
+    ] remoteExec ["MWF_fnc_showNotification", 0];
     [format ["%1 has collapsed and has been lost.", _displayName]] remoteExec ["systemChat", 0];
 
     private _remainingFOBs = (missionNamespace getVariable ["MWF_FOB_Registry", []]) select { !isNull (_x param [1, objNull]) };

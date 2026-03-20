@@ -19,6 +19,7 @@ if (_pendingVehicles isEqualTo []) exitWith {
 };
 
 private _restoredCount = 0;
+private _failedCount = 0;
 {
     _x params [
         ["_className", "", [""]],
@@ -33,6 +34,7 @@ private _restoredCount = 0;
     if (_className isNotEqualTo "") then {
         private _veh = createVehicle [_className, [0, 0, 0], [], 0, "CAN_COLLIDE"];
         if (isNull _veh) then {
+            _failedCount = _failedCount + 1;
             diag_log format ["[MWF Persistence] Failed to restore vehicle class %1.", _className];
         } else {
 
@@ -63,6 +65,7 @@ private _restoredCount = 0;
 
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", [], true];
 missionNamespace setVariable ["MWF_SessionVehiclesRestored", true, true];
+missionNamespace setVariable ["MWF_LastRestoreSummary", [_restoredCount, _failedCount], true];
 
-diag_log format ["[MWF Persistence] Restored %1 bought vehicle(s).", _restoredCount];
+diag_log format ["[MWF Persistence] Restored %1 bought vehicle(s). Failed: %2.", _restoredCount, _failedCount];
 true

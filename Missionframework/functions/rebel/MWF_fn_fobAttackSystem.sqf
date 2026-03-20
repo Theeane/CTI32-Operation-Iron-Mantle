@@ -249,8 +249,20 @@ if (_mode == "TERMINAL_DESTROYED") exitWith {
     ["ATTACH", _terminal] remoteExec ["MWF_fnc_fobRepairInteraction", 0, true];
     ["START", _terminal] spawn MWF_fnc_fobDespawnSystem;
 
+    if (_marker isNotEqualTo "") then {
+        _marker setMarkerColor "ColorRed";
+    };
+
+    private _remainingMinutes = ceil (((_deadline - diag_tickTime) max 0) / 60);
     private _msg = format ["%1 terminal knocked offline. Repair it before the FOB collapses.", _displayName];
     [_msg] remoteExec ["systemChat", 0];
+    [
+        [
+            "FOB TERMINAL OFFLINE",
+            format ["%1 disabled. Redeploy to this FOB is offline. Repair cost: %2 Supplies | Collapse in ~%3 minute(s). MOB and other FOBs remain usable.", _displayName, _repairCost, _remainingMinutes]
+        ],
+        "warning"
+    ] remoteExec ["MWF_fnc_showNotification", 0];
 
     [getPosASL _terminal, _displayName, _marker] call _scheduleLeaderRespawn;
 
@@ -293,6 +305,9 @@ if (_mode == "RESTORE_PENDING") exitWith {
             } else {
                 _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
                 _targetTerminal allowDamage true;
+                if (_targetMarker isNotEqualTo "") then {
+                    _targetMarker setMarkerColor "ColorOrange";
+                };
                 missionNamespace setVariable ["MWF_isUnderAttack", true, true];
                 missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _targetName, _targetMarker, diag_tickTime + _remaining], true];
 
@@ -330,10 +345,16 @@ if (_mode == "RESTORE_PENDING") exitWith {
                     ) then {
                         _terminal setVariable ["MWF_isUnderAttack", false, true];
                         _terminal allowDamage false;
+                        private _displayNameLocal = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
+                        private _markerLocal = _terminal getVariable ["MWF_FOB_Marker", ""];
+                        if (_markerLocal isNotEqualTo "") then {
+                            _markerLocal setMarkerColor "ColorBLUFOR";
+                        };
                         missionNamespace setVariable ["MWF_isUnderAttack", false, true];
                         missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
-                        [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
-                        ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
+                        [format ["%1 has survived the rebel assault.", _displayNameLocal]] remoteExec ["systemChat", 0];
+                        [["FOB DEFENDED", format ["%1 survived the rebel assault. Terminal access restored.", _displayNameLocal]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+                        ["SCHEDULE_RESPAWN", getPosASL _terminal, _displayNameLocal, _markerLocal] call MWF_fnc_fobAttackSystem;
                     };
                 };
             };
@@ -398,11 +419,21 @@ if (_mode == "START") then {
 
     _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
     _targetTerminal allowDamage true;
+    if (_marker isNotEqualTo "") then {
+        _marker setMarkerColor "ColorOrange";
+    };
     missionNamespace setVariable ["MWF_isUnderAttack", true, true];
     missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _displayName, _marker, _attackEndAt], true];
 
     private _startMsg = format ["Rebel cells are assaulting %1 after the leader was killed. Defend the FOB for 15 minutes.", _displayName];
     [_startMsg] remoteExec ["systemChat", 0];
+    [
+        [
+            "FOB UNDER ATTACK",
+            format ["%1 is under assault for 15 minutes. Only this FOB terminal is locked. MOB and other FOBs remain usable.", _displayName]
+        ],
+        "warning"
+    ] remoteExec ["MWF_fnc_showNotification", 0];
 
     if (!isNil "MWF_fnc_requestDelayedSave") then {
         [] call MWF_fnc_requestDelayedSave;
@@ -442,15 +473,21 @@ if (_mode == "START") then {
         ) then {
             _terminal setVariable ["MWF_isUnderAttack", false, true];
             _terminal allowDamage false;
+            private _displayNameLocal = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
+            private _markerLocal = _terminal getVariable ["MWF_FOB_Marker", ""];
+            if (_markerLocal isNotEqualTo "") then {
+                _markerLocal setMarkerColor "ColorBLUFOR";
+            };
             missionNamespace setVariable ["MWF_isUnderAttack", false, true];
             missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
-            [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
+            [format ["%1 has survived the rebel assault.", _displayNameLocal]] remoteExec ["systemChat", 0];
+            [["FOB DEFENDED", format ["%1 survived the rebel assault. Terminal access restored.", _displayNameLocal]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 
             if (!isNil "MWF_fnc_requestDelayedSave") then {
                 [] call MWF_fnc_requestDelayedSave;
             };
 
-            ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
+            ["SCHEDULE_RESPAWN", getPosASL _terminal, _displayNameLocal, _markerLocal] call MWF_fnc_fobAttackSystem;
         };
     };
 

@@ -27,3 +27,52 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 
 // Log completion
 diag_log format ["[MWF] SUCCESS: Player initialization completed for %1.", name player];
+
+[] spawn {
+    uiSleep 3;
+
+    if !(missionNamespace getVariable ["MWF_HasCampaignSave", false]) exitWith {};
+
+    private _loadSummary = missionNamespace getVariable ["MWF_LastLoadSummary", []];
+    if (_loadSummary isEqualType [] && {count _loadSummary >= 6}) then {
+        _loadSummary params [
+            ["_phase", "TUTORIAL", [""]],
+            ["_zoneCount", 0, [0]],
+            ["_vehicleCount", 0, [0]],
+            ["_missionCount", 0, [0]],
+            ["_damagedFobCount", 0, [0]],
+            ["_grandOpActive", false, [true]]
+        ];
+
+        private _loadText = format [
+            "Campaign restored. Phase: %1 | Saved zones: %2 | Bought vehicles: %3 | Active side missions: %4 | Damaged FOBs: %5",
+            _phase,
+            _zoneCount,
+            _vehicleCount,
+            _missionCount,
+            _damagedFobCount
+        ];
+        if (_grandOpActive) then {
+            _loadText = _loadText + " | Main operation active";
+        };
+
+        [["SAVE RESTORED", _loadText], "info"] call MWF_fnc_showNotification;
+    };
+
+    uiSleep 2;
+
+    private _restoreSummary = missionNamespace getVariable ["MWF_LastRestoreSummary", []];
+    if (_restoreSummary isEqualType [] && {count _restoreSummary >= 2}) then {
+        _restoreSummary params [
+            ["_restoredVehicles", 0, [0]],
+            ["_failedVehicles", 0, [0]]
+        ];
+
+        private _restoreText = format ["Bought vehicles restored: %1", _restoredVehicles];
+        if (_failedVehicles > 0) then {
+            _restoreText = _restoreText + format [" | Failed restores: %1", _failedVehicles];
+        };
+
+        [["SESSION RESTORE", _restoreText], "info"] call MWF_fnc_showNotification;
+    };
+};

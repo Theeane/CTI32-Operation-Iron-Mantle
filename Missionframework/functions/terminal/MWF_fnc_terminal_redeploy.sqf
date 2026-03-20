@@ -47,7 +47,7 @@ switch (_modeUpper) do {
         private _registry = missionNamespace getVariable ["MWF_FOB_Registry", []];
         {
             _x params ["_marker", "_obj", ["_name", "FOB", [""]]];
-            if (!isNull _obj) then {
+            if (!isNull _obj && !(_obj getVariable ["MWF_FOB_IsDamaged", false])) then {
                 _targets pushBack ["FOB", _name, getPosATL _obj];
             };
         } forEach _registry;

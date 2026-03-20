@@ -73,9 +73,17 @@ private _repairCost = _terminal getVariable ["MWF_FOB_RepairCost", 0];
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
 private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+private _displayName = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
+private _marker = _terminal getVariable ["MWF_FOB_Marker", ""];
 
 if (_supplies < _repairCost) exitWith {
-    [format ["Insufficient Supplies. Required: %1 | Available: %2", _repairCost, _supplies]] remoteExec ["systemChat", owner _caller];
+    [
+        [
+            "FOB REPAIR",
+            format ["Insufficient Supplies. Required: %1 | Available: %2", _repairCost, _supplies]
+        ],
+        "warning"
+    ] remoteExec ["MWF_fnc_showNotification", owner _caller];
 };
 
 [_supplies - _repairCost, _intel, _notoriety] call MWF_fnc_syncEconomyState;
@@ -86,6 +94,10 @@ _terminal setVariable ["MWF_FOB_DespawnDeadline", -1, true];
 _terminal setVariable ["MWF_isUnderAttack", false, true];
 _terminal allowDamage false;
 _terminal setDamage 0;
+
+if (_marker isNotEqualTo "") then {
+    _marker setMarkerColor "ColorBLUFOR";
+};
 
 missionNamespace setVariable ["MWF_isUnderAttack", false, true];
 missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
@@ -100,7 +112,13 @@ missionNamespace setVariable ["MWF_DamagedFOBs", _damaged, true];
 
 ["REMOVE", _terminal] remoteExec ["MWF_fnc_fobRepairInteraction", 0, true];
 
-private _displayName = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
+[
+    [
+        "FOB RESTORED",
+        format ["%1 terminal repaired. Redeploy and terminal access restored. Cost: %2 Supplies.", _displayName, _repairCost]
+    ],
+    "success"
+] remoteExec ["MWF_fnc_showNotification", 0];
 [format ["%1 terminal repaired. FOB operations restored.", _displayName]] remoteExec ["systemChat", 0];
 
 if (!isNil "MWF_fnc_requestDelayedSave") then {

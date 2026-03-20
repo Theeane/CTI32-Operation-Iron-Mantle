@@ -17,10 +17,10 @@ if (isNull _laptop) exitWith {};
 _laptop allowDamage false;
 
 private _condOpenWar = "(missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR'";
-private _condPeace = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(missionNamespace getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condPeace = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
 private _condDamaged = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condAttack = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (missionNamespace getVariable ['MWF_isUnderAttack', false])";
+private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && !(_target getVariable ['MWF_isUnderAttack', false])";
+private _condAttack = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_isUnderAttack', false])";
 
 _laptop addAction [
     "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>",
@@ -86,17 +86,46 @@ _laptop addAction [
 ];
 
 _laptop addAction [
-    "<t color='#FF0000'>[ SYSTEM LOCKDOWN - UNDER ATTACK ]</t>",
-    { hint "Critical Error: Command functions disabled during active engagement. Defend the perimeter!"; },
+    "<t color='#FF0000'>[ SYSTEM LOCKDOWN - LOCAL FOB UNDER ATTACK ]</t>",
+    {
+        params ["_target"];
+        private _displayName = _target getVariable ['MWF_FOB_DisplayName', 'FOB'];
+        private _state = missionNamespace getVariable ['MWF_FOBAttackState', ['idle']];
+        private _remainingText = "Unknown";
+        if ((_state param [0, 'idle']) isEqualTo 'active') then {
+            private _remaining = ((_state param [4, diag_tickTime]) - diag_tickTime) max 0;
+            private _minutes = floor (_remaining / 60);
+            private _seconds = floor (_remaining mod 60);
+            _remainingText = if (_minutes > 0) then {
+                format ['%1m %2s', _minutes, _seconds]
+            } else {
+                format ['%1s', _seconds]
+            };
+        };
+        hint format ["%1 is currently under attack. This FOB computer is locked until the assault ends.\n\nRemaining: %2\n\nThe MOB and other FOB computers remain usable.", _displayName, _remainingText];
+    },
     nil, 6, true, true, "", _condAttack, 5
 ];
 
 _laptop addAction [
     "<t color='#ff8800'>[ TERMINAL OFFLINE - REPAIR REQUIRED ]</t>",
     {
-        params ["_target", "_caller"];
+        params ["_target"];
+        private _displayName = _target getVariable ['MWF_FOB_DisplayName', 'FOB'];
         private _cost = _target getVariable ['MWF_FOB_RepairCost', 0];
-        hint format ["FOB terminal damaged. Repair cost: %1 Supplies.", _cost];
+        private _deadline = _target getVariable ['MWF_FOB_DespawnDeadline', -1];
+        private _remainingText = "Expired";
+        if (_deadline >= 0) then {
+            private _remaining = (_deadline - diag_tickTime) max 0;
+            private _minutes = floor (_remaining / 60);
+            private _seconds = floor (_remaining mod 60);
+            _remainingText = if (_minutes > 0) then {
+                format ['%1m %2s', _minutes, _seconds]
+            } else {
+                format ['%1s', _seconds]
+            };
+        };
+        hint format ["%1 terminal offline.\n\nRepair cost: %2 Supplies\nTime until FOB collapse: %3\n\nRedeploy to this FOB is disabled until the terminal is repaired.", _displayName, _cost, _remainingText];
     },
     nil, 6, true, true, "", _condDamaged, 5
 ];

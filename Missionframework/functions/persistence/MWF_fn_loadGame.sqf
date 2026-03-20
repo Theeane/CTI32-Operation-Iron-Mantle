@@ -207,6 +207,19 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
+missionNamespace setVariable [
+    "MWF_LastLoadSummary",
+    [
+        missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
+        count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]),
+        count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]),
+        count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]),
+        count (missionNamespace getVariable ["MWF_PendingDamagedFOBs", []]),
+        missionNamespace getVariable ["MWF_GrandOperationActive", false]
+    ],
+    true
+];
+
 diag_log format [
     "[MWF] Campaign state restored. Phase: %1 | Pending saved zones: %2 | Pending vehicles: %3 | Pending missions: %4 | Pending leader: %5 | Pending attack: %6 | Pending damaged FOBs: %7.",
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],

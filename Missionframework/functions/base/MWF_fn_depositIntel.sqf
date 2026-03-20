@@ -5,6 +5,7 @@
 
     Description:
     Deposits a player's carried intel into the authoritative shared Intel pool.
+    Adds clearer command-node feedback and post-upload totals.
 */
 
 params [["_laptop", objNull, [objNull]], ["_caller", objNull, [objNull]]];
@@ -15,7 +16,20 @@ if (isNull _caller) exitWith {};
 private _tempIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
 
 if (_tempIntel <= 0) exitWith {
-    ["TaskFailed", ["", "No digital data detected for upload."]] remoteExec ["BIS_fnc_showNotification", _caller];
+    [["INTEL UPLOAD", "No temporary intel is currently being carried."], "warning"] remoteExecCall ["MWF_fnc_showNotification", owner _caller];
+};
+
+private _nodeLabel = "Command Network";
+if (!isNull _laptop) then {
+    if (_laptop getVariable ["MWF_isFOB", false]) then {
+        _nodeLabel = _laptop getVariable ["MWF_FOB_DisplayName", "FOB"];
+    } else {
+        if (_laptop getVariable ["MWF_isMobileRespawn", false]) then {
+            _nodeLabel = _laptop getVariable ["MWF_MRU_DisplayName", "Mobile Respawn Unit"];
+        } else {
+            _nodeLabel = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
+        };
+    };
 };
 
 private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
@@ -28,10 +42,13 @@ _caller setVariable ["MWF_carriedIntelValue", 0, true];
 _caller setVariable ["MWF_carryingIntel", false, true];
 
 [
-    "TaskSucceeded",
-    ["", format ["Data Secured: +%1 Intel uploaded to command network.", _tempIntel]]
-] remoteExec ["BIS_fnc_showNotification", _caller];
+    [
+        "INTEL BANKED",
+        format ["Uploaded %1 Intel at %2. Banked total: %3.", _tempIntel, _nodeLabel, _newIntel]
+    ],
+    "success"
+] remoteExecCall ["MWF_fnc_showNotification", owner _caller];
 
 if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
 
-diag_log format ["[MWF] Economy: %1 deposited %2 Intel. New Intel total: %3.", name _caller, _tempIntel, _newIntel];
+diag_log format ["[MWF] Economy: %1 deposited %2 Intel at %3. New Intel total: %4.", name _caller, _tempIntel, _nodeLabel, _newIntel];

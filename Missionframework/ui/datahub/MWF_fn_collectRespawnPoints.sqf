@@ -40,7 +40,7 @@ private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { get
 
 {
     _x params ["", "_obj", ["_name", "FOB", [""]]];
-    if (!isNull _obj) then {
+    if (!isNull _obj && !(_obj getVariable ["MWF_FOB_IsDamaged", false])) then {
         ["FOB", _name, getPosATL _obj, _obj] call _pushEntry;
     };
 } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
