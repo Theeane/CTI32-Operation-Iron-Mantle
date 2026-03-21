@@ -282,6 +282,7 @@ private _showSelectedEntry = {
                 format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", ""]],
                 format ["<t color='#222222'>Effect: %1</t>", _meta getOrDefault ["effectText", ""]],
                 format ["<t color='#222222'>Fallback Reward: %1</t>", _meta getOrDefault ["fallbackText", ""]],
+                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["costText", format ["Cost: %1 Intel", _meta getOrDefault ["intelCost", 0]]]],
                 format ["<t color='#222222'>Status: %1</t>", _statusText]
             ];
 

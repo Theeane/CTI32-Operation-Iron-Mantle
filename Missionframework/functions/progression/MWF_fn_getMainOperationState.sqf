@@ -43,7 +43,12 @@ if (_record isEqualTo []) exitWith {
         ["readyAt", 0],
         ["readyClockText", "--:--"],
         ["statusText", "Unknown"],
-        ["tooltipText", "Operation metadata unavailable."]
+        ["tooltipText", "Operation metadata unavailable."],
+        ["intelCost", 0],
+        ["effectiveIntelCost", 0],
+        ["hasFreeCharge", false],
+        ["isAffordable", false],
+        ["costText", "Cost unknown"]
     ]
 };
 
@@ -56,7 +61,8 @@ _record params [
     "_effectType",
     "_effectText",
     "_fallbackText",
-    ["_cooldownSeconds", 3600, [0]]
+    ["_cooldownSeconds", 3600, [0]],
+    ["_intelCost", 0, [0]]
 ];
 
 private _now = serverTime;
@@ -74,6 +80,17 @@ private _state = "available";
 private _statusText = "Available";
 private _tooltip = format ["%1 is ready to accept.", _title];
 private _readyClockText = "--:--";
+
+private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
+private _hasFreeCharge = _freeCharges > 0;
+private _effectiveIntelCost = if (_hasFreeCharge) then { 0 } else { _intelCost max 0 };
+private _availableIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _isAffordable = _availableIntel >= _effectiveIntelCost;
+private _costText = if (_hasFreeCharge) then {
+    format ["FREE via intel breakthrough charge (base cost %1 Intel)", _intelCost max 0]
+} else {
+    format ["Cost: %1 Intel", _effectiveIntelCost]
+};
 
 if (_isCoolingDown) then {
     private _minutes = (_cooldownRemaining / 60) call BIS_fnc_floor;
@@ -103,10 +120,19 @@ if (_isCoolingDown) then {
 if (_isActive) then {
     _state = "active";
     _statusText = "Active";
-    _tooltip = format ["%1 is already active.", _title];
+    _tooltip = format ["%1 is already active. %2", _title, _costText];
 } else {
     if (_isCoolingDown) then {
         _state = "cooldown";
+        _tooltip = format ["%1 %2", _tooltip, _costText];
+    } else {
+        if (!_isAffordable) then {
+            _state = "insufficient_intel";
+            _statusText = format ["Need %1 Intel", _effectiveIntelCost];
+            _tooltip = format ["%1 requires %2 Intel. Team bank currently holds %3.", _title, _effectiveIntelCost, _availableIntel];
+        } else {
+            _tooltip = format ["%1 %2", _tooltip, _costText];
+        };
     };
 };
 
@@ -119,6 +145,11 @@ createHashMapFromArray [
     ["effectText", _effectText],
     ["fallbackText", _fallbackText],
     ["cooldownSeconds", _cooldownSeconds],
+    ["intelCost", _intelCost max 0],
+    ["effectiveIntelCost", _effectiveIntelCost max 0],
+    ["hasFreeCharge", _hasFreeCharge],
+    ["isAffordable", _isAffordable],
+    ["costText", _costText],
     ["state", _state],
     ["isAvailable", _state isEqualTo "available"],
     ["isActive", _isActive],

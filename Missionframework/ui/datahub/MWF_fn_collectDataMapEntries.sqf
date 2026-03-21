@@ -321,7 +321,7 @@ switch (_modeUpper) do {
 
         {
             private _entry = _x;
-            _entry params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText", "_cooldownSeconds"];
+            _entry params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText", "_cooldownSeconds", ["_intelCost", 0, [0]]];
             private _placement = if (_placements isEqualTo []) then {
                 []
             } else {
@@ -354,6 +354,9 @@ switch (_modeUpper) do {
                         ["effectText", _effectText],
                         ["fallbackText", _fallbackText],
                         ["cooldownSeconds", _cooldownSeconds],
+                        ["intelCost", _intelCost],
+                        ["effectiveIntelCost", _state getOrDefault ["effectiveIntelCost", _intelCost]],
+                        ["costText", _state getOrDefault ["costText", format ["Cost: %1 Intel", _intelCost]]],
                         ["status", _state getOrDefault ["state", "unknown"]],
                         ["statusText", _state getOrDefault ["statusText", "Unknown"]],
                         ["tooltipText", _state getOrDefault ["tooltipText", ""]],

@@ -35,6 +35,7 @@ switch (toUpper _mode) do {
             _x params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText"];
             private _state = [_key, _x] call MWF_fnc_getMainOperationState;
             private _detailLine = format ["<t size='0.85'>Effect: %1</t>", _effectText];
+            _detailLine = _detailLine + format ["<br/><t size='0.85'>%1</t>", _state getOrDefault ["costText", "Cost: --"]];
             if !(_fallbackText isEqualTo "") then {
                 _detailLine = _detailLine + format ["<br/><t size='0.85'>Fallback: %1</t>", _fallbackText];
             };
@@ -117,7 +118,7 @@ switch (toUpper _mode) do {
         };
 
         private _entry = _ops # _index;
-        _entry params ["_key", "_title"];
+        _entry params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText", "_cooldownSeconds", ["_intelCost", 0, [0]]];
         private _state = [_key, _entry] call MWF_fnc_getMainOperationState;
         if !(_state getOrDefault ["isAvailable", false]) exitWith {
             private _reason = _state getOrDefault ["tooltipText", "Operation unavailable."];
@@ -147,7 +148,7 @@ switch (toUpper _mode) do {
         };
 
         private _entry = _ops # _index;
-        _entry params ["_key", "_title", "_desc", "_fnName"];
+        _entry params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText", "_cooldownSeconds", ["_intelCost", 0, [0]]];
         private _state = [_key, _entry] call MWF_fnc_getMainOperationState;
         if !(_state getOrDefault ["isAvailable", false]) exitWith {
             [(_state getOrDefault ["tooltipText", "Operation unavailable."])] remoteExecCall ["systemChat", _requestOwner];
@@ -172,8 +173,15 @@ switch (toUpper _mode) do {
 
         private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
         private _usedFreeCharge = _freeCharges > 0;
-        if (_usedFreeCharge) then {
-            missionNamespace setVariable ["MWF_FreeMainOpCharges", (_freeCharges - 1) max 0, true];
+        private _intelCostToApply = if (_usedFreeCharge) then { 0 } else { _intelCost max 0 };
+        private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+
+        if (!_usedFreeCharge && {_currentIntel < _intelCostToApply}) exitWith {
+            missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+            [format ["Not enough Intel for %1. Need %2, bank has %3.", _title, _intelCostToApply, _currentIntel]] remoteExecCall ["systemChat", _requestOwner];
         };
 
         private _fn = missionNamespace getVariable [_fnName, objNull];
@@ -193,10 +201,25 @@ switch (toUpper _mode) do {
             ["Main operation runtime bridge is unavailable."] remoteExecCall ["systemChat", _requestOwner];
         };
 
-        ["START", [_key, _fnName, _title, _position, _requestOwner]] call MWF_fnc_mainOperationRuntime;
+        private _started = ["START", [_key, _fnName, _title, _position, _requestOwner]] call MWF_fnc_mainOperationRuntime;
+        if !(_started) exitWith {
+            missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+            missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+            [format ["Grand Operation failed to start: %1", _title]] remoteExecCall ["systemChat", _requestOwner];
+        };
 
-        [["MAIN OPERATION", format ["%1 launched in %2.%3", _title, _zoneName, if (_usedFreeCharge) then {" Intel breakthrough charge consumed."} else {""}]], "info"] remoteExec ["MWF_fnc_showNotification", 0];
+        if (_usedFreeCharge) then {
+            missionNamespace setVariable ["MWF_FreeMainOpCharges", (_freeCharges - 1) max 0, true];
+        } else {
+            private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
+            private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+            [_supplies, (_currentIntel - _intelCostToApply) max 0, _notoriety] call MWF_fnc_syncEconomyState;
+        };
+
+        [["MAIN OPERATION", format ["%1 launched in %2.%3", _title, _zoneName, if (_usedFreeCharge) then {" Intel breakthrough charge consumed."} else {format [" %1 Intel spent.", _intelCostToApply]}]], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         [format ["Grand Operation started: %1", _title]] remoteExecCall ["systemChat", _requestOwner];
-        diag_log format ["[MWF Main Operations] Started %1 at %2 in %3.", _key, _position, _zoneName];
+        diag_log format ["[MWF Main Operations] Started %1 at %2 in %3. IntelCost=%4 UsedFreeCharge=%5", _key, _position, _zoneName, _intelCostToApply, _usedFreeCharge];
     };
 };

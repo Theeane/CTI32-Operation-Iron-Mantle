@@ -10,7 +10,7 @@
 
     Return:
     Array of records:
-    [key, title, description, functionName, impactId, effectType, effectText, fallbackText, cooldownSeconds]
+    [key, title, description, functionName, impactId, effectType, effectText, fallbackText, cooldownSeconds, intelCost]
 */
 
 private _registry = [
@@ -23,7 +23,8 @@ private _registry = [
         "progression",
         "+18 threat / +22 tier progression.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
-        3600
+        3600,
+        100
     ],
     [
         "POINT_BLANK",
@@ -34,7 +35,8 @@ private _registry = [
         "progression",
         "+22 threat / +28 tier progression and unlocks jet assets.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
-        3600
+        3600,
+        150
     ],
     [
         "SEVERED_NERVE",
@@ -45,7 +47,8 @@ private _registry = [
         "tier_reduction",
         "Attempts to reduce OPFOR world tier by 1.",
         "If the Tier 3 floor blocks the reduction, the operation converts to Supplies / Intel instead.",
-        3600
+        3600,
+        175
     ],
     [
         "STASIS_STRIKE",
@@ -56,7 +59,8 @@ private _registry = [
         "tier_block",
         "Blocks OPFOR tier progression and main-op threat progression for 60 minutes.",
         "If a block is already active, the operation converts to Supplies / Intel instead of extending the timer.",
-        3600
+        3600,
+        200
     ],
     [
         "STEEL_RAIN",
@@ -67,7 +71,8 @@ private _registry = [
         "progression",
         "+20 threat / +24 tier progression.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
-        3600
+        3600,
+        125
     ],
     [
         "APEX_PREDATOR",
@@ -78,7 +83,8 @@ private _registry = [
         "progression",
         "+28 threat / +34 tier progression.",
         "No special fallback. Standard main operation rewards still apply if progression is suppressed elsewhere.",
-        3600
+        3600,
+        250
     ]
 ];
 
