@@ -68,7 +68,7 @@ private _primaryFobMin = (_distanceSteps # 0) # 1;
 
 private _readMissionDefinition = {
     params ["_missionPath"];
-    if !fileExists _missionPath exitWith { [] };
+    if !(fileExists _missionPath) exitWith { [] };
 
     private _raw = loadFile _missionPath;
     if (_raw isEqualTo "") exitWith { [] };

@@ -15,6 +15,14 @@ params [
 if (_className isEqualTo "") exitWith {};
 if (!hasInterface) exitWith {};
 
+private _cfg = configFile >> "CfgVehicles" >> _className;
+if !(isClass _cfg) exitWith {
+    systemChat format ["Build failed: unknown class %1.", _className];
+};
+
+private _displayName = getText (_cfg >> "displayName");
+if (_displayName isEqualTo "") then { _displayName = _className; };
+
 // 1. Create the Ghost locally
 private _ghost = _className createVehicleLocal [0, 0, 0];
 _ghost setAllowDamage false;
@@ -32,7 +40,9 @@ private _rotation = 0;
 private _actionConfirm = player addAction ["<t color='#00ff00'>Confirm Placement</t>", { _confirmed = true; }, [], 100, false, false, "", "true"];
 private _actionCancel = player addAction ["<t color='#ff0000'>Cancel Construction</t>", { _aborted = true; }, [], 99, false, false, "", "true"];
 
-hint "PLACEMENT MODE ACTIVE\nUse Q/E to rotate the object.";
+hint format ["PLACEMENT MODE ACTIVE
+%1
+Use Q/E to rotate the object.", _displayName];
 
 // 3. Movement Loop
 while {!_confirmed && !_aborted && alive player} do {
@@ -58,11 +68,11 @@ if (_confirmed) then {
     private _finalPos = player modelToWorld [0, 10, 0];
     private _finalDir = getDir player + _rotation;
 
-    // Call server to spawn the real vehicle and deduct supplies
-    [_className, _finalPos, _finalDir, _price] remoteExec ["MWF_fnc_finalizeBuild", 2];
-    
-    hint "Construction Complete.";
-    diag_log format ["[MWF Build] Player placed %1 at %2 for %3 supplies.", _className, _finalPos, _price];
+    // Call server to validate, charge, and spawn the real object
+    [_className, _finalPos, _finalDir, _price, player] remoteExec ["MWF_fnc_finalizeBuild", 2];
+
+    hint format ["Build request submitted: %1", _displayName];
+    diag_log format ["[MWF Build] Player submitted placement of %1 at %2 (client hint cost %3).", _className, _finalPos, _price];
 } else {
     hint "Construction Aborted.";
     diag_log format ["[MWF Build] Player aborted placement of %1.", _className];

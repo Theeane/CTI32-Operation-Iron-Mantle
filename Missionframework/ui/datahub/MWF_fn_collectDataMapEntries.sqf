@@ -95,6 +95,9 @@ switch (_modeUpper) do {
         private _tier5Unlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
         private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
         private _isMobContext = _contextType isEqualTo "MOB";
+        private _heliBuildCost = if (_heliClass isEqualTo "") then { 0 } else { [_heliClass] call MWF_fnc_getBuildAssetCost };
+        private _jetBuildCost = if (_jetClass isEqualTo "") then { 0 } else { [_jetClass] call MWF_fnc_getBuildAssetCost };
+        private _garageBuildCost = if (_garageClass isEqualTo "") then { 0 } else { missionNamespace getVariable ["MWF_Economy_Cost_MOB_Garage", 300] };
 
         private _garageBuilt = false;
         if (_garageClass isNotEqualTo "") then {
@@ -133,6 +136,23 @@ switch (_modeUpper) do {
 
         private _upgradeEntries = [
             [
+                "Virtual Garage",
+                [(_contextPos # 0), (_contextPos # 1) + 28, 0],
+                createHashMapFromArray [
+                    ["upgradeId", "GARAGE"],
+                    ["description", "Base-local garage structure for storing, retrieving, customizing, and scrapping vehicles at the current MOB/FOB."],
+                    ["baseContextText", _baseContextText],
+                    ["contextTerminal", _contextTerminal],
+                    ["buildClass", _garageClass],
+                    ["buildCost", _garageBuildCost],
+                    ["isUnlocked", !_garageBlocked],
+                    ["isBuilt", _garageBuilt],
+                    ["statusText", if (_garageBlocked) then {if (_garageBlockedReason find "under attack" > -1) then {"FOB Under Attack"} else {if (_garageBlockedReason find "offline" > -1) then {"FOB Offline"} else {"Unavailable"}}} else {if (_garageBuilt) then {"Ready"} else {"Ready To Build"}}],
+                    ["tooltipText", if (_garageBlocked) then {_garageBlockedReason} else {if (_garageBuilt) then {format ["Virtual Garage is online at %1. Use the garage object on foot within 5 meters.", _contextLabel]} else {format ["Place the Virtual Garage at %1 with ghost placement. Cost: %2 Supplies.", _contextLabel, _garageBuildCost]}}],
+                    ["actionMode", if (_garageBlocked) then {"LOCKED"} else {if (_garageBuilt) then {"GARAGE_INFO"} else {"GARAGE_BUILD"}}]
+                ]
+            ],
+            [
                 "Helicopter Uplink",
                 [(_contextPos # 0) - 22, (_contextPos # 1) + 8, 0],
                 createHashMapFromArray [
@@ -141,10 +161,12 @@ switch (_modeUpper) do {
                     ["description", "Unlocks helicopter logistics through a MOB-only upgrade structure."],
                     ["baseContextText", _baseContextText],
                     ["contextTerminal", _contextTerminal],
+                    ["buildClass", _heliClass],
+                    ["buildCost", _heliBuildCost],
                     ["isUnlocked", _heliUnlocked],
                     ["isBuilt", _heliBuilt],
                     ["statusText", if (!_heliUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_heliBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_isMobContext) then {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the helicopter uplink."}} else {_mobOnlyTooltip}}],
+                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_isMobContext) then {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {format ["Place the Helicopter Uplink with ghost placement at the MOB. Cost: %1 Supplies.", _heliBuildCost]}} else {_mobOnlyTooltip}}],
                     ["actionMode", if (!_heliUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_heliBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
                 ]
             ],
@@ -157,31 +179,18 @@ switch (_modeUpper) do {
                     ["description", "Unlocks fixed-wing strike logistics through a MOB-only upgrade structure."],
                     ["baseContextText", _baseContextText],
                     ["contextTerminal", _contextTerminal],
+                    ["buildClass", _jetClass],
+                    ["buildCost", _jetBuildCost],
                     ["isUnlocked", _jetUnlocked],
                     ["isBuilt", _jetBuilt],
                     ["statusText", if (!_jetUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_jetBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_isMobContext) then {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the aircraft control building."}} else {_mobOnlyTooltip}}],
+                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_isMobContext) then {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {format ["Place the Aircraft Control building with ghost placement at the MOB. Cost: %1 Supplies.", _jetBuildCost]}} else {_mobOnlyTooltip}}],
                     ["actionMode", if (!_jetUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_jetBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
                 ]
             ],
             [
-                "Virtual Garage",
-                [(_contextPos # 0), (_contextPos # 1) - 20, 0],
-                createHashMapFromArray [
-                    ["upgradeId", "GARAGE"],
-                    ["description", "Base-local garage structure for storing, retrieving, customizing, and scrapping vehicles at the current MOB/FOB."],
-                    ["baseContextText", _baseContextText],
-                    ["contextTerminal", _contextTerminal],
-                    ["isUnlocked", !_garageBlocked],
-                    ["isBuilt", _garageBuilt],
-                    ["statusText", if (_garageBlocked) then {if (_garageBlockedReason find "under attack" > -1) then {"FOB Under Attack"} else {if (_garageBlockedReason find "offline" > -1) then {"FOB Offline"} else {"Unavailable"}}} else {if (_garageBuilt) then {"Ready"} else {"Ready To Build"}}],
-                    ["tooltipText", if (_garageBlocked) then {_garageBlockedReason} else {if (_garageBuilt) then {format ["Virtual Garage is online at %1. Use the garage object on foot within 5 meters.", _contextLabel]} else {format ["Use Base Building at %1 to place the virtual garage object for this base.", _contextLabel]}}],
-                    ["actionMode", if (_garageBlocked) then {"LOCKED"} else {if (_garageBuilt) then {"GARAGE_INFO"} else {"GARAGE_BUILD"}}]
-                ]
-            ],
-            [
                 "Base Tier 5",
-                [(_contextPos # 0), (_contextPos # 1) + 28, 0],
+                [(_contextPos # 0), (_contextPos # 1) - 20, 0],
                 createHashMapFromArray [
                     ["upgradeId", "TIER5"],
                     ["requiredOperation", "Apex Predator"],

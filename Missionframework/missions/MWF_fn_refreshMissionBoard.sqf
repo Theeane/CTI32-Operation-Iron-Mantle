@@ -30,7 +30,7 @@ if (_registry isEqualTo [] || _placements isEqualTo [] || _supportedDomains isEq
 private _readMissionDefinition = {
     params ["_missionPath"];
 
-    if !fileExists _missionPath exitWith { [] };
+    if !(fileExists _missionPath) exitWith { [] };
 
     private _raw = loadFile _missionPath;
     if (_raw isEqualTo "") exitWith { [] };

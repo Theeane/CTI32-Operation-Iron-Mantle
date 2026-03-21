@@ -127,7 +127,7 @@ private _showSelectedEntry = {
                     [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 case "BASE_BUILDING": {
-                    [_actionCtrl, "Base Building", true, _tooltipText] call _setButtonState;
+                    [_actionCtrl, "Build Upgrade", true, _tooltipText] call _setButtonState;
                     [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
                 };
                 case "GARAGE_BUILD": {
@@ -483,17 +483,31 @@ switch (_modeUpper) do {
                     true
                 };
                 case "BASE_BUILDING": {
-                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
+                    private _buildClass = _meta getOrDefault ["buildClass", ""];
+                    private _buildCost = _meta getOrDefault ["buildCost", 0];
+                    if (_buildClass isEqualTo "") exitWith {
+                        if (!isNull _statusCtrl) then {
+                            _statusCtrl ctrlSetText "Upgrade build data missing.";
+                        };
+                        false
+                    };
                     [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    [_terminal] spawn MWF_fnc_enterBuildMode;
+                    [_buildClass, _buildCost] spawn MWF_fnc_startBuildPlacement;
                     true
                 };
                 case "GARAGE_BUILD": {
-                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
+                    private _buildClass = _meta getOrDefault ["buildClass", ""];
+                    private _buildCost = _meta getOrDefault ["buildCost", 0];
+                    if (_buildClass isEqualTo "") exitWith {
+                        if (!isNull _statusCtrl) then {
+                            _statusCtrl ctrlSetText "Virtual garage build data missing.";
+                        };
+                        false
+                    };
                     [["VIRTUAL GARAGE", _tooltipText], "info"] call MWF_fnc_showNotification;
                     ["CLOSE"] call MWF_fnc_dataHub;
-                    [_terminal] spawn MWF_fnc_enterBuildMode;
+                    [_buildClass, _buildCost] spawn MWF_fnc_startBuildPlacement;
                     true
                 };
                 case "GARAGE_INFO": {
