@@ -6,7 +6,7 @@
     Era: modern
 
     Description:
-    Authored modern land mission template.
+    Official authored modern land mission template.
     Runtime remains mod agnostic:
     - no hardcoded faction classnames in the template
     - OPFOR / civilians / support come from active presets
@@ -32,8 +32,8 @@ private _missionDefinition = [
     ["usesRebels", false],
     ["compositionKey", "intel_briefcase_easy"],
     ["sceneVariant", "briefcase"],
-    ["objectiveAction", "Download Intel"],
-    ["completionNote", "Field intelligence recovered."],
+    ["objectiveAction", "Recover Briefcase"],
+    ["completionNote", "Briefcase data recovered."],
     ["clearRadius", 32],
     ["guardCount", 4],
     ["patrolRadius", 40],
@@ -50,11 +50,11 @@ private _missionDefinition = [
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Modern authored intel mission runtime site."],
+    ["notes", "Official authored modern land intel mission. Runtime stays preset-driven, map agnostic, and category-aware."],
     ["assetRules", [
-        "Use active OPFOR preset infantry scaled by world tier for guards.",
-        "Use civilians from the active preset when the mission definition enables them.",
-        "Use the shared runtime scene for category-specific objective props.",
+        "Use active OPFOR preset infantry scaled by world tier for site security.",
+        "Use active civilian preset ambience only when usesCivilians is true.",
+        "Use sceneVariant to shape the runtime prop cluster and objective presentation.",
         "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];

@@ -44,29 +44,307 @@ private _resolveClass = {
 
 private _objectiveClassForCategory = {
     params [["_category", "disrupt", [""]], ["_variant", "", [""]]];
-    switch (toLower _category) do {
+    private _categoryLower = toLower _category;
+    private _variantLower = toLower _variant;
+
+    switch (_categoryLower) do {
         case "intel": {
-            switch (toLower _variant) do {
-                case "checkpoint_logs": { [["Land_Laptop_unfolded_F", "Land_DataTerminal_01_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
-                case "briefcase": { [["Land_Laptop_unfolded_F", "Land_MapBoard_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+            switch (_variantLower) do {
+                case "checkpoint_logs": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "briefcase": { [["Land_Laptop_unfolded_F", "Land_DataTerminal_01_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "courier_terminal": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "signals": { [["Land_Laptop_unfolded_F", "Land_DataTerminal_01_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "counterinsurgency": { [["Land_Laptop_unfolded_F", "Land_DataTerminal_01_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "uav": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "comms_bunker": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "airdefense": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
+                case "encryption": { [["Land_DataTerminal_01_F", "Land_Laptop_unfolded_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
                 default { [["Land_Laptop_unfolded_F", "Land_DataTerminal_01_F"], "Land_Laptop_unfolded_F"] call _resolveClass };
             };
         };
         case "supply": {
-            switch (toLower _variant) do {
+            switch (_variantLower) do {
                 case "fuel": { [["CargoNet_01_barrels_F", "CargoNet_01_box_F"], "CargoNet_01_box_F"] call _resolveClass };
                 case "ammo": { [["Box_NATO_AmmoVeh_F", "CargoNet_01_box_F"], "CargoNet_01_box_F"] call _resolveClass };
+                case "siege": { [["Box_NATO_AmmoVeh_F", "CargoNet_01_box_F"], "CargoNet_01_box_F"] call _resolveClass };
                 default { [["CargoNet_01_box_F", "Box_NATO_AmmoVeh_F"], "CargoNet_01_box_F"] call _resolveClass };
             };
         };
         default {
-            switch (toLower _variant) do {
+            switch (_variantLower) do {
                 case "fuel_pumps": { [["Land_FuelStation_01_pump_F", "Land_PortableGenerator_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
                 case "relay_mast": { [["Land_TTowerSmall_1_F", "Land_PortableGenerator_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
+                case "command_relay": { [["Land_TTowerSmall_1_F", "Land_DataTerminal_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
+                case "radar_service": { [["Land_TTowerBig_1_F", "Land_TTowerSmall_1_F", "Land_PortableGenerator_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
+                case "hq_spine": { [["Land_DataTerminal_01_F", "Land_PortableGenerator_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
+                case "warhead_rig": { [["Land_Device_assembled_F", "Land_PortableGenerator_01_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
                 default { [["Land_PortableGenerator_01_F", "Land_Device_assembled_F"], "Land_PortableGenerator_01_F"] call _resolveClass };
             };
         };
     }
+};
+
+private _decorOffsetsForMission = {
+    params [["_category", "disrupt", [""]], ["_variant", "", [""]]];
+    private _categoryLower = toLower _category;
+    private _variantLower = toLower _variant;
+
+    switch (_categoryLower) do {
+        case "intel": {
+            switch (_variantLower) do {
+                case "briefcase": {
+                    [
+                        [[1.5, 0.3, 0], "Land_MapBoard_F"],
+                        [[-1.4, -0.6, 0], "Land_PortableDesk_01_black_F"],
+                        [[0.2, 1.8, 0], "Land_File_research_F"]
+                    ]
+                };
+                case "checkpoint_logs": {
+                    [
+                        [[1.7, 0.2, 0], "Land_MapBoard_F"],
+                        [[-1.3, -0.9, 0], "Land_PortableDesk_01_black_F"],
+                        [[0.6, 1.7, 0], "Land_File_research_F"]
+                    ]
+                };
+                case "courier_terminal": {
+                    [
+                        [[1.7, 0.0, 0], "Land_PortableDesk_01_black_F"],
+                        [[-1.3, -0.8, 0], "Land_File_research_F"],
+                        [[0.2, 1.8, 0], "Land_MapBoard_F"]
+                    ]
+                };
+                case "signals": {
+                    [
+                        [[1.6, 0.2, 0], "Land_PortableGenerator_01_F"],
+                        [[-1.5, -0.8, 0], "Land_PortableDesk_01_black_F"],
+                        [[0.5, 1.9, 0], "Land_File_research_F"]
+                    ]
+                };
+                case "counterinsurgency": {
+                    [
+                        [[1.6, 0.2, 0], "Land_MapBoard_F"],
+                        [[-1.5, -0.8, 0], "Land_File_research_F"],
+                        [[0.5, 1.9, 0], "Land_PortableDesk_01_black_F"]
+                    ]
+                };
+                case "uav": {
+                    [
+                        [[1.6, 0.2, 0], "Land_PortableGenerator_01_F"],
+                        [[-1.5, -0.8, 0], "Land_MapBoard_F"],
+                        [[0.5, 1.9, 0], "Land_File_research_F"]
+                    ]
+                };
+                case "comms_bunker": {
+                    [
+                        [[1.6, 0.2, 0], "Land_PortableGenerator_01_F"],
+                        [[-1.5, -0.8, 0], "Land_PortableDesk_01_black_F"],
+                        [[0.5, 1.9, 0], "Land_MapBoard_F"]
+                    ]
+                };
+                case "airdefense": {
+                    [
+                        [[1.6, 0.2, 0], "Land_MapBoard_F"],
+                        [[-1.5, -0.8, 0], "Land_PortableGenerator_01_F"],
+                        [[0.5, 1.9, 0], "Land_File_research_F"]
+                    ]
+                };
+                case "encryption": {
+                    [
+                        [[1.6, 0.2, 0], "Land_PortableDesk_01_black_F"],
+                        [[-1.5, -0.8, 0], "Land_PortableGenerator_01_F"],
+                        [[0.5, 1.9, 0], "Land_File_research_F"]
+                    ]
+                };
+                default {
+                    [
+                        [[1.8, 0.2, 0], "Land_MapBoard_F"],
+                        [[-1.6, -0.8, 0], "Land_PortableDesk_01_black_F"],
+                        [[-0.6, 1.6, 0], "Land_File_research_F"]
+                    ]
+                };
+            };
+        };
+        case "supply": {
+            switch (_variantLower) do {
+                case "medical": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "CargoNet_01_box_F"],
+                        [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+                case "fuel": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_barrels_F"],
+                        [[-1.8, -0.7, 0], "Land_CanisterFuel_F"],
+                        [[0.3, 2.0, 0], "CargoNet_01_box_F"]
+                    ]
+                };
+                case "relief": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "Land_Pallet_MilBoxes_F"],
+                        [[0.3, 2.0, 0], "CargoNet_01_box_F"]
+                    ]
+                };
+                case "ammo": {
+                    [
+                        [[1.9, 0.4, 0], "Box_NATO_AmmoVeh_F"],
+                        [[-1.8, -0.7, 0], "CargoNet_01_box_F"],
+                        [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+                case "hub": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "Box_NATO_AmmoVeh_F"],
+                        [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+                case "convoy": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "CargoNet_01_barrels_F"],
+                        [[0.3, 2.0, 0], "Land_CanisterFuel_F"]
+                    ]
+                };
+                case "armor_node": {
+                    [
+                        [[1.9, 0.4, 0], "Box_NATO_AmmoVeh_F"],
+                        [[-1.8, -0.7, 0], "CargoNet_01_box_F"],
+                        [[0.3, 2.0, 0], "Land_PortableGenerator_01_F"]
+                    ]
+                };
+                case "siege": {
+                    [
+                        [[1.9, 0.4, 0], "Box_NATO_AmmoVeh_F"],
+                        [[-1.8, -0.7, 0], "Box_NATO_AmmoVeh_F"],
+                        [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+                case "sustainment": {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "Land_Pallet_MilBoxes_F"],
+                        [[0.3, 2.0, 0], "CargoNet_01_barrels_F"]
+                    ]
+                };
+                default {
+                    [
+                        [[1.9, 0.4, 0], "CargoNet_01_box_F"],
+                        [[-1.8, -0.7, 0], "Box_NATO_AmmoVeh_F"],
+                        [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+            };
+        };
+        default {
+            switch (_variantLower) do {
+                case "fuel_pumps": {
+                    [
+                        [[2.2, 0.0, 0], "Land_CanisterFuel_F"],
+                        [[-1.8, 1.1, 0], "Land_PortableGenerator_01_F"],
+                        [[0.9, -2.0, 0], "Land_CanisterFuel_F"]
+                    ]
+                };
+                case "relay_mast": {
+                    [
+                        [[2.1, 0.0, 0], "Land_Device_assembled_F"],
+                        [[-1.7, 1.0, 0], "Land_PortableGenerator_01_F"],
+                        [[0.8, -1.8, 0], "Land_ToolTrolley_02_F"]
+                    ]
+                };
+                case "artillery_power": {
+                    [
+                        [[2.1, 0.0, 0], "Land_PortableGenerator_01_F"],
+                        [[-1.7, 1.0, 0], "Land_CanisterFuel_F"],
+                        [[0.8, -1.8, 0], "Land_ToolTrolley_02_F"]
+                    ]
+                };
+                case "motor_pool": {
+                    [
+                        [[2.1, 0.0, 0], "Land_CanisterFuel_F"],
+                        [[-1.7, 1.0, 0], "Land_PortableGenerator_01_F"],
+                        [[0.8, -1.8, 0], "Land_Pallet_MilBoxes_F"]
+                    ]
+                };
+                case "command_relay": {
+                    [
+                        [[2.1, 0.0, 0], "Land_Device_assembled_F"],
+                        [[-1.7, 1.0, 0], "Land_PortableGenerator_01_F"],
+                        [[0.8, -1.8, 0], "Land_MapBoard_F"]
+                    ]
+                };
+                case "radar_service": {
+                    [
+                        [[2.1, 0.0, 0], "Land_PortableGenerator_01_F"],
+                        [[-1.7, 1.0, 0], "Land_Device_assembled_F"],
+                        [[0.8, -1.8, 0], "Land_ToolTrolley_02_F"]
+                    ]
+                };
+                case "warhead_rig": {
+                    [
+                        [[2.1, 0.0, 0], "Land_Device_assembled_F"],
+                        [[-1.7, 1.0, 0], "Land_Pallet_MilBoxes_F"],
+                        [[0.8, -1.8, 0], "Land_CanisterFuel_F"]
+                    ]
+                };
+                case "hq_spine": {
+                    [
+                        [[2.1, 0.0, 0], "Land_Device_assembled_F"],
+                        [[-1.7, 1.0, 0], "Land_PortableGenerator_01_F"],
+                        [[0.8, -1.8, 0], "Land_MapBoard_F"]
+                    ]
+                };
+                default {
+                    [
+                        [[2.2, 0.0, 0], "Land_CanisterFuel_F"],
+                        [[-1.8, 1.1, 0], "Land_PortableGenerator_01_F"],
+                        [[0.9, -2.0, 0], "Land_ToolTrolley_02_F"]
+                    ]
+                };
+            };
+        };
+    }
+};
+
+private _pickCivilianPool = {
+    private _pool = missionNamespace getVariable ["MWF_CIV_Units", missionNamespace getVariable ["MWF_Civ_List", []]];
+    if !(_pool isEqualType []) then { _pool = []; };
+    if (_pool isEqualTo []) then { _pool = ["C_man_1"]; };
+    _pool
+};
+
+private _spawnCivilianElement = {
+    params ["_center", "_unitCount", "_radius"];
+    private _units = [];
+    private _groups = [];
+    private _pool = call _pickCivilianPool;
+
+    if (_pool isEqualTo []) exitWith { [_units, _groups] };
+
+    private _group = createGroup [civilian, true];
+    _groups pushBack _group;
+
+    for "_i" from 1 to (_unitCount max 1) do {
+        private _spawnPos = [_center, 10, _radius, 3, 0, 0.25, 0, [], [_center, _center]] call BIS_fnc_findSafePos;
+        private _unitClass = selectRandom _pool;
+        private _unit = _group createUnit [_unitClass, _spawnPos, [], 0, "NONE"];
+        _unit setBehaviour "SAFE";
+        _unit setSpeedMode "LIMITED";
+        _unit disableAI "TARGET";
+        _unit disableAI "AUTOTARGET";
+        _unit enableDynamicSimulation true;
+        _units pushBack _unit;
+    };
+
+    {
+        _x setBehaviour "SAFE";
+        _x setSpeedMode "LIMITED";
+        [_x, _center, (_radius max 15) min 40] call BIS_fnc_taskPatrol;
+    } forEach _groups;
+
+    [_units, _groups]
 };
 
 private _actionTextForCategory = {
@@ -231,29 +509,7 @@ switch (toUpper _mode) do {
         _objective setVariable ["MWF_SideMissionUsed", false, true];
 
         private _props = [_objective];
-        private _decorOffsets = switch (toLower _category) do {
-            case "intel": {
-                [
-                    [[1.8, 0.2, 0], "Land_MapBoard_F"],
-                    [[-1.6, -0.8, 0], "Land_PortableDesk_01_black_F"],
-                    [[-0.6, 1.6, 0], "Land_File_research_F"]
-                ]
-            };
-            case "supply": {
-                [
-                    [[1.9, 0.4, 0], "CargoNet_01_box_F"],
-                    [[-1.8, -0.7, 0], "Box_NATO_AmmoVeh_F"],
-                    [[0.3, 2.0, 0], "Land_Pallet_MilBoxes_F"]
-                ]
-            };
-            default {
-                [
-                    [[2.2, 0.0, 0], "Land_CanisterFuel_F"],
-                    [[-1.8, 1.1, 0], "Land_PortableGenerator_01_F"],
-                    [[0.9, -2.0, 0], "Land_ToolTrolley_02_F"]
-                ]
-            };
-        };
+        private _decorOffsets = [_category, _variant] call _decorOffsetsForMission;
 
         {
             _x params ["_ofs", "_class"];
@@ -266,6 +522,14 @@ switch (toUpper _mode) do {
 
         private _guardData = [_objectivePos, _guardCount, (_clearRadius + 15), _patrolRadius, _addOfficer] call _spawnGuardElement;
         _guardData params ["_guardUnits", "_guardGroups"];
+
+        private _civilianUnits = [];
+        private _civilianGroups = [];
+        if ([_missionDefinition, "usesCivilians", false] call _getDefinitionValue) then {
+            private _civilianCount = switch (toLower _difficulty) do { case "hard": {3}; case "medium": {2}; default {2}; };
+            private _civilianData = [_objectivePos, _civilianCount, (_clearRadius + 12)] call _spawnCivilianElement;
+            _civilianData params ["_civilianUnits", "_civilianGroups"];
+        };
 
         private _markerName = format ["MWF_SM_%1", _missionKey];
         deleteMarker _markerName;
@@ -323,6 +587,8 @@ switch (toUpper _mode) do {
             ["props", _props],
             ["guards", _guardUnits],
             ["guardGroups", _guardGroups],
+            ["civilians", _civilianUnits],
+            ["civilianGroups", _civilianGroups],
             ["clearRadius", _clearRadius],
             ["completionNote", _completionNote],
             ["variant", _variant]
@@ -413,6 +679,12 @@ switch (toUpper _mode) do {
             {
                 if (!isNull _x) then { deleteGroup _x; };
             } forEach (_record getOrDefault ["guardGroups", []]);
+            {
+                if (!isNull _x) then { deleteVehicle _x; };
+            } forEach (_record getOrDefault ["civilians", []]);
+            {
+                if (!isNull _x) then { deleteGroup _x; };
+            } forEach (_record getOrDefault ["civilianGroups", []]);
 
             private _markerName = _record getOrDefault ["marker", ""];
             private _areaMarkerName = _record getOrDefault ["areaMarker", ""];
