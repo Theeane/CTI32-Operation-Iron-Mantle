@@ -8,8 +8,9 @@
 */
 
 params [["_fobObject", objNull, [objNull]]];
-if (isNull _fobObject) exitWith {};
-if !((_fobObject getVariable ["MWF_FOB_PackActionIds", []]) isEqualTo []) exitWith {};
+if (!hasInterface) exitWith { false };
+if (isNull _fobObject) exitWith { false };
+if !((_fobObject getVariable ["MWF_FOB_PackActionIds_Local", []]) isEqualTo []) exitWith { true };
 
 private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false])";
 private _actionIds = [];
@@ -56,4 +57,4 @@ _actionIds pushBack ([
     false
 ] call BIS_fnc_holdActionAdd);
 
-_fobObject setVariable ["MWF_FOB_PackActionIds", _actionIds, true];
+_fobObject setVariable ["MWF_FOB_PackActionIds_Local", _actionIds];

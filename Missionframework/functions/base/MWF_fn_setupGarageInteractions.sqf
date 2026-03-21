@@ -12,7 +12,7 @@ params [["_garage", objNull, [objNull]]];
 if (!hasInterface) exitWith { false };
 if (isNull _garage) exitWith { false };
 
-private _existing = _garage getVariable ["MWF_Garage_ActionIds", []];
+private _existing = _garage getVariable ["MWF_Garage_ActionIds_Local", []];
 if !(_existing isEqualTo []) exitWith { true };
 
 private _ids = [];
@@ -54,5 +54,5 @@ _ids pushBack (_garage addAction [
     nil, 6, true, true, "", _condOnFoot
 ]);
 
-_garage setVariable ["MWF_Garage_ActionIds", _ids, true];
+_garage setVariable ["MWF_Garage_ActionIds_Local", _ids];
 true

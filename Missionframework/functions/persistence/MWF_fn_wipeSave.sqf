@@ -70,6 +70,7 @@ private _keys = [
     "MWF_Save_Unlock_Tier5",
     "MWF_Save_Perk_HeliDiscount",
     "MWF_Save_GrandOperationState",
+    "MWF_Save_RevealedInfrastructureSites",
     "MWF_Save_CompositionType"
 ];
 

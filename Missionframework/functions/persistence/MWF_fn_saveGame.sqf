@@ -39,7 +39,7 @@ private _boughtVehicles = [];
     };
 } forEach vehicles;
 
-private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
+private _activeSideMissions = [];
 
 private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
 private _mainBasePos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
@@ -184,30 +184,42 @@ if ((_respawnState param [0, ""]) isEqualTo "pending") then {
 };
 
 private _mainOperationState = [];
-private _currentGrandOperation = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
-private _mainOpRuntimeMap = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
-if (
-    (missionNamespace getVariable ["MWF_GrandOperationActive", false]) &&
-    {_currentGrandOperation isNotEqualTo ""} &&
-    {_mainOpRuntimeMap isEqualType createHashMap}
-) then {
-    private _runtimeRecord = _mainOpRuntimeMap getOrDefault [_currentGrandOperation, createHashMap];
-    if (_runtimeRecord isEqualType createHashMap) then {
-        private _runtimeStartedAt = _runtimeRecord getOrDefault ["startedAt", serverTime];
-        _mainOperationState = [
-            _currentGrandOperation,
-            missionNamespace getVariable ["MWF_CurrentGrandOperationTitle", ""],
-            + (missionNamespace getVariable ["MWF_CurrentGrandOperationPlacement", []]),
-            _runtimeRecord getOrDefault ["functionName", ""],
-            + (_runtimeRecord getOrDefault ["position", [0, 0, 0]]),
-            _runtimeRecord getOrDefault ["phaseIndex", 0],
-            (serverTime - _runtimeStartedAt) max 0,
-            missionNamespace getVariable ["MWF_Op_Detected", false],
-            missionNamespace getVariable ["MWF_SkyGuardian_RadarsDestroyed", 0],
-            missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1]
+private _revealedInfrastructureIds = + (missionNamespace getVariable ["MWF_RevealedInfrastructureIDs", []]);
+private _infrastructureRegistry = + (missionNamespace getVariable ["MWF_InfrastructureRegistry", []]);
+private _destroyedHQs = + (missionNamespace getVariable ["MWF_DestroyedHQs", []]);
+private _destroyedRoadblocks = + (missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]);
+private _revealedInfrastructureSites = [];
+{
+    if (_x isEqualType [] && {count _x >= 4}) then {
+        _x params [
+            ["_infraId", "", [""]],
+            ["_infraType", "ROADBLOCK", [""]],
+            ["_object", objNull, [objNull]],
+            ["_storedPos", [0, 0, 0], [[]]]
         ];
+
+        if (_infraId in _revealedInfrastructureIds) then {
+            private _normalizedType = toUpper _infraType;
+            private _pos = if (!isNull _object) then { getPosATL _object } else { +_storedPos };
+            private _destroyedRegistry = if (_normalizedType isEqualTo "HQ") then { _destroyedHQs } else { _destroyedRoadblocks };
+
+            if (
+                (_normalizedType in ["HQ", "ROADBLOCK"]) &&
+                {_pos isEqualType []} &&
+                {(count _pos) >= 2} &&
+                {(_destroyedRegistry findIf { _x distance2D _pos < 35 }) < 0}
+            ) then {
+                private _existingIndex = _revealedInfrastructureSites findIf {
+                    ((_x param [0, ""]) isEqualTo _infraId) ||
+                    (((_x param [1, ""]) isEqualTo _normalizedType) && {((_x param [2, [0, 0, 0], [[]]]) distance2D _pos) < 35})
+                };
+                if (_existingIndex < 0) then {
+                    _revealedInfrastructureSites pushBack [_infraId, _normalizedType, _pos];
+                };
+            };
+        };
     };
-};
+} forEach _infrastructureRegistry;
 
 private _damagedFOBs = [];
 {
@@ -256,16 +268,17 @@ profileNamespace setVariable ["MWF_Save_CivilianCasualties", missionNamespace ge
 profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVariable ["MWF_DestroyedHQs", []]];
 profileNamespace setVariable ["MWF_Save_DestroyedRoadblocks", missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]];
 profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
-profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariable ["MWF_FixedInfrastructure", []]];
-profileNamespace setVariable ["MWF_Save_PotentialBaseSites", missionNamespace getVariable ["MWF_PotentialBaseSites", []]];
+profileNamespace setVariable ["MWF_Save_FixedInfra", []];
+profileNamespace setVariable ["MWF_Save_PotentialBaseSites", []];
 profileNamespace setVariable ["MWF_Save_FreeMainOpCharges", missionNamespace getVariable ["MWF_FreeMainOpCharges", 0]];
 profileNamespace setVariable ["MWF_Save_RevealedInfrastructureIDs", missionNamespace getVariable ["MWF_RevealedInfrastructureIDs", []]];
+profileNamespace setVariable ["MWF_Save_RevealedInfrastructureSites", _revealedInfrastructureSites];
 profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
 profileNamespace setVariable ["MWF_Save_BuiltUpgradeStructures", _builtUpgradeStructures];
-profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
+profileNamespace setVariable ["MWF_Save_ActiveSideMissions", []];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
 profileNamespace setVariable ["MWF_Save_RebelLeaderContext", _leaderContext];
@@ -278,7 +291,7 @@ profileNamespace setVariable ["MWF_Save_Unlock_Jets", missionNamespace getVariab
 profileNamespace setVariable ["MWF_Save_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Tier5", missionNamespace getVariable ["MWF_Unlock_Tier5", false]];
 profileNamespace setVariable ["MWF_Save_Perk_HeliDiscount", missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1]];
-profileNamespace setVariable ["MWF_Save_GrandOperationState", _mainOperationState];
+profileNamespace setVariable ["MWF_Save_GrandOperationState", []];
 profileNamespace setVariable ["MWF_Save_CampaignAnalytics", + (missionNamespace getVariable ["MWF_Campaign_Analytics", []])];
 profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []])];
 private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap];
@@ -319,9 +332,9 @@ private _garageVehicleCount = 0;
         _garageVehicleCount = _garageVehicleCount + count (_x param [1, [], [[]]]);
     };
 } forEach (missionNamespace getVariable ["MWF_GarageStoredVehicles", []]);
-private _missionCount = count _activeSideMissions;
+private _missionCount = 0;
 private _builtUpgradeCount = count _builtUpgradeStructures;
-private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _builtUpgradeStructures) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _builtUpgradeStructures) + (count toArray str _revealedInfrastructureSites) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 

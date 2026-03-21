@@ -14,6 +14,7 @@ if (!isServer) exitWith {[]};
 private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) select { !isNull _x };
 private _placements = [];
 private _allMarkers = allMapMarkers;
+private _allowManualPlacements = !(missionNamespace getVariable ["MWF_HasCampaignSave", false]);
 
 private _collectMarkerSeries = {
     params ["_baseName"];
@@ -27,7 +28,7 @@ private _collectMarkerSeries = {
     _result
 };
 
-private _manualAnchors = ["main_op"] call _collectMarkerSeries;
+private _manualAnchors = if (_allowManualPlacements) then { ["main_op"] call _collectMarkerSeries } else { [] };
 private _mobRef = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
 private _mobPos = if (!isNull _mobRef) then { getPosATL _mobRef } else { getMarkerPos "respawn_west" };
 private _fobObjects = (missionNamespace getVariable ["MWF_FOB_Registry", []]) apply { _x param [1, objNull, [objNull]] };

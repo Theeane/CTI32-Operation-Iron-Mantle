@@ -19,6 +19,7 @@ params [["_mode", "BOOTSTRAP"], ["_params", []]];
 
 private _allMarkers = allMapMarkers;
 private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) select { !isNull _x };
+private _allowManualPlacements = !(missionNamespace getVariable ["MWF_HasCampaignSave", false]);
 private _mobRef = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
 private _mobPos = if (!isNull _mobRef) then { getPosATL _mobRef } else { getMarkerPos "respawn_west" };
 private _fobObjects = (missionNamespace getVariable ["MWF_FOB_Registry", []]) apply { _x param [1, objNull, [objNull]] };
@@ -82,13 +83,36 @@ private _resolveStableInfrastructureId = {
     format ["%1_%2", toLower _normalizedType, _siteIndex]
 };
 
+private _savedRevealedInfrastructureSites = +(missionNamespace getVariable ["MWF_PersistentRevealedInfrastructureSites", []]);
+
+private _findSavedRevealedRecord = {
+    params ["_pos", ["_normalizedType", "ROADBLOCK", [""]]];
+    private _matchIndex = _savedRevealedInfrastructureSites findIf {
+        (_x isEqualType []) &&
+        {(count _x) >= 3} &&
+        {((toUpper (_x param [1, "", [""]])) isEqualTo (toUpper _normalizedType))} &&
+        {((_x param [2, [0, 0, 0], [[]]]) distance2D _pos) < 35}
+    };
+    if (_matchIndex < 0) exitWith { [] };
+    +(_savedRevealedInfrastructureSites # _matchIndex)
+};
+
+private _pushUniqueSite = {
+    params ["_siteList", "_pos"];
+    if !(_pos isEqualType [] && {count _pos >= 2}) exitWith { _siteList };
+    if ((_siteList findIf { (_x distance2D _pos) < 35 }) < 0) then {
+        _siteList pushBack _pos;
+    };
+    _siteList
+};
+
 private _enemyZones = _zones select {
     private _owner = toLower (_x getVariable ["MWF_zoneOwnerState", if (_x getVariable ["MWF_isCaptured", false]) then {"player"} else {"enemy"}]);
     _owner isEqualTo "enemy"
 };
 
 private _generateHQSites = {
-    private _manual = [["hq"] call _collectMarkerSeries] call _manualMarkerPositions;
+    private _manual = if (_allowManualPlacements) then { [["hq"] call _collectMarkerSeries] call _manualMarkerPositions } else { [] };
     if !(_manual isEqualTo []) exitWith { _manual };
 
     private _preferred = _enemyZones select {
@@ -113,7 +137,7 @@ private _generateHQSites = {
 };
 
 private _generateRoadblockSites = {
-    private _manual = [["roadblock"] call _collectMarkerSeries] call _manualMarkerPositions;
+    private _manual = if (_allowManualPlacements) then { [["roadblock"] call _collectMarkerSeries] call _manualMarkerPositions } else { [] };
     if !(_manual isEqualTo []) exitWith { _manual };
 
     private _pool = +_enemyZones;
@@ -142,29 +166,42 @@ private _generateRoadblockSites = {
 if (_mode == "BOOTSTRAP") exitWith {
     if (missionNamespace getVariable ["MWF_InfrastructureBootstrapped", false]) exitWith {};
 
-    private _hqSites = +(missionNamespace getVariable ["MWF_FixedInfrastructure", []]);
-    private _roadblockSites = +(missionNamespace getVariable ["MWF_PotentialBaseSites", []]);
+    private _hqSites = call _generateHQSites;
+    private _roadblockSites = call _generateRoadblockSites;
 
-    if (_hqSites isEqualTo []) then {
-        _hqSites = call _generateHQSites;
-        missionNamespace setVariable ["MWF_FixedInfrastructure", _hqSites, true];
-    };
-    if (_roadblockSites isEqualTo []) then {
-        _roadblockSites = call _generateRoadblockSites;
-        missionNamespace setVariable ["MWF_PotentialBaseSites", _roadblockSites, true];
-    };
+    {
+        private _savedPos = +(_x param [2, [], [[]]]);
+        _hqSites = [_hqSites, _savedPos] call _pushUniqueSite;
+    } forEach (_savedRevealedInfrastructureSites select {
+        (_x isEqualType []) && {(count _x) >= 3} && {((toUpper (_x param [1, "", [""]])) isEqualTo "HQ")}
+    });
 
+    {
+        private _savedPos = +(_x param [2, [], [[]]]);
+        _roadblockSites = [_roadblockSites, _savedPos] call _pushUniqueSite;
+    } forEach (_savedRevealedInfrastructureSites select {
+        (_x isEqualType []) && {(count _x) >= 3} && {((toUpper (_x param [1, "", [""]])) isEqualTo "ROADBLOCK")}
+    });
+
+    missionNamespace setVariable ["MWF_FixedInfrastructure", _hqSites, true];
+    missionNamespace setVariable ["MWF_PotentialBaseSites", _roadblockSites, true];
     missionNamespace setVariable ["MWF_HQSiteRegistry", _hqSites, true];
     missionNamespace setVariable ["MWF_RoadblockSiteRegistry", _roadblockSites, true];
 
     ["REFRESH_FIXED_BASES"] call MWF_fnc_spawnManager;
 
     {
-        ["CREATE_BASE", [_x, "ROADBLOCK", [_x, "ROADBLOCK"] call _resolveStableInfrastructureId]] call MWF_fnc_spawnManager;
+        private _savedRecord = [_x, "ROADBLOCK"] call _findSavedRevealedRecord;
+        private _forcedId = if (_savedRecord isEqualType [] && {count _savedRecord >= 1}) then {
+            _savedRecord param [0, "", [""]]
+        } else {
+            [_x, "ROADBLOCK"] call _resolveStableInfrastructureId
+        };
+        ["CREATE_BASE", [_x, "ROADBLOCK", _forcedId]] call MWF_fnc_spawnManager;
     } forEach _roadblockSites;
 
     missionNamespace setVariable ["MWF_InfrastructureBootstrapped", true, true];
-    diag_log format ["[MWF SPAWN] Infrastructure bootstrapped. HQ sites: %1 | Roadblock sites: %2", count _hqSites, count _roadblockSites];
+    diag_log format ["[MWF SPAWN] Infrastructure bootstrapped. HQ sites: %1 | Roadblock sites: %2 | Saved reveals injected: %3", count _hqSites, count _roadblockSites, count _savedRevealedInfrastructureSites];
 };
 
 if (_mode == "REFRESH_FIXED_BASES") exitWith {
@@ -175,7 +212,13 @@ if (_mode == "REFRESH_FIXED_BASES") exitWith {
         private _pos = _x;
         if !([_pos, _destroyedHQs] call _siteMatchesDestroyed) then {
             if !([_pos, 75] call _siteOccupied) then {
-                ["CREATE_BASE", [_pos, "HQ", [_pos, "HQ"] call _resolveStableInfrastructureId]] call MWF_fnc_spawnManager;
+                private _savedRecord = [_pos, "HQ"] call _findSavedRevealedRecord;
+                private _forcedId = if (_savedRecord isEqualType [] && {count _savedRecord >= 1}) then {
+                    _savedRecord param [0, "", [""]]
+                } else {
+                    [_pos, "HQ"] call _resolveStableInfrastructureId
+                };
+                ["CREATE_BASE", [_pos, "HQ", _forcedId]] call MWF_fnc_spawnManager;
             };
         };
     } forEach _fixedBases;

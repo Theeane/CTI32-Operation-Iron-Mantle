@@ -9,8 +9,9 @@
 
 params [["_terminal", objNull, [objNull]]];
 
-if (isNull _terminal) exitWith {};
-if !((_terminal getVariable ["MWF_FOB_InteractionActionIds", []]) isEqualTo []) exitWith {};
+if (!hasInterface) exitWith { false };
+if (isNull _terminal) exitWith { false };
+if !((_terminal getVariable ["MWF_FOB_InteractionActionIds_Local", []]) isEqualTo []) exitWith { true };
 
 private _actionIds = [];
 
@@ -63,6 +64,6 @@ Intel: %2", _supplies, _intel];
     ]
 );
 
-_terminal setVariable ["MWF_FOB_InteractionActionIds", _actionIds, true];
+_terminal setVariable ["MWF_FOB_InteractionActionIds_Local", _actionIds];
 
 diag_log format ["[MWF FOB] Interaction actions added to terminal %1. Total actions: %2.", _terminal, count _actionIds];

@@ -63,10 +63,6 @@ if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
 [] spawn MWF_fnc_economy;
 [] call MWF_fnc_initMissionSystem;
 
-if (!isNil "MWF_fnc_restoreActiveMainOperation") then {
-    [] call MWF_fnc_restoreActiveMainOperation;
-};
-
 if (!isNil "MWF_fnc_infrastructureManager") then {
     ["INIT"] call MWF_fnc_infrastructureManager;
 };

@@ -68,7 +68,10 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
             [] call MWF_fnc_refreshMissionBoard;
         };
 
-        private _pendingActiveMissions = + (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]);
+        missionNamespace setVariable ["MWF_PendingActiveSideMissions", [], true];
+        missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", true, true];
+
+        private _pendingActiveMissions = [];
         private _successfulRestores = [];
         private _failedRestores = [];
 

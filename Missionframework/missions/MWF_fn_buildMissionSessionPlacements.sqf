@@ -25,6 +25,7 @@ params [
 
 private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) select { !isNull _x };
 private _allMarkers = allMapMarkers;
+private _allowManualPlacements = !(missionNamespace getVariable ["MWF_HasCampaignSave", false]);
 
 private _collectMarkerSeries = {
     params ["_baseName"];
@@ -38,8 +39,8 @@ private _collectMarkerSeries = {
     _result
 };
 
-private _manualLandAnchors = ["side_mission"] call _collectMarkerSeries;
-private _manualNavalAnchors = ["Naval_mission"] call _collectMarkerSeries;
+private _manualLandAnchors = if (_allowManualPlacements) then { ["side_mission"] call _collectMarkerSeries } else { [] };
+private _manualNavalAnchors = if (_allowManualPlacements) then { ["Naval_mission"] call _collectMarkerSeries } else { [] };
 
 private _landEnabled = missionNamespace getVariable ["MWF_Feature_LandEnabled", true];
 private _navalEnabled = missionNamespace getVariable ["MWF_Feature_NavalEnabled", false];

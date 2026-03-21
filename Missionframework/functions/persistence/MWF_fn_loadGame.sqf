@@ -125,10 +125,13 @@ missionNamespace setVariable ["MWF_CivilianCasualties", [profileNamespace getVar
 missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable ["MWF_Save_DestroyedHQs", []], true];
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];
 missionNamespace setVariable ["MWF_FOB_Positions", profileNamespace getVariable ["MWF_Save_FOBs", []], true];
-missionNamespace setVariable ["MWF_FixedInfrastructure", profileNamespace getVariable ["MWF_Save_FixedInfra", []], true];
-missionNamespace setVariable ["MWF_PotentialBaseSites", profileNamespace getVariable ["MWF_Save_PotentialBaseSites", []], true];
+missionNamespace setVariable ["MWF_FixedInfrastructure", [], true];
+missionNamespace setVariable ["MWF_PotentialBaseSites", [], true];
+missionNamespace setVariable ["MWF_HQSiteRegistry", [], true];
+missionNamespace setVariable ["MWF_RoadblockSiteRegistry", [], true];
 missionNamespace setVariable ["MWF_FreeMainOpCharges", [profileNamespace getVariable ["MWF_Save_FreeMainOpCharges", 0], 0, 9999, 0] call _clampNumber, true];
 missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", +(profileNamespace getVariable ["MWF_Save_RevealedInfrastructureIDs", []]), true];
+missionNamespace setVariable ["MWF_PersistentRevealedInfrastructureSites", +(profileNamespace getVariable ["MWF_Save_RevealedInfrastructureSites", []]), true];
 missionNamespace setVariable ["MWF_completedMissions", profileNamespace getVariable ["MWF_Save_Missions", []], true];
 missionNamespace setVariable ["MWF_CurrentTier", [profileNamespace getVariable ["MWF_Save_Tier", 1], 1, 10, 1] call _clampNumber, true];
 missionNamespace setVariable ["MWF_CapturedZoneCount", [profileNamespace getVariable ["MWF_Save_CapturedZoneCount", 0], 0, 100000, 0] call _clampNumber, true];
@@ -153,7 +156,7 @@ missionNamespace setVariable ["MWF_LoadedZoneSaveData", profileNamespace getVari
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", profileNamespace getVariable ["MWF_Save_BoughtVehicles", []], true];
 missionNamespace setVariable ["MWF_GarageStoredVehicles", profileNamespace getVariable ["MWF_Save_GarageStoredVehicles", []], true];
 missionNamespace setVariable ["MWF_PendingBuiltUpgradeStructures", profileNamespace getVariable ["MWF_Save_BuiltUpgradeStructures", []], true];
-missionNamespace setVariable ["MWF_PendingActiveSideMissions", profileNamespace getVariable ["MWF_Save_ActiveSideMissions", []], true];
+missionNamespace setVariable ["MWF_PendingActiveSideMissions", [], true];
 missionNamespace setVariable ["MWF_Campaign_Phase", profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false], true];
 missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", [profileNamespace getVariable ["MWF_Save_RebelLeaderSettlementCount", 0], 0, 100000, 0] call _clampNumber, true];
@@ -172,7 +175,7 @@ missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", [], true];
 missionNamespace setVariable ["MWF_GarageRegistry", [], true];
 missionNamespace setVariable ["MWF_BuiltUpgradeStructuresRestored", false, true];
 missionNamespace setVariable ["MWF_SessionVehiclesRestored", false, true];
-missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", false, true];
+missionNamespace setVariable ["MWF_PendingActiveSideMissionsRestored", true, true];
 missionNamespace setVariable ["MWF_Unlock_Heli", profileNamespace getVariable ["MWF_Save_Unlock_Heli", false], true];
 missionNamespace setVariable ["MWF_Unlock_Jets", profileNamespace getVariable ["MWF_Save_Unlock_Jets", false], true];
 missionNamespace setVariable ["MWF_Unlock_Armor", profileNamespace getVariable ["MWF_Save_Unlock_Armor", false], true];
@@ -193,19 +196,11 @@ private _cooldownMap = createHashMap;
 } forEach _cooldownPairs;
 missionNamespace setVariable ["MWF_MainOperationCooldowns", _cooldownMap, true];
 
-private _grandOperationState = profileNamespace getVariable ["MWF_Save_GrandOperationState", []];
-missionNamespace setVariable ["MWF_PendingGrandOperationState", _grandOperationState, true];
-if (_grandOperationState isEqualType [] && {count _grandOperationState >= 3}) then {
-    missionNamespace setVariable ["MWF_GrandOperationActive", true, true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperation", _grandOperationState param [0, "", [""]], true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", _grandOperationState param [1, "", [""]], true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", + (_grandOperationState param [2, [], [[]]]), true];
-} else {
-    missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-};
+missionNamespace setVariable ["MWF_PendingGrandOperationState", [], true];
+missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
@@ -216,11 +211,11 @@ profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Campaign state restored. Phase: %1 | Pending saved zones: %2 | Pending vehicles: %3 | Pending missions: %4 | Pending leader: %5 | Pending attack: %6 | Pending damaged FOBs: %7.",
+    "[MWF] Campaign state restored. Phase: %1 | Pending saved zones: %2 | Pending vehicles: %3 | Revealed infrastructure sites: %4 | Pending leader: %5 | Pending attack: %6 | Pending damaged FOBs: %7.",
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     count (missionNamespace getVariable ["MWF_LoadedZoneSaveData", []]),
     count (missionNamespace getVariable ["MWF_PendingBoughtVehicles", []]),
-    count (missionNamespace getVariable ["MWF_PendingActiveSideMissions", []]),
+    count (missionNamespace getVariable ["MWF_PersistentRevealedInfrastructureSites", []]),
     count (missionNamespace getVariable ["MWF_PendingRebelLeaderContext", []]),
     count (missionNamespace getVariable ["MWF_PendingFOBAttackState", []]),
     count (missionNamespace getVariable ["MWF_PendingDamagedFOBs", []])
