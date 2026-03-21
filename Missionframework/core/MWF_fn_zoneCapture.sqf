@@ -19,6 +19,8 @@ private _zonePos = getPosWorld _zone;
 private _zoneRange = (_zone getVariable ["MWF_zoneRange", 300]) max 150;
 private _zoneName = _zone getVariable ["MWF_zoneName", "Unknown Zone"];
 private _lossTimerDeadline = 0;
+private _supportRolledThisEngagement = false;
+private _supportContextKey = format ["zone_%1", _zone getVariable ["MWF_zoneID", netId _zone]];
 
 diag_log format ["[MWF Zone Capture] Started capture loop for zone: %1 at %2.", _zoneName, _zonePos];
 
@@ -41,7 +43,20 @@ while { !isNull _zone } do {
     private _friendlyCount = count _friendlyUnits;
     private _isCaptured = _zone getVariable ["MWF_isCaptured", false];
 
-    _zone setVariable ["MWF_contested", (_enemyCount > 0 && _friendlyCount > 0), true];
+    private _isContested = (_enemyCount > 0 && _friendlyCount > 0);
+    private _isDefensePressure = (_isCaptured && {_enemyCount > 0});
+    private _supportShouldRoll = _isContested || _isDefensePressure;
+
+    _zone setVariable ["MWF_contested", _isContested, true];
+
+    if (_supportShouldRoll) then {
+        if (!_supportRolledThisEngagement && {!isNil "MWF_fnc_civRepSupport"}) then {
+            ["TRIGGER", [_zonePos, _supportContextKey, _zone]] call MWF_fnc_civRepSupport;
+            _supportRolledThisEngagement = true;
+        };
+    } else {
+        _supportRolledThisEngagement = false;
+    };
 
     if (!_isCaptured) then {
         if (_friendlyCount > 0 && { _enemyCount == 0 }) then {

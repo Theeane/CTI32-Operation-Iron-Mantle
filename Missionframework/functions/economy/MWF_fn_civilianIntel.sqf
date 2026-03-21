@@ -5,6 +5,7 @@
 
     Description:
     Civilian questioning helper for the temporary intel pipeline.
+    Special task informants route through the civ-rep informant system.
 */
 
 params [
@@ -20,6 +21,10 @@ if (_civ getVariable ["MWF_isQuestioned", false]) exitWith {
 
 _caller playAction "GestureHi";
 sleep 2;
+
+if (_civ getVariable ["MWF_isTaskInformant", false]) exitWith {
+    ["INTERACT", _civ, _caller] remoteExecCall ["MWF_fnc_civRepInformant", 2];
+};
 
 private _findChance = 30;
 private _intelGained = 8 + floor (random 8);

@@ -4,7 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Handles civilian reputation, threshold penalties, and rebel leader escalation.
+    Handles civilian reputation, threshold penalties, rebel-alignment shifts,
+    and rebel leader escalation.
 */
 
 if (!isServer) exitWith {};
@@ -17,7 +18,7 @@ params [
 if (_mode == "ADJUST") exitWith {
     private _oldRep = missionNamespace getVariable ["MWF_CivRep", 0];
     private _newRep = ((_oldRep + _amount) max -100) min 100;
-    private _rebelThreshold = missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30];
+    private _rebelThreshold = missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -25];
 
     missionNamespace setVariable ["MWF_CivRep", _newRep, true];
 
@@ -26,6 +27,10 @@ if (_mode == "ADJUST") exitWith {
         missionNamespace setVariable ["MWF_RepPenaltyCount", _penalties + 1, true];
         diag_log format ["[KPIN REP]: Penalty threshold reached. Total Penalties: %1", _penalties + 1];
         ["SAVE"] call MWF_fnc_saveManager;
+    };
+
+    if (!isNil "MWF_fnc_civRepSupport") then {
+        ["SYNC_RELATIONS"] call MWF_fnc_civRepSupport;
     };
 
     if (
@@ -55,6 +60,10 @@ if (_mode == "GET_BRIBE_COST") exitWith {
 if (_mode == "RESET") exitWith {
     missionNamespace setVariable ["MWF_CivRep", 0, true];
     missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+
+    if (!isNil "MWF_fnc_civRepSupport") then {
+        ["SYNC_RELATIONS"] call MWF_fnc_civRepSupport;
+    };
 
     if (!isNil "MWF_fnc_rebelManager") then {
         ["REFRESH_ZONES"] spawn MWF_fnc_rebelManager;

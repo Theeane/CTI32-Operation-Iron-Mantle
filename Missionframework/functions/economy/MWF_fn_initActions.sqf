@@ -4,13 +4,16 @@
     Project: Military War Framework
 
     Description:
-    Handles init actions for the economy system.
+    Handles interaction actions for civilians and searchable bodies.
 */
 
-params ["_unit"];
+params [["_unit", objNull, [objNull]]];
+if (isNull _unit) exitWith {};
 
-// 1. Logic for Civilians
 if (side _unit == civilian) exitWith {
+    if (_unit getVariable ["MWF_CivTalkActionInit", false]) exitWith {};
+    _unit setVariable ["MWF_CivTalkActionInit", true];
+
     _unit addAction [
         "<t color='#FFCC00'>Talk to Civilian</t>",
         {
@@ -22,26 +25,25 @@ if (side _unit == civilian) exitWith {
         true,
         true,
         "",
-        "alive _target && _target distance _this < 3",
+        "alive _target && _target distance _this < 3 && !(_target getVariable ['MWF_isQuestioned', false])",
         5
     ];
 };
 
-// 2. Logic for Soldiers (Searching bodies)
-// We add this to all soldiers, but the action is only visible if they are dead.
-if (side _unit != civilian) exitWith {
-    _unit addAction [
-        "<t color='#FF0000'>Search Body</t>",
-        {
-            params ["_target", "_caller"];
-            [_target, _caller] spawn MWF_fnc_searchBody;
-        },
-        nil,
-        1.5,
-        true,
-        true,
-        "",
-        "!alive _target && _target distance _this < 2.5 && !(_target getVariable ['MWF_isSearched', false])",
-        5
-    ];
-};
+if (_unit getVariable ["MWF_SearchBodyActionInit", false]) exitWith {};
+_unit setVariable ["MWF_SearchBodyActionInit", true];
+
+_unit addAction [
+    "<t color='#FF0000'>Search Body</t>",
+    {
+        params ["_target", "_caller"];
+        [_target, _caller] spawn MWF_fnc_searchBody;
+    },
+    nil,
+    1.5,
+    true,
+    true,
+    "",
+    "!alive _target && _target distance _this < 2.5 && !(_target getVariable ['MWF_isSearched', false])",
+    5
+];

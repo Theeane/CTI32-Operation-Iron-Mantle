@@ -531,6 +531,10 @@ switch (toUpper _mode) do {
             _civilianData params ["_civilianUnits", "_civilianGroups"];
         };
 
+        if (!isNil "MWF_fnc_civRepSupport") then {
+            ["TRIGGER", [_objectivePos, format ["mission_%1", _missionKey], _objective]] call MWF_fnc_civRepSupport;
+        };
+
         private _markerName = format ["MWF_SM_%1", _missionKey];
         deleteMarker _markerName;
         private _marker = createMarker [_markerName, _objectivePos];

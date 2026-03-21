@@ -228,6 +228,7 @@ class CfgFunctions {
             class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
             class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
             class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
+            class restoreActiveMainOperation { file = "Missionframework/functions/persistence/MWF_fn_restoreActiveMainOperation.sqf"; };
             class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
             class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
@@ -268,6 +269,8 @@ class CfgFunctions {
             file = "Missionframework/functions/reputation";
             class cityMonitor { file = "Missionframework/functions/reputation/MWF_fn_cityMonitor.sqf"; };
             class civRep { file = "Missionframework/functions/reputation/MWF_fn_civRep.sqf"; };
+            class civRepSupport { file = "Missionframework/functions/reputation/MWF_fn_civRepSupport.sqf"; };
+            class civRepInformant { file = "Missionframework/functions/reputation/MWF_fn_civRepInformant.sqf"; };
             class handleCivilianCasualty { file = "Missionframework/functions/reputation/MWF_fn_handleCivilianCasualty.sqf"; };
         };
 

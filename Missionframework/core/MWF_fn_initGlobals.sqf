@@ -129,7 +129,7 @@ missionNamespace setVariable [
 ];
 missionNamespace setVariable [
     "MWF_CivRep_Threshold_Rebel",
-    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30],
+    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -25],
     true
 ];
 missionNamespace setVariable [
@@ -162,6 +162,36 @@ missionNamespace setVariable [
     missionNamespace getVariable ["MWF_FOBDespawnGraceSeconds", 900],
     true
 ];
+missionNamespace setVariable [
+    "MWF_CivRep_PositiveSupportThreshold",
+    missionNamespace getVariable ["MWF_CivRep_PositiveSupportThreshold", 25],
+    true
+];
+missionNamespace setVariable [
+    "MWF_CivRep_NegativeSupportThreshold",
+    missionNamespace getVariable ["MWF_CivRep_NegativeSupportThreshold", -25],
+    true
+];
+missionNamespace setVariable [
+    "MWF_CivRep_InformantCooldown",
+    missionNamespace getVariable ["MWF_CivRep_InformantCooldown", 1800],
+    true
+];
+if (isNil { missionNamespace getVariable "MWF_CivRep_InformantNextAllowed" }) then {
+    missionNamespace setVariable ["MWF_CivRep_InformantNextAllowed", 0, true];
+};
+if (isNil { missionNamespace getVariable "MWF_CivRepSupportCooldowns" }) then {
+    missionNamespace setVariable ["MWF_CivRepSupportCooldowns", createHashMap, true];
+};
+if (isNil { missionNamespace getVariable "MWF_ActiveInformant" }) then {
+    missionNamespace setVariable ["MWF_ActiveInformant", objNull, true];
+};
+if (isNil { missionNamespace getVariable "MWF_ActiveInformantGroup" }) then {
+    missionNamespace setVariable ["MWF_ActiveInformantGroup", grpNull, true];
+};
+if (isNil { missionNamespace getVariable "MWF_ActiveInformantZoneName" }) then {
+    missionNamespace setVariable ["MWF_ActiveInformantZoneName", "", true];
+};
 
 if (isNil { missionNamespace getVariable "MWF_RebelLeaderSettlementCount" }) then {
     missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", 0, true];
@@ -225,7 +255,7 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
 diag_log format [
     "[MWF] Global state initialized. Campaign phase: %1 | Rebel threshold: %2 | Civilian penalty: -%3 | Scaling: %4 | Unit cap: %5",
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
-    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30],
+    missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -25],
     missionNamespace getVariable ["MWF_CivRep_Penalty_CivilianDeath", 2],
     missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"],
     missionNamespace getVariable ["MWF_DynamicUnitCap", 100]
