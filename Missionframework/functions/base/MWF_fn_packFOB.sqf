@@ -10,7 +10,15 @@
 params [["_fobObject", objNull, [objNull]]];
 if (!hasInterface) exitWith { false };
 if (isNull _fobObject) exitWith { false };
-if !((_fobObject getVariable ["MWF_FOB_PackActionIds_Local", []]) isEqualTo []) exitWith { true };
+
+private _registryKey = format ["MWF_FOB_PackActionIds_Local_%1", netId _fobObject];
+private _existing = missionNamespace getVariable [_registryKey, []];
+
+if !(_existing isEqualTo []) then {
+    {
+        [_fobObject, _x] call BIS_fnc_holdActionRemove;
+    } forEach _existing;
+};
 
 private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false])";
 private _actionIds = [];
@@ -57,4 +65,5 @@ _actionIds pushBack ([
     false
 ] call BIS_fnc_holdActionAdd);
 
-_fobObject setVariable ["MWF_FOB_PackActionIds_Local", _actionIds];
+missionNamespace setVariable [_registryKey, _actionIds];
+true

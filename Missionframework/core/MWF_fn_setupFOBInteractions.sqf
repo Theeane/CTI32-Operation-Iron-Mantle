@@ -11,7 +11,15 @@ params [["_terminal", objNull, [objNull]]];
 
 if (!hasInterface) exitWith { false };
 if (isNull _terminal) exitWith { false };
-if !((_terminal getVariable ["MWF_FOB_InteractionActionIds_Local", []]) isEqualTo []) exitWith { true };
+
+private _registryKey = format ["MWF_FOB_InteractionActionIds_Local_%1", netId _terminal];
+private _existing = missionNamespace getVariable [_registryKey, []];
+
+if !(_existing isEqualTo []) then {
+    {
+        _terminal removeAction _x;
+    } forEach _existing;
+};
 
 private _actionIds = [];
 
@@ -51,9 +59,7 @@ _actionIds pushBack (
         {
             private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", 0];
             private _intel = missionNamespace getVariable ["MWF_res_intel", 0];
-            hint format ["Current FOB Logistics:
-Supplies: %1
-Intel: %2", _supplies, _intel];
+            hint format ["Current FOB Logistics:\nSupplies: %1\nIntel: %2", _supplies, _intel];
         },
         [],
         1,
@@ -64,6 +70,7 @@ Intel: %2", _supplies, _intel];
     ]
 );
 
-_terminal setVariable ["MWF_FOB_InteractionActionIds_Local", _actionIds];
+missionNamespace setVariable [_registryKey, _actionIds];
 
 diag_log format ["[MWF FOB] Interaction actions added to terminal %1. Total actions: %2.", _terminal, count _actionIds];
+true

@@ -12,8 +12,14 @@ params [["_garage", objNull, [objNull]]];
 if (!hasInterface) exitWith { false };
 if (isNull _garage) exitWith { false };
 
-private _existing = _garage getVariable ["MWF_Garage_ActionIds_Local", []];
-if !(_existing isEqualTo []) exitWith { true };
+private _registryKey = format ["MWF_Garage_ActionIds_Local_%1", netId _garage];
+private _existing = missionNamespace getVariable [_registryKey, []];
+
+if !(_existing isEqualTo []) then {
+    {
+        _garage removeAction _x;
+    } forEach _existing;
+};
 
 private _ids = [];
 private _condOnFoot = "alive _this && vehicle _this == _this && (_this distance _target) <= 5";
@@ -54,5 +60,5 @@ _ids pushBack (_garage addAction [
     nil, 6, true, true, "", _condOnFoot
 ]);
 
-_garage setVariable ["MWF_Garage_ActionIds_Local", _ids];
+missionNamespace setVariable [_registryKey, _ids];
 true
