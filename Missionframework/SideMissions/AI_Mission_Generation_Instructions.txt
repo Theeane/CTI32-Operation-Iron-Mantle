@@ -1,4 +1,4 @@
-AI Mission Generation Instructions (Gold Standard, Community Range _4–_99)
+AI Mission Generation Instructions (Gold Standard v2.2, Community Range _4–_99)
 
 Important blind-test rule:
 When running in a web/chat environment without trusted folder visibility, the AI must treat ID availability as unknown.
@@ -167,7 +167,18 @@ Do not invent or assume support for:
 
 If a mission idea needs a special environment, express it through the description, sceneVariant, and compositionKey rather than unsupported zone tags.
 
-8. Approved runtime sceneVariant families
+8. Zone discipline rule (MANDATORY)
+Use the narrowest approved zone selection that correctly fits the mission concept.
+
+Do NOT broaden allowedZoneTypes for variety, flavor, fallback, or creativity.
+Do NOT add an extra approved zone type unless the mission concept explicitly requires it.
+
+Examples:
+- if town + factory is sufficient, use only town + factory
+- do not add military just because it also sounds plausible
+- do not add capital unless the mission concept specifically needs capital-scale placement
+
+9. Approved runtime sceneVariant families
 Community missions should stay within the runtime-supported modern land sceneVariant style.
 
 Supply examples:
@@ -205,7 +216,20 @@ Disrupt examples:
 
 If a new sceneVariant is proposed, treat it as a request for framework/runtime support first, not as something the mission file can force by itself.
 
-9. Mod agnostic rules
+10. Strict minimalism rule (MANDATORY)
+Community mission templates must use the smallest correct implementation that fits the mission concept.
+
+The AI must NOT add extra flavor structure, broaden scope, or add optional metadata behavior unless it is explicitly required by the mission idea or explicitly supported by the framework.
+
+Prefer:
+- the smallest valid zone set
+- the simplest valid sceneVariant
+- the most conservative runtime assumptions
+- the minimum necessary explanation in comments and assetRules
+
+Do not "improve" the mission by adding extra allowed zones, extra behavior claims, or extra author comments.
+
+11. Mod agnostic rules
 Mission templates must remain mod agnostic.
 
 Do NOT hardcode:
@@ -219,7 +243,7 @@ Do NOT hardcode:
 Mission templates describe intent only.
 Runtime asset selection must come from presets and progression systems.
 
-10. Preset / scaling source rules
+12. Preset / scaling source rules
 OPFOR
 - source: active OPFOR preset
 - scaled by: world tier
@@ -235,14 +259,14 @@ Rebels
 - source: active resistance preset
 - scaled by: rebel tier
 
-11. CompositionKey rules
+13. CompositionKey rules
 compositionKey is allowed as a future composition hook and naming signal.
 However:
 - community mission templates must still work if the composition is not populated yet
 - compositionKey must not be treated as permission to hardcode props in the mission file
 - runtime remains map agnostic first
 
-12. Undercover / civilians / rebels rules
+14. Undercover / civilians / rebels rules
 Current normal land patterns:
 - supply: usually allowUndercover = true
 - intel: usually allowUndercover = true
@@ -257,7 +281,24 @@ Current normal usage:
 Do not mark every mission as stealth-capable by default.
 Do not mark every mission as rebel-enabled by default.
 
-13. Reward rules
+15. AssetRules discipline rule (MANDATORY)
+assetRules may describe intent, constraints, and allowed framework-level expectations only.
+
+assetRules must NOT:
+- promise specific runtime behavior unless explicitly guaranteed by the framework
+- claim that a specific objective carrier, spawn method, or interaction already exists unless confirmed
+- describe speculative implementation as if it is already supported
+
+Good:
+- "Use active OPFOR preset infantry scaled by world tier for site security."
+- "Use sceneVariant to guide runtime presentation."
+
+Bad:
+- "Officer carries the intel objective."
+- "Van is spawned through convoy logic."
+- "Runtime guarantees a vehicle delivery phase."
+
+16. Reward rules
 Rewards are fixed per mission.
 Do not randomize rewards.
 
@@ -270,7 +311,7 @@ rewardThreatUndercover should usually be:
 - 0 for clean stealth-friendly supply/intel work
 - low but non-zero when a mission still creates visible disruption
 
-14. Difficulty rules
+17. Difficulty rules
 Allowed difficulty labels:
 - easy
 - medium
@@ -285,7 +326,18 @@ Difficulty should scale through:
 
 Do not scale difficulty by hardcoding faction assets in the template.
 
-15. Community safety boundaries
+18. Comment header discipline rule (MANDATORY)
+Use only the approved header structure shown in the gold-standard skeleton.
+
+Do not add extra header fields such as:
+- Description:
+- Notes:
+- Runtime:
+- Special Rules:
+
+The header should remain minimal and standardized for diff readability.
+
+19. Community safety boundaries
 Community AI mission templates in _4–_99 must NOT:
 - edit core framework logic
 - edit presets
@@ -296,7 +348,7 @@ Community AI mission templates in _4–_99 must NOT:
 - overwrite official/internal missions
 - author main operations through this side mission pipeline
 
-16. Gold-standard authoring workflow (MANDATORY)
+20. Gold-standard authoring workflow (MANDATORY)
 1. choose land + category + difficulty
 2. inspect the exact target folder
 3. if the folder cannot be inspected directly, ask whether the correct category-specific _4 file already exists
@@ -306,12 +358,28 @@ Community AI mission templates in _4–_99 must NOT:
 7. use the exact params contract
 8. use the exact missionDefinition field order
 9. use only approved zone types
-10. use no hardcoded classnames
-11. keep the mission mod agnostic
-12. set fixed rewards
-13. save with matching filename / missionId / numeric call ID
+10. use the narrowest valid zone set
+11. use no hardcoded classnames
+12. keep the mission mod agnostic
+13. avoid promising unsupported runtime behavior
+14. set fixed rewards
+15. save with matching filename / missionId / numeric call ID
 
-17. Minimal community skeleton
+21. Final self-check (MANDATORY)
+Before finalizing the file, the AI must verify all of the following:
+
+1. Did I ask about _4 first if folder visibility was unavailable?
+2. Did I use the correct path, prefix, and ID?
+3. Did I keep the exact params contract?
+4. Did I keep the exact field order?
+5. Did I use only approved zone types?
+6. Did I use the narrowest valid zone set?
+7. Did I avoid inventing metadata keys?
+8. Did I avoid promising unsupported runtime behavior?
+9. Did I avoid hardcoded classnames?
+10. Did I keep the file minimal and gold-standard compliant?
+
+22. Minimal community skeleton
 Use this exact skeleton shape, then fill in mission-specific metadata:
 
 /*
@@ -363,7 +431,7 @@ private _missionDefinition = [
     ["assetRules", [
         "Use active OPFOR preset infantry scaled by world tier for site security.",
         "Use active civilian preset ambience only when usesCivilians is true.",
-        "Use sceneVariant to shape the runtime prop cluster and objective presentation.",
+        "Use sceneVariant to guide runtime presentation only.",
         "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
