@@ -25,18 +25,15 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 // Update resource display
 [] call MWF_fnc_updateResourceUI;
 
-// Damage should interrupt sensitive interactions cleanly without granting invulnerability.
-if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
-    player setVariable ["MWF_DamageInterruptEHAdded", true];
-    player addEventHandler ["HandleDamage", {
-        params ["_unit", "_selection", "_damage", "_source", "_projectile"];
-        private _currentDamage = damage _unit;
-        if ((_damage > _currentDamage) || {(_projectile isEqualType "") && {_projectile isNotEqualTo ""}} || {(_source isEqualType objNull) && {!isNull _source}}) then {
-            [] call MWF_fnc_interruptSensitiveInteraction;
-        };
-        _damage
-    }];
-};
-
 // Log completion
 diag_log format ["[MWF] SUCCESS: Player initialization completed for %1.", name player];
+// Sensitive interaction damage interrupt
+player addEventHandler ["HandleDamage", {
+    params ["_unit", "_selection", "_damage", "_source", "_projectile", "_hitPartIndex", "_instigator"];
+
+    if (missionNamespace getVariable ["MWF_BuildPlacement_Active", false]) then {
+        missionNamespace setVariable ["MWF_BuildPlacement_Interrupted", true];
+    };
+
+    _damage
+}];

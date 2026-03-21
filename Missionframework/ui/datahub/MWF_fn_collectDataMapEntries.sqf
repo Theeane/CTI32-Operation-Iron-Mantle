@@ -38,162 +38,62 @@ switch (_modeUpper) do {
     case "UPGRADES": {
         private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
         private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
-        private _mobLabel = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
-        private _commandTerminal = missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull];
-        private _fobRegistry = missionNamespace getVariable ["MWF_FOB_Registry", []];
-        private _playerPos = if (!isNull player) then { getPosATL player } else { _mobPos };
-
-        private _contextTerminal = objNull;
-        private _contextType = "MOB";
-        private _contextLabel = _mobLabel;
-        private _contextKey = "MOB";
-        private _contextPos = _mobPos;
-
-        if (!isNull _commandTerminal && {alive _commandTerminal} && {_playerPos distance2D _commandTerminal <= 25}) then {
-            _contextTerminal = _commandTerminal;
-        } else {
-            private _nearestFob = objNull;
-            private _nearestDist = 1e10;
-            {
-                private _terminal = _x param [1, objNull];
-                if (!isNull _terminal) then {
-                    private _dist = _playerPos distance2D _terminal;
-                    if (_dist <= 25 && {_dist < _nearestDist}) then {
-                        _nearestFob = _terminal;
-                        _nearestDist = _dist;
-                    };
-                };
-            } forEach _fobRegistry;
-
-            if (!isNull _nearestFob) then {
-                _contextTerminal = _nearestFob;
-            } else {
-                if (!isNull _mainBase && {_playerPos distance2D _mobPos <= 150}) then {
-                    _contextTerminal = _mainBase;
-                };
-            };
-        };
-
-        if (!isNull _contextTerminal && {_contextTerminal getVariable ["MWF_FOB_DisplayName", ""] isNotEqualTo ""}) then {
-            _contextType = "FOB";
-            _contextLabel = _contextTerminal getVariable ["MWF_FOB_DisplayName", "FOB"];
-            _contextKey = format ["FOB:%1", _contextLabel];
-            _contextPos = getPosATL _contextTerminal;
-        } else {
-            if (!isNull _contextTerminal) then {
-                _contextPos = getPosATL _contextTerminal;
-            };
-        };
-
         private _heliClass = missionNamespace getVariable ["MWF_Heli_Tower_Class", ""];
         private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
-        private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
-        private _heliBuilt = (_heliClass isNotEqualTo "") && {({ typeOf _x isEqualTo _heliClass } count (nearestObjects [_mobPos, [_heliClass], 120])) > 0};
-        private _jetBuilt = (_jetClass isNotEqualTo "") && {({ typeOf _x isEqualTo _jetClass } count (nearestObjects [_mobPos, [_jetClass], 120])) > 0};
+        private _upgradeRegistry = +(missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []]);
+        _upgradeRegistry = _upgradeRegistry select { !isNull (_x param [1, objNull]) };
+        missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", _upgradeRegistry, true];
+        private _isUpgradeBuilt = {
+            params ["_upgradeKey", "_fallbackClass"];
+            private _keyUpper = toUpper _upgradeKey;
+            if ((_upgradeRegistry findIf { (toUpper ((_x param [0, "", [""]]) call BIS_fnc_trimString)) isEqualTo _keyUpper }) >= 0) exitWith { true };
+            (_fallbackClass isNotEqualTo "") && {({ typeOf _x isEqualTo _fallbackClass } count (nearestObjects [_mobPos, [_fallbackClass], 120])) > 0}
+        };
+        private _heliBuilt = ["HELI", _heliClass] call _isUpgradeBuilt;
+        private _jetBuilt = ["JET", _jetClass] call _isUpgradeBuilt;
+        private _heliCost = [_heliClass] call MWF_fnc_getBuildAssetCost;
+        private _jetCost = [_jetClass] call MWF_fnc_getBuildAssetCost;
         private _heliUnlocked = missionNamespace getVariable ["MWF_Unlock_Heli", false];
         private _jetUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
         private _tier5Unlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
         private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
-        private _isMobContext = _contextType isEqualTo "MOB";
-        private _heliBuildCost = if (_heliClass isEqualTo "") then { 0 } else { [_heliClass] call MWF_fnc_getBuildAssetCost };
-        private _jetBuildCost = if (_jetClass isEqualTo "") then { 0 } else { [_jetClass] call MWF_fnc_getBuildAssetCost };
-        private _garageBuildCost = if (_garageClass isEqualTo "") then { 0 } else { missionNamespace getVariable ["MWF_Economy_Cost_MOB_Garage", 300] };
-
-        private _garageBuilt = false;
-        if (_garageClass isNotEqualTo "") then {
-            _garageBuilt = (({ private _garageObj = _x param [0, objNull]; !isNull _garageObj && {(_garageObj getVariable ["MWF_isVirtualGarage", false])} && {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _contextKey} } count (missionNamespace getVariable ["MWF_GarageRegistry", []])) > 0);
-        };
-
-        private _garageBlocked = false;
-        private _garageBlockedReason = "";
-        if (_garageClass isEqualTo "") then {
-            _garageBlocked = true;
-            _garageBlockedReason = "Virtual garage classname is not configured in the active BLUFOR preset.";
-        } else {
-            if (_contextType isEqualTo "FOB") then {
-                if (isNull _contextTerminal) then {
-                    _garageBlocked = true;
-                    _garageBlockedReason = "FOB terminal unavailable.";
-                } else {
-                    if (_contextTerminal getVariable ["MWF_FOB_IsDamaged", false]) then {
-                        _garageBlocked = true;
-                        _garageBlockedReason = format ["%1 is offline and must be rebuilt before its garage can be used or rebuilt.", _contextLabel];
-                    } else {
-                        if (_contextTerminal getVariable ["MWF_isUnderAttack", false]) then {
-                            _garageBlocked = true;
-                            _garageBlockedReason = format ["%1 is under attack. Garage build/use is disabled until the assault ends.", _contextLabel];
-                        };
-                    };
-                };
-            };
-        };
-
-        private _mobOnlyTooltip = if (_isMobContext) then { "" } else { "This is a permanent MOB-only upgrade. Access the Command Network at the MOB to build or manage it." };
-        private _baseContextText = format ["Current base: %1", _contextLabel];
 
         private _upgradeEntries = [
             [
-                "Virtual Garage",
-                [(_contextPos # 0), (_contextPos # 1) + 28, 0],
-                createHashMapFromArray [
-                    ["upgradeId", "GARAGE"],
-                    ["description", "Base-local garage structure for storing, retrieving, and scrapping vehicles at the current MOB/FOB."],
-                    ["baseContextText", _baseContextText],
-                    ["contextTerminal", _contextTerminal],
-                    ["buildClass", _garageClass],
-                    ["buildCost", _garageBuildCost],
-                    ["isUnlocked", !_garageBlocked],
-                    ["isBuilt", _garageBuilt],
-                    ["statusText", if (_garageBlocked) then {if (_garageBlockedReason find "under attack" > -1) then {"FOB Under Attack"} else {if (_garageBlockedReason find "offline" > -1) then {"FOB Offline"} else {"Unavailable"}}} else {if (_garageBuilt) then {"Ready"} else {"Ready To Build"}}],
-                    ["tooltipText", if (_garageBlocked) then {_garageBlockedReason} else {if (_garageBuilt) then {format ["Virtual Garage is online at %1. Use the garage object on foot within 5 meters.", _contextLabel]} else {format ["Place the Virtual Garage at %1 with ghost placement. Cost: %2 Supplies.", _contextLabel, _garageBuildCost]}}],
-                    ["actionMode", if (_garageBlocked) then {"LOCKED"} else {if (_garageBuilt) then {"GARAGE_INFO"} else {"GARAGE_BUILD"}}]
-                ]
-            ],
-            [
                 "Helicopter Uplink",
-                [(_contextPos # 0) - 22, (_contextPos # 1) + 8, 0],
+                [(_mobPos # 0) - 22, (_mobPos # 1) + 8, 0],
                 createHashMapFromArray [
                     ["upgradeId", "HELI"],
                     ["requiredOperation", "Sky Guardian"],
                     ["description", "Unlocks helicopter logistics through a MOB-only upgrade structure."],
-                    ["baseContextText", _baseContextText],
-                    ["contextTerminal", _contextTerminal],
-                    ["buildClass", _heliClass],
-                    ["buildCost", _heliBuildCost],
                     ["isUnlocked", _heliUnlocked],
                     ["isBuilt", _heliBuilt],
-                    ["statusText", if (!_heliUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_heliBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_isMobContext) then {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {format ["Place the Helicopter Uplink with ghost placement at the MOB. Cost: %1 Supplies.", _heliBuildCost]}} else {_mobOnlyTooltip}}],
-                    ["actionMode", if (!_heliUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_heliBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
+                    ["statusText", if (!_heliUnlocked) then {"Locked"} else {if (_heliBuilt) then {"Ready"} else {"Unlocked - Build Required"}}],
+                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the helicopter uplink."}}},
+                    ["actionMode", if (!_heliUnlocked) then {"LOCKED"} else {if (_heliBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}}]
                 ]
             ],
             [
                 "Aircraft Control",
-                [(_contextPos # 0) + 22, (_contextPos # 1) + 8, 0],
+                [(_mobPos # 0) + 22, (_mobPos # 1) + 8, 0],
                 createHashMapFromArray [
                     ["upgradeId", "JET"],
                     ["requiredOperation", "Point Blank"],
                     ["description", "Unlocks fixed-wing strike logistics through a MOB-only upgrade structure."],
-                    ["baseContextText", _baseContextText],
-                    ["contextTerminal", _contextTerminal],
-                    ["buildClass", _jetClass],
-                    ["buildCost", _jetBuildCost],
                     ["isUnlocked", _jetUnlocked],
                     ["isBuilt", _jetBuilt],
-                    ["statusText", if (!_jetUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_jetBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_isMobContext) then {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {format ["Place the Aircraft Control building with ghost placement at the MOB. Cost: %1 Supplies.", _jetBuildCost]}} else {_mobOnlyTooltip}}],
-                    ["actionMode", if (!_jetUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_jetBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
+                    ["statusText", if (!_jetUnlocked) then {"Locked"} else {if (_jetBuilt) then {"Ready"} else {"Unlocked - Build Required"}}],
+                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {"Use Base Building at the MOB to place the aircraft control building."}}},
+                    ["actionMode", if (!_jetUnlocked) then {"LOCKED"} else {if (_jetBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}}]
                 ]
             ],
             [
                 "Base Tier 5",
-                [(_contextPos # 0), (_contextPos # 1) - 20, 0],
+                [(_mobPos # 0), (_mobPos # 1) + 28, 0],
                 createHashMapFromArray [
                     ["upgradeId", "TIER5"],
                     ["requiredOperation", "Apex Predator"],
                     ["description", "Extends the player base progression path to Tier 5. Vehicle presets may place special Tier 5 assets at the bottom of their categories."],
-                    ["baseContextText", _baseContextText],
-                    ["contextTerminal", _contextTerminal],
                     ["isUnlocked", _tier5Unlocked],
                     ["isBuilt", _tier5Unlocked && {_currentTier >= 5}],
                     ["statusText", if (!_tier5Unlocked) then {"Locked"} else {if (_currentTier >= 5) then {"Complete"} else {"Ready"}}],

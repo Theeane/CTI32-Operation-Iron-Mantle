@@ -41,6 +41,8 @@ class CfgFunctions {
             class handleBuildPlacement { file = "Missionframework/core/MWF_fn_handleBuildPlacement.sqf"; };
             class isBuildAssetAllowed { file = "Missionframework/core/MWF_fn_isBuildAssetAllowed.sqf"; };
             class getBuildAssetCost { file = "Missionframework/core/MWF_fn_getBuildAssetCost.sqf"; };
+            class validateBuildPlacement { file = "Missionframework/core/MWF_fn_validateBuildPlacement.sqf"; };
+            class cleanupBuildPlacement { file = "Missionframework/core/MWF_fn_cleanupBuildPlacement.sqf"; };
         };
 
         class Compatibility {
@@ -56,7 +58,6 @@ class CfgFunctions {
             class addIntel { file = "Missionframework/functions/compat/MWF_fn_addIntel.sqf"; };
             class checkUndercover { file = "Missionframework/functions/MWF_fnc_checkUndercover.sqf"; };
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
-            class interruptSensitiveInteraction { file = "Missionframework/functions/MWF_fn_interruptSensitiveInteraction.sqf"; };
         };
 
         class Terminal {
@@ -114,8 +115,6 @@ class CfgFunctions {
             class unregisterFOB { file = "Missionframework/functions/base/MWF_fn_unregisterFOB.sqf"; };
             class updateBuyCategory { file = "Missionframework/functions/base/MWF_fn_updateBuyCategory.sqf"; };
             class upgradeBaseTier { file = "Missionframework/functions/base/MWF_fn_upgradeBaseTier.sqf"; };
-            class garageSystem { file = "Missionframework/functions/base/MWF_fn_garageSystem.sqf"; };
-            class setupGarageInteractions { file = "Missionframework/functions/base/MWF_fn_setupGarageInteractions.sqf"; };
         };
 
         class Zones {
@@ -227,10 +226,10 @@ class CfgFunctions {
             class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
             class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
             class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
-            class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
             class restoreActiveMainOperation { file = "Missionframework/functions/persistence/MWF_fn_restoreActiveMainOperation.sqf"; };
             class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
+            class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
         };
 
         class Presets {

@@ -1,136 +1,131 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Function: MWF_fn_startBuildPlacement
     Project: Military War Framework
 
     Description:
-    Handles client-side build placement with ghost preview and confirmation.
-    Physical base-upgrade structures use the same interrupt-safe local placement
-    state model as vehicle ghost placement so damage can cleanly cancel them.
+    Handles client-side ghost placement for physical base upgrades.
 */
 
 params [
     ["_className", "", [""]],
-    ["_price", 0, [0]]
+    ["_price", 0, [0]],
+    ["_upgradeId", "", [""]]
 ];
 
-if (_className isEqualTo "") exitWith {};
-if (!hasInterface) exitWith {};
+if (_className isEqualTo "") exitWith { false };
+if (!hasInterface) exitWith { false };
 
-private _cfg = configFile >> "CfgVehicles" >> _className;
-if !(isClass _cfg) exitWith {
-    systemChat format ["Build failed: unknown class %1.", _className];
+[] call MWF_fnc_cleanupBuildPlacement;
+
+private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+if (_supplies < _price) exitWith {
+    [format ["Insufficient Supplies: %1 needed.", _price]] call BIS_fnc_showSubtitle;
+    false
 };
-
-private _displayName = getText (_cfg >> "displayName");
-if (_displayName isEqualTo "") then { _displayName = _className; };
-
-[] call MWF_fnc_cleanupVehiclePlacement;
-missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", false];
-missionNamespace setVariable ["MWF_BuildPlacement_Aborted", false];
-missionNamespace setVariable ["MWF_BuildPlacement_Rotation", 0];
-missionNamespace setVariable ["MWF_BuildPlacement_Class", _className];
-missionNamespace setVariable ["MWF_BuildPlacement_Price", _price];
-missionNamespace setVariable ["MWF_BuildPlacement_Name", _displayName];
 
 private _ghost = _className createVehicleLocal [0, 0, 0];
 _ghost setAllowDamage false;
 _ghost enableSimulation false;
-_ghost setAlpha 0.6;
 _ghost setVehicleLock "LOCKED";
+_ghost setAlpha 0.45;
 _ghost disableCollisionWith player;
 
-missionNamespace setVariable ["MWF_VehiclePlacement_Active", true];
-missionNamespace setVariable ["MWF_SensitiveInteraction_Type", "BUILD_PLACEMENT"];
-missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", _ghost];
-missionNamespace setVariable ["MWF_VehiclePlacement_Class", _className];
-missionNamespace setVariable ["MWF_VehiclePlacement_Cost", _price];
-missionNamespace setVariable ["MWF_VehiclePlacement_Name", _displayName];
-missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", getDir player];
-missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", true];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement active."];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir player];
+missionNamespace setVariable ["MWF_BuildPlacement_Active", true];
+missionNamespace setVariable ["MWF_BuildPlacement_Ghost", _ghost];
+missionNamespace setVariable ["MWF_BuildPlacement_Class", _className];
+missionNamespace setVariable ["MWF_BuildPlacement_Cost", _price];
+missionNamespace setVariable ["MWF_BuildPlacement_UpgradeId", _upgradeId];
+missionNamespace setVariable ["MWF_BuildPlacement_Rotation", getDir player];
+missionNamespace setVariable ["MWF_BuildPlacement_IsValid", false];
+missionNamespace setVariable ["MWF_BuildPlacement_LastReason", "Placement not yet validated."];
+missionNamespace setVariable ["MWF_BuildPlacement_LastPosATL", getPosATL player];
+missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", false];
+missionNamespace setVariable ["MWF_BuildPlacement_Cancelled", false];
+missionNamespace setVariable ["MWF_BuildPlacement_Interrupted", false];
 
 private _confirmAction = player addAction [
-    format ["<t color='#00FF66'>Confirm Build: %1 (%2 Supplies)</t>", _displayName, _price],
-    {
-        missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", true];
-    },
+    format ["<t color='#00FF66'>Confirm Construction (%1 Supplies)</t>", _price],
+    { missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", true]; },
     nil,
     100,
     false,
     true,
     "",
-    "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
+    "missionNamespace getVariable ['MWF_BuildPlacement_Active', false]"
 ];
 
 private _cancelAction = player addAction [
     "<t color='#FF5555'>Cancel Construction</t>",
-    {
-        missionNamespace setVariable ["MWF_BuildPlacement_Aborted", true];
-    },
+    { missionNamespace setVariable ["MWF_BuildPlacement_Cancelled", true]; },
     nil,
     99,
     false,
     true,
     "",
-    "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
+    "missionNamespace getVariable ['MWF_BuildPlacement_Active', false]"
 ];
 
-missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", _confirmAction];
-missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", _cancelAction];
+missionNamespace setVariable ["MWF_BuildPlacement_ConfirmAction", _confirmAction];
+missionNamespace setVariable ["MWF_BuildPlacement_CancelAction", _cancelAction];
 
 [
-    ["BUILD PLACEMENT", format ["Ghost build active for %1. Confirm or cancel from the action menu. Use Q/E to rotate.", _displayName]],
+    ["BASE UPGRADE", "Ghost placement active. Confirm or cancel from the action menu."],
     "info"
 ] call MWF_fnc_showNotification;
 
 while {
-    (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) &&
+    missionNamespace getVariable ["MWF_BuildPlacement_Active", false] &&
+    alive player &&
     !(missionNamespace getVariable ["MWF_BuildPlacement_Confirmed", false]) &&
-    !(missionNamespace getVariable ["MWF_BuildPlacement_Aborted", false]) &&
-    alive player
+    !(missionNamespace getVariable ["MWF_BuildPlacement_Cancelled", false]) &&
+    !(missionNamespace getVariable ["MWF_BuildPlacement_Interrupted", false])
 } do {
-    private _rotation = missionNamespace getVariable ["MWF_BuildPlacement_Rotation", 0];
-    if (inputAction "User1" > 0) then { _rotation = _rotation + 2; };
-    if (inputAction "User2" > 0) then { _rotation = _rotation - 2; };
+    private _rotation = missionNamespace getVariable ["MWF_BuildPlacement_Rotation", getDir player];
+    if (inputAction "TurnLeft" > 0) then { _rotation = _rotation - 1.5; };
+    if (inputAction "TurnRight" > 0) then { _rotation = _rotation + 1.5; };
     missionNamespace setVariable ["MWF_BuildPlacement_Rotation", _rotation];
 
-    private _pos = player modelToWorld [0, 10, 0];
-    _ghost setPosATL _pos;
-    _ghost setDir (getDir player + _rotation);
+    private _posATL = player modelToWorld [0, 8, 0];
+    _ghost setVectorUp surfaceNormal _posATL;
+    _ghost setPosATL _posATL;
+    _ghost setDir _rotation;
 
-    missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL _ghost];
-    missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir _ghost];
+    private _result = [_className, _posATL, _rotation, _ghost] call MWF_fnc_validateBuildPlacement;
+    missionNamespace setVariable ["MWF_BuildPlacement_IsValid", _result param [0, false]];
+    missionNamespace setVariable ["MWF_BuildPlacement_LastReason", _result param [1, "Placement invalid."]];
+    missionNamespace setVariable ["MWF_BuildPlacement_LastPosATL", _posATL];
 
-    uiSleep 0.01;
+    _ghost setAlpha ([0.65, 0.25] select !(_result param [0, false]));
+    uiSleep 0.02;
 };
 
 private _confirmed = missionNamespace getVariable ["MWF_BuildPlacement_Confirmed", false];
-private _aborted = missionNamespace getVariable ["MWF_BuildPlacement_Aborted", false];
-private _rotation = missionNamespace getVariable ["MWF_BuildPlacement_Rotation", 0];
-private _interrupted = !(missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) && {!_confirmed} && {!_aborted};
+private _cancelled = missionNamespace getVariable ["MWF_BuildPlacement_Cancelled", false];
+private _interrupted = missionNamespace getVariable ["MWF_BuildPlacement_Interrupted", false];
+private _isValid = missionNamespace getVariable ["MWF_BuildPlacement_IsValid", false];
+private _finalPosATL = + (missionNamespace getVariable ["MWF_BuildPlacement_LastPosATL", getPosATL player]);
+private _finalDir = missionNamespace getVariable ["MWF_BuildPlacement_Rotation", getDir player];
+private _reason = missionNamespace getVariable ["MWF_BuildPlacement_LastReason", "Placement invalid."];
 
-[] call MWF_fnc_cleanupVehiclePlacement;
+[] call MWF_fnc_cleanupBuildPlacement;
 
-if (_confirmed) then {
-    private _finalPos = player modelToWorld [0, 10, 0];
-    private _finalDir = getDir player + _rotation;
-
-    [_className, _finalPos, _finalDir, _price, player] remoteExec ["MWF_fnc_finalizeBuild", 2];
-
-    hint format ["Build request submitted: %1", _displayName];
-    diag_log format ["[MWF Build] Player submitted placement of %1 at %2 (client hint cost %3).", _className, _finalPos, _price];
-} else {
-    if (_aborted) then {
-        hint "Construction aborted.";
-        diag_log format ["[MWF Build] Player aborted placement of %1.", _className];
-    } else {
-        if (_interrupted) then {
-            diag_log format ["[MWF Build] Player placement of %1 was interrupted.", _className];
-        } else {
-            diag_log format ["[MWF Build] Placement loop for %1 ended without confirmation.", _className];
-        };
-    };
+if (_interrupted) exitWith {
+    [["BASE UPGRADE", "Build placement interrupted by damage."], "warning"] call MWF_fnc_showNotification;
+    false
 };
+
+if (_cancelled || {!alive player}) exitWith {
+    [["BASE UPGRADE", "Construction cancelled."], "info"] call MWF_fnc_showNotification;
+    false
+};
+
+if (!_confirmed) exitWith { false };
+if (!_isValid) exitWith {
+    systemChat _reason;
+    false
+};
+
+[_className, _finalPosATL, _finalDir, _price, _upgradeId] remoteExec ["MWF_fnc_finalizeBuild", 2];
+[["BASE UPGRADE", "Construction request sent to server."], "success"] call MWF_fnc_showNotification;
+true

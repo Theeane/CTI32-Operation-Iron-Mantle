@@ -40,51 +40,19 @@ private _boughtVehicles = [];
 } forEach vehicles;
 
 private _builtUpgradeStructures = [];
-private _savedUpgradeObjects = [];
-private _trackUpgradeStructure = {
-    params ["_obj"];
-    if (isNull _obj) exitWith {};
-    if ((_savedUpgradeObjects find _obj) > -1) exitWith {};
-    _savedUpgradeObjects pushBack _obj;
-    _builtUpgradeStructures pushBack [
-        typeOf _obj,
-        getPosASL _obj,
-        vectorDir _obj,
-        vectorUp _obj,
-        damage _obj
-    ];
-};
-
-private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
-private _mainBasePos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
-private _heliClass = missionNamespace getVariable ["MWF_Heli_Tower_Class", ""];
-private _jetClass = missionNamespace getVariable ["MWF_Jet_Control_Class", ""];
-private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
-
-if (_heliClass isNotEqualTo "") then {
-    { [_x] call _trackUpgradeStructure; } forEach (nearestObjects [_mainBasePos, [_heliClass], 120]);
-};
-if (_jetClass isNotEqualTo "") then {
-    { [_x] call _trackUpgradeStructure; } forEach (nearestObjects [_mainBasePos, [_jetClass], 120]);
-};
-if (_garageClass isNotEqualTo "") then {
-    {
-        if (_x getVariable ["MWF_isVirtualGarage", false]) then {
-            [_x] call _trackUpgradeStructure;
-        };
-    } forEach (nearestObjects [_mainBasePos, [_garageClass], 120]);
-
-    {
-        private _terminal = _x param [1, objNull];
-        if (!isNull _terminal) then {
-            {
-                if (_x getVariable ["MWF_isVirtualGarage", false]) then {
-                    [_x] call _trackUpgradeStructure;
-                };
-            } forEach (nearestObjects [getPosATL _terminal, [_garageClass], 120]);
-        };
-    } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
-};
+{
+    _x params [["_upgradeId", "", [""]], ["_object", objNull, [objNull]], ["_className", "", [""]]];
+    if (!isNull _object) then {
+        _builtUpgradeStructures pushBack [
+            _upgradeId,
+            typeOf _object,
+            getPosASL _object,
+            vectorDir _object,
+            vectorUp _object,
+            damage _object
+        ];
+    };
+} forEach (missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []]);
 
 private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
 
@@ -202,7 +170,6 @@ profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_BuiltUpgradeStructures", _builtUpgradeStructures];
-profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
@@ -251,26 +218,17 @@ profileNamespace setVariable ["MWF_Save_CompositionType", missionNamespace getVa
 
 private _zoneCount = count _zoneSaveData;
 private _vehicleCount = count _boughtVehicles;
-private _builtUpgradeCount = count _builtUpgradeStructures;
-private _garageVehicleCount = 0;
-{
-    if (_x isEqualType [] && {count _x >= 2}) then {
-        _garageVehicleCount = _garageVehicleCount + count (_x param [1, [], [[]]]);
-    };
-} forEach (missionNamespace getVariable ["MWF_GarageStoredVehicles", []]);
 private _missionCount = count _activeSideMissions;
-private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str _builtUpgradeStructures) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Upgrades: %5 | Garage Stored: %6 | Missions: %7 | Leader Active: %8 | Damaged FOBs: %9 | Est. Payload: ~%10KB.",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Missions: %5 | Leader Active: %6 | Damaged FOBs: %7 | Est. Payload: ~%8KB.",
     _reason,
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     _zoneCount,
     _vehicleCount,
-    _builtUpgradeCount,
-    _garageVehicleCount,
     _missionCount,
     !(_leaderContext isEqualTo []),
     count _damagedFOBs,
