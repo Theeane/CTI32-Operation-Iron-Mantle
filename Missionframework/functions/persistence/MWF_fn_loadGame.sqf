@@ -207,7 +207,6 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
     missionNamespace setVariable ["MWF_current_stage", 3, true];
 };
 
-profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 saveProfileNamespace;
 
 diag_log format [
