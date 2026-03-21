@@ -126,9 +126,7 @@ if (_isGarageUpgrade) then {
                 {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _baseKey}
             }) > -1;
 
-            private _alreadyNearby = ({ typeOf _x isEqualTo _garageClass } count (nearestObjects [_basePos, [_garageClass], 120])) > 0;
-
-            if (_alreadyRegistered || _alreadyNearby) then {
+            if (_alreadyRegistered) then {
                 _garageRejectReason = format ["Virtual Garage is already built at %1.", _baseLabel];
             };
         };
@@ -165,6 +163,45 @@ _vehicle setPosATL _pos;
 
 if (_className isEqualTo "B_Slingload_01_Cargo_F") then {
     [_vehicle] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
+};
+
+private _upgradeId = if (_isGarageUpgrade) then {
+    "GARAGE"
+} else {
+    if (_isHeliUpgrade) then {
+        "HELI"
+    } else {
+        if (_isJetUpgrade) then {
+            "JET"
+        } else {
+            ""
+        }
+    }
+};
+
+private _upgradeBaseKey = "MOB";
+private _upgradeBaseType = "MOB";
+private _upgradeBaseLabel = missionNamespace getVariable ["MWF_MOB_Name", "MOB"];
+if (_isGarageUpgrade) then {
+    _upgradeBaseType = _garageBaseInfo param [1, "MOB"];
+    _upgradeBaseKey = _garageBaseInfo param [2, "MOB"];
+    _upgradeBaseLabel = _garageBaseInfo param [3, _upgradeBaseLabel];
+};
+
+if (_upgradeId isNotEqualTo "") then {
+    _vehicle setVariable ["MWF_isPhysicalBaseUpgrade", true, true];
+    _vehicle setVariable ["MWF_UpgradeId", _upgradeId, true];
+    _vehicle setVariable ["MWF_BaseKey", _upgradeBaseKey, true];
+    _vehicle setVariable ["MWF_BaseType", _upgradeBaseType, true];
+    _vehicle setVariable ["MWF_BaseLabel", _upgradeBaseLabel, true];
+
+    private _builtRegistry = +(missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []]);
+    _builtRegistry = _builtRegistry select {
+        private _existingObj = _x param [1, objNull];
+        !isNull _existingObj && {_existingObj != _vehicle}
+    };
+    _builtRegistry pushBack [_upgradeId, _vehicle, _className, _upgradeBaseKey, _upgradeBaseType, _upgradeBaseLabel];
+    missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", _builtRegistry, true];
 };
 
 if (_isGarageUpgrade) then {

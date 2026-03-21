@@ -41,6 +41,112 @@ private _boughtVehicles = [];
 
 private _activeSideMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
 
+private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+private _mainBasePos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
+private _mobLabel = missionNamespace getVariable ["MWF_MOB_Name", "MOB"];
+private _builtRegistry = + (missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []]);
+private _builtUpgradeStructures = [];
+private _cleanBuiltRegistry = [];
+private _pushBuiltUpgradeRecord = {
+    params [
+        ["_upgradeId", "", [""]],
+        ["_obj", objNull, [objNull]],
+        ["_className", "", [""]],
+        ["_baseKey", "", [""]],
+        ["_baseType", "", [""]],
+        ["_baseLabel", "", [""]]
+    ];
+
+    if (isNull _obj) exitWith {};
+
+    if (_upgradeId isEqualTo "") then {
+        _upgradeId = toUpper (_obj getVariable ["MWF_UpgradeId", ""]);
+    } else {
+        _upgradeId = toUpper _upgradeId;
+    };
+
+    if (_className isEqualTo "") then {
+        _className = typeOf _obj;
+    };
+
+    if (_baseKey isEqualTo "") then {
+        _baseKey = _obj getVariable ["MWF_BaseKey", "MOB"];
+    };
+
+    if (_baseType isEqualTo "") then {
+        _baseType = _obj getVariable ["MWF_BaseType", if ((_baseKey find "FOB:") isEqualTo 0) then {"FOB"} else {"MOB"}];
+    };
+
+    if (_baseLabel isEqualTo "") then {
+        _baseLabel = _obj getVariable [
+            "MWF_BaseLabel",
+            if (_baseType isEqualTo "FOB" && {(_baseKey find "FOB:") isEqualTo 0}) then {
+                _baseKey select [4]
+            } else {
+                _mobLabel
+            }
+        ];
+    };
+
+    if (_upgradeId isEqualTo "" || {_className isEqualTo ""}) exitWith {};
+
+    private _posASL = getPosASL _obj;
+    private _existingIndex = _builtUpgradeStructures findIf {
+        ((_x param [0, ""]) isEqualTo _upgradeId) &&
+        {((_x param [6, ""]) isEqualTo _baseKey)} &&
+        {((_x param [2, [0, 0, 0], [[]]]) distance _posASL) <= 1.5}
+    };
+    if (_existingIndex >= 0) exitWith {};
+
+    _cleanBuiltRegistry pushBack [_upgradeId, _obj, _className, _baseKey, _baseType, _baseLabel];
+    _builtUpgradeStructures pushBack [
+        _upgradeId,
+        _className,
+        _posASL,
+        vectorDir _obj,
+        vectorUp _obj,
+        damage _obj,
+        _baseKey,
+        _baseType,
+        _baseLabel
+    ];
+};
+
+{
+    _x params [
+        ["_upgradeId", "", [""]],
+        ["_obj", objNull, [objNull]],
+        ["_className", "", [""]],
+        ["_baseKey", "", [""]],
+        ["_baseType", "", [""]],
+        ["_baseLabel", "", [""]]
+    ];
+    [_upgradeId, _obj, _className, _baseKey, _baseType, _baseLabel] call _pushBuiltUpgradeRecord;
+} forEach _builtRegistry;
+
+{
+    private _garageObj = _x param [0, objNull];
+    private _garageKey = _x param [1, "MOB", [""]];
+    private _garageLabel = _x param [2, if (_garageKey isEqualTo "MOB") then {_mobLabel} else {"Garage"}, [""]];
+    private _garageType = _x param [3, if ((_garageKey find "FOB:") isEqualTo 0) then {"FOB"} else {"MOB"}, [""]];
+    ["GARAGE", _garageObj, typeOf _garageObj, _garageKey, _garageType, _garageLabel] call _pushBuiltUpgradeRecord;
+} forEach (missionNamespace getVariable ["MWF_GarageRegistry", []]);
+
+{
+    _x params ["_upgradeId", "_structureClass"];
+    if (_structureClass isNotEqualTo "") then {
+        private _matches = nearestObjects [_mainBasePos, [_structureClass], 120];
+        if !(_matches isEqualTo []) then {
+            [_upgradeId, _matches # 0, _structureClass, "MOB", "MOB", _mobLabel] call _pushBuiltUpgradeRecord;
+        };
+    };
+} forEach [
+    ["HELI", missionNamespace getVariable ["MWF_Heli_Tower_Class", ""]],
+    ["JET", missionNamespace getVariable ["MWF_Jet_Control_Class", ""]]
+];
+
+missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", _cleanBuiltRegistry, true];
+
 private _leaderContext = if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) then {
     + (missionNamespace getVariable ["MWF_RebelLeaderContext", []])
 } else {
@@ -158,6 +264,7 @@ profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
+profileNamespace setVariable ["MWF_Save_BuiltUpgradeStructures", _builtUpgradeStructures];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
@@ -213,17 +320,19 @@ private _garageVehicleCount = 0;
     };
 } forEach (missionNamespace getVariable ["MWF_GarageStoredVehicles", []]);
 private _missionCount = count _activeSideMissions;
-private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+private _builtUpgradeCount = count _builtUpgradeStructures;
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _builtUpgradeStructures) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 
 diag_log format [
-    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Garage Stored: %5 | Missions: %6 | Leader Active: %7 | Damaged FOBs: %8 | Est. Payload: ~%9KB.",
+    "[MWF] Game saved (%1). Phase: %2 | Zones: %3 | Vehicles: %4 | Garage Stored: %5 | Built Upgrades: %6 | Missions: %7 | Leader Active: %8 | Damaged FOBs: %9 | Est. Payload: ~%10KB.",
     _reason,
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     _zoneCount,
     _vehicleCount,
     _garageVehicleCount,
+    _builtUpgradeCount,
     _missionCount,
     !(_leaderContext isEqualTo []),
     count _damagedFOBs,

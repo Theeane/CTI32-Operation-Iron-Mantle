@@ -22,6 +22,9 @@ missionNamespace setVariable ["MWF_FOB_Registry", missionNamespace getVariable [
 missionNamespace setVariable ["MWF_FOBsRestored", missionNamespace getVariable ["MWF_FOBsRestored", false], true];
 missionNamespace setVariable ["MWF_GarageRegistry", missionNamespace getVariable ["MWF_GarageRegistry", []], true];
 missionNamespace setVariable ["MWF_GarageStoredVehicles", missionNamespace getVariable ["MWF_GarageStoredVehicles", []], true];
+missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []], true];
+missionNamespace setVariable ["MWF_PendingBuiltUpgradeStructures", missionNamespace getVariable ["MWF_PendingBuiltUpgradeStructures", []], true];
+missionNamespace setVariable ["MWF_BuiltUpgradeStructuresRestored", missionNamespace getVariable ["MWF_BuiltUpgradeStructuresRestored", false], true];
 missionNamespace setVariable ["MWF_FixedInfrastructure", missionNamespace getVariable ["MWF_FixedInfrastructure", []], true];
 missionNamespace setVariable ["MWF_PotentialBaseSites", missionNamespace getVariable ["MWF_PotentialBaseSites", []], true];
 missionNamespace setVariable ["MWF_HQSiteRegistry", missionNamespace getVariable ["MWF_HQSiteRegistry", []], true];

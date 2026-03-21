@@ -168,6 +168,10 @@ _activeMissions pushBack [
 ];
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
 
+if (!isNil "MWF_fnc_requestDelayedSave") then {
+    [] call MWF_fnc_requestDelayedSave;
+};
+
 if (!isNil "MWF_fnc_sideMissionRuntime") then {
     ["START", [_missionKey, _category, _difficulty, _missionId, _position, _zoneName, _taskId, _compositionPath, _missionDefinition]] call MWF_fnc_sideMissionRuntime;
 };

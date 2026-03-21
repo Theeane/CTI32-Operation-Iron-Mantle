@@ -214,6 +214,10 @@ switch (toUpper _mode) do {
             [(_effectiveIntelCost * -1), "INTEL"] call MWF_fnc_addResource;
         };
 
+        if (!isNil "MWF_fnc_requestDelayedSave") then {
+            [] call MWF_fnc_requestDelayedSave;
+        };
+
         private _launchText = if (_usedFreeCharge) then {
             format ["%1 launched in %2. Intel breakthrough charge consumed.", _title, _zoneName]
         } else {

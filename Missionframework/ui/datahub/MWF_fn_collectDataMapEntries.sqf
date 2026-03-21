@@ -102,9 +102,6 @@ switch (_modeUpper) do {
         private _garageBuilt = false;
         if (_garageClass isNotEqualTo "") then {
             _garageBuilt = (({ private _garageObj = _x param [0, objNull]; !isNull _garageObj && {(_garageObj getVariable ["MWF_isVirtualGarage", false])} && {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _contextKey} } count (missionNamespace getVariable ["MWF_GarageRegistry", []])) > 0);
-            if (!_garageBuilt) then {
-                _garageBuilt = ({ typeOf _x isEqualTo _garageClass } count (nearestObjects [_contextPos, [_garageClass], 120])) > 0;
-            };
         };
 
         private _garageBlocked = false;
