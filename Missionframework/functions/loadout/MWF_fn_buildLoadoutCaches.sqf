@@ -10,7 +10,7 @@
     Caches built:
     - MWF_OpforUniformClasses      : all OPFOR-linked uniforms
     - MWF_CivilianUniformClasses   : all civilian-linked uniforms
-    - MWF_ArsenalItemClasses       : Arsenal-visible non-OPFOR-uniform items
+    - MWF_ArsenalItemClasses       : Arsenal-visible non-OPFOR-uniform items minus user blacklist entries
     - MWF_OpforClothingClasses     : OPFOR uniform/vest/headgear classes sourced from the active OPFOR preset infantry
 */
 
@@ -24,6 +24,13 @@ if (_cached) exitWith {
     ]
 };
 
+if !(missionNamespace getVariable ["MWF_GlobalBlacklistLoaded", false]) then {
+    missionNamespace setVariable ["MWF_GlobalBlacklist", [], true];
+    call compile preprocessFileLineNumbers "Missionframework/global_blacklist.sqf";
+    missionNamespace setVariable ["MWF_GlobalBlacklistLoaded", true];
+};
+
+private _globalBlacklist = + (missionNamespace getVariable ["MWF_GlobalBlacklist", []]);
 private _opforUniforms = [];
 private _civilianUniforms = [];
 private _arsenalItems = [];
@@ -101,6 +108,8 @@ if (!isNil "_opforPreset" && {_opforPreset isEqualType createHashMap}) then {
         } forEach (_opforPreset getOrDefault [_x, []]);
     } forEach ["Infantry_T1", "Infantry_T2", "Infantry_T3", "Infantry_T4", "Infantry_T5"];
 };
+
+_arsenalItems = _arsenalItems - _globalBlacklist;
 
 missionNamespace setVariable ["MWF_OpforUniformClasses", _opforUniforms];
 missionNamespace setVariable ["MWF_CivilianUniformClasses", _civilianUniforms];

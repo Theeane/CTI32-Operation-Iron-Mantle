@@ -7,9 +7,8 @@ params ["_player", "_missionType"];
 private _baseReward = 0;
 private _bonusReward = 0;
 
-// Check undercover
-private _currentUniform = uniform _player;
-private _isUndercover = !(_currentUniform in MWF_Undercover_Blacklist);
+// Check undercover through the live undercover system.
+private _isUndercover = [_player] call MWF_fnc_checkUndercover;
 
 switch (_missionType) do {
 
