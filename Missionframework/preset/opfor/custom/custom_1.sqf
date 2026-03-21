@@ -31,11 +31,20 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
 
     // --- VEHICLE Tiers (Replace with your mod classes) ---
-    ["Vehicles_T1", ["O_Truck_02_transport_F"]],      // Light Transport
-    ["Vehicles_T2", ["O_MRAP_02_hmg_F"]],             // Armed Recon
-    ["Vehicles_T3", ["O_APC_Wheeled_02_rcws_v2_F"]],  // Infantry Fighting Vehicle
-    ["Vehicles_T4", ["O_MBT_02_cannon_F"]],           // Main Battle Tank
-    ["Vehicles_T5", ["O_Heli_Attack_02_dynamicLoadout_F"]], // Heavy Air Support
+    ["Vehicles_T1", 
+    ["O_Truck_02_transport_F"]],      // Light Transport
+
+    ["Vehicles_T2", 
+    ["O_MRAP_02_hmg_F"]],             // Armed Recon
+
+    ["Vehicles_T3", 
+    ["O_APC_Wheeled_02_rcws_v2_F"]],  // Infantry Fighting Vehicle
+
+    ["Vehicles_T4", 
+    ["O_MBT_02_cannon_F"]],           // Main Battle Tank
+
+    ["Vehicles_T5", 
+    ["O_Heli_Attack_02_dynamicLoadout_F"]], // Heavy Air Support
 
     // --- Core Units ---
     ["Leader", "O_Officer_F"],
