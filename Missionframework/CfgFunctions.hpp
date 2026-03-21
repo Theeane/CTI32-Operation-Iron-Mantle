@@ -41,8 +41,6 @@ class CfgFunctions {
             class handleBuildPlacement { file = "Missionframework/core/MWF_fn_handleBuildPlacement.sqf"; };
             class isBuildAssetAllowed { file = "Missionframework/core/MWF_fn_isBuildAssetAllowed.sqf"; };
             class getBuildAssetCost { file = "Missionframework/core/MWF_fn_getBuildAssetCost.sqf"; };
-            class validateBuildPlacement { file = "Missionframework/core/MWF_fn_validateBuildPlacement.sqf"; };
-            class cleanupBuildPlacement { file = "Missionframework/core/MWF_fn_cleanupBuildPlacement.sqf"; };
         };
 
         class Compatibility {
@@ -229,13 +227,19 @@ class CfgFunctions {
             class restoreActiveMainOperation { file = "Missionframework/functions/persistence/MWF_fn_restoreActiveMainOperation.sqf"; };
             class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
-            class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
         };
 
         class Presets {
             file = "Missionframework/functions/presets";
             class initPresets { file = "Missionframework/functions/presets/MWF_fn_initPresets.sqf"; };
             class resolveCompositionPath { file = "Missionframework/functions/presets/MWF_fn_resolveCompositionPath.sqf"; };
+        };
+
+        class Scaling {
+            file = "Missionframework/functions/scaling";
+            class getScalingProfile { file = "Missionframework/functions/scaling/MWF_fn_getScalingProfile.sqf"; };
+            class getAISpawnAllowance { file = "Missionframework/functions/scaling/MWF_fn_getAISpawnAllowance.sqf"; };
+            class scaleSpawnCount { file = "Missionframework/functions/scaling/MWF_fn_scaleSpawnCount.sqf"; };
         };
 
         class Infrastructure {

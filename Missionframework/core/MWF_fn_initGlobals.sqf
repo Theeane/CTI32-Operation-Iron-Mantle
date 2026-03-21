@@ -65,11 +65,6 @@ private _buildingMode = missionNamespace getVariable [
     missionNamespace getVariable ["MWF_LockedBuildingMode", ["MWF_Param_BuildingDamageMode", 0] call BIS_fnc_getParamValue]
 ];
 
-private _debugModeEnabled = missionNamespace getVariable [
-    "MWF_DebugMode",
-    (["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) isEqualTo 1
-];
-
 if (isNil { missionNamespace getVariable "MWF_Economy_Supplies" }) then {
     missionNamespace setVariable ["MWF_Economy_Supplies", _startSupplies, true];
 };
@@ -210,7 +205,6 @@ missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true]
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
 missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
-missionNamespace setVariable ["MWF_DebugMode", _debugModeEnabled, true];
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
@@ -218,8 +212,10 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
 };
 
 diag_log format [
-    "[MWF] Global state initialized. Campaign phase: %1 | Rebel threshold: %2 | Civilian penalty: -%3",
+    "[MWF] Global state initialized. Campaign phase: %1 | Rebel threshold: %2 | Civilian penalty: -%3 | Scaling: %4 | Unit cap: %5",
     missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"],
     missionNamespace getVariable ["MWF_CivRep_Threshold_Rebel", -30],
-    missionNamespace getVariable ["MWF_CivRep_Penalty_CivilianDeath", 2]
+    missionNamespace getVariable ["MWF_CivRep_Penalty_CivilianDeath", 2],
+    missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"],
+    missionNamespace getVariable ["MWF_DynamicUnitCap", 100]
 ];

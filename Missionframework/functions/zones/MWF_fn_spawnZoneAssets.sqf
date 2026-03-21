@@ -14,7 +14,17 @@ private _tierData = MWF_Zone_Tier_Settings get _tier;
 private _multiplier = _tierData select 2;
 
 // 2. SPAWN ENEMIES (OPFOR)
-private _enemyCount = round (8 * _multiplier); 
+private _enemyBaseCount = round (8 * _multiplier);
+private _enemyCountDesired = if (!isNil "MWF_fnc_scaleSpawnCount") then {
+    [_enemyBaseCount, missionNamespace getVariable ["MWF_AIZoneEnemyMultiplier", 1], 1, 64] call MWF_fnc_scaleSpawnCount
+} else {
+    _enemyBaseCount
+};
+private _enemyCount = if (!isNil "MWF_fnc_getAISpawnAllowance") then {
+    [_enemyCountDesired, 0, _enemyCountDesired > 0] call MWF_fnc_getAISpawnAllowance
+} else {
+    _enemyCountDesired
+};
 for "_i" from 1 to _enemyCount do {
     private _spawnPos = [_zonePos, 10, 150, 3, 0, 20, 0] call BIS_fnc_findSafePos;
     private _unitClass = selectRandom MWF_Army_Infantry; 
@@ -43,7 +53,17 @@ for "_i" from 1 to _enemyCount do {
 };
 
 // 3. SPAWN CIVILIANS
-private _civCount = round (6 * _multiplier);
+private _civBaseCount = round (6 * _multiplier);
+private _civCountDesired = if (!isNil "MWF_fnc_scaleSpawnCount") then {
+    [_civBaseCount, missionNamespace getVariable ["MWF_AIZoneCivilianMultiplier", 1], 0, 64] call MWF_fnc_scaleSpawnCount
+} else {
+    _civBaseCount
+};
+private _civCount = if (!isNil "MWF_fnc_getAISpawnAllowance") then {
+    [_civCountDesired, 0, false] call MWF_fnc_getAISpawnAllowance
+} else {
+    _civCountDesired
+};
 for "_i" from 1 to _civCount do {
     private _civClass = selectRandom MWF_Civ_List;
     private _spawnPos = [_zonePos, 20, 200, 3, 0, 20, 0] call BIS_fnc_findSafePos;
@@ -62,4 +82,4 @@ for "_i" from 1 to _civCount do {
     [_group, _zonePos, 100] call bis_fnc_taskPatrol;
 };
 
-diag_log format ["[Iron Mantle] Zone Assets spawned at %1 with Tier %2", _zonePos, _tier];
+diag_log format ["[Iron Mantle] Zone Assets spawned at %1 with Tier %2 | Enemies: %3 | Civilians: %4 | Scaling: %5 | Unit cap: %6", _zonePos, _tier, _enemyCount, _civCount, missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"], missionNamespace getVariable ["MWF_DynamicUnitCap", 100]];

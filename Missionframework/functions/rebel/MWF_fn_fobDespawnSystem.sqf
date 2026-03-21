@@ -68,6 +68,21 @@ if (_mode == "DESPAWN") exitWith {
 
     deleteVehicle _terminal;
 
+    private _garageRegistry = missionNamespace getVariable ["MWF_GarageRegistry", []];
+    private _baseKey = format ["FOB:%1", _displayName];
+    {
+        private _garageObj = _x param [0, objNull];
+        private _garageKey = _x param [1, "", [""]];
+        if (!isNull _garageObj && {_garageKey isEqualTo _baseKey}) then {
+            deleteVehicle _garageObj;
+        };
+    } forEach _garageRegistry;
+    missionNamespace setVariable ["MWF_GarageRegistry", _garageRegistry select {
+        private _garageObj = _x param [0, objNull];
+        private _garageKey = _x param [1, "", [""]];
+        (!isNull _garageObj) && {!(_garageKey isEqualTo _baseKey)}
+    }, true];
+
     private _damaged = missionNamespace getVariable ["MWF_DamagedFOBs", []];
     _damaged = _damaged select {
         private _savedPos = _x param [0, []];
@@ -123,10 +138,6 @@ if (_mode == "RESTORE_PENDING") exitWith {
                 _terminal setVariable ["MWF_isUnderAttack", false, true];
                 _terminal allowDamage false;
                 _terminal setDamage 0.89;
-                private _markerRef = _terminal getVariable ["MWF_FOB_Marker", _marker];
-                if (_markerRef isEqualType "" && {_markerRef isNotEqualTo ""} && {markerColor _markerRef isNotEqualTo ""}) then {
-                    _markerRef setMarkerColor "ColorRed";
-                };
 
                 private _damaged = missionNamespace getVariable ["MWF_DamagedFOBs", []];
                 _damaged = _damaged select {

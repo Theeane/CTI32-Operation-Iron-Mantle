@@ -80,10 +80,16 @@ private _spawnWave = {
     } forEach _enemyZones;
     _sorted sort true;
 
+    private _maxGroups = if (!isNil "MWF_fnc_scaleSpawnCount") then {
+        [6, missionNamespace getVariable ["MWF_AIFobAssaultGroupMultiplier", 1], 1, 10] call MWF_fnc_scaleSpawnCount
+    } else {
+        6
+    };
+
     private _selected = [];
     {
         _selected pushBack (_x select 1);
-        if ((count _selected) >= 6) exitWith {};
+        if ((count _selected) >= _maxGroups) exitWith {};
     } forEach _sorted;
 
     private _groupsSpawned = 0;
@@ -94,22 +100,35 @@ private _spawnWave = {
         private _spawnPos = [_zonePos, 20, _zoneRange, 2, 0, 0.4, 0] call BIS_fnc_findSafePos;
 
         if (_spawnPos isEqualType [] && {count _spawnPos >= 2}) then {
-            private _grp = createGroup [resistance, true];
-            private _unitCount = 4 + floor (random 2);
-            for "_i" from 1 to _unitCount do {
-                private _class = selectRandom _pool;
-                private _unit = _grp createUnit [_class, _spawnPos, [], 6, "FORM"];
-                _unit setSkill (0.35 + random 0.25);
-                _unit setVariable ["MWF_RebelAssaultUnit", true, true];
+            private _unitBaseCount = 4 + floor (random 2);
+            private _unitCountDesired = if (!isNil "MWF_fnc_scaleSpawnCount") then {
+                [_unitBaseCount, missionNamespace getVariable ["MWF_AIFobAssaultUnitMultiplier", 1], 1, 12] call MWF_fnc_scaleSpawnCount
+            } else {
+                _unitBaseCount
+            };
+            private _unitCount = if (!isNil "MWF_fnc_getAISpawnAllowance") then {
+                [_unitCountDesired, 0, true] call MWF_fnc_getAISpawnAllowance
+            } else {
+                _unitCountDesired
             };
 
-            _grp setBehaviour "AWARE";
-            _grp setCombatMode "RED";
-            private _wp = _grp addWaypoint [_targetPosATL, 0];
-            _wp setWaypointType "SAD";
-            _wp setWaypointBehaviour "AWARE";
-            _wp setWaypointCombatMode "RED";
-            _groupsSpawned = _groupsSpawned + 1;
+            if (_unitCount > 0) then {
+                private _grp = createGroup [resistance, true];
+                for "_i" from 1 to _unitCount do {
+                    private _class = selectRandom _pool;
+                    private _unit = _grp createUnit [_class, _spawnPos, [], 6, "FORM"];
+                    _unit setSkill (0.35 + random 0.25);
+                    _unit setVariable ["MWF_RebelAssaultUnit", true, true];
+                };
+
+                _grp setBehaviour "AWARE";
+                _grp setCombatMode "RED";
+                private _wp = _grp addWaypoint [_targetPosATL, 0];
+                _wp setWaypointType "SAD";
+                _wp setWaypointBehaviour "AWARE";
+                _wp setWaypointCombatMode "RED";
+                _groupsSpawned = _groupsSpawned + 1;
+            };
         };
     } forEach _selected;
 
@@ -249,20 +268,8 @@ if (_mode == "TERMINAL_DESTROYED") exitWith {
     ["ATTACH", _terminal] remoteExec ["MWF_fnc_fobRepairInteraction", 0, true];
     ["START", _terminal] spawn MWF_fnc_fobDespawnSystem;
 
-    if (_marker isNotEqualTo "") then {
-        _marker setMarkerColor "ColorRed";
-    };
-
-    private _remainingMinutes = ceil (((_deadline - diag_tickTime) max 0) / 60);
     private _msg = format ["%1 terminal knocked offline. Repair it before the FOB collapses.", _displayName];
     [_msg] remoteExec ["systemChat", 0];
-    [
-        [
-            "FOB TERMINAL OFFLINE",
-            format ["%1 disabled. Redeploy to this FOB is offline. Repair cost: %2 Supplies | Collapse in ~%3 minute(s). MOB and other FOBs remain usable.", _displayName, _repairCost, _remainingMinutes]
-        ],
-        "warning"
-    ] remoteExec ["MWF_fnc_showNotification", 0];
 
     [getPosASL _terminal, _displayName, _marker] call _scheduleLeaderRespawn;
 
@@ -305,9 +312,6 @@ if (_mode == "RESTORE_PENDING") exitWith {
             } else {
                 _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
                 _targetTerminal allowDamage true;
-                if (_targetMarker isNotEqualTo "") then {
-                    _targetMarker setMarkerColor "ColorOrange";
-                };
                 missionNamespace setVariable ["MWF_isUnderAttack", true, true];
                 missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _targetName, _targetMarker, diag_tickTime + _remaining], true];
 
@@ -345,16 +349,10 @@ if (_mode == "RESTORE_PENDING") exitWith {
                     ) then {
                         _terminal setVariable ["MWF_isUnderAttack", false, true];
                         _terminal allowDamage false;
-                        private _displayNameLocal = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
-                        private _markerLocal = _terminal getVariable ["MWF_FOB_Marker", ""];
-                        if (_markerLocal isNotEqualTo "") then {
-                            _markerLocal setMarkerColor "ColorBLUFOR";
-                        };
                         missionNamespace setVariable ["MWF_isUnderAttack", false, true];
                         missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
-                        [format ["%1 has survived the rebel assault.", _displayNameLocal]] remoteExec ["systemChat", 0];
-                        [["FOB DEFENDED", format ["%1 survived the rebel assault. Terminal access restored.", _displayNameLocal]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
-                        ["SCHEDULE_RESPAWN", getPosASL _terminal, _displayNameLocal, _markerLocal] call MWF_fnc_fobAttackSystem;
+                        [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
+                        ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
                     };
                 };
             };
@@ -419,21 +417,11 @@ if (_mode == "START") then {
 
     _targetTerminal setVariable ["MWF_isUnderAttack", true, true];
     _targetTerminal allowDamage true;
-    if (_marker isNotEqualTo "") then {
-        _marker setMarkerColor "ColorOrange";
-    };
     missionNamespace setVariable ["MWF_isUnderAttack", true, true];
     missionNamespace setVariable ["MWF_FOBAttackState", ["active", getPosASL _targetTerminal, _displayName, _marker, _attackEndAt], true];
 
     private _startMsg = format ["Rebel cells are assaulting %1 after the leader was killed. Defend the FOB for 15 minutes.", _displayName];
     [_startMsg] remoteExec ["systemChat", 0];
-    [
-        [
-            "FOB UNDER ATTACK",
-            format ["%1 is under assault for 15 minutes. Only this FOB terminal is locked. MOB and other FOBs remain usable.", _displayName]
-        ],
-        "warning"
-    ] remoteExec ["MWF_fnc_showNotification", 0];
 
     if (!isNil "MWF_fnc_requestDelayedSave") then {
         [] call MWF_fnc_requestDelayedSave;
@@ -473,21 +461,15 @@ if (_mode == "START") then {
         ) then {
             _terminal setVariable ["MWF_isUnderAttack", false, true];
             _terminal allowDamage false;
-            private _displayNameLocal = _terminal getVariable ["MWF_FOB_DisplayName", "FOB"];
-            private _markerLocal = _terminal getVariable ["MWF_FOB_Marker", ""];
-            if (_markerLocal isNotEqualTo "") then {
-                _markerLocal setMarkerColor "ColorBLUFOR";
-            };
             missionNamespace setVariable ["MWF_isUnderAttack", false, true];
             missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
-            [format ["%1 has survived the rebel assault.", _displayNameLocal]] remoteExec ["systemChat", 0];
-            [["FOB DEFENDED", format ["%1 survived the rebel assault. Terminal access restored.", _displayNameLocal]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
+            [format ["%1 has survived the rebel assault.", _terminal getVariable ["MWF_FOB_DisplayName", "FOB"]]] remoteExec ["systemChat", 0];
 
             if (!isNil "MWF_fnc_requestDelayedSave") then {
                 [] call MWF_fnc_requestDelayedSave;
             };
 
-            ["SCHEDULE_RESPAWN", getPosASL _terminal, _displayNameLocal, _markerLocal] call MWF_fnc_fobAttackSystem;
+            ["SCHEDULE_RESPAWN", getPosASL _terminal, _terminal getVariable ["MWF_FOB_DisplayName", "FOB"], _terminal getVariable ["MWF_FOB_Marker", ""]] call MWF_fnc_fobAttackSystem;
         };
     };
 

@@ -175,18 +175,29 @@ private _responseQueueArray = [];
     ];
 } forEach _responseQueue;
 
+private _pressureMultiplier = missionNamespace getVariable ["MWF_AIPressureMultiplier", 1];
+private _patrolDensityMultiplier = missionNamespace getVariable ["MWF_AIPatrolDensityMultiplier", _pressureMultiplier];
+private _qrfIntervalMultiplier = missionNamespace getVariable ["MWF_AIQRFIntervalMultiplier", 1];
+
+private _scaledPatrolDensity = ((_directives getOrDefault ["patrolDensity", 0.2]) * _patrolDensityMultiplier) min 0.95;
+private _scaledQrfInterval = round ((((_directives getOrDefault ["qrfInterval", 900]) * _qrfIntervalMultiplier) max 180) min 1800);
+private _scaledRoadblockPressure = round (((_directives getOrDefault ["roadblockPressure", 0]) * _pressureMultiplier) min 100);
+private _scaledHQPressure = round (((_directives getOrDefault ["hqPressure", 0]) * _pressureMultiplier) min 100);
+
 private _directiveArray = [
     ["globalThreatLevel", _globalThreatLevel],
     ["globalThreatPercent", _threatPercent],
     ["globalThreatState", _globalThreatState],
-    ["patrolDensity", _directives getOrDefault ["patrolDensity", 0.2]],
-    ["qrfInterval", _directives getOrDefault ["qrfInterval", 900]],
-    ["roadblockPressure", _directives getOrDefault ["roadblockPressure", 0]],
-    ["hqPressure", _directives getOrDefault ["hqPressure", 0]],
+    ["patrolDensity", _scaledPatrolDensity],
+    ["qrfInterval", _scaledQrfInterval],
+    ["roadblockPressure", _scaledRoadblockPressure],
+    ["hqPressure", _scaledHQPressure],
     ["basePressure", _directives getOrDefault ["basePressure", 0]],
     ["baseAttackState", _directives getOrDefault ["baseAttackState", "idle"]],
     ["missionEscalation", _directives getOrDefault ["missionEscalation", "low"]],
-    ["enabledResponses", _directives getOrDefault ["enabledResponses", []]]
+    ["enabledResponses", _directives getOrDefault ["enabledResponses", []]],
+    ["playerScaling", missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"]],
+    ["dynamicUnitCap", missionNamespace getVariable ["MWF_DynamicUnitCap", 100]]
 ];
 
 private _previousThreatLevel = missionNamespace getVariable ["MWF_GlobalThreatLevel", -1];
@@ -214,10 +225,10 @@ missionNamespace setVariable ["MWF_ThreatDirectiveArray", _directiveArray, true]
 missionNamespace setVariable ["MWF_ThreatResponseQueueArray", _responseQueueArray, true];
 missionNamespace setVariable ["MWF_ThreatBasePressure", _baseThreat getOrDefault ["basePressure", 0], true];
 missionNamespace setVariable ["MWF_ThreatBaseAttackState", _baseThreat getOrDefault ["baseAttackState", "idle"], true];
-missionNamespace setVariable ["MWF_ThreatRoadblockPressure", _directives getOrDefault ["roadblockPressure", 0], true];
-missionNamespace setVariable ["MWF_ThreatHQPressure", _directives getOrDefault ["hqPressure", 0], true];
-missionNamespace setVariable ["MWF_ThreatPatrolDensity", _directives getOrDefault ["patrolDensity", 0.2], true];
-missionNamespace setVariable ["MWF_ThreatQRFInterval", _directives getOrDefault ["qrfInterval", 900], true];
+missionNamespace setVariable ["MWF_ThreatRoadblockPressure", _scaledRoadblockPressure, true];
+missionNamespace setVariable ["MWF_ThreatHQPressure", _scaledHQPressure, true];
+missionNamespace setVariable ["MWF_ThreatPatrolDensity", _scaledPatrolDensity, true];
+missionNamespace setVariable ["MWF_ThreatQRFInterval", _scaledQrfInterval, true];
 missionNamespace setVariable ["MWF_ThreatMissionEscalation", _directives getOrDefault ["missionEscalation", "low"], true];
 
 missionNamespace setVariable ["MWF_ZoneThreatIndex", _zoneThreatIndex, false];

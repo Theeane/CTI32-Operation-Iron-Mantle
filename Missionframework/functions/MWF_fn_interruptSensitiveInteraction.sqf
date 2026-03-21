@@ -16,37 +16,6 @@ if ((diag_tickTime - _lastAt) < 0.2) exitWith { false };
 missionNamespace setVariable ["MWF_SensitiveInterrupt_LastAt", diag_tickTime];
 
 private _interrupted = false;
-private _interruptReason = "Damage received. Active build/garage/terminal interaction closed.";
-
-if (missionNamespace getVariable ["MWF_BuildPlacement_Active", false]) then {
-    private _ghost = missionNamespace getVariable ["MWF_BuildPlacement_Ghost", objNull];
-    if (!isNull _ghost) then {
-        deleteVehicle _ghost;
-    };
-
-    private _confirmAction = missionNamespace getVariable ["MWF_BuildPlacement_ConfirmAction", -1];
-    if (_confirmAction >= 0) then {
-        player removeAction _confirmAction;
-    };
-
-    private _cancelAction = missionNamespace getVariable ["MWF_BuildPlacement_CancelAction", -1];
-    if (_cancelAction >= 0) then {
-        player removeAction _cancelAction;
-    };
-
-    missionNamespace setVariable ["MWF_BuildPlacement_Ghost", objNull];
-    missionNamespace setVariable ["MWF_BuildPlacement_ConfirmAction", -1];
-    missionNamespace setVariable ["MWF_BuildPlacement_CancelAction", -1];
-    missionNamespace setVariable ["MWF_BuildPlacement_Interrupted", true];
-    missionNamespace setVariable ["MWF_BuildPlacement_InterruptReason", _interruptReason];
-    missionNamespace setVariable ["MWF_BuildPlacement_Aborted", true];
-    missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", false];
-    missionNamespace setVariable ["MWF_BuildPlacement_Active", false];
-    if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "BUILD_PLACEMENT") then {
-        missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
-    };
-    _interrupted = true;
-};
 
 if (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) then {
     [] call MWF_fnc_cleanupVehiclePlacement;
@@ -66,7 +35,7 @@ if (!isNull _curatorDisplay) then {
 };
 
 if (_interrupted) then {
-    [["INTERACTION INTERRUPTED", _interruptReason], "warning"] call MWF_fnc_showNotification;
+    [["INTERACTION INTERRUPTED", "Damage received. Active build/garage/terminal interaction closed."], "warning"] call MWF_fnc_showNotification;
 };
 
 _interrupted
