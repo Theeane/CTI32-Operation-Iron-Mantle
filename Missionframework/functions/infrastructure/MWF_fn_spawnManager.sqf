@@ -192,12 +192,13 @@ if (_mode == "BOOTSTRAP") exitWith {
 
     {
         private _savedRecord = [_x, "ROADBLOCK"] call _findSavedRevealedRecord;
-        private _forcedId = if (_savedRecord isEqualType [] && {count _savedRecord >= 1}) then {
+        private _isPersistedReveal = _savedRecord isEqualType [] && {count _savedRecord >= 1};
+        private _forcedId = if (_isPersistedReveal) then {
             _savedRecord param [0, "", [""]]
         } else {
             [_x, "ROADBLOCK"] call _resolveStableInfrastructureId
         };
-        ["CREATE_BASE", [_x, "ROADBLOCK", _forcedId]] call MWF_fnc_spawnManager;
+        ["CREATE_BASE", [_x, "ROADBLOCK", _forcedId, _isPersistedReveal]] call MWF_fnc_spawnManager;
     } forEach _roadblockSites;
 
     missionNamespace setVariable ["MWF_InfrastructureBootstrapped", true, true];
@@ -213,12 +214,13 @@ if (_mode == "REFRESH_FIXED_BASES") exitWith {
         if !([_pos, _destroyedHQs] call _siteMatchesDestroyed) then {
             if !([_pos, 75] call _siteOccupied) then {
                 private _savedRecord = [_pos, "HQ"] call _findSavedRevealedRecord;
-                private _forcedId = if (_savedRecord isEqualType [] && {count _savedRecord >= 1}) then {
+                private _isPersistedReveal = _savedRecord isEqualType [] && {count _savedRecord >= 1};
+                private _forcedId = if (_isPersistedReveal) then {
                     _savedRecord param [0, "", [""]]
                 } else {
                     [_pos, "HQ"] call _resolveStableInfrastructureId
                 };
-                ["CREATE_BASE", [_pos, "HQ", _forcedId]] call MWF_fnc_spawnManager;
+                ["CREATE_BASE", [_pos, "HQ", _forcedId, _isPersistedReveal]] call MWF_fnc_spawnManager;
             };
         };
     } forEach _fixedBases;
@@ -228,11 +230,12 @@ if (_mode == "CREATE_BASE") exitWith {
     _params params [
         ["_pos", [], [[]]],
         ["_type", "ROADBLOCK", [""]],
-        ["_stableId", "", [""]]
+        ["_stableId", "", [""]],
+        ["_ignoreBaseDistance", false, [false]]
     ];
 
     if !((_pos isEqualType []) && {count _pos >= 2}) exitWith { objNull };
-    if !([_pos, 1000, 1500] call _isFarEnoughFromBases) exitWith { objNull };
+    if (!_ignoreBaseDistance && {!([_pos, 1000, 1500] call _isFarEnoughFromBases)}) exitWith { objNull };
 
     private _normalizedType = toUpper _type;
     private _destroyedRegistry = if (_normalizedType == "HQ") then {

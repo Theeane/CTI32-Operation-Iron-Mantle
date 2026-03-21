@@ -41,11 +41,13 @@ private _keys = [
     "MWF_Save_DestroyedHQs",
     "MWF_Save_DestroyedRoadblocks",
     "MWF_Save_FixedInfra",
+    "MWF_Save_PotentialBaseSites",
     "MWF_Save_FOBs",
     "MWF_Save_Tier",
     "MWF_Save_Missions",
     "MWF_Save_BoughtVehicles",
     "MWF_Save_GarageStoredVehicles",
+    "MWF_Save_BuiltUpgradeStructures",
     "MWF_Save_ActiveSideMissions",
     "MWF_Save_Campaign_Phase",
     "MWF_Save_Tutorial_SupplyRunDone",
@@ -70,6 +72,8 @@ private _keys = [
     "MWF_Save_Unlock_Tier5",
     "MWF_Save_Perk_HeliDiscount",
     "MWF_Save_GrandOperationState",
+    "MWF_Save_FreeMainOpCharges",
+    "MWF_Save_RevealedInfrastructureIDs",
     "MWF_Save_RevealedInfrastructureSites",
     "MWF_Save_CompositionType"
 ];
