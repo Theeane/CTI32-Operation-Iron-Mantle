@@ -4,8 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Opens a curated Virtual Arsenal that excludes OPFOR uniforms while keeping
-    all other regular categories available.
+    Opens a curated Virtual Arsenal that excludes OPFOR uniforms while allowing
+    the root global blacklist to remove any supported arsenal class across
+    weapons, magazines, items and backpacks.
 */
 
 if (!hasInterface) exitWith { false };
@@ -16,6 +17,9 @@ if !(missionNamespace getVariable ["MWF_InLoadoutZone", false]) exitWith {
 
 [] call MWF_fnc_buildLoadoutCaches;
 private _arsenalItems = missionNamespace getVariable ["MWF_ArsenalItemClasses", []];
+private _arsenalWeapons = missionNamespace getVariable ["MWF_ArsenalWeaponClasses", []];
+private _arsenalMagazines = missionNamespace getVariable ["MWF_ArsenalMagazineClasses", []];
+private _arsenalBackpacks = missionNamespace getVariable ["MWF_ArsenalBackpackClasses", []];
 
 private _box = missionNamespace getVariable ["MWF_LoadoutArsenalBox", objNull];
 if (isNull _box) then {
@@ -31,9 +35,9 @@ clearMagazineCargo _box;
 clearItemCargo _box;
 clearBackpackCargo _box;
 
-[_box, true, false] call BIS_fnc_addVirtualWeaponCargo;
-[_box, true, false] call BIS_fnc_addVirtualMagazineCargo;
-[_box, true, false] call BIS_fnc_addVirtualBackpackCargo;
+[_box, _arsenalWeapons, false] call BIS_fnc_addVirtualWeaponCargo;
+[_box, _arsenalMagazines, false] call BIS_fnc_addVirtualMagazineCargo;
+[_box, _arsenalBackpacks, false] call BIS_fnc_addVirtualBackpackCargo;
 [_box, _arsenalItems, false] call BIS_fnc_addVirtualItemCargo;
 
 ["Open", [false, _box, player]] call BIS_fnc_arsenal;
