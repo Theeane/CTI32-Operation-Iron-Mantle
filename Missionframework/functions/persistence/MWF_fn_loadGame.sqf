@@ -126,6 +126,9 @@ missionNamespace setVariable ["MWF_DestroyedHQs", profileNamespace getVariable [
 missionNamespace setVariable ["MWF_DestroyedRoadblocks", profileNamespace getVariable ["MWF_Save_DestroyedRoadblocks", []], true];
 missionNamespace setVariable ["MWF_FOB_Positions", profileNamespace getVariable ["MWF_Save_FOBs", []], true];
 missionNamespace setVariable ["MWF_FixedInfrastructure", profileNamespace getVariable ["MWF_Save_FixedInfra", []], true];
+missionNamespace setVariable ["MWF_PotentialBaseSites", profileNamespace getVariable ["MWF_Save_PotentialBaseSites", []], true];
+missionNamespace setVariable ["MWF_FreeMainOpCharges", [profileNamespace getVariable ["MWF_Save_FreeMainOpCharges", 0], 0, 9999, 0] call _clampNumber, true];
+missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", +(profileNamespace getVariable ["MWF_Save_RevealedInfrastructureIDs", []]), true];
 missionNamespace setVariable ["MWF_completedMissions", profileNamespace getVariable ["MWF_Save_Missions", []], true];
 missionNamespace setVariable ["MWF_CurrentTier", [profileNamespace getVariable ["MWF_Save_Tier", 1], 1, 10, 1] call _clampNumber, true];
 missionNamespace setVariable ["MWF_CapturedZoneCount", [profileNamespace getVariable ["MWF_Save_CapturedZoneCount", 0], 0, 100000, 0] call _clampNumber, true];

@@ -151,6 +151,9 @@ profileNamespace setVariable ["MWF_Save_DestroyedHQs", missionNamespace getVaria
 profileNamespace setVariable ["MWF_Save_DestroyedRoadblocks", missionNamespace getVariable ["MWF_DestroyedRoadblocks", []]];
 profileNamespace setVariable ["MWF_Save_Tier", missionNamespace getVariable ["MWF_CurrentTier", 1]];
 profileNamespace setVariable ["MWF_Save_FixedInfra", missionNamespace getVariable ["MWF_FixedInfrastructure", []]];
+profileNamespace setVariable ["MWF_Save_PotentialBaseSites", missionNamespace getVariable ["MWF_PotentialBaseSites", []]];
+profileNamespace setVariable ["MWF_Save_FreeMainOpCharges", missionNamespace getVariable ["MWF_FreeMainOpCharges", 0]];
+profileNamespace setVariable ["MWF_Save_RevealedInfrastructureIDs", missionNamespace getVariable ["MWF_RevealedInfrastructureIDs", []]];
 profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MWF_FOB_Positions", []]];
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];

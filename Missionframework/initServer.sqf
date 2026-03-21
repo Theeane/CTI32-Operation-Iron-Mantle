@@ -68,13 +68,10 @@ if (!isNil "MWF_fnc_restoreActiveMainOperation") then {
 };
 
 if (!isNil "MWF_fnc_infrastructureManager") then {
-    [] spawn MWF_fnc_infrastructureManager;
+    ["INIT"] call MWF_fnc_infrastructureManager;
 };
 if (!isNil "MWF_fnc_spawnManager") then {
-    [] spawn MWF_fnc_spawnManager;
-};
-if (!isNil "MWF_fnc_intelManager") then {
-    [] spawn MWF_fnc_intelManager;
+    ["BOOTSTRAP"] spawn MWF_fnc_spawnManager;
 };
 if (!isNil "MWF_fnc_cityMonitor") then {
     [] spawn MWF_fnc_cityMonitor;

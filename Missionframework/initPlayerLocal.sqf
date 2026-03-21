@@ -22,6 +22,11 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 [] call MWF_fnc_initLoadoutSystem;
 [] spawn MWF_fnc_undercoverHandler;
 
+// Local HQ / roadblock discovery markers
+if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
+    [] spawn MWF_fnc_infrastructureMarkerManager;
+};
+
 // Update resource display
 [] call MWF_fnc_updateResourceUI;
 

@@ -8,12 +8,13 @@
     Placements are randomized per server runtime, remain fixed during the runtime,
     and regenerate on restart.
 
-    Rules added in this patch:
-    - land side missions prefer enemy-held zones only
-    - mission templates respect allowedZoneTypes where possible
+    Rules:
+    - land side missions prefer enemy-held zones when manual anchors are not supplied
+    - side_mission_1..N are optional manual overrides and placeholders are ignored
+    - Air currently reuses the land placement model when enabled later
+    - Naval remains feature-switched and only reads suffixed markers
     - missions avoid the MOB
     - missions avoid FOBs
-    - tutorial remains the exception elsewhere; this generator only handles side missions
 */
 
 if (!isServer) exitWith {[]};
@@ -24,27 +25,31 @@ params [
 
 private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) select { !isNull _x };
 private _allMarkers = allMapMarkers;
-private _navalAnchors = _allMarkers select { toLower _x find "naval_mission" == 0 };
-if (_navalAnchors isEqualTo [] && {"Naval_mission" in _allMarkers}) then {
-    _navalAnchors pushBack "Naval_mission";
-};
 
-private _airAnchors = [];
-for "_i" from 1 to 99 do {
-    private _markerName = format ["MWF_Air_SideMission_%1", _i];
-    if (_markerName in _allMarkers) then {
-        _airAnchors pushBack _markerName;
+private _collectMarkerSeries = {
+    params ["_baseName"];
+    private _result = [];
+    for "_i" from 1 to 99 do {
+        private _markerName = format ["%1_%2", _baseName, _i];
+        if (_markerName in _allMarkers) then {
+            _result pushBack _markerName;
+        };
     };
-};
-if (_airAnchors isEqualTo [] && {"MWF_Air_SideMission" in _allMarkers}) then {
-    _airAnchors pushBack "MWF_Air_SideMission";
+    _result
 };
 
-missionNamespace setVariable ["MWF_MissionDomainSupported_Land", !(_zones isEqualTo []), true];
-missionNamespace setVariable ["MWF_MissionDomainSupported_Naval", !(_navalAnchors isEqualTo []), true];
-missionNamespace setVariable ["MWF_MissionDomainSupported_Air", !(_airAnchors isEqualTo []), true];
-missionNamespace setVariable ["MWF_NavalMissionAnchors", _navalAnchors, true];
-missionNamespace setVariable ["MWF_AirMissionAnchors", _airAnchors, true];
+private _manualLandAnchors = ["side_mission"] call _collectMarkerSeries;
+private _manualNavalAnchors = ["Naval_mission"] call _collectMarkerSeries;
+
+private _landEnabled = missionNamespace getVariable ["MWF_Feature_LandEnabled", true];
+private _navalEnabled = missionNamespace getVariable ["MWF_Feature_NavalEnabled", false];
+private _airEnabled = missionNamespace getVariable ["MWF_Feature_AirEnabled", false];
+
+missionNamespace setVariable ["MWF_MissionDomainSupported_Land", _landEnabled && (!(_zones isEqualTo []) || !(_manualLandAnchors isEqualTo [])), true];
+missionNamespace setVariable ["MWF_MissionDomainSupported_Naval", _navalEnabled && !(_manualNavalAnchors isEqualTo []), true];
+missionNamespace setVariable ["MWF_MissionDomainSupported_Air", _airEnabled && (missionNamespace getVariable ["MWF_MissionDomainSupported_Land", false]), true];
+missionNamespace setVariable ["MWF_LandMissionAnchors", _manualLandAnchors, true];
+missionNamespace setVariable ["MWF_NavalMissionAnchors", _manualNavalAnchors, true];
 
 private _placements = [];
 if (_templates isEqualTo []) exitWith {
@@ -142,22 +147,33 @@ private _pickLandPlacement = {
 };
 
 private _pickMarkerPlacement = {
-    params ["_markerName", ["_innerRadius", 80, [0]], ["_outerRadius", 350, [0]]];
+    params ["_markerName", ["_innerRadius", 80, [0]], ["_outerRadius", 350, [0]], ["_waterOnly", false, [false]], ["_landOnly", false, [false]]];
 
     private _center = getMarkerPos _markerName;
     if (_center isEqualTo [0,0,0]) exitWith {_center};
 
-    private _candidate = [_center, _innerRadius, _outerRadius, 5, 0, 0.25, 0, [], [_center, _center]] call BIS_fnc_findSafePos;
-    if (_candidate isEqualTo _center) then {
-        private _angle = random 360;
-        private _distance = _innerRadius + random ((_outerRadius - _innerRadius) max 25);
-        _candidate = [
-            (_center # 0) + ((sin _angle) * _distance),
-            (_center # 1) + ((cos _angle) * _distance),
-            0
-        ];
+    private _candidate = _center;
+    private _found = false;
+    for "_attempt" from 0 to 24 do {
+        private _probe = [_center, _innerRadius, _outerRadius, 5, 0, 0.25, 0, [], [_center, _center]] call BIS_fnc_findSafePos;
+        if (_probe isEqualTo _center) then {
+            private _angle = random 360;
+            private _distance = _innerRadius + random ((_outerRadius - _innerRadius) max 25);
+            _probe = [
+                (_center # 0) + ((sin _angle) * _distance),
+                (_center # 1) + ((cos _angle) * _distance),
+                0
+            ];
+        };
+
+        private _isWater = surfaceIsWater _probe;
+        if ((!_waterOnly || {_isWater}) && (!_landOnly || {!_isWater})) exitWith {
+            _candidate = _probe;
+            _found = true;
+        };
     };
 
+    if (!_found) then { _candidate = +_center; };
     _candidate
 };
 
@@ -166,6 +182,19 @@ private _isFarEnoughFromBases = {
     if ((_mobPos distance2D _pos) < _mobMin) exitWith { false };
     private _nearFob = _fobPositions findIf { (_x distance2D _pos) < _fobMin };
     _nearFob < 0
+};
+
+private _pickManualAnchor = {
+    params ["_anchors", "_mobMin", "_fobMin"];
+    private _picked = "";
+    {
+        private _candidate = _x;
+        private _candidatePos = getMarkerPos _candidate;
+        if ([_candidatePos, _mobMin, _fobMin] call _isFarEnoughFromBases) exitWith {
+            _picked = _candidate;
+        };
+    } forEach (_anchors call BIS_fnc_arrayShuffle);
+    _picked
 };
 
 {
@@ -178,8 +207,13 @@ private _isFarEnoughFromBases = {
     private _allowedZoneTypes = [_missionDefinition, "allowedZoneTypes", []] call _getDefinitionValue;
     private _allowedZoneTypesLower = _allowedZoneTypes apply { toLower (str _x) };
 
-    switch (_domain) do {
-        case "land": {
+    if (_domain in ["land", "air"]) then {
+        private _pickedManual = [_manualLandAnchors, _primaryMobMin, _primaryFobMin] call _pickManualAnchor;
+        if (_pickedManual isNotEqualTo "") then {
+            _areaId = _pickedManual;
+            _areaName = format ["Manual AO (%1)", _category];
+            _position = [_pickedManual, 90, 360, false, true] call _pickMarkerPlacement;
+        } else {
             private _zonePool = _zones select {
                 private _owner = toLower (_x getVariable ["MWF_zoneOwnerState", if (_x getVariable ["MWF_isCaptured", false]) then {"player"} else {"enemy"}]);
                 private _zoneType = toLower (_x getVariable ["MWF_zoneType", "town"]);
@@ -190,11 +224,8 @@ private _isFarEnoughFromBases = {
             {
                 _x params ["_mobMin", "_fobMin"];
                 private _candidates = _zonePool select {
-                    [_x, _mobMin, _fobMin] call {
-                        params ["_zone", "_mobMinLocal", "_fobMinLocal"];
-                        private _zonePos = getPosATL _zone;
-                        [_zonePos, _mobMinLocal, _fobMinLocal] call _isFarEnoughFromBases
-                    }
+                    private _zonePos = getPosATL _x;
+                    [_zonePos, _mobMin, _fobMin] call _isFarEnoughFromBases
                 };
                 if (_candidates isNotEqualTo []) exitWith {
                     _pickedZone = selectRandom _candidates;
@@ -207,38 +238,13 @@ private _isFarEnoughFromBases = {
                 _position = [_pickedZone] call _pickLandPlacement;
             };
         };
-
-        case "naval": {
-            private _picked = "";
-            {
-                private _candidate = _x;
-                private _candidatePos = getMarkerPos _candidate;
-                if ([_candidatePos, _primaryMobMin, _primaryFobMin] call _isFarEnoughFromBases) exitWith {
-                    _picked = _candidate;
-                };
-            } forEach (_navalAnchors call BIS_fnc_arrayShuffle);
-
+    } else {
+        if (_domain isEqualTo "naval") then {
+            private _picked = [_manualNavalAnchors, _primaryMobMin, _primaryFobMin] call _pickManualAnchor;
             if (_picked isNotEqualTo "") then {
                 _areaId = _picked;
                 _areaName = format ["Naval AO (%1)", _category];
-                _position = [_picked, 100, 450] call _pickMarkerPlacement;
-            };
-        };
-
-        case "air": {
-            private _picked = "";
-            {
-                private _candidate = _x;
-                private _candidatePos = getMarkerPos _candidate;
-                if ([_candidatePos, _primaryMobMin, _primaryFobMin] call _isFarEnoughFromBases) exitWith {
-                    _picked = _candidate;
-                };
-            } forEach (_airAnchors call BIS_fnc_arrayShuffle);
-
-            if (_picked isNotEqualTo "") then {
-                _areaId = _picked;
-                _areaName = format ["Air AO (%1)", _category];
-                _position = [_picked, 120, 500] call _pickMarkerPlacement;
+                _position = [_picked, 100, 450, true, false] call _pickMarkerPlacement;
             };
         };
     };

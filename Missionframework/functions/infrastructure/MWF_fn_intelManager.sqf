@@ -4,10 +4,10 @@
     Project: Military War Framework
 
     Description:
-    Searchable officer/computer intel pipeline for HQ and roadblock infrastructure.
-    This replaces the old server-`cameraView` discovery loop with authoritative
-    search interactions that award digital intel or return nothing when the player
-    is already carrying too much useful intel.
+    Temporary-intel pipeline manager.
+    - search interactions on HQ / roadblock intel anchors award temporary intel
+    - generic carried-intel awards are centralized here for bodies / civilians / infrastructure
+    - location reveals never happen here; they only roll during a true command-network turn-in
 */
 
 if (!isServer) exitWith { false };
@@ -16,10 +16,6 @@ params [
     ["_mode", "SPAWN_INTEL", [""]],
     ["_params", []]
 ];
-
-private _getCurrentIntel = {
-    missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]]
-};
 
 private _pickOfficerClass = {
     private _preset = missionNamespace getVariable ["MWF_OPFOR_Preset", createHashMap];
@@ -64,6 +60,29 @@ private _registerSearchAction = {
 };
 
 switch (toUpper _mode) do {
+    case "ADD_CARRIED": {
+        _params params [
+            ["_receiver", objNull, [objNull]],
+            ["_amount", 0, [0]],
+            ["_title", "TEMP INTEL", [""]],
+            ["_detail", "Temporary intel secured.", [""]]
+        ];
+
+        if (isNull _receiver || {_amount <= 0}) exitWith { false };
+
+        private _current = _receiver getVariable ["MWF_carriedIntelValue", 0];
+        private _newValue = (_current + _amount) max 0;
+        _receiver setVariable ["MWF_carriedIntelValue", _newValue, true];
+        _receiver setVariable ["MWF_carryingIntel", (_newValue > 0), true];
+
+        [
+            [_title, format ["%1 (+%2 Temp Intel | Carrying: %3)", _detail, _amount, _newValue]],
+            "success"
+        ] remoteExecCall ["MWF_fnc_showNotification", owner _receiver];
+
+        true
+    };
+
     case "SPAWN_INTEL": {
         _params params [
             ["_basePos", [0,0,0], [[]]],
@@ -123,25 +142,18 @@ switch (toUpper _mode) do {
 
         _target setVariable ["MWF_IntelSearchUsed", true, true];
 
-        private _currentIntel = call _getCurrentIntel;
-        private _findChance = (85 - (_currentIntel / 4)) max 10 min 85;
-        private _foundIntel = (random 100) <= _findChance;
-        private _reward = 0;
-
-        if (_foundIntel) then {
-            _reward = switch (toUpper _searchType) do {
-                case "OFFICER": { 18 + floor (random 13) };
-                default { 10 + floor (random 11) };
-            };
-            [_reward, "INTEL"] call MWF_fnc_addResource;
-            [format ["Recovered %1 intel from the %2.", _reward, toLower _searchType]] remoteExec ["hint", owner _caller];
-            [["INTEL RECOVERED", format ["%1 Intel secured.", _reward]], "success"] remoteExec ["MWF_fnc_showNotification", 0];
-        } else {
-            [format ["You found nothing useful on the %1.", toLower _searchType]] remoteExec ["hint", owner _caller];
-            [["SEARCH COMPLETE", "Nothing useful was recovered."], "info"] remoteExec ["MWF_fnc_showNotification", 0];
+        private _carriedIntel = _caller getVariable ["MWF_carriedIntelValue", 0];
+        if (_carriedIntel >= 150) exitWith {
+            [["SEARCH COMPLETE", "You are already carrying too much temporary intel to sort anything useful here."], "info"] remoteExecCall ["MWF_fnc_showNotification", owner _caller];
+            true
         };
 
-        if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
+        private _reward = switch (toUpper _searchType) do {
+            case "OFFICER": { 18 + floor (random 13) };
+            default { 10 + floor (random 11) };
+        };
+
+        ["ADD_CARRIED", [_caller, _reward, "TEMP INTEL", format ["Recovered %1 temporary intel from the %2.", _reward, toLower _searchType]]] call MWF_fnc_intelManager;
         true
     };
 

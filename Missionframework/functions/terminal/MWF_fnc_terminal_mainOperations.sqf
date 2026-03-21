@@ -29,7 +29,8 @@ switch (toUpper _mode) do {
 
         ["CLOSE"] call MWF_fnc_terminal_mainOperations;
 
-        private _text = "Main Operations<br/>Select a grand operation from the action menu.<br/><br/>";
+        private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
+        private _text = format ["Main Operations<br/>Select a grand operation from the action menu.<br/><t size='0.85'>Intel jackpot charges: %1</t><br/><br/>", _freeCharges];
         {
             _x params ["_key", "_title", "_desc", "_fnName", "_impactId", "_effectType", "_effectText", "_fallbackText"];
             private _state = [_key, _x] call MWF_fnc_getMainOperationState;
@@ -169,6 +170,12 @@ switch (toUpper _mode) do {
         missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", _title, true];
         missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", _placement, true];
 
+        private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
+        private _usedFreeCharge = _freeCharges > 0;
+        if (_usedFreeCharge) then {
+            missionNamespace setVariable ["MWF_FreeMainOpCharges", (_freeCharges - 1) max 0, true];
+        };
+
         private _fn = missionNamespace getVariable [_fnName, objNull];
         if (isNil "_fn" || {_fn isEqualTo objNull}) exitWith {
             missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
@@ -188,7 +195,7 @@ switch (toUpper _mode) do {
 
         ["START", [_key, _fnName, _title, _position, _requestOwner]] call MWF_fnc_mainOperationRuntime;
 
-        [["MAIN OPERATION", format ["%1 launched in %2.", _title, _zoneName]], "info"] remoteExec ["MWF_fnc_showNotification", 0];
+        [["MAIN OPERATION", format ["%1 launched in %2.%3", _title, _zoneName, if (_usedFreeCharge) then {" Intel breakthrough charge consumed."} else {""}]], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         [format ["Grand Operation started: %1", _title]] remoteExecCall ["systemChat", _requestOwner];
         diag_log format ["[MWF Main Operations] Started %1 at %2 in %3.", _key, _position, _zoneName];
     };

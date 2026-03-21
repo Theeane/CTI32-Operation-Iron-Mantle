@@ -102,6 +102,7 @@ class CfgFunctions {
             class initCommandPC { file = "Missionframework/functions/base/MWF_fn_initCommandPC.sqf"; };
             class initFOB { file = "Missionframework/functions/base/MWF_fn_initFOB.sqf"; };
             class initMobileRespawn { file = "Missionframework/functions/base/MWF_fn_initMobileRespawn.sqf"; };
+            class vehicleIntelTransfer { file = "Missionframework/functions/base/MWF_fn_vehicleIntelTransfer.sqf"; };
             class spawnInitialFOBAsset { file = "Missionframework/functions/base/MWF_fn_spawnInitialFOBAsset.sqf"; };
             class initiatePurchase { file = "Missionframework/functions/base/MWF_fn_initiatePurchase.sqf"; };
             class openBuyMenu { file = "Missionframework/functions/base/MWF_fn_openBuyMenu.sqf"; };
@@ -246,6 +247,7 @@ class CfgFunctions {
             file = "Missionframework/functions/infrastructure";
             class infrastructureManager { file = "Missionframework/functions/infrastructure/MWF_fn_infrastructureManager.sqf"; };
             class intelManager { file = "Missionframework/functions/infrastructure/MWF_fn_intelManager.sqf"; };
+            class infrastructureMarkerManager { file = "Missionframework/functions/infrastructure/MWF_fn_infrastructureMarkerManager.sqf"; };
             class spawnManager { file = "Missionframework/functions/infrastructure/MWF_fn_spawnManager.sqf"; };
         };
 

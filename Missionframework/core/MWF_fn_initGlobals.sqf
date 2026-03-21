@@ -106,6 +106,17 @@ if (isNil { missionNamespace getVariable "MWF_Campaign_Phase" }) then {
     missionNamespace setVariable ["MWF_Campaign_Phase", "TUTORIAL", true];
 };
 
+missionNamespace setVariable ["MWF_Feature_LandEnabled", missionNamespace getVariable ["MWF_Feature_LandEnabled", true], true];
+missionNamespace setVariable ["MWF_Feature_NavalEnabled", missionNamespace getVariable ["MWF_Feature_NavalEnabled", false], true];
+missionNamespace setVariable ["MWF_Feature_AirEnabled", missionNamespace getVariable ["MWF_Feature_AirEnabled", false], true];
+
+if (isNil { missionNamespace getVariable "MWF_FreeMainOpCharges" }) then {
+    missionNamespace setVariable ["MWF_FreeMainOpCharges", 0, true];
+};
+if (isNil { missionNamespace getVariable "MWF_RevealedInfrastructureIDs" }) then {
+    missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", [], true];
+};
+
 if (isNil { missionNamespace getVariable "MWF_Tutorial_SupplyRunDone" }) then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", false, true];
 };

@@ -6,6 +6,8 @@
     Description:
     Discovers side mission templates from the domain-aware folder structure.
     The mission pool is parameter-driven and only scans numbered templates.
+    Domain availability is feature-switch driven so naval and air can remain
+    coded but disabled until their systems are ready.
 
     Return:
     Array of mission template records:
@@ -20,7 +22,11 @@ private _definitions = [
     ["intel", "MissionIntel"]
 ];
 
-private _domains = ["land", "naval", "air"];
+private _domains = [];
+if (missionNamespace getVariable ["MWF_Feature_LandEnabled", true]) then { _domains pushBack "land"; };
+if (missionNamespace getVariable ["MWF_Feature_NavalEnabled", false]) then { _domains pushBack "naval"; };
+if (missionNamespace getVariable ["MWF_Feature_AirEnabled", false]) then { _domains pushBack "air"; };
+
 private _difficulties = ["easy", "medium", "hard"];
 private _templates = [];
 private _maxTemplateId = (missionNamespace getVariable ["MWF_Param_SideMissionTemplateLimit", 24]) max 1 min 99;
@@ -47,5 +53,5 @@ private _maxTemplateId = (missionNamespace getVariable ["MWF_Param_SideMissionTe
 } forEach _domains;
 
 missionNamespace setVariable ["MWF_MissionTemplateRegistry", _templates, true];
-diag_log format ["[MWF Missions] Discovered %1 side mission template(s) across land/naval/air. Pool limit: %2.", count _templates, _maxTemplateId];
+diag_log format ["[MWF Missions] Discovered %1 side mission template(s). Enabled domains: %2 | Pool limit: %3.", count _templates, _domains, _maxTemplateId];
 _templates

@@ -4,15 +4,13 @@
     Project: Military War Framework
 
     Description:
-    Handles HQ and roadblock destruction tracking and infrastructure integration.
-    Updated to preserve persistent destroyed-object registries and feed the threat layer.
+    Handles HQ and roadblock destruction tracking, registry state, and infrastructure integration.
 */
 
 if (!isServer) exitWith {};
 
 params [["_mode", "INIT"], ["_params", []]];
 
-// --- MODE: INIT ---
 if (_mode == "INIT") exitWith {
     if (missionNamespace getVariable ["MWF_InfrastructureManagerStarted", false]) exitWith {};
     missionNamespace setVariable ["MWF_InfrastructureManagerStarted", true, true];
@@ -25,7 +23,8 @@ if (_mode == "INIT") exitWith {
             ["_position", [], [[]]],
             ["_objectNetId", "", [""]],
             ["_destroyerUid", "", [""]],
-            ["_destroyerName", "Unknown", [""]]
+            ["_destroyerName", "Unknown", [""]],
+            ["_infraId", "", [""]]
         ];
 
         private _normalizedType = toUpper _type;
@@ -36,6 +35,22 @@ if (_mode == "INIT") exitWith {
             _destroyedRegistry pushBackUnique _position;
             missionNamespace setVariable [_registryVar, _destroyedRegistry, true];
         };
+
+        if (_infraId isNotEqualTo "") then {
+            private _revealed = +(missionNamespace getVariable ["MWF_RevealedInfrastructureIDs", []]);
+            private _revealIndex = _revealed find _infraId;
+            if (_revealIndex >= 0) then {
+                _revealed deleteAt _revealIndex;
+                missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", _revealed, true];
+            };
+        };
+
+        private _registry = +(missionNamespace getVariable ["MWF_InfrastructureRegistry", []]);
+        _registry = _registry select {
+            private _entryId = _x param [0, "", [""]];
+            if (_infraId isEqualTo "") then { true } else { !(_entryId isEqualTo _infraId) }
+        };
+        missionNamespace setVariable ["MWF_InfrastructureRegistry", _registry, true];
 
         private _supplyReward = if (_normalizedType == "HQ") then {50} else {20};
         private _supplyVar = "MWF_Economy_Supplies";
@@ -101,17 +116,29 @@ if (_mode == "INIT") exitWith {
     }] call CBA_fnc_addEventHandler;
 };
 
-// --- MODE: REGISTER ---
 if (_mode == "REGISTER") exitWith {
     _params params [
         ["_object", objNull, [objNull]],
-        ["_type", "ROADBLOCK", [""]]
+        ["_type", "ROADBLOCK", [""]],
+        ["_forcedId", "", [""]]
     ];
 
     if (isNull _object) exitWith {};
 
     private _normalizedType = toUpper _type;
+    private _infraId = _forcedId;
+    if (_infraId isEqualTo "") then {
+        private _nextId = missionNamespace getVariable ["MWF_NextInfrastructureId", 0];
+        _infraId = format ["%1_%2", toLower _normalizedType, _nextId];
+        missionNamespace setVariable ["MWF_NextInfrastructureId", _nextId + 1, true];
+    };
+
     _object setVariable ["MWF_InfraType", _normalizedType, true];
+    _object setVariable ["MWF_InfrastructureId", _infraId, true];
+
+    private _registry = +(missionNamespace getVariable ["MWF_InfrastructureRegistry", []]);
+    _registry pushBack [_infraId, _normalizedType, _object, getPosWorld _object];
+    missionNamespace setVariable ["MWF_InfrastructureRegistry", _registry, true];
 
     if (!isNil "MWF_fnc_intelManager") then {
         ["SPAWN_INTEL", [getPosWorld _object, _normalizedType]] call MWF_fnc_intelManager;
@@ -120,6 +147,7 @@ if (_mode == "REGISTER") exitWith {
     _object addEventHandler ["Killed", {
         params ["_unit", "_killer", "_instigator"];
         private _type = _unit getVariable ["MWF_InfraType", "ROADBLOCK"];
+        private _infraId = _unit getVariable ["MWF_InfrastructureId", ""];
 
         private _actor = if (!isNull _instigator) then { _instigator } else { _killer };
         if (!isNull _actor && {!isPlayer _actor}) then {
@@ -135,8 +163,8 @@ if (_mode == "REGISTER") exitWith {
         private _uid = if (!isNull _actor && {isPlayer _actor}) then { getPlayerUID _actor } else { "" };
         private _name = if (!isNull _actor && {isPlayer _actor}) then { name _actor } else { "Unknown" };
 
-        ["MWF_Infra_Destroyed", [_type, getPosWorld _unit, netId _unit, _uid, _name]] call CBA_fnc_serverEvent;
+        ["MWF_Infra_Destroyed", [_type, getPosWorld _unit, netId _unit, _uid, _name, _infraId]] call CBA_fnc_serverEvent;
     }];
 
-    diag_log format ["[MWF INFRA] Registered %1 at %2.", _normalizedType, getPosWorld _object];
+    diag_log format ["[MWF INFRA] Registered %1 at %2 as %3.", _normalizedType, getPosWorld _object, _infraId];
 };

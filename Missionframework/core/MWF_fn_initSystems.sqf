@@ -23,6 +23,14 @@ missionNamespace setVariable ["MWF_FOBsRestored", missionNamespace getVariable [
 missionNamespace setVariable ["MWF_GarageRegistry", missionNamespace getVariable ["MWF_GarageRegistry", []], true];
 missionNamespace setVariable ["MWF_GarageStoredVehicles", missionNamespace getVariable ["MWF_GarageStoredVehicles", []], true];
 missionNamespace setVariable ["MWF_FixedInfrastructure", missionNamespace getVariable ["MWF_FixedInfrastructure", []], true];
+missionNamespace setVariable ["MWF_PotentialBaseSites", missionNamespace getVariable ["MWF_PotentialBaseSites", []], true];
+missionNamespace setVariable ["MWF_HQSiteRegistry", missionNamespace getVariable ["MWF_HQSiteRegistry", []], true];
+missionNamespace setVariable ["MWF_RoadblockSiteRegistry", missionNamespace getVariable ["MWF_RoadblockSiteRegistry", []], true];
+missionNamespace setVariable ["MWF_InfrastructureRegistry", missionNamespace getVariable ["MWF_InfrastructureRegistry", []], true];
+missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", missionNamespace getVariable ["MWF_RevealedInfrastructureIDs", []], true];
+missionNamespace setVariable ["MWF_InfrastructureBootstrapped", missionNamespace getVariable ["MWF_InfrastructureBootstrapped", false], true];
+missionNamespace setVariable ["MWF_NextInfrastructureId", missionNamespace getVariable ["MWF_NextInfrastructureId", 0], true];
+missionNamespace setVariable ["MWF_FreeMainOpCharges", missionNamespace getVariable ["MWF_FreeMainOpCharges", 0], true];
 missionNamespace setVariable ["MWF_completedMissions", missionNamespace getVariable ["MWF_completedMissions", []], true];
 missionNamespace setVariable ["MWF_RepPenaltyCount", missionNamespace getVariable ["MWF_RepPenaltyCount", 0], true];
 missionNamespace setVariable ["MWF_CurrentTier", missionNamespace getVariable ["MWF_CurrentTier", 1], true];
