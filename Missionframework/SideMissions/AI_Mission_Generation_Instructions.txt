@@ -1,5 +1,9 @@
 AI Mission Generation Instructions (Gold Standard, Community Range _4–_99)
 
+Important blind-test rule:
+When running in a web/chat environment without trusted folder visibility, the AI must treat ID availability as unknown.
+It must ask for confirmation before using _4 or any other community ID.
+
 Purpose
 These instructions apply only to community-authored side mission templates in the _4–_99 range.
 Official/internal missions _1–_3 are reserved and may be used as style references, but must not be overwritten,
@@ -50,8 +54,34 @@ Those paths are not the current land side mission format.
 Community AI generation must never modify _1–_3.
 Use _1–_3 only as reference examples for style, structure, and field order.
 
+2a. if the AI cannot inspect the folder directly, explicitly ask the user whether _4 already exists before choosing an ID
+
 3. ID selection rules (MANDATORY)
-Before creating a new community mission, the AI must first inspect the target folder and find which numeric IDs already exist.
+Before creating a new community mission, the AI must first determine which numeric IDs already exist in the exact target folder.
+
+Normal workflow:
+1. inspect the exact target folder
+2. list all used IDs
+3. choose the next free ID in the _4–_99 range
+4. ensure missionId string, filename, and final execute call all use the same ID
+
+Blind / no-file-access workflow (MANDATORY):
+If the AI cannot directly inspect the folder contents, it must NOT guess that _4 is free.
+It must first ask the user whether the first community slot already exists.
+
+Required behavior:
+- first ask whether <MissionPrefix>_4 already exists in the exact target folder
+- if _4 does not exist, use _4
+- if _4 already exists, ask for the used IDs or the folder contents
+- only after that, choose the next free _4–_99 ID
+- never overwrite an existing file
+- never assume an ID is free without confirmation when folder inspection is unavailable
+
+Examples:
+- if MissionSupply_4 and MissionSupply_5 already exist, do not overwrite them
+- choose MissionSupply_6 if 6 is the next free ID
+- if the AI cannot inspect the folder itself, it must first ask:
+  "Does MissionSupply_4 already exist in Missionframework/SideMissions/land/supply/easy/?"
 
 Workflow:
 1. inspect the exact target folder
