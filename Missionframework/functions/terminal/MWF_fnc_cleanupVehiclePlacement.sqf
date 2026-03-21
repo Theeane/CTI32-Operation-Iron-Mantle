@@ -38,7 +38,13 @@ missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", -1];
 missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", -1];
-if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then {
+missionNamespace setVariable ["MWF_BuildPlacement_Confirmed", false];
+missionNamespace setVariable ["MWF_BuildPlacement_Aborted", false];
+missionNamespace setVariable ["MWF_BuildPlacement_Rotation", nil];
+missionNamespace setVariable ["MWF_BuildPlacement_Class", nil];
+missionNamespace setVariable ["MWF_BuildPlacement_Price", nil];
+missionNamespace setVariable ["MWF_BuildPlacement_Name", nil];
+if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) in ["VEHICLE_PLACEMENT", "BUILD_PLACEMENT"]) then {
     missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
 };
 

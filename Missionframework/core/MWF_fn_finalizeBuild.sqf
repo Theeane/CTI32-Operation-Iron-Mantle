@@ -126,15 +126,7 @@ if (_isGarageUpgrade) then {
                 {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _baseKey}
             }) > -1;
 
-            private _alreadyNearby = ({
-                private _nearObj = _x;
-                !isNull _nearObj &&
-                {(_nearObj getVariable ["MWF_isVirtualGarage", false])} &&
-                {(typeOf _nearObj) isEqualTo _garageClass} &&
-                {(_nearObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _baseKey}
-            } count (nearestObjects [_basePos, [_garageClass], 120])) > 0;
-
-            if (_alreadyRegistered || _alreadyNearby) then {
+            if (_alreadyRegistered) then {
                 _garageRejectReason = format ["Virtual Garage is already built at %1.", _baseLabel];
             };
         };
@@ -168,59 +160,24 @@ private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
 private _vehicle = createVehicle [_className, _pos, [], 0, "CAN_COLLIDE"];
 _vehicle setDir _dir;
 _vehicle setPosATL _pos;
-if (_isHeliUpgrade || _isJetUpgrade || _isGarageUpgrade) then {
-    _vehicle allowDamage false;
-};
 
 if (_className isEqualTo "B_Slingload_01_Cargo_F") then {
     [_vehicle] remoteExec ["MWF_fnc_setupFOBAction", 0, true];
 };
 
-private _builtUpgradeStructures = + (missionNamespace getVariable ["MWF_BuiltUpgradeStructures", []]);
-private _buildRecord = [];
-
 if (_isGarageUpgrade) then {
     _vehicle setVariable ["MWF_isVirtualGarage", true, true];
+    _vehicle allowDamage false;
     ["REGISTER_BUILD", _vehicle, _builder, 0] call MWF_fnc_garageSystem;
-
-    private _garageBaseKey = _garageBaseInfo param [2, "MOB"];
-    _vehicle setVariable ["MWF_BuildUpgradeId", "GARAGE", true];
-    _vehicle setVariable ["MWF_BuildUpgradeBaseKey", _garageBaseKey, true];
-    _buildRecord = ["GARAGE", _className, getPosASL _vehicle, vectorDir _vehicle, vectorUp _vehicle, _garageBaseKey];
-
     [["BASE UPGRADE ONLINE", "Virtual Garage constructed. Use the garage object on foot within 5 meters."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 };
 
 if (_isHeliUpgrade) then {
-    _vehicle setVariable ["MWF_BuildUpgradeId", "HELI", true];
-    _vehicle setVariable ["MWF_BuildUpgradeBaseKey", "MOB", true];
-    _buildRecord = ["HELI", _className, getPosASL _vehicle, vectorDir _vehicle, vectorUp _vehicle, "MOB"];
     [["BASE UPGRADE ONLINE", "Helicopter uplink constructed. Helicopters are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
 };
 
 if (_isJetUpgrade) then {
-    _vehicle setVariable ["MWF_BuildUpgradeId", "JET", true];
-    _vehicle setVariable ["MWF_BuildUpgradeBaseKey", "MOB", true];
-    _buildRecord = ["JET", _className, getPosASL _vehicle, vectorDir _vehicle, vectorUp _vehicle, "MOB"];
     [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0];
-};
-
-if !(_buildRecord isEqualTo []) then {
-    private _buildId = _buildRecord param [0, "", [""]];
-    private _buildBaseKey = _buildRecord param [5, "", [""]];
-    private _existingIndex = _builtUpgradeStructures findIf {
-        ((_x param [0, "", [""]]) isEqualTo _buildId) &&
-        {((_x param [5, "", [""]]) isEqualTo _buildBaseKey)}
-    };
-    if (_existingIndex >= 0) then {
-        _builtUpgradeStructures set [_existingIndex, _buildRecord];
-    } else {
-        _builtUpgradeStructures pushBack _buildRecord;
-    };
-    missionNamespace setVariable ["MWF_BuiltUpgradeStructures", _builtUpgradeStructures, true];
-    if (!isNil "MWF_fnc_requestDelayedSave") then {
-        [] call MWF_fnc_requestDelayedSave;
-    };
 };
 
 if (!isNull _builder) then {

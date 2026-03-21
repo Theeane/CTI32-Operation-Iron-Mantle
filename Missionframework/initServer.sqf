@@ -53,6 +53,7 @@ if (markerColor _mainRespawnMarker isNotEqualTo "") then {
 [] call MWF_fnc_presetManager;
 [] call MWF_fnc_restoreSession;
 [] call MWF_fnc_restoreFOBs;
+[] call MWF_fnc_restoreBuiltUpgradeStructures;
 [] call MWF_fnc_spawnInitialFOBAsset;
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;

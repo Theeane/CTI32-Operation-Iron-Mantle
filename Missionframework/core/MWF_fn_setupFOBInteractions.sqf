@@ -16,7 +16,7 @@ private _actionIds = [];
 
 _actionIds pushBack (
     _terminal addAction [
-        "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect</t>",
+        "<t color='#00bbff' size='1.2'>[ FOB ] Open Base Architect (Structures)</t>",
         {
             [_target] spawn MWF_fnc_openBaseArchitect;
         },
