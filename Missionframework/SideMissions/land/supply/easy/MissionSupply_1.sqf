@@ -1,16 +1,23 @@
 /*
-    Author: OpenAI / ChatGPT
+    Author: Theane / ChatGPT
     Template: MissionSupply_1
     Category: supply
     Difficulty: easy
-    Era: modern
+    Domain: land
+    Era: modern-compatible / mod agnostic
 
-    Description:
-    Authored modern land mission template.
-    Runtime remains mod agnostic:
-    - no hardcoded faction classnames in the template
-    - OPFOR / civilians / support come from active presets
-    - objective scene is built from category metadata by the shared runtime
+    Gold standard reference template for Missionframework/SideMissions/land/supply/easy/.
+    This file is intentionally conservative and should be treated as the pattern
+    for future authored or AI-generated supply missions.
+
+    Rules demonstrated here:
+    - keep params exactly as [_slotData, _caller]
+    - keep naming consistent: MissionSupply_<id>
+    - use only structured metadata, never hardcoded world objects or faction classnames
+    - use valid known zone tags only
+    - fixed rewards only, never randomized
+    - rely on compositionKey + preset/tier systems for world dressing and opposition
+    - finish with the shared runtime call to MWF_fnc_executeMissionTemplate
 */
 
 params [
@@ -21,41 +28,48 @@ params [
 private _missionDefinition = [
     ["missionId", "MissionSupply_1"],
     ["title", "Recover Medical Cache"],
-    ["description", "Recover the emergency medical cache before OPFOR relocates it."],
+    ["description", "Secure a light logistics cache containing medical supplies before OPFOR reclaim or destroy it."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory']],
+
+    // Placement
+    ["allowedZoneTypes", ["town", "roadside"]],
     ["allowUndercover", true],
+
+    // Runtime faction intent only; actual assets come from active presets
     ["usesOpfor", true],
     ["usesBluforSupport", false],
     ["usesCivilians", true],
     ["usesRebels", false],
+
+    // Scene / resolver
     ["compositionKey", "supply_medical_easy"],
-    ["sceneVariant", "medical"],
-    ["objectiveAction", "Secure Supplies"],
-    ["completionNote", "Supply cache secured."],
-    ["clearRadius", 32],
-    ["guardCount", 4],
-    ["patrolRadius", 40],
-    ["addOfficer", false],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 135],
+
+    // Fixed rewards
+    ["rewardSupplies", 120],
     ["rewardIntel", 10],
     ["rewardThreat", 4],
     ["rewardTier", 2],
     ["rewardThreatUndercover", 0],
+
+    // Reputation / access
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Modern authored supply mission runtime site."],
+
+    // Authoring notes only
+    ["notes", "Baseline easy supply mission. Supplies-first reward profile, stealth-friendly, no special-case runtime assumptions."],
     ["assetRules", [
-        "Use active OPFOR preset infantry scaled by world tier for guards.",
-        "Use civilians from the active preset when the mission definition enables them.",
-        "Use the shared runtime scene for category-specific objective props.",
-        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
+        "Use OPFOR from preset/opfor scaled by world tier.",
+        "Use BLUFOR from preset/blufor scaled by player base tier only when support is enabled.",
+        "Use civilians from preset/civilians when enabled.",
+        "Use rebels from preset/resistance scaled by rebel tier only when enabled.",
+        "Use compositionKey for all props, layout, and scene dressing.",
+        "Do not hardcode units, vehicles, props, or buildings in mission definitions."
     ]]
 ];
 
