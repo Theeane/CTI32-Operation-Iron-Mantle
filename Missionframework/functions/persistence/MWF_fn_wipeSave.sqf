@@ -46,6 +46,7 @@ private _keys = [
     "MWF_Save_Missions",
     "MWF_Save_BoughtVehicles",
     "MWF_Save_GarageStoredVehicles",
+    "MWF_Save_BuiltUpgradeStructures",
     "MWF_Save_ActiveSideMissions",
     "MWF_Save_Campaign_Phase",
     "MWF_Save_Tutorial_SupplyRunDone",

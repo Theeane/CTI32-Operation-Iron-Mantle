@@ -155,6 +155,7 @@ profileNamespace setVariable ["MWF_Save_FOBs", missionNamespace getVariable ["MW
 profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable ["MWF_completedMissions", []]];
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
+profileNamespace setVariable ["MWF_Save_BuiltUpgradeStructures", + (missionNamespace getVariable ["MWF_BuiltUpgradeStructures", []])];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", _activeSideMissions];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
@@ -210,7 +211,7 @@ private _garageVehicleCount = 0;
     };
 } forEach (missionNamespace getVariable ["MWF_GarageStoredVehicles", []]);
 private _missionCount = count _activeSideMissions;
-private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
+private _estimatedTotalBytes = (count toArray str _zoneSaveData) + (count toArray str _boughtVehicles) + (count toArray str (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])) + (count toArray str (missionNamespace getVariable ["MWF_BuiltUpgradeStructures", []])) + (count toArray str _activeSideMissions) + (count toArray str _damagedFOBs) + (count toArray str _leaderContext);
 
 saveProfileNamespace;
 

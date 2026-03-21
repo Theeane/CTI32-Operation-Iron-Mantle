@@ -103,7 +103,13 @@ switch (_modeUpper) do {
         if (_garageClass isNotEqualTo "") then {
             _garageBuilt = (({ private _garageObj = _x param [0, objNull]; !isNull _garageObj && {(_garageObj getVariable ["MWF_isVirtualGarage", false])} && {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _contextKey} } count (missionNamespace getVariable ["MWF_GarageRegistry", []])) > 0);
             if (!_garageBuilt) then {
-                _garageBuilt = ({ typeOf _x isEqualTo _garageClass } count (nearestObjects [_contextPos, [_garageClass], 120])) > 0;
+                _garageBuilt = ({
+                    private _garageObj = _x;
+                    !isNull _garageObj &&
+                    {(_garageObj getVariable ["MWF_isVirtualGarage", false])} &&
+                    {(typeOf _garageObj) isEqualTo _garageClass} &&
+                    {(_garageObj getVariable ["MWF_Garage_BaseKey", ""]) isEqualTo _contextKey}
+                } count (nearestObjects [_contextPos, [_garageClass], 120])) > 0;
             };
         };
 
@@ -140,7 +146,7 @@ switch (_modeUpper) do {
                 [(_contextPos # 0), (_contextPos # 1) + 28, 0],
                 createHashMapFromArray [
                     ["upgradeId", "GARAGE"],
-                    ["description", "Base-local garage structure for storing, retrieving, customizing, and scrapping vehicles at the current MOB/FOB."],
+                    ["description", "Base-local garage structure for storing, retrieving, and scrapping vehicles at the current MOB/FOB."],
                     ["baseContextText", _baseContextText],
                     ["contextTerminal", _contextTerminal],
                     ["buildClass", _garageClass],
