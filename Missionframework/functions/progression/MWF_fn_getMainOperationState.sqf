@@ -4,7 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Returns the runtime state for a main operation.
+    Returns the runtime state for a main operation, including cooldown,
+    placeholder Intel cost, and whether a free-charge will make the next
+    operation cost-free.
 
     Params:
     0: STRING - operation key
@@ -46,9 +48,8 @@ if (_record isEqualTo []) exitWith {
         ["tooltipText", "Operation metadata unavailable."],
         ["intelCost", 0],
         ["effectiveIntelCost", 0],
-        ["hasFreeCharge", false],
-        ["isAffordable", false],
-        ["costText", "Cost unknown"]
+        ["freeChargeAvailable", false],
+        ["canAfford", false]
     ]
 };
 
@@ -81,16 +82,11 @@ private _statusText = "Available";
 private _tooltip = format ["%1 is ready to accept.", _title];
 private _readyClockText = "--:--";
 
+private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
-private _hasFreeCharge = _freeCharges > 0;
-private _effectiveIntelCost = if (_hasFreeCharge) then { 0 } else { _intelCost max 0 };
-private _availableIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-private _isAffordable = _availableIntel >= _effectiveIntelCost;
-private _costText = if (_hasFreeCharge) then {
-    format ["FREE via intel breakthrough charge (base cost %1 Intel)", _intelCost max 0]
-} else {
-    format ["Cost: %1 Intel", _effectiveIntelCost]
-};
+private _freeChargeAvailable = _freeCharges > 0;
+private _effectiveIntelCost = if (_freeChargeAvailable) then { 0 } else { _intelCost max 0 };
+private _canAfford = _freeChargeAvailable || {_currentIntel >= _effectiveIntelCost};
 
 if (_isCoolingDown) then {
     private _minutes = (_cooldownRemaining / 60) call BIS_fnc_floor;
@@ -120,18 +116,31 @@ if (_isCoolingDown) then {
 if (_isActive) then {
     _state = "active";
     _statusText = "Active";
-    _tooltip = format ["%1 is already active. %2", _title, _costText];
+    _tooltip = format ["%1 is already active.", _title];
 } else {
     if (_isCoolingDown) then {
         _state = "cooldown";
-        _tooltip = format ["%1 %2", _tooltip, _costText];
     } else {
-        if (!_isAffordable) then {
+        if (!_canAfford) then {
             _state = "insufficient_intel";
-            _statusText = format ["Need %1 Intel", _effectiveIntelCost];
-            _tooltip = format ["%1 requires %2 Intel. Team bank currently holds %3.", _title, _effectiveIntelCost, _availableIntel];
+            _statusText = format ["Requires %1 Intel", _effectiveIntelCost];
+            _tooltip = format ["%1 requires %2 Intel. Current Intel: %3.", _title, _effectiveIntelCost, _currentIntel];
         } else {
-            _tooltip = format ["%1 %2", _tooltip, _costText];
+            if (_freeChargeAvailable && {_intelCost > 0}) then {
+                _statusText = format ["Available | FREE (%1 charge)", _freeCharges];
+                _tooltip = format ["%1 is ready. A stored intel breakthrough makes this launch free.", _title];
+            } else {
+                _statusText = if (_intelCost > 0) then {
+                    format ["Available | Cost: %1 Intel", _effectiveIntelCost]
+                } else {
+                    "Available"
+                };
+                _tooltip = if (_intelCost > 0) then {
+                    format ["%1 is ready to accept for %2 Intel.", _title, _effectiveIntelCost]
+                } else {
+                    format ["%1 is ready to accept.", _title]
+                };
+            };
         };
     };
 };
@@ -145,11 +154,6 @@ createHashMapFromArray [
     ["effectText", _effectText],
     ["fallbackText", _fallbackText],
     ["cooldownSeconds", _cooldownSeconds],
-    ["intelCost", _intelCost max 0],
-    ["effectiveIntelCost", _effectiveIntelCost max 0],
-    ["hasFreeCharge", _hasFreeCharge],
-    ["isAffordable", _isAffordable],
-    ["costText", _costText],
     ["state", _state],
     ["isAvailable", _state isEqualTo "available"],
     ["isActive", _isActive],
@@ -158,5 +162,10 @@ createHashMapFromArray [
     ["readyAt", _readyAt],
     ["readyClockText", _readyClockText],
     ["statusText", _statusText],
-    ["tooltipText", _tooltip]
+    ["tooltipText", _tooltip],
+    ["intelCost", _intelCost max 0],
+    ["effectiveIntelCost", _effectiveIntelCost max 0],
+    ["freeChargeAvailable", _freeChargeAvailable],
+    ["freeChargeCount", _freeCharges max 0],
+    ["canAfford", _canAfford]
 ]

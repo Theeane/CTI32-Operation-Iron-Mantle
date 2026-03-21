@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionSupply_3
     Category: supply
     Difficulty: medium
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionSupply_3"],
-    ["title", "Extract Repair Parts"],
-    ["description", "Recover mission-critical repair parts from a contested logistics node."],
+    ["title", "Break Convoy Staging Site"],
+    ["description", "Seize the staging site of an enemy convoy before it rolls out."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military', 'capital']],
+    ["allowedZoneTypes", ['factory', 'town']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
-    ["usesCivilians", false],
-    ["usesRebels", true],
-    ["compositionKey", "supply_parts_medium"],
+    ["usesCivilians", true],
+    ["usesRebels", false],
+    ["compositionKey", "supply_convoy_medium"],
+    ["sceneVariant", "convoy"],
+    ["objectiveAction", "Secure Supplies"],
+    ["completionNote", "Supply cache secured."],
+    ["clearRadius", 38],
+    ["guardCount", 6],
+    ["patrolRadius", 55],
+    ["addOfficer", false],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 188],
-    ["rewardIntel", 26],
-    ["rewardThreat", 8],
-    ["rewardTier", 6],
+    ["rewardSupplies", 215],
+    ["rewardIntel", 22],
+    ["rewardThreat", 6],
+    ["rewardTier", 3],
     ["rewardThreatUndercover", 0],
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Can later integrate rebel access checks if desired."],
+    ["notes", "Modern authored supply mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 

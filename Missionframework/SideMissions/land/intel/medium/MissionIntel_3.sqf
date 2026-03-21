@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionIntel_3
     Category: intel
     Difficulty: medium
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionIntel_3"],
-    ["title", "Seize Encrypted Drives"],
-    ["description", "Recover protected data drives from a guarded site before OPFOR can purge them."],
+    ["title", "Steal UAV Telemetry"],
+    ["description", "Extract UAV telemetry packages from a monitoring node before they are forwarded."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military', 'capital']],
+    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
-    ["usesCivilians", false],
+    ["usesCivilians", true],
     ["usesRebels", false],
-    ["compositionKey", "intel_drives_medium"],
+    ["compositionKey", "intel_uav_medium"],
+    ["sceneVariant", "uav"],
+    ["objectiveAction", "Download Intel"],
+    ["completionNote", "Field intelligence recovered."],
+    ["clearRadius", 38],
+    ["guardCount", 6],
+    ["patrolRadius", 55],
+    ["addOfficer", true],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 96],
-    ["rewardIntel", 126],
+    ["rewardSupplies", 80],
+    ["rewardIntel", 74],
     ["rewardThreat", 6],
-    ["rewardTier", 5],
+    ["rewardTier", 3],
     ["rewardThreatUndercover", 0],
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Supports loud or stealth approaches."],
+    ["notes", "Modern authored intel mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 

@@ -5,8 +5,8 @@
 
     Description:
     Returns the central metadata registry for all land main operations.
-    This is the single source of truth for titles, descriptions, effect text,
-    fallback text, cooldown, runtime function, and impact identity.
+    This is the single source of truth for titles, descriptions, runtime function,
+    strategic effect text, cooldown, and placeholder Intel start cost.
 
     Return:
     Array of records:

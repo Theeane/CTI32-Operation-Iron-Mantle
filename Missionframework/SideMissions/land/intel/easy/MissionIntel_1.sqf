@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionIntel_1
     Category: intel
     Difficulty: easy
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionIntel_1"],
-    ["title", "Recover Courier Notes"],
-    ["description", "Locate a courier drop and secure low-level documents before they disappear into the local network."],
+    ["title", "Recover Patrol Briefcase"],
+    ["description", "Grab patrol notes and route tables from a lightly-defended field cache."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'roadside']],
+    ["allowedZoneTypes", ['town', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
     ["usesCivilians", true],
     ["usesRebels", false],
-    ["compositionKey", "intel_courier_easy"],
+    ["compositionKey", "intel_briefcase_easy"],
+    ["sceneVariant", "briefcase"],
+    ["objectiveAction", "Download Intel"],
+    ["completionNote", "Field intelligence recovered."],
+    ["clearRadius", 32],
+    ["guardCount", 4],
+    ["patrolRadius", 40],
+    ["addOfficer", false],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 54],
-    ["rewardIntel", 64],
-    ["rewardThreat", 3],
+    ["rewardSupplies", 55],
+    ["rewardIntel", 38],
+    ["rewardThreat", 4],
     ["rewardTier", 2],
     ["rewardThreatUndercover", 0],
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Stealth-focused intel mission."],
+    ["notes", "Modern authored intel mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 

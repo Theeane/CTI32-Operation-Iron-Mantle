@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionSupply_3
     Category: supply
     Difficulty: hard
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionSupply_3"],
-    ["title", "Relieve Rebel Lifeline"],
-    ["description", "Deliver or secure supplies tied to a resistance-aligned lifeline under pressure."],
+    ["title", "Crack Sustainment Base"],
+    ["description", "Storm a protected sustainment base and strip it of matériel before reinforcements arrive."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['town', 'rural', 'capital']],
+    ["allowedZoneTypes", ['military', 'capital', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
     ["usesCivilians", true],
-    ["usesRebels", true],
-    ["compositionKey", "supply_rebel_hard"],
+    ["usesRebels", false],
+    ["compositionKey", "supply_sustainment_hard"],
+    ["sceneVariant", "sustainment"],
+    ["objectiveAction", "Secure Supplies"],
+    ["completionNote", "Supply cache secured."],
+    ["clearRadius", 45],
+    ["guardCount", 8],
+    ["patrolRadius", 70],
+    ["addOfficer", false],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 256],
-    ["rewardIntel", 36],
-    ["rewardThreat", 9],
-    ["rewardTier", 8],
+    ["rewardSupplies", 295],
+    ["rewardIntel", 34],
+    ["rewardThreat", 8],
+    ["rewardTier", 4],
     ["rewardThreatUndercover", 0],
-    ["requiresRebelCooperation", true],
-    ["minCivilianRep", 5],
-    ["minRebelRep", 5],
-    ["failIfRepTooLow", true],
-    ["notes", "This mission is designed to respect rebel/civil reputation systems."],
+    ["requiresRebelCooperation", false],
+    ["minCivilianRep", 0],
+    ["minRebelRep", 0],
+    ["failIfRepTooLow", false],
+    ["notes", "Modern authored supply mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 

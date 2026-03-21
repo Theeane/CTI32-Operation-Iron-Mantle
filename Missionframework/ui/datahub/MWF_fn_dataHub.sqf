@@ -266,6 +266,12 @@ private _showSelectedEntry = {
             };
             private _readyClockText = _state getOrDefault ["readyClockText", "--:--"];
             private _cooldownRemaining = _state getOrDefault ["cooldownRemaining", 0];
+            private _effectiveIntelCost = _state getOrDefault ["effectiveIntelCost", _meta getOrDefault ["intelCost", 0]];
+            private _costInfo = if (_state getOrDefault ["freeChargeAvailable", false]) then {
+                format ["<t color='#222222'>Cost: FREE (%1 charge ready)</t>", _state getOrDefault ["freeChargeCount", 0]]
+            } else {
+                format ["<t color='#222222'>Cost: %1 Intel</t>", _effectiveIntelCost]
+            };
             private _cooldownInfo = if (_cooldownRemaining > 0) then {
                 format ["<t color='#222222'>Cooldown: %1 sec remaining | ETA %2</t>", _cooldownRemaining, _readyClockText]
             } else {
@@ -281,8 +287,8 @@ private _showSelectedEntry = {
                 format ["<t color='#222222'>AO: %1</t>", _zoneName],
                 format ["<t color='#222222'>%1</t>", _meta getOrDefault ["description", ""]],
                 format ["<t color='#222222'>Effect: %1</t>", _meta getOrDefault ["effectText", ""]],
+                _costInfo,
                 format ["<t color='#222222'>Fallback Reward: %1</t>", _meta getOrDefault ["fallbackText", ""]],
-                format ["<t color='#222222'>%1</t>", _meta getOrDefault ["costText", format ["Cost: %1 Intel", _meta getOrDefault ["intelCost", 0]]]],
                 format ["<t color='#222222'>Status: %1</t>", _statusText]
             ];
 

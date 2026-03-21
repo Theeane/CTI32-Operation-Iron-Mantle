@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionDisrupt_3
     Category: disrupt
     Difficulty: hard
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionDisrupt_3"],
-    ["title", "Ruin Heavy Route Hub"],
-    ["description", "Smash a major route-control hub and force OPFOR to rebuild its security network from scratch."],
+    ["title", "Black Out HQ Relay Spine"],
+    ["description", "Knock out a major relay spine and leave the regional HQ blind and fragmented."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['capital', 'factory', 'military']],
-    ["allowUndercover", true],
+    ["allowedZoneTypes", ['capital', 'military']],
+    ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
     ["usesCivilians", false],
     ["usesRebels", false],
-    ["compositionKey", "disrupt_routehub_hard"],
+    ["compositionKey", "disrupt_hq_spine_hard"],
+    ["sceneVariant", "hq_spine"],
+    ["objectiveAction", "Plant Charges"],
+    ["completionNote", "Enemy site sabotaged."],
+    ["clearRadius", 45],
+    ["guardCount", 8],
+    ["patrolRadius", 70],
+    ["addOfficer", true],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 196],
-    ["rewardIntel", 54],
-    ["rewardThreat", 14],
-    ["rewardTier", 10],
-    ["rewardThreatUndercover", 1],
+    ["rewardSupplies", 225],
+    ["rewardIntel", 44],
+    ["rewardThreat", 8],
+    ["rewardTier", 4],
+    ["rewardThreatUndercover", 0],
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Best used for late pressure spikes."],
+    ["notes", "Modern authored disrupt mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 

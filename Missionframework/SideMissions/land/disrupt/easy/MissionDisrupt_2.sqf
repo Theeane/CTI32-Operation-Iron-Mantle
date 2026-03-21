@@ -1,17 +1,16 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / ChatGPT
     Template: MissionDisrupt_2
     Category: disrupt
     Difficulty: easy
+    Era: modern
 
     Description:
-    Structured official mission template with fixed per-mission rewards.
-    This file must remain mod agnostic:
-    - no hardcoded unit classnames
-    - no hardcoded vehicle classnames
-    - no hardcoded object classnames
-    - runtime forces come from presets/tier systems
-    - scene dressing comes from composition keys
+    Authored modern land mission template.
+    Runtime remains mod agnostic:
+    - no hardcoded faction classnames in the template
+    - OPFOR / civilians / support come from active presets
+    - objective scene is built from category metadata by the shared runtime
 */
 
 params [
@@ -21,36 +20,42 @@ params [
 
 private _missionDefinition = [
     ["missionId", "MissionDisrupt_2"],
-    ["title", "Break Checkpoint Rhythm"],
-    ["description", "Hit a soft checkpoint pattern and scatter low-tier security coverage before they stabilize the route."],
+    ["title", "Knock Out Relay Mast"],
+    ["description", "Disable a short-range relay mast and interrupt enemy coordination in the area."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory', 'roadside']],
-    ["allowUndercover", true],
+    ["allowedZoneTypes", ['military', 'town']],
+    ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
-    ["usesCivilians", true],
+    ["usesCivilians", false],
     ["usesRebels", false],
-    ["compositionKey", "disrupt_checkpoint_easy"],
+    ["compositionKey", "disrupt_relay_mast_easy"],
+    ["sceneVariant", "relay_mast"],
+    ["objectiveAction", "Plant Charges"],
+    ["completionNote", "Enemy site sabotaged."],
+    ["clearRadius", 32],
+    ["guardCount", 4],
+    ["patrolRadius", 40],
+    ["addOfficer", false],
     ["enemyTierSource", "worldTier"],
     ["bluforTierSource", "playerBaseTier"],
     ["rebelTierSource", "rebelTier"],
-    ["rewardSupplies", 90],
-    ["rewardIntel", 22],
-    ["rewardThreat", 6],
-    ["rewardTier", 4],
+    ["rewardSupplies", 110],
+    ["rewardIntel", 18],
+    ["rewardThreat", 4],
+    ["rewardTier", 2],
     ["rewardThreatUndercover", 0],
     ["requiresRebelCooperation", false],
     ["minCivilianRep", 0],
     ["minRebelRep", 0],
     ["failIfRepTooLow", false],
-    ["notes", "Good stealth candidate around populated areas."],
+    ["notes", "Modern authored disrupt mission runtime site."],
     ["assetRules", [
-        "Use OPFOR from preset/opfor scaled by world tier.",
-        "Use BLUFOR from preset/blufor scaled by player base tier when support is enabled.",
-        "Use civilians from preset/civilians when enabled.",
-        "Use rebels from preset/resistance scaled by rebel tier when enabled.",
-        "Use compositionKey for all props/layouts."
+        "Use active OPFOR preset infantry scaled by world tier for guards.",
+        "Use civilians from the active preset when the mission definition enables them.",
+        "Use the shared runtime scene for category-specific objective props.",
+        "Use compositionKey only as a future composition hook; runtime must remain map agnostic today."
     ]]
 ];
 
