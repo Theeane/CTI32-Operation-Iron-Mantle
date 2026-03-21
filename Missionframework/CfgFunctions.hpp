@@ -56,6 +56,7 @@ class CfgFunctions {
             class addIntel { file = "Missionframework/functions/compat/MWF_fn_addIntel.sqf"; };
             class checkUndercover { file = "Missionframework/functions/MWF_fnc_checkUndercover.sqf"; };
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
+            class interruptSensitiveInteraction { file = "Missionframework/functions/MWF_fn_interruptSensitiveInteraction.sqf"; };
         };
 
         class Terminal {
@@ -111,6 +112,8 @@ class CfgFunctions {
             class registerFOB { file = "Missionframework/functions/base/MWF_fn_registerFOB.sqf"; };
             class repackFOB { file = "Missionframework/functions/base/MWF_fn_repackFOB.sqf"; };
             class restoreFOBs { file = "Missionframework/functions/base/MWF_fn_restoreFOBs.sqf"; };
+            class garageSystem { file = "Missionframework/functions/base/MWF_fn_garageSystem.sqf"; };
+            class setupGarageInteractions { file = "Missionframework/functions/base/MWF_fn_setupGarageInteractions.sqf"; };
             class unregisterFOB { file = "Missionframework/functions/base/MWF_fn_unregisterFOB.sqf"; };
             class updateBuyCategory { file = "Missionframework/functions/base/MWF_fn_updateBuyCategory.sqf"; };
             class upgradeBaseTier { file = "Missionframework/functions/base/MWF_fn_upgradeBaseTier.sqf"; };
@@ -226,6 +229,7 @@ class CfgFunctions {
             class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
             class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
             class restoreActiveMainOperation { file = "Missionframework/functions/persistence/MWF_fn_restoreActiveMainOperation.sqf"; };
+            class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
             class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
         };
