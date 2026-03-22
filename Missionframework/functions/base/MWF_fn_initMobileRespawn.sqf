@@ -20,10 +20,11 @@ if (isNull _vehicle) exitWith {
 
 private _respawnTruckClass = missionNamespace getVariable ["MWF_Respawn_Truck", ""];
 private _respawnHeliClass = missionNamespace getVariable ["MWF_Respawn_Heli", ""];
-private _acceptedClasses = [_respawnTruckClass, _respawnHeliClass] select { _x isEqualType "" && {_x isNotEqualTo ""} };
-private _classAllowed = _acceptedClasses isEqualTo [] || {(typeOf _vehicle) in _acceptedClasses};
-if !(_classAllowed || {_vehicle getVariable ["MWF_isMobileRespawn", false]}) exitWith {
-    diag_log format ["[MWF] initMobileRespawn skipped for %1. Accepted MRU classes: %2", typeOf _vehicle, _acceptedClasses];
+private _acceptedClasses = [];
+if (_respawnTruckClass isNotEqualTo "") then { _acceptedClasses pushBackUnique _respawnTruckClass; };
+if (_respawnHeliClass isNotEqualTo "") then { _acceptedClasses pushBackUnique _respawnHeliClass; };
+if (_acceptedClasses isNotEqualTo [] && {!(typeOf _vehicle in _acceptedClasses)}) exitWith {
+    diag_log format ["[MWF] initMobileRespawn skipped for %1. Accepted MRU classes: %2.", typeOf _vehicle, _acceptedClasses];
     false
 };
 
@@ -34,8 +35,8 @@ missionNamespace setVariable ["MWF_allMobileRespawns", _currentRespawns, true];
 
 _vehicle setVariable ["MWF_isMobileRespawn", true, true];
 _vehicle setVariable ["MWF_respawnAvailable", true, true];
-private _displayLabel = if ((typeOf _vehicle) isEqualTo _respawnHeliClass) then {"Mobile Respawn Helicopter"} else {"Mobile Respawn Unit"};
-_vehicle setVariable ["MWF_MRU_DisplayName", _displayLabel, true];
+private _displayName = if (typeOf _vehicle isEqualTo _respawnHeliClass) then {"Respawn Helicopter"} else {"Mobile Respawn Unit"};
+_vehicle setVariable ["MWF_MRU_DisplayName", _displayName, true];
 _vehicle setVariable ["MWF_StoredIntelValue", 0, true];
 
 private _existingRespawnId = _vehicle getVariable ["MWF_respawnPositionId", -1];
@@ -43,7 +44,7 @@ if (_existingRespawnId isEqualType 0 && {_existingRespawnId >= 0}) then {
     [west, _existingRespawnId] call BIS_fnc_removeRespawnPosition;
 };
 
-private _respawnId = [west, _vehicle, _displayLabel] call BIS_fnc_addRespawnPosition;
+private _respawnId = [west, _vehicle, _displayName] call BIS_fnc_addRespawnPosition;
 _vehicle setVariable ["MWF_respawnPositionId", _respawnId, true];
 
 private _storeActionId = _vehicle addAction [
@@ -127,9 +128,6 @@ if (!isNil "MWF_fnc_refreshFOBMarkers") then {
 [_vehicle, 25, "MRU", objNull, true] call MWF_fnc_registerLoadoutZone;
 
 missionNamespace setVariable ["MWF_LastMobileRespawn", _vehicle, true];
-if ((typeOf _vehicle) isEqualTo _respawnHeliClass) then {
-    missionNamespace setVariable ["MWF_LastMobileRespawnHeli", _vehicle, true];
-};
 
 diag_log format ["[MWF] System: Mobile Respawn initialized on %1", typeOf _vehicle];
 true

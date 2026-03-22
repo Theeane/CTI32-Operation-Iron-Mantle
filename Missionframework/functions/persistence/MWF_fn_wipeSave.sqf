@@ -75,7 +75,8 @@ private _keys = [
     "MWF_Save_FreeMainOpCharges",
     "MWF_Save_RevealedInfrastructureIDs",
     "MWF_Save_RevealedInfrastructureSites",
-    "MWF_Save_CompositionType"
+    "MWF_Save_CompositionType",
+    "MWF_Save_CompletedMainOperations"
 ];
 
 {

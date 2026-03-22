@@ -39,6 +39,16 @@ missionNamespace setVariable ["MWF_RepPenaltyCount", missionNamespace getVariabl
 missionNamespace setVariable ["MWF_CurrentTier", missionNamespace getVariable ["MWF_CurrentTier", 1], true];
 missionNamespace setVariable ["MWF_AuthenticatedPlayers", missionNamespace getVariable ["MWF_AuthenticatedPlayers", []], true];
 missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];
+missionNamespace setVariable ["MWF_LegacyZoneInformantsEnabled", missionNamespace getVariable ["MWF_LegacyZoneInformantsEnabled", false], true];
+missionNamespace setVariable ["MWF_CompletedMainOperations", missionNamespace getVariable ["MWF_CompletedMainOperations", []], true];
+missionNamespace setVariable ["MWF_EndgameActive", missionNamespace getVariable ["MWF_EndgameActive", false], true];
+missionNamespace setVariable ["MWF_EndgameCompleted", missionNamespace getVariable ["MWF_EndgameCompleted", false], true];
+missionNamespace setVariable ["MWF_EndgameOutcome", missionNamespace getVariable ["MWF_EndgameOutcome", ""], true];
+missionNamespace setVariable ["MWF_EndgameLeader", missionNamespace getVariable ["MWF_EndgameLeader", objNull], true];
+missionNamespace setVariable ["MWF_EndgameLeaderGroup", missionNamespace getVariable ["MWF_EndgameLeaderGroup", grpNull], true];
+missionNamespace setVariable ["MWF_EndgameRebelContact", missionNamespace getVariable ["MWF_EndgameRebelContact", objNull], true];
+missionNamespace setVariable ["MWF_EndgameReservedZoneId", missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""], true];
+missionNamespace setVariable ["MWF_EndgameState", missionNamespace getVariable ["MWF_EndgameState", []], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false], true];
 
 missionNamespace setVariable ["MWF_WorldTier", missionNamespace getVariable ["MWF_WorldTier", 1], true];
@@ -141,7 +151,6 @@ missionNamespace setVariable ["MWF_PendingFOBAttackState", missionNamespace getV
 missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", missionNamespace getVariable ["MWF_PendingRebelLeaderRespawnState", []], true];
 missionNamespace setVariable ["MWF_PendingDamagedFOBs", missionNamespace getVariable ["MWF_PendingDamagedFOBs", []], true];
 missionNamespace setVariable ["MWF_isUnderAttack", missionNamespace getVariable ["MWF_isUnderAttack", false], true];
-missionNamespace setVariable ["MWF_Campaign_Analytics", missionNamespace getVariable ["MWF_Campaign_Analytics", []], true];
 
 setTimeMultiplier (["MWF_Param_TimeMultiplier", 1] call BIS_fnc_getParamValue);
 

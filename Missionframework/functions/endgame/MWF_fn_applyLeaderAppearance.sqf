@@ -1,37 +1,53 @@
 /*
-    Author: Theane / ChatGPT
-    Function: MWF_fnc_applyLeaderAppearance
-    Description: Applies shared endgame leader visuals on top of the preset-defined unit class.
+    Author: OpenAI / ChatGPT
+    Function: fn_applyLeaderAppearance
+    Project: Military War Framework
+
+    Description:
+    Applies the shared endgame leader appearance layer.
+    The preset leader class still controls baseline uniform / weapons / gear.
+    This adds the common red beret marker plus optional face / beard polish.
 */
-params [["_leader", objNull, [objNull]]];
+if (!isServer) exitWith { false };
 
-if (isNull _leader) exitWith { false };
-if (!local _leader) exitWith { false };
+params [
+    ["_unit", objNull, [objNull]]
+];
+if (isNull _unit) exitWith { false };
 
-private _beretClass = missionNamespace getVariable ["MWF_EndgameLeaderRedBeretClass", "H_Beret_Red"];
-private _vanillaFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_VanillaFaces", []]);
-private _asczFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_ASCZFaces", []]);
-private _beards = +(missionNamespace getVariable ["MWF_EndgameLeader_Beards", []]);
-
-removeHeadgear _leader;
-if (_beretClass isNotEqualTo "") then { _leader addHeadgear _beretClass; };
-
-private _validASCZ = _asczFaces select { _x isEqualType "" && {_x isNotEqualTo ""} && {isClass (configFile >> "CfgFaces" >> "Man_A3" >> _x)} };
-private _validVanilla = _vanillaFaces select { _x isEqualType "" && {_x isNotEqualTo ""} };
-private _selectedFace = "";
-if !(_validASCZ isEqualTo []) then {
-    _selectedFace = selectRandom _validASCZ;
-} else {
-    if !(_validVanilla isEqualTo []) then { _selectedFace = selectRandom _validVanilla; };
+private _redBeret = missionNamespace getVariable ["MWF_EndgameLeader_RedBeret", "H_Beret_Colonel"];
+if (_redBeret isNotEqualTo "" && {isClass (configFile >> "CfgWeapons" >> _redBeret)}) then {
+    removeHeadgear _unit;
+    _unit addHeadgear _redBeret;
 };
-if (_selectedFace isNotEqualTo "") then { _leader setFace _selectedFace; };
 
-if !(_beards isEqualTo []) then {
-    private _beardClass = selectRandom _beards;
-    if (_beardClass isEqualType "" && {_beardClass isNotEqualTo ""} && {((_beardClass find "MWF_BEARD_") != 0)}) then {
-        removeGoggles _leader;
-        if (isClass (configFile >> "CfgGlasses" >> _beardClass)) then {
-            _leader addGoggles _beardClass;
+private _facePool = [];
+private _asczFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_ASCZFaces", []]);
+private _vanillaFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_VanillaFaces", []]);
+
+// Prefer ASCZ faces when available, otherwise fallback to vanilla.
+{
+    if (_x isEqualType "" && {_x != ""}) then { _facePool pushBackUnique _x; };
+} forEach _asczFaces;
+if (_facePool isEqualTo []) then {
+    {
+        if (_x isEqualType "" && {_x != ""}) then { _facePool pushBackUnique _x; };
+    } forEach _vanillaFaces;
+};
+if (_facePool isNotEqualTo []) then {
+    _unit setFace (selectRandom _facePool);
+};
+
+private _beards = +(missionNamespace getVariable ["MWF_EndgameLeader_Beards", []]);
+private _beard = if (_beards isEqualTo []) then {""} else {selectRandom _beards};
+if (_beard isNotEqualTo "") then {
+    if (isClass (configFile >> "CfgGlasses" >> _beard)) then {
+        removeGoggles _unit;
+        _unit addGoggles _beard;
+    } else {
+        if (isClass (configFile >> "CfgWeapons" >> _beard)) then {
+            removeGoggles _unit;
+            _unit addGoggles _beard;
         };
     };
 };

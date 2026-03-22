@@ -13,8 +13,6 @@ params ["_zonePos", "_tier"];
 private _tierData = MWF_Zone_Tier_Settings get _tier;
 private _multiplier = _tierData select 2;
 
-private _useLegacyInformants = isNil "MWF_fnc_civRepInformant";
-
 // 2. SPAWN ENEMIES (OPFOR)
 private _enemyBaseCount = round (8 * _multiplier);
 private _enemyCountDesired = if (!isNil "MWF_fnc_scaleSpawnCount") then {
@@ -43,9 +41,11 @@ for "_i" from 1 to _enemyCount do {
         _unit setRank "PRIVATE";  // Becomes Grunt (Lower detection range)
     };
 
-    // Legacy informant rolls are only used when the newer civ-rep informant system is unavailable.
-    if (_useLegacyInformants && {random 100 < 15}) then {
-        _unit setVariable ["MWF_isInformant", true, true];
+    // Legacy flat informants are disabled when the civ-rep informant system is active.
+    if (missionNamespace getVariable ["MWF_LegacyZoneInformantsEnabled", false]) then {
+        if (random 100 < 15) then {
+            _unit setVariable ["MWF_isInformant", true, true];
+        };
     };
 
     // Apply interaction suite (Search Body, Undercover, Hold-Action UI)
@@ -73,9 +73,11 @@ for "_i" from 1 to _civCount do {
     private _group = createGroup civilian;
     private _civ = _group createUnit [_civClass, _spawnPos, [], 0, "NONE"];
 
-    // Legacy civilian informants are suppressed when the newer civ-rep informant system exists.
-    if (_useLegacyInformants && {random 100 < 25}) then {
-        _civ setVariable ["MWF_isInformant", true, true];
+    // Legacy flat informants are disabled when the civ-rep informant system is active.
+    if (missionNamespace getVariable ["MWF_LegacyZoneInformantsEnabled", false]) then {
+        if (random 100 < 25) then {
+            _civ setVariable ["MWF_isInformant", true, true];
+        };
     };
 
     // Apply interaction suite (Talking / 5s UI Circle)

@@ -56,7 +56,7 @@ class CfgFunctions {
             class addIntel { file = "Missionframework/functions/compat/MWF_fn_addIntel.sqf"; };
             class checkUndercover { file = "Missionframework/functions/MWF_fnc_checkUndercover.sqf"; };
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
-            class playConfiguredMusicLocal { file = "Missionframework/functions/endgame/MWF_fn_playConfiguredMusicLocal.sqf"; };
+            class interruptSensitiveInteraction { file = "Missionframework/functions/MWF_fn_interruptSensitiveInteraction.sqf"; };
         };
 
         class Terminal {
@@ -112,6 +112,8 @@ class CfgFunctions {
             class registerFOB { file = "Missionframework/functions/base/MWF_fn_registerFOB.sqf"; };
             class repackFOB { file = "Missionframework/functions/base/MWF_fn_repackFOB.sqf"; };
             class restoreFOBs { file = "Missionframework/functions/base/MWF_fn_restoreFOBs.sqf"; };
+            class garageSystem { file = "Missionframework/functions/base/MWF_fn_garageSystem.sqf"; };
+            class setupGarageInteractions { file = "Missionframework/functions/base/MWF_fn_setupGarageInteractions.sqf"; };
             class unregisterFOB { file = "Missionframework/functions/base/MWF_fn_unregisterFOB.sqf"; };
             class updateBuyCategory { file = "Missionframework/functions/base/MWF_fn_updateBuyCategory.sqf"; };
             class upgradeBaseTier { file = "Missionframework/functions/base/MWF_fn_upgradeBaseTier.sqf"; };
@@ -226,6 +228,7 @@ class CfgFunctions {
             class recordCampaignEvent { file = "Missionframework/functions/persistence/MWF_fn_recordCampaignEvent.sqf"; };
             class registerAuthenticatedPlayer { file = "Missionframework/functions/persistence/MWF_fn_registerAuthenticatedPlayer.sqf"; };
             class restoreSession { file = "Missionframework/functions/persistence/MWF_fn_restoreSession.sqf"; };
+            class restoreBuiltUpgradeStructures { file = "Missionframework/functions/persistence/MWF_fn_restoreBuiltUpgradeStructures.sqf"; };
             class sanitizeComposition { file = "Missionframework/functions/persistence/MWF_fn_sanitizeComposition.sqf"; };
             class showEndSummary { file = "Missionframework/functions/persistence/MWF_fn_showEndSummary.sqf"; };
         };
@@ -251,14 +254,6 @@ class CfgFunctions {
             class spawnManager { file = "Missionframework/functions/infrastructure/MWF_fn_spawnManager.sqf"; };
         };
 
-
-        class Endgame {
-            file = "Missionframework/functions/endgame";
-            class endgameManager { file = "Missionframework/functions/endgame/MWF_fn_endgameManager.sqf"; };
-            class applyLeaderAppearance { file = "Missionframework/functions/endgame/MWF_fn_applyLeaderAppearance.sqf"; };
-            class showEndingScreen { file = "Missionframework/functions/endgame/MWF_fn_showEndingScreen.sqf"; };
-        };
-
         class Rebel {
             file = "Missionframework/functions/rebel";
             class rebelManager { file = "Missionframework/functions/rebel/MWF_fn_rebelManager.sqf"; };
@@ -273,7 +268,21 @@ class CfgFunctions {
             file = "Missionframework/functions/reputation";
             class cityMonitor { file = "Missionframework/functions/reputation/MWF_fn_cityMonitor.sqf"; };
             class civRep { file = "Missionframework/functions/reputation/MWF_fn_civRep.sqf"; };
+            class civRepSupport { file = "Missionframework/functions/reputation/MWF_fn_civRepSupport.sqf"; };
+            class civRepInformant { file = "Missionframework/functions/reputation/MWF_fn_civRepInformant.sqf"; };
             class handleCivilianCasualty { file = "Missionframework/functions/reputation/MWF_fn_handleCivilianCasualty.sqf"; };
+        };
+
+
+        class Audio {
+            file = "Missionframework/functions/endgame";
+            class playSharedMusic { file = "Missionframework/functions/endgame/MWF_fn_playSharedMusic.sqf"; };
+        };
+
+        class Endgame {
+            file = "Missionframework/functions/endgame";
+            class applyLeaderAppearance { file = "Missionframework/functions/endgame/MWF_fn_applyLeaderAppearance.sqf"; };
+            class endgameManager { file = "Missionframework/functions/endgame/MWF_fn_endgameManager.sqf"; };
         };
 
         class Interactions {

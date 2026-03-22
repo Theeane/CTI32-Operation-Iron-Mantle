@@ -195,6 +195,7 @@ private _cooldownMap = createHashMap;
     };
 } forEach _cooldownPairs;
 missionNamespace setVariable ["MWF_MainOperationCooldowns", _cooldownMap, true];
+missionNamespace setVariable ["MWF_CompletedMainOperations", profileNamespace getVariable ["MWF_Save_CompletedMainOperations", []], true];
 
 missionNamespace setVariable ["MWF_PendingGrandOperationState", [], true];
 missionNamespace setVariable ["MWF_GrandOperationActive", false, true];

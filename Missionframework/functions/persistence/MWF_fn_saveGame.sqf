@@ -305,6 +305,7 @@ if (_cooldownMap isEqualType createHashMap) then {
     } forEach keys _cooldownMap;
 };
 profileNamespace setVariable ["MWF_Save_MainOperationCooldowns", _cooldownPairs];
+profileNamespace setVariable ["MWF_Save_CompletedMainOperations", +(missionNamespace getVariable ["MWF_CompletedMainOperations", []])];
 
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
 profileNamespace setVariable ["MWF_Save_SupplyTimer", missionNamespace getVariable ["MWF_Locked_SupplyTimer", 10]];

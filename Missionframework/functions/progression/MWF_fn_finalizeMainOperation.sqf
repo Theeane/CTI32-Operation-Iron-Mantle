@@ -36,4 +36,8 @@ missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
 missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
 missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
 
+private _completed = +(missionNamespace getVariable ["MWF_CompletedMainOperations", []]);
+_completed pushBackUnique _key;
+missionNamespace setVariable ["MWF_CompletedMainOperations", _completed, true];
+
 [] call MWF_fnc_saveGame;
