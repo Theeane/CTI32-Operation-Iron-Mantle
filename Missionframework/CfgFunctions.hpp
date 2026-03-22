@@ -56,6 +56,7 @@ class CfgFunctions {
             class addIntel { file = "Missionframework/functions/compat/MWF_fn_addIntel.sqf"; };
             class checkUndercover { file = "Missionframework/functions/MWF_fnc_checkUndercover.sqf"; };
             class globalStateManager { file = "Missionframework/functions/MWF_fnc_globalStateManager.sqf"; };
+            class playConfiguredMusicLocal { file = "Missionframework/functions/endgame/MWF_fn_playConfiguredMusicLocal.sqf"; };
         };
 
         class Terminal {
@@ -248,6 +249,14 @@ class CfgFunctions {
             class intelManager { file = "Missionframework/functions/infrastructure/MWF_fn_intelManager.sqf"; };
             class infrastructureMarkerManager { file = "Missionframework/functions/infrastructure/MWF_fn_infrastructureMarkerManager.sqf"; };
             class spawnManager { file = "Missionframework/functions/infrastructure/MWF_fn_spawnManager.sqf"; };
+        };
+
+
+        class Endgame {
+            file = "Missionframework/functions/endgame";
+            class endgameManager { file = "Missionframework/functions/endgame/MWF_fn_endgameManager.sqf"; };
+            class applyLeaderAppearance { file = "Missionframework/functions/endgame/MWF_fn_applyLeaderAppearance.sqf"; };
+            class showEndingScreen { file = "Missionframework/functions/endgame/MWF_fn_showEndingScreen.sqf"; };
         };
 
         class Rebel {

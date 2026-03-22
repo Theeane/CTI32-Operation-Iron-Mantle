@@ -52,7 +52,8 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ["Vehicles_T5", [
         "vn_o_armor_ot34_01",               // Flame Tank / Advanced MBT
         "vn_o_air_mi2_04_05"                // Mi-2 (Attack Variant)
-    ]]
+    ]],
+    ["Leader", "vn_o_men_nva_01"]
 ];
 
 publicVariable "MWF_OPFOR_Preset";

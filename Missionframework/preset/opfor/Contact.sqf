@@ -53,7 +53,8 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ["Vehicles_T5", [
         "O_R_MBT_04_cannon_F",              // T-140 Angara
         "O_R_Heli_Attack_02_dynamicLoadout_F" // Mi-48 Kajman
-    ]]
+    ]],
+    ["Leader", "O_R_Officer_F"]
 ];
 
 // --- SYNC & BROADCAST ---

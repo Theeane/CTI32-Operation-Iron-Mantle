@@ -48,7 +48,8 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ]],
     ["Vehicles_T5", [
         "gm_gc_army_heli_akp74_80_str"             // Attack Helicopter
-    ]]
+    ]],
+    ["Leader", "gm_gc_army_officer_80_str"]
 ];
 
 // --- SYNC & BROADCAST ---

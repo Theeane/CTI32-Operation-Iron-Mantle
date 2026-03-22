@@ -53,7 +53,8 @@ MWF_OPFOR_Preset = createHashMapFromArray [
     ["Vehicles_T5", [
         "CUP_B_CDF_MBT_04_cannon_FST",       // Main Battle Tank (T-140 Angara)
         "CUP_B_CDF_Heli_Attack_02_dynamicLoadout_FST" // Attack Helicopter (Mi-48 Kajman)
-    ]]
+    ]],
+    ["Leader", "CUP_B_CDF_Officer_FST"]
 ];
 
 // --- SYNC & BROADCAST ---

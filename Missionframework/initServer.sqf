@@ -70,6 +70,9 @@ if (!isNil "MWF_fnc_infrastructureManager") then {
 if (!isNil "MWF_fnc_spawnManager") then {
     ["BOOTSTRAP"] spawn MWF_fnc_spawnManager;
 };
+if (!isNil "MWF_fnc_endgameManager") then {
+    ["INIT"] call MWF_fnc_endgameManager;
+};
 if (!isNil "MWF_fnc_cityMonitor") then {
     [] spawn MWF_fnc_cityMonitor;
 };
