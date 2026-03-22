@@ -52,10 +52,10 @@ if (markerColor _mainRespawnMarker isNotEqualTo "") then {
 [] call MWF_fnc_initCampaignAnalytics;
 [] call MWF_fnc_presetManager;
 [] call MWF_fnc_restoreSession;
+[] call MWF_fnc_restoreFOBs;
 if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
     [] call MWF_fnc_restoreBuiltUpgradeStructures;
 };
-[] call MWF_fnc_restoreFOBs;
 [] call MWF_fnc_spawnInitialFOBAsset;
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;
@@ -63,9 +63,6 @@ if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
 [] spawn MWF_fnc_economy;
 [] call MWF_fnc_initMissionSystem;
 
-if (!isNil "MWF_fnc_restoreActiveMainOperation") then {
-    [] call MWF_fnc_restoreActiveMainOperation;
-};
 
 if (!isNil "MWF_fnc_infrastructureManager") then {
     ["INIT"] call MWF_fnc_infrastructureManager;
@@ -75,12 +72,6 @@ if (!isNil "MWF_fnc_spawnManager") then {
 };
 if (!isNil "MWF_fnc_cityMonitor") then {
     [] spawn MWF_fnc_cityMonitor;
-};
-if (!isNil "MWF_fnc_civRepSupport") then {
-    ["SYNC_RELATIONS"] call MWF_fnc_civRepSupport;
-};
-if (!isNil "MWF_fnc_civRepInformant") then {
-    ["INIT"] call MWF_fnc_civRepInformant;
 };
 
 if (!isNil "MWF_fnc_rebelLeaderSystem") then {

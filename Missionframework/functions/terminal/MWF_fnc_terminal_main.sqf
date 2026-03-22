@@ -33,7 +33,7 @@ switch (toUpper _mode) do {
         private _condMissionHub = "alive _target && alive _this && _this distance _target < 3 && ((['MISSION_HUB'] call MWF_fnc_validateTerminalAccess) select 0)";
         private _condMainOps = "alive _target && alive _this && _this distance _target < 3 && ((['MAIN_OPERATIONS'] call MWF_fnc_validateTerminalAccess) select 0)";
 
-        _terminal addAction ["<t color='#7CC8FF'>[Terminal] Upload Data</t>", { [player] call MWF_fnc_terminal_upload; }, nil, 1.5, true, true, "", _condBase];
+        _terminal addAction ["<t color='#7CC8FF'>[Terminal] Upload Data</t>", { [player, false, _target] call MWF_fnc_terminal_upload; }, nil, 1.5, true, true, "", _condBase];
         _terminal addAction ["<t color='#7CC8FF'>[Terminal] Mission Hub</t>", { ["MISSION_HUB", _target] call MWF_fnc_terminal_main; }, nil, 1.4, true, true, "", _condMissionHub];
         _terminal addAction ["<t color='#FFD700'>[Terminal] Intelligence Disrupt (150 I)</t>", { [player] call MWF_fnc_terminal_disrupt; }, nil, 1.3, true, true, "", _condBase];
         _terminal addAction ["<t color='#9AD8FF'>[Terminal] Main Operations</t>", { ["MAIN_OPERATIONS", _target] call MWF_fnc_terminal_main; }, nil, 1.25, true, true, "", _condMainOps];
@@ -48,7 +48,7 @@ switch (toUpper _mode) do {
         private _root = ["MWF_Term_Root", "Terminal", "", {true}, {true}] call ace_interact_menu_fnc_createAction;
         [_terminal, 0, ["ACE_MainActions"], _root] call ace_interact_menu_fnc_addActionToObject;
 
-        private _upld = ["MWF_Term_Up", "Upload Data", "", { [player] call MWF_fnc_terminal_upload; }, {alive _target}] call ace_interact_menu_fnc_createAction;
+        private _upld = ["MWF_Term_Up", "Upload Data", "", { [player, false, _target] call MWF_fnc_terminal_upload; }, {alive _target}] call ace_interact_menu_fnc_createAction;
         [_terminal, 0, ["ACE_MainActions", "MWF_Term_Root"], _upld] call ace_interact_menu_fnc_addActionToObject;
 
         private _hub = ["MWF_Term_Hub", "Mission Hub", "", { ["MISSION_HUB", _target] call MWF_fnc_terminal_main; }, {alive _target && ((['MISSION_HUB'] call MWF_fnc_validateTerminalAccess) select 0)}] call ace_interact_menu_fnc_createAction;

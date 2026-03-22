@@ -114,9 +114,10 @@ if (_surfaceRule isEqualTo "WATER") then {
 };
 
 private _respawnTruckClass = missionNamespace getVariable ["MWF_Respawn_Truck", ""];
-if (_respawnTruckClass isNotEqualTo "" && {_className isEqualTo _respawnTruckClass}) then {
+private _respawnHeliClass = missionNamespace getVariable ["MWF_Respawn_Heli", ""];
+if ((_className isEqualTo _respawnTruckClass) || {_className isEqualTo _respawnHeliClass}) then {
     [_spawnVehicle] call MWF_fnc_initMobileRespawn;
-    ["Mobile Respawn Unit deployed."] remoteExec ["systemChat", remoteExecutedOwner];
+    [if (_className isEqualTo _respawnHeliClass) then {"Mobile Respawn Helicopter deployed."} else {"Mobile Respawn Unit deployed."}] remoteExec ["systemChat", remoteExecutedOwner];
 };
 
 [_spawnVehicle] spawn {
