@@ -1,7 +1,7 @@
 /*
     Author: Theane / ChatGPT
     Function: MWF_fnc_showEndingScreen
-    Description: Presents the 30-second finale screen while the endgame music continues.
+    Description: Presents the 30-second finale screen while the endgame music continues. Shared helper used by the live endgame flow.
 */
 params [
     ["_endingType", "PLAYER", [""]],
@@ -44,8 +44,11 @@ private _endingTitle = switch (toUpper _endingType) do {
 };
 
 private _executioner = [7] call _pickWinner;
+private _summary = if ((toUpper _endingType) isEqualTo "REBEL") then {"The surrendered leader was delivered to the rebel leader."} else {"The OPFOR leader was killed by player action."};
+
 private _textLines = [
     format ["<t size='1.35' color='#d8c27a'>%1</t>", _endingTitle],
+    _summary,
     " ",
     ["OPFOR Killed", [2] call _pickWinner] call _fmt,
     ["Rebels Killed", [3] call _pickWinner] call _fmt,

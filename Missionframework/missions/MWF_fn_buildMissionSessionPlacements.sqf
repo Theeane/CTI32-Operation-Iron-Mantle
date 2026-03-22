@@ -26,6 +26,7 @@ params [
 private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) select { !isNull _x };
 private _allMarkers = allMapMarkers;
 private _allowManualPlacements = !(missionNamespace getVariable ["MWF_HasCampaignSave", false]);
+private _reservedZoneId = toLower (missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""]);
 
 private _collectMarkerSeries = {
     params ["_baseName"];
@@ -218,7 +219,8 @@ private _pickManualAnchor = {
             private _zonePool = _zones select {
                 private _owner = toLower (_x getVariable ["MWF_zoneOwnerState", if (_x getVariable ["MWF_isCaptured", false]) then {"player"} else {"enemy"}]);
                 private _zoneType = toLower (_x getVariable ["MWF_zoneType", "town"]);
-                (_owner isEqualTo "enemy") && ((_allowedZoneTypesLower isEqualTo []) || {_zoneType in _allowedZoneTypesLower})
+                private _zoneId = toLower (_x getVariable ["MWF_zoneID", ""]);
+                (_owner isEqualTo "enemy") && ((_allowedZoneTypesLower isEqualTo []) || {_zoneType in _allowedZoneTypesLower}) && (_reservedZoneId isEqualTo "" || {_zoneId isNotEqualTo _reservedZoneId})
             };
 
             private _pickedZone = objNull;

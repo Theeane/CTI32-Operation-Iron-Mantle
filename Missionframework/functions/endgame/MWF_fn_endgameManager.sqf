@@ -9,7 +9,7 @@
     Ending flow:
     - When the campaign reaches endgame prerequisites, a preset-unique OPFOR leader spawns.
     - If rebel standing is positive and the leader's guards are neutralized, the leader can surrender.
-    - Escorting the surrendered leader to the rebel contact triggers the Rebel ending.
+    - Escorting the surrendered leader to the rebel leader triggers the Rebel ending.
     - Killing the leader directly triggers the Player ending.
     - Regardless of outcome, leader death starts endgame music immediately.
       After ~30 seconds the end screen appears and remains for ~30 seconds while music continues.
@@ -99,7 +99,7 @@ if (_modeUpper isEqualTo "ATTACH_UI") exitWith {
         private _task = player createSimpleTask ["MWF_EndgameLeaderTask"];
         _task setSimpleTaskDescription [
             if (_rebelAvailable) then {
-                format ["Operation Iron Mantle is active near %1. Eliminate the OPFOR leader, or force his surrender and escort him to the rebel contact for the Rebel ending.", _zoneName]
+                format ["Operation Iron Mantle is active near %1. Eliminate the OPFOR leader, or force his surrender and escort him to the rebel leader for the Rebel ending.", _zoneName]
             } else {
                 format ["Operation Iron Mantle is active near %1. Eliminate the OPFOR leader to finish the campaign.", _zoneName]
             },
@@ -117,7 +117,7 @@ if (_modeUpper isEqualTo "ATTACH_UI") exitWith {
         createMarkerLocal [_markerName, getPosATL _contact];
         _markerName setMarkerTypeLocal "mil_unknown";
         _markerName setMarkerColorLocal "ColorGUER";
-        _markerName setMarkerTextLocal "Rebel Contact";
+        _markerName setMarkerTextLocal "Rebel Leader";
         missionNamespace setVariable ["MWF_EndgameContactMarkerLocal", _markerName];
     };
     true
@@ -135,15 +135,19 @@ if (_modeUpper isEqualTo "END_SEQUENCE") exitWith {
             ["PLAY", _musicClass] call MWF_fnc_playSharedMusic;
         };
         uiSleep 30;
-        private _lines = [_analyticsLocal] call _builder;
-        private _heading = if ((toUpper _outcomeLocal) isEqualTo "REBEL") then {
-            "<t size='1.45' color='#88d18a'>Rebel Ending</t><br/><t color='#d8d8d8'>The surrendered leader was delivered to the rebels.</t>"
+        if (!isNil "MWF_fnc_showEndingScreen") then {
+            [_outcomeLocal, _analyticsLocal, 30] call MWF_fnc_showEndingScreen;
         } else {
-            "<t size='1.45' color='#d18a8a'>Player Ending</t><br/><t color='#d8d8d8'>The OPFOR leader was killed by player action.</t>"
+            private _lines = [_analyticsLocal] call _builder;
+            private _heading = if ((toUpper _outcomeLocal) isEqualTo "REBEL") then {
+                "<t size='1.45' color='#88d18a'>Rebel Ending</t><br/><t color='#d8d8d8'>The surrendered leader was delivered to the rebel leader.</t>"
+            } else {
+                "<t size='1.45' color='#d18a8a'>Player Ending</t><br/><t color='#d8d8d8'>The OPFOR leader was killed by player action.</t>"
+            };
+            hintSilent parseText (_heading + "<br/><br/>" + (_lines joinString "<br/>"));
+            uiSleep 30;
+            hintSilent "";
         };
-        hintSilent parseText (_heading + "<br/><br/>" + (_lines joinString "<br/>"));
-        uiSleep 30;
-        hintSilent "";
     };
     true
 };
@@ -164,18 +168,37 @@ private _clearServerState = {
     };
     private _contact = missionNamespace getVariable ["MWF_EndgameRebelContact", objNull];
     if (!isNull _contact) then {
-        private _grp = group _contact;
-        deleteVehicle _contact;
-        if (!isNull _grp && {{alive _x} count units _grp == 0}) then { deleteGroup _grp; };
+        if (!(missionNamespace getVariable ["MWF_EndgameUsingActiveRebelLeader", false])) then {
+            private _grp = group _contact;
+            deleteVehicle _contact;
+            if (!isNull _grp && {{alive _x} count units _grp == 0}) then { deleteGroup _grp; };
+        };
     };
     missionNamespace setVariable ["MWF_EndgameLeader", objNull, true];
     missionNamespace setVariable ["MWF_EndgameLeaderGroup", grpNull, true];
     missionNamespace setVariable ["MWF_EndgameRebelContact", objNull, true];
+    missionNamespace setVariable ["MWF_EndgameUsingActiveRebelLeader", false, true];
     missionNamespace setVariable ["MWF_EndgameReservedZoneId", "", true];
     missionNamespace setVariable ["MWF_EndgameState", [], true];
 };
 
 private _spawnRebelContact = {
+    private _activeLeader = missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull];
+    if (!isNull _activeLeader && {alive _activeLeader}) exitWith {
+        ["REMOVE", _activeLeader] remoteExec ["MWF_fnc_rebelLeaderDialogue", 0];
+        _activeLeader allowDamage false;
+        _activeLeader setCaptive true;
+        _activeLeader disableAI "AUTOCOMBAT";
+        _activeLeader disableAI "TARGET";
+        _activeLeader disableAI "AUTOTARGET";
+        _activeLeader setBehaviourStrong "CARELESS";
+        _activeLeader setCombatMode "BLUE";
+        doStop _activeLeader;
+        missionNamespace setVariable ["MWF_EndgameUsingActiveRebelLeader", true, true];
+        _activeLeader
+    };
+
+    missionNamespace setVariable ["MWF_EndgameUsingActiveRebelLeader", false, true];
     private _resPreset = missionNamespace getVariable ["MWF_RES_Preset", createHashMap];
     private _class = _resPreset getOrDefault ["Leader", "I_G_officer_F"];
     if (_class isEqualTo "") then {
@@ -374,7 +397,7 @@ if (_modeUpper isEqualTo "MONITOR") exitWith {
             _leader setBehaviourStrong "CARELESS";
             _leader setCombatMode "BLUE";
             removeAllWeapons _leader;
-            ["The OPFOR leader has surrendered. Escort him to the rebel contact for the Rebel ending."] remoteExec ["systemChat", 0];
+            ["The OPFOR leader has surrendered. Escort him to the rebel leader for the Rebel ending."] remoteExec ["systemChat", 0];
         };
 
         if (_leader getVariable ["MWF_EndBossSurrendered", false]) then {

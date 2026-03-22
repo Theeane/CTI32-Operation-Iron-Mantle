@@ -27,6 +27,7 @@ if (isServer && {!hasInterface}) exitWith {
 };
 
 if (!hasInterface) exitWith { false };
+if (!isNil "MWF_fnc_playConfiguredMusicLocal") exitWith { ["", _musicClass] call MWF_fnc_playConfiguredMusicLocal };
 0 fadeMusic 1;
 playMusic _musicClass;
 true

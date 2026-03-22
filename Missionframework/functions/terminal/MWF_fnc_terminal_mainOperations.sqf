@@ -166,8 +166,15 @@ switch (toUpper _mode) do {
         };
 
         private _placements = missionNamespace getVariable ["MWF_GrandOperationSessionPlacements", []];
+        private _reservedZoneId = toLower (missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""]);
+        if (_reservedZoneId isNotEqualTo "") then {
+            _placements = _placements select { toLower (_x param [2, "", [""]]) isNotEqualTo _reservedZoneId };
+        };
         if (_placements isEqualTo []) then {
             _placements = [] call MWF_fnc_buildGrandOperationPlacements;
+            if (_reservedZoneId isNotEqualTo "") then {
+                _placements = _placements select { toLower (_x param [2, "", [""]]) isNotEqualTo _reservedZoneId };
+            };
         };
 
         if (_placements isEqualTo []) exitWith {

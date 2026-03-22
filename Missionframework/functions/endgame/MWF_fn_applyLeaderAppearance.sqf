@@ -24,15 +24,23 @@ if (_redBeret isNotEqualTo "" && {isClass (configFile >> "CfgWeapons" >> _redBer
 private _facePool = [];
 private _asczFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_ASCZFaces", []]);
 private _vanillaFaces = +(missionNamespace getVariable ["MWF_EndgameLeader_VanillaFaces", []]);
+private _isValidFace = {
+    params ["_faceClass"];
+    (_faceClass isEqualType "") && {
+        _faceClass != "" && {
+            isClass (configFile >> "CfgFaces" >> "Man_A3" >> _faceClass) ||
+            isClass (configFile >> "CfgIdentities" >> _faceClass) ||
+            isClass (configFile >> "CfgFaces" >> _faceClass)
+        }
+    }
+};
 
-// Prefer ASCZ faces when available, otherwise fallback to vanilla.
-{
-    if (_x isEqualType "" && {_x != ""}) then { _facePool pushBackUnique _x; };
-} forEach _asczFaces;
-if (_facePool isEqualTo []) then {
-    {
-        if (_x isEqualType "" && {_x != ""}) then { _facePool pushBackUnique _x; };
-    } forEach _vanillaFaces;
+private _validAsczFaces = _asczFaces select { [_x] call _isValidFace };
+private _validVanillaFaces = _vanillaFaces select { [_x] call _isValidFace };
+if (_validAsczFaces isNotEqualTo []) then {
+    _facePool = +_validAsczFaces;
+} else {
+    _facePool = +_validVanillaFaces;
 };
 if (_facePool isNotEqualTo []) then {
     _unit setFace (selectRandom _facePool);

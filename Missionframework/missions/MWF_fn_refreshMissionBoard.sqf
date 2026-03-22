@@ -12,6 +12,13 @@ if (!isServer) exitWith {[]};
 
 private _registry = + (missionNamespace getVariable ["MWF_MissionTemplateRegistry", []]);
 private _placements = + (missionNamespace getVariable ["MWF_MissionSessionPlacements", []]);
+private _reservedZoneId = toLower (missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""]);
+if (_reservedZoneId isNotEqualTo "") then {
+    _placements = _placements select {
+        private _areaId = toLower (_x param [2, "", [""]]);
+        _areaId isNotEqualTo _reservedZoneId
+    };
+};
 private _previousBoard = + (missionNamespace getVariable ["MWF_MissionBoardSlots", []]);
 
 private _supportedDomains = [];

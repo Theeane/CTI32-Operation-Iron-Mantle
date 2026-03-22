@@ -277,11 +277,13 @@ class CfgFunctions {
         class Audio {
             file = "Missionframework/functions/endgame";
             class playSharedMusic { file = "Missionframework/functions/endgame/MWF_fn_playSharedMusic.sqf"; };
+            class playConfiguredMusicLocal { file = "Missionframework/functions/endgame/MWF_fn_playConfiguredMusicLocal.sqf"; };
         };
 
         class Endgame {
             file = "Missionframework/functions/endgame";
             class applyLeaderAppearance { file = "Missionframework/functions/endgame/MWF_fn_applyLeaderAppearance.sqf"; };
+            class showEndingScreen { file = "Missionframework/functions/endgame/MWF_fn_showEndingScreen.sqf"; };
             class endgameManager { file = "Missionframework/functions/endgame/MWF_fn_endgameManager.sqf"; };
         };
 

@@ -15,6 +15,7 @@ private _zones = (missionNamespace getVariable ["MWF_all_mission_zones", []]) se
 private _placements = [];
 private _allMarkers = allMapMarkers;
 private _allowManualPlacements = !(missionNamespace getVariable ["MWF_HasCampaignSave", false]);
+private _reservedZoneId = toLower (missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""]);
 
 private _collectMarkerSeries = {
     params ["_baseName"];
@@ -96,7 +97,8 @@ if (_manualAnchors isNotEqualTo []) then {
 
     private _enemyZones = _zones select {
         private _owner = toLower (_x getVariable ["MWF_zoneOwnerState", if (_x getVariable ["MWF_isCaptured", false]) then {"player"} else {"enemy"}]);
-        _owner isEqualTo "enemy"
+        private _zoneId = toLower (_x getVariable ["MWF_zoneID", ""]);
+        (_owner isEqualTo "enemy") && (_reservedZoneId isEqualTo "" || {_zoneId isNotEqualTo _reservedZoneId})
     };
 
     private _isValidZone = {
