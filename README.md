@@ -88,8 +88,6 @@ Planned or supported operational environments include:
 
 - Land warfare  
 - Naval operations  
-- River operations  
-- Underground / tunnel missions  
 - Future air operations
 
 Systems activate only when the map environment supports them.
