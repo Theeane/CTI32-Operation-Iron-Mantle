@@ -28,7 +28,7 @@ if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
 };
 
 // Update resource display
-[] call MWF_fnc_updateResourceUI;
+[] spawn MWF_fnc_updateResourceUI;
 
 // Damage should interrupt sensitive interactions cleanly without granting invulnerability.
 if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {

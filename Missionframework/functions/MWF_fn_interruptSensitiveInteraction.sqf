@@ -22,6 +22,11 @@ if (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) then {
     _interrupted = true;
 };
 
+if (missionNamespace getVariable ["MWF_BuildPlacement_Active", false]) then {
+    [] call MWF_fnc_cleanupBuildPlacement;
+    _interrupted = true;
+};
+
 private _dataHubDisplay = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
 if (!isNull _dataHubDisplay) then {
     ["CLOSE"] call MWF_fnc_dataHub;

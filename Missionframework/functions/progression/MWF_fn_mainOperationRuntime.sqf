@@ -5,12 +5,13 @@
 
     Description:
     Server-side runtime coordinator for main operations.
-    It bridges the gap between START-only launch and later phase callbacks by
-    monitoring the currently active phase task and advancing the operation when
-    that task is marked succeeded.
+    Bridges launch to authored later phase callbacks by monitoring the current
+    phase task, starting the missing objective backend for that phase, and
+    advancing the operation when the task is marked succeeded.
 
     Modes:
     - START   : initialize runtime state and start monitoring
+    - RESTORE : rebuild runtime/task state after load and resume monitoring
     - MONITOR : monitor current phase task until it advances
     - STOP    : clear runtime state for a specific operation
 */
@@ -19,7 +20,7 @@ if (!isServer) exitWith { false };
 
 params [
     ["_mode", "START", [""]],
-    ["_arg1", "", ["", createHashMap]],
+    ["_arg1", "", ["", createHashMap, []]],
     ["_arg2", [], [[], [0,0,0]]],
     ["_arg3", "", [""]]
 ];
@@ -85,6 +86,28 @@ if (isNil "_runtimeMap" || { !(_runtimeMap isEqualType createHashMap) }) then {
     _runtimeMap = createHashMap;
 };
 
+private _currentStateForPhaseIndex = {
+    params ["_sequence", ["_phaseIndex", 0, [0]]];
+    if (_phaseIndex <= 0) exitWith { "START" };
+    private _previous = _sequence # ((_phaseIndex - 1) max 0);
+    _previous param [1, "START", [""]]
+};
+
+private _rebuildPhaseTasks = {
+    params ["_key", "_fn", "_position", "_sequence", ["_phaseIndex", 0, [0]]];
+    missionNamespace setVariable ["MWF_MainOperationRestoreMode", true, true];
+    ["START", _position] call _fn;
+
+    for "_i" from 1 to _phaseIndex do {
+        private _stateName = [_sequence, _i] call _currentStateForPhaseIndex;
+        if !(_stateName isEqualTo "COMPLETE") then {
+            [_stateName, _position] call _fn;
+        };
+    };
+
+    missionNamespace setVariable ["MWF_MainOperationRestoreMode", false, true];
+};
+
 switch (toUpper _mode) do {
     case "START": {
         _arg1 params [
@@ -117,12 +140,14 @@ switch (toUpper _mode) do {
             ["sequence", _sequence],
             ["phaseIndex", 0],
             ["active", true],
-            ["startedAt", serverTime]
+            ["startedAt", serverTime],
+            ["armedTaskId", ""]
         ];
 
         _runtimeMap set [_key, _record];
         missionNamespace setVariable ["MWF_MainOperationRuntime", _runtimeMap, true];
 
+        missionNamespace setVariable ["MWF_MainOperationRestoreMode", false, true];
         ["START", _position] call _fn;
         ["MONITOR", _key] spawn MWF_fnc_mainOperationRuntime;
         true
@@ -143,15 +168,23 @@ switch (toUpper _mode) do {
         private _sequence = [_key] call _buildSequence;
         if (_sequence isEqualTo []) exitWith { false };
 
+        private _fn = missionNamespace getVariable [_fnName, objNull];
+        if (isNil "_fn" || {_fn isEqualTo objNull}) exitWith { false };
+
+        private _safePhaseIndex = (_phaseIndex max 0) min (((count _sequence) - 1) max 0);
+
+        [_key, _fn, _position, _sequence, _safePhaseIndex] call _rebuildPhaseTasks;
+
         private _record = createHashMapFromArray [
             ["key", _key],
             ["functionName", _fnName],
             ["title", _title],
             ["position", _position],
             ["sequence", _sequence],
-            ["phaseIndex", (_phaseIndex max 0) min (((count _sequence) - 1) max 0)],
+            ["phaseIndex", _safePhaseIndex],
             ["active", true],
-            ["startedAt", _startedAt]
+            ["startedAt", _startedAt],
+            ["armedTaskId", ""]
         ];
 
         _runtimeMap set [_key, _record];
@@ -171,11 +204,15 @@ switch (toUpper _mode) do {
             private _record = _allRuntime getOrDefault [_key, createHashMap];
             if !(_record isEqualType createHashMap) exitWith { false };
             if !(_record getOrDefault ["active", false]) exitWith { true };
-            if !((missionNamespace getVariable ["MWF_CurrentGrandOperation", ""]) isEqualTo _key) exitWith { true };
+            if !((missionNamespace getVariable ["MWF_CurrentGrandOperation", ""]) isEqualTo _key) exitWith {
+                ["STOP", _key] call MWF_fnc_mainOperationBackend;
+                true
+            };
 
             private _sequence = _record getOrDefault ["sequence", []];
             private _phaseIndex = _record getOrDefault ["phaseIndex", 0];
             if (_phaseIndex >= count _sequence) exitWith {
+                ["STOP", _key] call MWF_fnc_mainOperationBackend;
                 _record set ["active", false];
                 _allRuntime set [_key, _record];
                 missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
@@ -184,8 +221,31 @@ switch (toUpper _mode) do {
 
             private _phaseData = _sequence # _phaseIndex;
             _phaseData params ["_taskId", "_nextState"];
+
+            if !((_record getOrDefault ["armedTaskId", ""]) isEqualTo _taskId) then {
+                private _started = ["START_PHASE", [_key, _phaseIndex, _taskId, _record getOrDefault ["position", [0,0,0]]]] call MWF_fnc_mainOperationBackend;
+                if (_started) then {
+                    _record set ["armedTaskId", _taskId];
+                    _allRuntime set [_key, _record];
+                    missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                };
+            };
+
             private _taskState = [_taskId] call BIS_fnc_taskState;
+            if (_taskState in ["FAILED", "CANCELED"]) exitWith {
+                ["STOP", _key] call MWF_fnc_mainOperationBackend;
+                _allRuntime deleteAt _key;
+                missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+                missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+                missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+                missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+                if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
+                true
+            };
+
             if (_taskState isEqualTo "SUCCEEDED") then {
+                ["STOP", _key] call MWF_fnc_mainOperationBackend;
                 private _fnName = _record getOrDefault ["functionName", ""];
                 private _position = _record getOrDefault ["position", [0,0,0]];
                 private _fn = missionNamespace getVariable [_fnName, objNull];
@@ -193,12 +253,15 @@ switch (toUpper _mode) do {
                     [_nextState, _position] call _fn;
                 };
 
-                _record set ["phaseIndex", _phaseIndex + 1];
                 if (_nextState isEqualTo "COMPLETE") then {
-                    _record set ["active", false];
+                    _allRuntime deleteAt _key;
+                    missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                } else {
+                    _record set ["phaseIndex", _phaseIndex + 1];
+                    _record set ["armedTaskId", ""];
+                    _allRuntime set [_key, _record];
+                    missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
                 };
-                _allRuntime set [_key, _record];
-                missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
             };
 
             sleep 2;
@@ -208,6 +271,7 @@ switch (toUpper _mode) do {
     case "STOP": {
         private _key = _arg1;
         if !(_key isEqualType "") exitWith { false };
+        ["STOP", _key] call MWF_fnc_mainOperationBackend;
         _runtimeMap deleteAt _key;
         missionNamespace setVariable ["MWF_MainOperationRuntime", _runtimeMap, true];
         true

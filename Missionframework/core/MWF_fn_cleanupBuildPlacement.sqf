@@ -43,4 +43,8 @@ if (_cancelAction >= 0) then {
     ["MWF_BuildPlacement_Interrupted", false]
 ];
 
+if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "BUILD_PLACEMENT") then {
+    missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
+};
+
 true

@@ -25,6 +25,11 @@ private _anchorPos = if (!isNull _terminal) then {
 };
 
 private _maxRange = 500;
+private _sessionId = format ["%1:%2:%3", getPlayerUID player, diag_tickTime, floor (random 1000000)];
+player setVariable ["MWF_BaseArchitect_AnchorPos", _anchorPos, true];
+player setVariable ["MWF_BaseArchitect_MaxRange", _maxRange, true];
+player setVariable ["MWF_BaseArchitect_SessionId", _sessionId, true];
+player setVariable ["MWF_BaseArchitect_Active", true, true];
 private _group = createGroup [sideLogic, true];
 private _curator = _group createUnit ["ModuleCurator_F", [0, 0, 0], [], 0, "NONE"];
 
@@ -34,7 +39,8 @@ player assignCurator _curator;
 _curator addEventHandler ["CuratorObjectPlaced", {
     params ["_curatorModule", "_entity"];
     if (isNull _entity) exitWith {};
-    [_entity, player] remoteExec ["MWF_fnc_handleBuildPlacement", 2];
+    private _sessionId = player getVariable ["MWF_BaseArchitect_SessionId", ""];
+    [_entity, player, _sessionId, "PLACE"] remoteExec ["MWF_fnc_handleBuildPlacement", 2];
 }];
 
 missionNamespace setVariable ["MWF_BaseArchitect_Active", true];
@@ -70,6 +76,10 @@ openCuratorInterface;
         deleteGroup _group;
     };
     missionNamespace setVariable ["MWF_BaseArchitect_Active", false];
+    player setVariable ["MWF_BaseArchitect_Active", false, true];
+    player setVariable ["MWF_BaseArchitect_AnchorPos", nil, true];
+    player setVariable ["MWF_BaseArchitect_MaxRange", nil, true];
+    player setVariable ["MWF_BaseArchitect_SessionId", nil, true];
     if (hasInterface) then {
         cutText ["", "BLACK OUT", 0.25];
         uiSleep 0.25;

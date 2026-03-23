@@ -75,7 +75,7 @@ while { !isNull _zone } do {
         if (_enemyCount > _friendlyCount && { _enemyCount > 0 }) then {
             _zone setVariable ["MWF_underAttack", true, true];
 
-            if (_lossTimerDeadline <= serverTime) then {
+            if (_lossTimerDeadline <= 0) then {
                 _lossTimerDeadline = serverTime + 120;
                 [format ["%1 is under attack.", _zoneName]] remoteExec ["systemChat", 0];
             };

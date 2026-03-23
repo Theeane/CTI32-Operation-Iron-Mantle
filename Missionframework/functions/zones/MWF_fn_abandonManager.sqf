@@ -4,53 +4,78 @@
     Project: Military War Framework
 
     Description:
-    Handles abandon manager for the zones system.
+    Cleans up player-owned vehicles that have been abandoned far away from players and
+    friendly bases for an extended period. Uses authoritative base positions instead of
+    the old marker-array assumption.
 */
 
 if (!isServer) exitWith {};
+if (missionNamespace getVariable ["MWF_AbandonManagerStarted", false]) exitWith {};
 
+missionNamespace setVariable ["MWF_AbandonManagerStarted", true, true];
 diag_log "[Iron Mantle] Abandon Manager started.";
+
+private _isTrackedVehicle = {
+    params ["_veh"];
+    (_veh getVariable ["MWF_isBought", false]) ||
+    (_veh getVariable ["MWF_isBuiltByPlayer", false]) ||
+    (_veh getVariable ["MWF_isPermanent", false])
+};
+
+private _isNearFriendlyBase = {
+    params ["_veh"];
+
+    private _vehPos = getPosATL _veh;
+    private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+    if (!isNull _mainBase && {_vehPos distance2D _mainBase < 200}) exitWith { true };
+
+    {
+        private _terminal = _x param [1, objNull];
+        if (!isNull _terminal && {_vehPos distance2D _terminal < 200}) exitWith { true };
+    } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
+
+    false
+};
 
 while {true} do {
     {
         private _veh = _x;
-        
-        // Only track vehicles that are not static/wrecks and are alive
-        if (alive _veh && !(_veh isKindOf "StaticWeapon")) then {
-            
-            private _isPermanent = _veh getVariable ["MWF_isPermanent", false];
-            private _isBuilt     = _veh getVariable ["MWF_isBuiltByPlayer", false];
 
-            // Only check vehicles that have been touched or bought by players
-            if (_isPermanent || _isBuilt) then {
-                
-                // 1. Check for nearby players (500m safety zone)
-                private _nearPlayers = allPlayers select { _x distance _veh < 500 };
-                
-                // 2. Check for nearby Friendly Bases (200m safety zone)
-                // Assuming MWF_FriendlyZones contains [markerName, tier]
-                private _nearFOB = MWF_ActiveZones select { (getMarkerPos (_x # 0)) distance _veh < 200 };
-
-                // 3. If abandoned (No players and no base nearby)
-                if (count _nearPlayers == 0 && count _nearFOB == 0) then {
-                    
-                    private _abandonTick = _veh getVariable ["MWF_abandonTick", 0];
-                    _veh setVariable ["MWF_abandonTick", _abandonTick + 1];
-
-                    // If abandoned for 3 ticks (Approx 30 minutes total)
-                    if (_abandonTick >= 3) then {
-                        diag_log format ["[Iron Mantle] Deleting abandoned vehicle: %1 at %2", typeOf _veh, getPos _veh];
-                        deleteVehicle _veh;
+        if (!alive _veh) then {
+            _veh setVariable ["MWF_abandonStartedAt", nil];
+        } else {
+            if !(_veh isKindOf "StaticWeapon") then {
+                if ([_veh] call _isTrackedVehicle) then {
+                    private _nearPlayers = allPlayers select {
+                        alive _x &&
+                        {(_x distance2D _veh) < 500}
                     };
-                } else {
-                    // Reset timer if someone is nearby or vehicle is home
-                    if (_veh getVariable ["MWF_abandonTick", 0] != 0) then {
-                        _veh setVariable ["MWF_abandonTick", 0];
+
+                    private _isHome = [_veh] call _isNearFriendlyBase;
+
+                    if ((count _nearPlayers) == 0 && {!_isHome}) then {
+                        private _startedAt = _veh getVariable ["MWF_abandonStartedAt", -1];
+                        if (_startedAt < 0) then {
+                            _veh setVariable ["MWF_abandonStartedAt", serverTime, true];
+                        } else {
+                            if ((serverTime - _startedAt) >= 1800) then {
+                                diag_log format [
+                                    "[Iron Mantle] Deleting abandoned tracked vehicle: %1 at %2",
+                                    typeOf _veh,
+                                    getPosATL _veh
+                                ];
+                                deleteVehicle _veh;
+                            };
+                        };
+                    } else {
+                        if ((_veh getVariable ["MWF_abandonStartedAt", -1]) >= 0) then {
+                            _veh setVariable ["MWF_abandonStartedAt", -1, true];
+                        };
                     };
                 };
             };
         };
     } forEach vehicles;
 
-    sleep 600; // 10 minute interval
+    uiSleep 60;
 };

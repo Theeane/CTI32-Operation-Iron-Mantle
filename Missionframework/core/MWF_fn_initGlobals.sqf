@@ -271,6 +271,17 @@ if (isNil { missionNamespace getVariable "MWF_PendingDamagedFOBs" }) then {
     missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
 };
 
+private _sessionSpawnDistance = ["MWF_Param_SpawnDistance", 1200] call BIS_fnc_getParamValue;
+private _sessionScalingBracket = ["MWF_Param_PlayerScalingBracket", 1] call BIS_fnc_getParamValue;
+private _sessionUnitCap = ["MWF_Param_UnitCap", 100] call BIS_fnc_getParamValue;
+private _sessionDebugMode = (["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0;
+private _scalingLabel = switch (_sessionScalingBracket) do {
+    case 0: {"1-8 Players (Small Group)"};
+    case 2: {"17-24 Players (Large Group)"};
+    case 3: {"25-32 Players (Full Scale)"};
+    default {"9-16 Players (Medium Group)"};
+};
+
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
 
@@ -286,6 +297,11 @@ missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true]
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
 missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
+missionNamespace setVariable ["MWF_SpawnDistance", _sessionSpawnDistance, true];
+missionNamespace setVariable ["MWF_PlayerScalingBracket", _sessionScalingBracket, true];
+missionNamespace setVariable ["MWF_PlayerScalingLabel", _scalingLabel, true];
+missionNamespace setVariable ["MWF_DynamicUnitCap", _sessionUnitCap, true];
+missionNamespace setVariable ["MWF_DebugMode", _sessionDebugMode, true];
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];

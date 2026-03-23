@@ -27,11 +27,7 @@ if (isNil "CBA_fnc_addSetting") exitWith {
         0              // Default value (0 = Center Right)
     ],
     nil,               // Global? No, this is a local client setting
-    { 
-        // CODE TO RUN ON CHANGE
-        // Updated to use the new MWF_fnc_ prefix
-        [] spawn MWF_fnc_updateResourceUI; 
-    }
+    { missionNamespace setVariable ["MWF_UI_RefreshRequested", true]; [] spawn MWF_fnc_updateResourceUI; }
 ] call CBA_fnc_addSetting;
 
 // --- HUD OPACITY SETTING ---
@@ -42,7 +38,7 @@ if (isNil "CBA_fnc_addSetting") exitWith {
     "AGS Framework", 
     [0.1, 1, 0.5, 1], // Min, Max, Default, Decimals
     nil, 
-    { [] spawn MWF_fnc_updateResourceUI; }
+    { missionNamespace setVariable ["MWF_UI_RefreshRequested", true]; [] spawn MWF_fnc_updateResourceUI; }
 ] call CBA_fnc_addSetting;
 
 diag_log "[MWF] UI: Client settings registered successfully.";

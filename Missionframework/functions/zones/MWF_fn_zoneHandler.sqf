@@ -5,8 +5,8 @@
 
     Description:
     Maintains non-persistent zone runtime state such as contested visuals and attack status.
-    Includes a lightweight integration hook to mark world/threat state dirty when
-    runtime zone pressure meaningfully changes.
+    Threat response queue data is projected into zone runtime so map/logic consumers can see
+    response pressure even before physical reinforcements arrive.
 */
 
 if (!isServer) exitWith {};
@@ -37,12 +37,13 @@ while {true} do {
                 {!(_x getVariable ["MWF_isQRF", false])}
             });
 
+            private _responseQueued = _zone getVariable ["MWF_zoneResponseQueued", false];
             private _previousContested = _zone getVariable ["MWF_contested", false];
             private _previousUnderAttack = _zone getVariable ["MWF_underAttack", false];
 
             private _newContested = (_friendlyCount > 0 && _enemyCount > 0);
             private _newUnderAttack = if (_zone getVariable ["MWF_isCaptured", false]) then {
-                (_enemyCount > _friendlyCount && _enemyCount > 0)
+                (_enemyCount > _friendlyCount && _enemyCount > 0) || {_responseQueued && {_friendlyCount > 0}}
             } else {
                 (_enemyCount > 0 && _friendlyCount > 0)
             };

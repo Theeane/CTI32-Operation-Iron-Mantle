@@ -4,7 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Builds the authoritative zone registry from manual overrides and automatic map generation, applies persistence, and starts zone runtime.
+    Builds the authoritative zone registry from manual overrides and automatic map generation,
+    applies persistence, and starts the zone runtime managers.
 */
 
 if (!isServer) exitWith {};
@@ -40,7 +41,7 @@ missionNamespace setVariable ["MWF_all_mission_zones", _allZones, true];
 missionNamespace setVariable ["MWF_ActiveZones", _allZones, true];
 
 private _loadedZoneSaveData = missionNamespace getVariable ["MWF_LoadedZoneSaveData", []];
-if (!(_loadedZoneSaveData isEqualTo [])) then {
+if !(_loadedZoneSaveData isEqualTo []) then {
     [_loadedZoneSaveData] call MWF_fnc_applyZoneSaveData;
 } else {
     [] call MWF_fnc_updateZoneProgression;
@@ -48,6 +49,19 @@ if (!(_loadedZoneSaveData isEqualTo [])) then {
 
 [] call MWF_fnc_initZones;
 
+if (!isNil "MWF_fnc_zoneHandler") then {
+    [] spawn MWF_fnc_zoneHandler;
+};
+
+if (!isNil "MWF_fnc_abandonManager") then {
+    [] spawn MWF_fnc_abandonManager;
+};
+
 missionNamespace setVariable ["MWF_ZoneSystemReady", true, true];
 
-diag_log format ["[MWF Zones] Zone manager initialized %1 zones. Manual: %2 | Generated: %3.", count _allZones, count _manualZones, count _generatedZones];
+diag_log format [
+    "[MWF Zones] Zone manager initialized %1 zones. Manual: %2 | Generated: %3 | Runtime started.",
+    count _allZones,
+    count _manualZones,
+    count _generatedZones
+];

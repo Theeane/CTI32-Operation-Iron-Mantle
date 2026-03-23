@@ -32,7 +32,7 @@ if (_cached) exitWith {
 
 if !(missionNamespace getVariable ["MWF_GlobalBlacklistLoaded", false]) then {
     missionNamespace setVariable ["MWF_GlobalBlacklist", [], true];
-    call compile preprocessFileLineNumbers "Missionframework/global_blacklist.sqf";
+    call compile preprocessFileLineNumbers "global_blacklist.sqf";
     missionNamespace setVariable ["MWF_GlobalBlacklistLoaded", true];
 };
 

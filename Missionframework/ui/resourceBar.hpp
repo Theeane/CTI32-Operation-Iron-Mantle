@@ -10,7 +10,7 @@
 class MWF_ResourceBar {
     idd = 9010;
     duration = 1e+011;
-    onLoad = "uiNamespace setVariable ['MWF_ctrl_resBar', _this select 0]";
+    onLoad = "uiNamespace setVariable ['MWF_ctrl_resBar', _this select 0]; uiNamespace setVariable ['MWF_ctrl_eye', (_this select 0) displayCtrl 9004];";
 
     class Controls {
         // --- 1. RESOURCE PANEL (Always visible) ---
@@ -45,7 +45,7 @@ class MWF_ResourceBar {
             y = safeZoneY + (safeZoneH * 0.55); 
             w = 0.06; h = 0.06;
             class Controls {
-                class UndercoverEye: RscPicture { idc = 9004; text = "media\icons\eye_green.paa"; x = 0; y = 0; w = 0.06; h = 0.06; };
+                class UndercoverEye: RscPicture { idc = 9004; text = "ui\eye_green.paa"; x = 0; y = 0; w = 0.06; h = 0.06; };
             };
         };
     };

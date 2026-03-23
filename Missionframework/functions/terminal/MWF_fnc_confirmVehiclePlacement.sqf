@@ -87,6 +87,13 @@ if ((toUpper _requiredUnlock) in ["HELI", "JETS"] && {!([_requiredUnlock] call _
     false
 };
 
+if ((toUpper _requiredUnlock) isEqualTo "HELI") then {
+    private _discount = missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1];
+    if (_discount < 1) then {
+        _cost = round ((_cost * _discount) max 1);
+    };
+};
+
 if (_supplies < _cost) exitWith {
     [format ["Vehicle purchase failed. Need %1 supplies.", _cost]] remoteExec ["systemChat", remoteExecutedOwner];
     false
@@ -137,7 +144,7 @@ if (!isNil "MWF_fnc_syncEconomyState") then {
     missionNamespace setVariable ["MWF_Supplies", _newSupplies, true];
     missionNamespace setVariable ["MWF_Supply", _newSupplies, true];
     missionNamespace setVariable ["MWF_Currency", _newSupplies + _intel, true];
-    remoteExec ["MWF_fnc_updateResourceUI", 0];
+    remoteExec ["MWF_fnc_updateResourceUI", -2]
 };
 
 if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };

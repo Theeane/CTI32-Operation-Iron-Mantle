@@ -278,6 +278,11 @@ profileNamespace setVariable ["MWF_Save_Missions", missionNamespace getVariable 
 profileNamespace setVariable ["MWF_Save_BoughtVehicles", _boughtVehicles];
 profileNamespace setVariable ["MWF_Save_GarageStoredVehicles", + (missionNamespace getVariable ["MWF_GarageStoredVehicles", []])];
 profileNamespace setVariable ["MWF_Save_BuiltUpgradeStructures", _builtUpgradeStructures];
+profileNamespace setVariable ["MWF_Save_EndgameActive", missionNamespace getVariable ["MWF_EndgameActive", false]];
+profileNamespace setVariable ["MWF_Save_EndgameCompleted", missionNamespace getVariable ["MWF_EndgameCompleted", false]];
+profileNamespace setVariable ["MWF_Save_EndgameOutcome", missionNamespace getVariable ["MWF_EndgameOutcome", ""]];
+profileNamespace setVariable ["MWF_Save_EndgameReservedZoneId", missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""]];
+profileNamespace setVariable ["MWF_Save_EndgameState", +(missionNamespace getVariable ["MWF_EndgameState", []])];
 profileNamespace setVariable ["MWF_Save_ActiveSideMissions", []];
 profileNamespace setVariable ["MWF_Save_Campaign_Phase", missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]];
 profileNamespace setVariable ["MWF_Save_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]];
@@ -291,7 +296,26 @@ profileNamespace setVariable ["MWF_Save_Unlock_Jets", missionNamespace getVariab
 profileNamespace setVariable ["MWF_Save_Unlock_Armor", missionNamespace getVariable ["MWF_Unlock_Armor", false]];
 profileNamespace setVariable ["MWF_Save_Unlock_Tier5", missionNamespace getVariable ["MWF_Unlock_Tier5", false]];
 profileNamespace setVariable ["MWF_Save_Perk_HeliDiscount", missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1]];
-profileNamespace setVariable ["MWF_Save_GrandOperationState", []];
+private _savedGrandOperationState = [];
+if (missionNamespace getVariable ["MWF_GrandOperationActive", false]) then {
+    private _activeKey = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
+    private _runtimeMap = missionNamespace getVariable ["MWF_MainOperationRuntime", createHashMap];
+    if (_activeKey isNotEqualTo "" && {_runtimeMap isEqualType createHashMap}) then {
+        private _record = _runtimeMap getOrDefault [_activeKey, createHashMap];
+        if (_record isEqualType createHashMap) then {
+            _savedGrandOperationState = [
+                _activeKey,
+                _record getOrDefault ["title", missionNamespace getVariable ["MWF_CurrentGrandOperationTitle", ""]],
+                _record getOrDefault ["functionName", ""],
+                _record getOrDefault ["position", [0,0,0]],
+                _record getOrDefault ["phaseIndex", 0],
+                _record getOrDefault ["startedAt", serverTime],
+                +(missionNamespace getVariable ["MWF_CurrentGrandOperationPlacement", []])
+            ];
+        };
+    };
+};
+profileNamespace setVariable ["MWF_Save_GrandOperationState", _savedGrandOperationState];
 profileNamespace setVariable ["MWF_Save_CampaignAnalytics", + (missionNamespace getVariable ["MWF_Campaign_Analytics", []])];
 profileNamespace setVariable ["MWF_Save_AuthenticatedPlayers", + (missionNamespace getVariable ["MWF_AuthenticatedPlayers", []])];
 private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns", createHashMap];

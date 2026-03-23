@@ -62,7 +62,7 @@ missionNamespace setVariable ["MWF_res_notoriety", _resolvedNotoriety, true];
 missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
 
 if (_refreshUI) then {
-    remoteExec ["MWF_fnc_updateResourceUI", 0];
+    remoteExec ["MWF_fnc_updateResourceUI", -2]
 };
 
 if (_queueSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {

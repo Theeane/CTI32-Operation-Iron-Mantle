@@ -182,6 +182,11 @@ missionNamespace setVariable ["MWF_Unlock_Armor", profileNamespace getVariable [
 missionNamespace setVariable ["MWF_Unlock_Tier5", profileNamespace getVariable ["MWF_Save_Unlock_Tier5", false], true];
 missionNamespace setVariable ["MWF_Perk_HeliDiscount", [profileNamespace getVariable ["MWF_Save_Perk_HeliDiscount", 1], 0.01, 10, 1] call _clampNumber, true];
 missionNamespace setVariable ["MWF_Campaign_Analytics", profileNamespace getVariable ["MWF_Save_CampaignAnalytics", []], true];
+missionNamespace setVariable ["MWF_EndgameActive", profileNamespace getVariable ["MWF_Save_EndgameActive", false], true];
+missionNamespace setVariable ["MWF_EndgameCompleted", profileNamespace getVariable ["MWF_Save_EndgameCompleted", false], true];
+missionNamespace setVariable ["MWF_EndgameOutcome", profileNamespace getVariable ["MWF_Save_EndgameOutcome", ""], true];
+missionNamespace setVariable ["MWF_EndgameReservedZoneId", profileNamespace getVariable ["MWF_Save_EndgameReservedZoneId", ""], true];
+missionNamespace setVariable ["MWF_EndgameState", +(profileNamespace getVariable ["MWF_Save_EndgameState", []]), true];
 missionNamespace setVariable ["MWF_AuthenticatedPlayers", profileNamespace getVariable ["MWF_Save_AuthenticatedPlayers", []], true];
 private _cooldownPairs = profileNamespace getVariable ["MWF_Save_MainOperationCooldowns", []];
 private _cooldownMap = createHashMap;
@@ -197,7 +202,8 @@ private _cooldownMap = createHashMap;
 missionNamespace setVariable ["MWF_MainOperationCooldowns", _cooldownMap, true];
 missionNamespace setVariable ["MWF_CompletedMainOperations", profileNamespace getVariable ["MWF_Save_CompletedMainOperations", []], true];
 
-missionNamespace setVariable ["MWF_PendingGrandOperationState", [], true];
+private _savedGrandOperationState = +(profileNamespace getVariable ["MWF_Save_GrandOperationState", []]);
+missionNamespace setVariable ["MWF_PendingGrandOperationState", _savedGrandOperationState, true];
 missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
 missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
 missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];

@@ -10,6 +10,7 @@
     - Waits for the world layer before becoming authoritative.
     - Uses dirty flags and stale checks instead of constant recalculation.
     - Prunes old incidents to keep network arrays small and Arma-safe.
+    - Projects the threat response queue into authoritative zone runtime variables.
 */
 
 if (!isServer) exitWith {};
@@ -88,6 +89,72 @@ missionNamespace setVariable ["MWF_ThreatLastRecalcAt", -1, false];
 
         if (_dirty || _stale) then {
             [] call MWF_fnc_recalculateThreatState;
+        };
+
+        private _queue = missionNamespace getVariable ["MWF_ThreatResponseQueue", []];
+        private _queueIndex = createHashMap;
+        {
+            private _zoneId = toLower (_x getOrDefault ["zoneId", ""]);
+            if (_zoneId != "") then {
+                _queueIndex set [_zoneId, _x];
+            };
+        } forEach _queue;
+
+        private _runtimeChanged = false;
+        {
+            private _zone = _x;
+            if (!isNull _zone) then {
+                private _zoneId = toLower (_zone getVariable ["MWF_zoneID", ""]);
+                private _entry = if (_zoneId != "") then {
+                    _queueIndex getOrDefault [_zoneId, createHashMap]
+                } else {
+                    createHashMap
+                };
+
+                if ((count _entry) > 0) then {
+                    private _wasQueued = _zone getVariable ["MWF_zoneResponseQueued", false];
+                    private _responseType = _entry getOrDefault ["type", ""];
+                    private _profile = _entry getOrDefault ["profile", ""];
+                    private _priority = _entry getOrDefault ["priority", 0];
+                    private _score = _entry getOrDefault ["score", 0];
+                    private _nextReadyAt = _zone getVariable ["MWF_zoneNextQRFReadyAt", 0];
+                    if (!_wasQueued || {_nextReadyAt <= 0}) then {
+                        _nextReadyAt = _nowServer + _qrfInterval;
+                    };
+
+                    if (
+                        !_wasQueued ||
+                        {(_zone getVariable ["MWF_zoneResponseType", ""]) != _responseType} ||
+                        {(_zone getVariable ["MWF_zoneResponseProfile", ""]) != _profile} ||
+                        {(_zone getVariable ["MWF_zoneResponsePriority", -1]) != _priority} ||
+                        {abs ((_zone getVariable ["MWF_zoneResponseScore", -1]) - _score) > 0.01}
+                    ) then {
+                        _runtimeChanged = true;
+                    };
+
+                    _zone setVariable ["MWF_zoneResponseQueued", true, true];
+                    _zone setVariable ["MWF_zoneResponseType", _responseType, true];
+                    _zone setVariable ["MWF_zoneResponseProfile", _profile, true];
+                    _zone setVariable ["MWF_zoneResponsePriority", _priority, true];
+                    _zone setVariable ["MWF_zoneResponseScore", _score, true];
+                    _zone setVariable ["MWF_zoneNextQRFReadyAt", _nextReadyAt, true];
+                } else {
+                    if (_zone getVariable ["MWF_zoneResponseQueued", false]) then {
+                        _runtimeChanged = true;
+                    };
+
+                    _zone setVariable ["MWF_zoneResponseQueued", false, true];
+                    _zone setVariable ["MWF_zoneResponseType", "", true];
+                    _zone setVariable ["MWF_zoneResponseProfile", "", true];
+                    _zone setVariable ["MWF_zoneResponsePriority", 0, true];
+                    _zone setVariable ["MWF_zoneResponseScore", 0, true];
+                    _zone setVariable ["MWF_zoneNextQRFReadyAt", 0, true];
+                };
+            };
+        } forEach (missionNamespace getVariable ["MWF_all_mission_zones", []]);
+
+        if (_runtimeChanged) then {
+            missionNamespace setVariable ["MWF_WorldStateDirty", true, false];
         };
 
         uiSleep 5;

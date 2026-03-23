@@ -84,6 +84,12 @@ if !(_curator getVariable ["MWF_ZeusSanitizerHandlersAdded", false]) then {
                         ["Unit spawn blocked by sanitizer."] remoteExec ["systemChat", owner _x];
                     };
                 } forEach curatorEditableObjects _curator;
+            } else {
+                private _owner = getAssignedCuratorUnit _curator;
+                if (!isNull _owner) then {
+                    private _sessionId = _owner getVariable ["MWF_BaseArchitect_SessionId", ""];
+                    [_entity, _owner, _sessionId, "EDIT"] remoteExec ["MWF_fnc_handleBuildPlacement", 2];
+                };
             };
         };
     }];
