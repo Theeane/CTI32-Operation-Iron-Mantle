@@ -193,11 +193,12 @@ switch (toUpper _mode) do {
             ["Main operation runtime bridge is unavailable."] remoteExecCall ["systemChat", _requestOwner];
         };
 
+        private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
         private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
         private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
-        private _usedFreeCharge = _freeCharges > 0;
-        private _effectiveIntelCost = if (_usedFreeCharge) then { 0 } else { _intelCost max 0 };
-        if (!_usedFreeCharge && {_currentIntel < _effectiveIntelCost}) exitWith {
+        private _usedFreeCharge = (!_debugMode) && {_freeCharges > 0};
+        private _effectiveIntelCost = if (_debugMode || {_usedFreeCharge}) then { 0 } else { _intelCost max 0 };
+        if (!_debugMode && {!_usedFreeCharge} && {_currentIntel < _effectiveIntelCost}) exitWith {
             [format ["%1 requires %2 Intel. Current Intel: %3.", _title, _effectiveIntelCost, _currentIntel]] remoteExecCall ["systemChat", _requestOwner];
         };
 
@@ -215,20 +216,28 @@ switch (toUpper _mode) do {
             [format ["Failed to start main operation: %1", _title]] remoteExecCall ["systemChat", _requestOwner];
         };
 
-        if (_usedFreeCharge) then {
-            missionNamespace setVariable ["MWF_FreeMainOpCharges", (_freeCharges - 1) max 0, true];
+        if (_debugMode) then {
+            // Debug mode bypasses intel consumption and free-charge usage.
         } else {
-            [(_effectiveIntelCost * -1), "INTEL"] call MWF_fnc_addResource;
+            if (_usedFreeCharge) then {
+                missionNamespace setVariable ["MWF_FreeMainOpCharges", (_freeCharges - 1) max 0, true];
+            } else {
+                [(_effectiveIntelCost * -1), "INTEL"] call MWF_fnc_addResource;
+            };
         };
 
         if (!isNil "MWF_fnc_requestDelayedSave") then {
             [] call MWF_fnc_requestDelayedSave;
         };
 
-        private _launchText = if (_usedFreeCharge) then {
-            format ["%1 launched in %2. Intel breakthrough charge consumed.", _title, _zoneName]
+        private _launchText = if (_debugMode) then {
+            format ["%1 launched in %2. DEBUG mode bypassed intel cost and cooldown gating.", _title, _zoneName]
         } else {
-            format ["%1 launched in %2. Cost: %3 Intel.", _title, _zoneName, _effectiveIntelCost]
+            if (_usedFreeCharge) then {
+                format ["%1 launched in %2. Intel breakthrough charge consumed.", _title, _zoneName]
+            } else {
+                format ["%1 launched in %2. Cost: %3 Intel.", _title, _zoneName, _effectiveIntelCost]
+            }
         };
         [["MAIN OPERATION", _launchText], "info"] remoteExec ["MWF_fnc_showNotification", 0];
         [format ["Grand Operation started: %1", _title]] remoteExecCall ["systemChat", _requestOwner];

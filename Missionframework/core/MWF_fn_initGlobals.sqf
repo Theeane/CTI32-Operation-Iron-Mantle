@@ -285,6 +285,11 @@ private _scalingLabel = switch (_sessionScalingBracket) do {
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
 
+if (_sessionDebugMode) then {
+    _resolvedSupplies = 9999;
+    _resolvedIntel = 9999;
+};
+
 missionNamespace setVariable ["MWF_Supplies", _resolvedSupplies, true];
 missionNamespace setVariable ["MWF_Intel", _resolvedIntel, true];
 missionNamespace setVariable ["MWF_Supply", _resolvedSupplies, true];
@@ -302,6 +307,25 @@ missionNamespace setVariable ["MWF_PlayerScalingBracket", _sessionScalingBracket
 missionNamespace setVariable ["MWF_PlayerScalingLabel", _scalingLabel, true];
 missionNamespace setVariable ["MWF_DynamicUnitCap", _sessionUnitCap, true];
 missionNamespace setVariable ["MWF_DebugMode", _sessionDebugMode, true];
+
+if (_sessionDebugMode && {isServer}) then {
+    missionNamespace setVariable ["MWF_DebugCommanderGuardStarted", missionNamespace getVariable ["MWF_DebugCommanderGuardStarted", false], true];
+    if !(missionNamespace getVariable ["MWF_DebugCommanderGuardStarted", false]) then {
+        missionNamespace setVariable ["MWF_DebugCommanderGuardStarted", true, true];
+        [] spawn {
+            while {missionNamespace getVariable ["MWF_DebugMode", false]} do {
+                private _commander = missionNamespace getVariable ["MWF_Commander", objNull];
+                if (!isNull _commander && {alive _commander}) then {
+                    _commander allowDamage false;
+                    _commander setDamage 0;
+                };
+                uiSleep 2;
+            };
+            missionNamespace setVariable ["MWF_DebugCommanderGuardStarted", false, true];
+        };
+    };
+    diag_log "[MWF Debug] Debug mode active. Supplies/Intel forced to 9999 and commander invulnerability guard enabled.";
+};
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
     missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];

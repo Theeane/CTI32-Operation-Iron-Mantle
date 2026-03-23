@@ -72,6 +72,7 @@ if (isNil "_cooldownMap" || { !(_cooldownMap isEqualType createHashMap) }) then 
     _cooldownMap = createHashMap;
 };
 
+private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
 private _readyAt = _cooldownMap getOrDefault [_recordKey, 0];
 private _currentKey = missionNamespace getVariable ["MWF_CurrentGrandOperation", ""];
 private _isActive = (missionNamespace getVariable ["MWF_GrandOperationActive", false]) && {_currentKey isEqualTo _recordKey};
@@ -86,8 +87,20 @@ private _currentIntel = missionNamespace getVariable ["MWF_res_intel", missionNa
 private _freeCharges = missionNamespace getVariable ["MWF_FreeMainOpCharges", 0];
 private _freeChargeAvailable = _freeCharges > 0;
 private _effectiveIntelCost = if (_freeChargeAvailable) then { 0 } else { _intelCost max 0 };
-private _canAfford = _freeChargeAvailable || {_currentIntel >= _effectiveIntelCost};
+private _canAfford = if (_debugMode) then { true } else { _freeChargeAvailable || {_currentIntel >= _effectiveIntelCost} };
 
+if (_debugMode && {!_isActive}) then {
+    _state = "available";
+    _statusText = if (_intelCost > 0) then {
+        format ["Available | DEBUG | Cost bypassed (%1 Intel)", _intelCost max 0]
+    } else {
+        "Available | DEBUG"
+    };
+    _tooltip = format ["%1 is available in debug mode. Cooldowns and intel costs are bypassed.", _title];
+    _cooldownRemaining = 0;
+    _isCoolingDown = false;
+    _readyClockText = "DEBUG";
+} else {
 if (_isCoolingDown) then {
     private _minutes = (_cooldownRemaining / 60) call BIS_fnc_floor;
     private _seconds = _cooldownRemaining mod 60;
@@ -143,6 +156,7 @@ if (_isActive) then {
             };
         };
     };
+};
 };
 
 createHashMapFromArray [

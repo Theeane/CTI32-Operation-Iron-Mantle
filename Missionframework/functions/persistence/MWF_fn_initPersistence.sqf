@@ -10,6 +10,19 @@
 if (!isServer) exitWith {};
 
 private _intervalSeconds = (["MWF_Param_SaveInterval", 15] call BIS_fnc_getParamValue) * 60;
+private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
+
+missionNamespace setVariable ["MWF_PersistenceIntervalSeconds", _intervalSeconds, true];
+missionNamespace setVariable ["MWF_savePending", false, true];
+
+if (_debugMode) exitWith {
+    MWF_fnc_requestDelayedSave = {
+        if (!isServer) exitWith {};
+        diag_log "[MWF Debug] Delayed save request ignored while debug mode is active.";
+    };
+
+    diag_log "[MWF Debug] Persistence initialized in debug mode. All saving, autosaving, and delayed saves are disabled.";
+};
 
 if !(missionNamespace getVariable ["MWF_AutoSaveLoopStarted", false]) then {
     missionNamespace setVariable ["MWF_AutoSaveLoopStarted", true, true];
@@ -22,9 +35,6 @@ if !(missionNamespace getVariable ["MWF_AutoSaveLoopStarted", false]) then {
         };
     };
 };
-
-missionNamespace setVariable ["MWF_PersistenceIntervalSeconds", _intervalSeconds, true];
-missionNamespace setVariable ["MWF_savePending", false, true];
 
 MWF_fnc_requestDelayedSave = {
     if (!isServer) exitWith {};

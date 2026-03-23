@@ -72,36 +72,7 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
 
         missionNamespace setVariable ["MWF_MissionSystemReady", true, true];
 
-        private _pendingGrandOp = +(missionNamespace getVariable ["MWF_PendingGrandOperationState", []]);
-        if (_pendingGrandOp isEqualType [] && {count _pendingGrandOp >= 6} && {!isNil "MWF_fnc_mainOperationRuntime"}) then {
-            _pendingGrandOp params [
-                ["_key", "", [""]],
-                ["_title", "", [""]],
-                ["_fnName", "", [""]],
-                ["_position", [0,0,0], [[]]],
-                ["_phaseIndex", 0, [0]],
-                ["_startedAt", serverTime, [0]],
-                ["_placement", [], [[]]]
-            ];
-
-            if (_key isNotEqualTo "" && {_fnName isNotEqualTo ""}) then {
-                missionNamespace setVariable ["MWF_GrandOperationActive", true, true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperation", _key, true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", _title, true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", +_placement, true];
-                private _restored = ["RESTORE", [_key, _fnName, _title, _position, _phaseIndex, _startedAt]] call MWF_fnc_mainOperationRuntime;
-                if (_restored) then {
-                    diag_log format ["[MWF Missions] Restored main operation %1 at phase index %2.", _key, _phaseIndex];
-                } else {
-                    missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-                    missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-                    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-                    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-                    diag_log format ["[MWF Missions] Failed to restore main operation %1.", _key];
-                };
-            };
-            missionNamespace setVariable ["MWF_PendingGrandOperationState", [], true];
-        };
+        missionNamespace setVariable ["MWF_PendingGrandOperationState", [], true];
 
         diag_log format ["[MWF Missions] Mission system ready. Templates discovered: %1.", count _templates];
     };
