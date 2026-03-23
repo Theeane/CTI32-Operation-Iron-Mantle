@@ -433,6 +433,8 @@ if (_modeUpper isEqualTo "LEADER_KILLED") exitWith {
     missionNamespace setVariable ["MWF_EndgameCompleted", true, true];
     missionNamespace setVariable ["MWF_EndgameActive", false, true];
     missionNamespace setVariable ["MWF_EndgameOutcome", _outcome, true];
+    missionNamespace setVariable ["MWF_EndgameOutcomeWanted", "", true];
+    call _clearServerState;
 
     private _analytics = +(missionNamespace getVariable ["MWF_Campaign_Analytics", []]);
     ["CLEAR_UI"] remoteExec ["MWF_fnc_endgameManager", 0, true];
