@@ -170,10 +170,22 @@ private _clearServerState = {
     };
 
     private _contact = missionNamespace getVariable ["MWF_EndgameRebelContact", objNull];
+    if (isNull _contact && {_usingActiveRebelLeader}) then {
+        _contact = missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull];
+    };
     if (!isNull _contact) then {
         if (_usingActiveRebelLeader) then {
             ["REMOVE", _contact] remoteExec ["MWF_fnc_rebelLeaderDialogue", 0];
             _contact setVariable ["MWF_RebelLeaderResolved", true, true];
+
+            private _campfire = _contact getVariable ["MWF_RebelCampfire", objNull];
+            if (!isNull _campfire) then {
+                deleteVehicle _campfire;
+            };
+
+            private _grp = group _contact;
+            deleteVehicle _contact;
+            if (!isNull _grp && {{alive _x} count units _grp == 0}) then { deleteGroup _grp; };
         } else {
             private _grp = group _contact;
             deleteVehicle _contact;
