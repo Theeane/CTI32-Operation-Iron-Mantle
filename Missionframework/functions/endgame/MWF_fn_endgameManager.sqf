@@ -193,14 +193,12 @@ private _clearServerState = {
         };
     };
 
-    if (_usingActiveRebelLeader) then {
-        missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
-        missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
-        missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
-        missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
-        missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
-        missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
-    };
+    missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+    missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+    missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+    missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
+    missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+    missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
 
     missionNamespace setVariable ["MWF_EndgameLeader", objNull, true];
     missionNamespace setVariable ["MWF_EndgameLeaderGroup", grpNull, true];

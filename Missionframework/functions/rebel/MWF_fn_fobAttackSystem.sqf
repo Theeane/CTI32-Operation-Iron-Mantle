@@ -160,6 +160,14 @@ private _launchRespawnTimerFromState = {
 
         missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
 
+        if ((missionNamespace getVariable ["MWF_EndgameActive", false]) || (missionNamespace getVariable ["MWF_EndgameCompleted", false])) exitWith {
+            missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+            if (!isNil "MWF_fnc_requestDelayedSave") then {
+                [] call MWF_fnc_requestDelayedSave;
+            };
+            diag_log "[MWF Rebel] Scheduled leader respawn skipped because endgame is active or completed.";
+        };
+
         if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) exitWith {
             if (!isNil "MWF_fnc_requestDelayedSave") then {
                 [] call MWF_fnc_requestDelayedSave;

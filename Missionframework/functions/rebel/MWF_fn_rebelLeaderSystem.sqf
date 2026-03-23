@@ -90,6 +90,11 @@ private _computeIntelCost = {
     (_baseCost * (2 ^ _penaltyCount)) min _maxCost
 };
 
+private _isEndgameLocked = {
+    (missionNamespace getVariable ["MWF_EndgameActive", false]) ||
+    (missionNamespace getVariable ["MWF_EndgameCompleted", false])
+};
+
 private _spawnLeaderFromContext = {
     params ["_ctx"];
 
@@ -259,6 +264,13 @@ if (_mode == "RESTORE_PENDING") exitWith {
     private _pending = missionNamespace getVariable ["MWF_PendingRebelLeaderContext", []];
     if (_pending isEqualTo []) exitWith {objNull};
 
+    if (call _isEndgameLocked) exitWith {
+        missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
+        missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+        diag_log "[MWF Rebel] Pending rebel leader restore skipped because endgame is active or completed.";
+        objNull
+    };
+
     missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
 
     private _leader = [_pending] call _spawnLeaderFromContext;
@@ -273,6 +285,13 @@ if (_mode == "RESTORE_PENDING") exitWith {
 };
 
 if (_mode == "RESPAWN_REPLACEMENT") exitWith {
+    if (call _isEndgameLocked) exitWith {
+        missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+        missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+        diag_log "[MWF Rebel] Replacement rebel leader spawn skipped because endgame is active or completed.";
+        objNull
+    };
+
     if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) exitWith {
         missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull]
     };
@@ -307,6 +326,13 @@ if (_mode == "RESPAWN_REPLACEMENT") exitWith {
 };
 
 if (_mode != "TRIGGER") exitWith {objNull};
+
+if (call _isEndgameLocked) exitWith {
+    missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+    missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+    diag_log "[MWF Rebel] Rebel leader trigger skipped because endgame is active or completed.";
+    objNull
+};
 
 if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) exitWith {
     missionNamespace getVariable ["MWF_ActiveRebelLeader", objNull]
