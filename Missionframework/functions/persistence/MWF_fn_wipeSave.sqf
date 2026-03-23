@@ -76,7 +76,12 @@ private _keys = [
     "MWF_Save_RevealedInfrastructureIDs",
     "MWF_Save_RevealedInfrastructureSites",
     "MWF_Save_CompositionType",
-    "MWF_Save_CompletedMainOperations"
+    "MWF_Save_CompletedMainOperations",
+    "MWF_Save_EndgameActive",
+    "MWF_Save_EndgameCompleted",
+    "MWF_Save_EndgameOutcome",
+    "MWF_Save_EndgameReservedZoneId",
+    "MWF_Save_EndgameState"
 ];
 
 {
