@@ -160,20 +160,36 @@ private _broadcastUiState = {
 };
 
 private _clearServerState = {
+    private _usingActiveRebelLeader = missionNamespace getVariable ["MWF_EndgameUsingActiveRebelLeader", false];
+
     private _leader = missionNamespace getVariable ["MWF_EndgameLeader", objNull];
     if (!isNull _leader) then {
         private _grp = group _leader;
         { if (!isNull _x) then { deleteVehicle _x; }; } forEach units _grp;
         if (!isNull _grp) then { deleteGroup _grp; };
     };
+
     private _contact = missionNamespace getVariable ["MWF_EndgameRebelContact", objNull];
     if (!isNull _contact) then {
-        if (!(missionNamespace getVariable ["MWF_EndgameUsingActiveRebelLeader", false])) then {
+        if (_usingActiveRebelLeader) then {
+            ["REMOVE", _contact] remoteExec ["MWF_fnc_rebelLeaderDialogue", 0];
+            _contact setVariable ["MWF_RebelLeaderResolved", true, true];
+        } else {
             private _grp = group _contact;
             deleteVehicle _contact;
             if (!isNull _grp && {{alive _x} count units _grp == 0}) then { deleteGroup _grp; };
         };
     };
+
+    if (_usingActiveRebelLeader) then {
+        missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
+        missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];
+        missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
+        missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
+        missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
+        missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+    };
+
     missionNamespace setVariable ["MWF_EndgameLeader", objNull, true];
     missionNamespace setVariable ["MWF_EndgameLeaderGroup", grpNull, true];
     missionNamespace setVariable ["MWF_EndgameRebelContact", objNull, true];

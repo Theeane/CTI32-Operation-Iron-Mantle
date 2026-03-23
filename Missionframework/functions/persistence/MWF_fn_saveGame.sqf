@@ -151,7 +151,14 @@ private _pushBuiltUpgradeRecord = {
 
 missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", _cleanBuiltRegistry, true];
 
-private _leaderContext = if (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) then {
+private _blockRebelLeaderPersistence =
+    (missionNamespace getVariable ["MWF_EndgameActive", false]) ||
+    (missionNamespace getVariable ["MWF_EndgameCompleted", false]);
+
+private _leaderContext = if (
+    (missionNamespace getVariable ["MWF_RebelLeaderEventActive", false]) &&
+    {!_blockRebelLeaderPersistence}
+) then {
     + (missionNamespace getVariable ["MWF_RebelLeaderContext", []])
 } else {
     []
@@ -174,16 +181,18 @@ if ((_attackState param [0, "idle"]) isEqualTo "active") then {
 
 private _respawnState = missionNamespace getVariable ["MWF_RebelLeaderRespawnState", []];
 private _savedLeaderRespawnState = [];
-if ((_respawnState param [0, ""]) isEqualTo "pending") then {
-    private _remaining = ((_respawnState param [4, -1]) - diag_tickTime) max 0;
-    if (_remaining > 0) then {
-        _savedLeaderRespawnState = [
-            "pending",
-            _respawnState param [1, []],
-            _respawnState param [2, ""],
-            _respawnState param [3, ""],
-            _remaining
-        ];
+if !(_blockRebelLeaderPersistence) then {
+    if ((_respawnState param [0, ""]) isEqualTo "pending") then {
+        private _remaining = ((_respawnState param [4, -1]) - diag_tickTime) max 0;
+        if (_remaining > 0) then {
+            _savedLeaderRespawnState = [
+                "pending",
+                _respawnState param [1, []],
+                _respawnState param [2, ""],
+                _respawnState param [3, ""],
+                _remaining
+            ];
+        };
     };
 };
 

@@ -160,9 +160,14 @@ missionNamespace setVariable ["MWF_PendingActiveSideMissions", [], true];
 missionNamespace setVariable ["MWF_Campaign_Phase", profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false], true];
 missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", [profileNamespace getVariable ["MWF_Save_RebelLeaderSettlementCount", 0], 0, 100000, 0] call _clampNumber, true];
-missionNamespace setVariable ["MWF_PendingRebelLeaderContext", profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []], true];
+
+private _savedEndgameCompleted = profileNamespace getVariable ["MWF_Save_EndgameCompleted", false];
+private _savedRebelLeaderContext = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []] };
+private _savedRebelLeaderRespawnState = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_RebelLeaderRespawnState", []] };
+
+missionNamespace setVariable ["MWF_PendingRebelLeaderContext", _savedRebelLeaderContext, true];
 missionNamespace setVariable ["MWF_PendingFOBAttackState", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];
-missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", profileNamespace getVariable ["MWF_Save_RebelLeaderRespawnState", []], true];
+missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", _savedRebelLeaderRespawnState, true];
 missionNamespace setVariable ["MWF_PendingDamagedFOBs", profileNamespace getVariable ["MWF_Save_DamagedFOBs", []], true];
 missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
 missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
