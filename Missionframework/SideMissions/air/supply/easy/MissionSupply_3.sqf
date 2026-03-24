@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Stabilize and move reclaimed supplies from a soft contact point back into BLUFOR circulation."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'rural', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", true],

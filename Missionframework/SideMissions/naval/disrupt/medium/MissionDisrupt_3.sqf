@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Damage a prepared vehicle pool and delay the next wave of hostile operational movement."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

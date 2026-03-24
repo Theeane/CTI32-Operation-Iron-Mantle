@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Intercept and redirect a valuable fuel movement to strengthen campaign logistics."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'roadside', 'town']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Locate a courier drop and secure low-level documents before they disappear into the local network."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

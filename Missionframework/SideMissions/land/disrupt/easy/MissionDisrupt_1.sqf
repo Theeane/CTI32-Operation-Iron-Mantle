@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Take out a field generator powering local OPFOR systems."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

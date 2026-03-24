@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Overload a fortified forward command post and interrupt hostile coordination at a strategic level."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

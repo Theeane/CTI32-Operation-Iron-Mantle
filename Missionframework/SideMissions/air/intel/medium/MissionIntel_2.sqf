@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Work through a resistance intermediary to obtain time-sensitive intelligence from a hostile district."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['town', 'rural', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

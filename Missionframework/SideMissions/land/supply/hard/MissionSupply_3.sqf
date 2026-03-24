@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Storm a protected sustainment base and strip it of matériel before reinforcements arrive."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Destroy the power node feeding an artillery support site."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

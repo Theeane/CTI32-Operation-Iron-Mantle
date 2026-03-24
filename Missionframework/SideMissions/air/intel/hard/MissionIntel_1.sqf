@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Slip into a high-value signal station and extract strategic information without collapsing the site."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

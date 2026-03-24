@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Strike a hardened signal node to reduce hostile command tempo in the surrounding district."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

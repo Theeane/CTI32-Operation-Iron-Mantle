@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Break into a hardened comms position and steal the region-wide routing package."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

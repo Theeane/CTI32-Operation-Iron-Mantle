@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Extract UAV telemetry packages from a monitoring node before they are forwarded."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

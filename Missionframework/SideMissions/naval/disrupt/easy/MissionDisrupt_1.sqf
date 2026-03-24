@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Disrupt a light OPFOR relay point and force a brief patrol blackout without hardcoded assets."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

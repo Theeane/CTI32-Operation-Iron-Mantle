@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Seize a civilian relief shipment that OPFOR redirected into a holding yard."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Extract checkpoint movement logs before the local garrison wipes them."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

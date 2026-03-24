@@ -117,7 +117,6 @@ Use this exact mission metadata style and keep the fields in this order:
 - description
 - category
 - difficulty
-- allowedZoneTypes
 - allowUndercover
 - usesOpfor
 - usesBluforSupport
@@ -148,37 +147,20 @@ Use this exact mission metadata style and keep the fields in this order:
 
 Do not invent new metadata keys unless the framework is explicitly updated to read them.
 
-7. Approved current land zone types
-For current land side mission authoring, use only zone types already supported by the current placement model:
+7. Placement discipline rule (MANDATORY)
+Normal side missions do NOT declare allowedZoneTypes.
 
-- town
-- military
-- factory
-- capital
+Use the shared placement model instead:
+- land and air use side_mission_1..N when valid
+- if no valid manual point exists, runtime generates a free land AO
+- campaign zones are avoidance-only for normal land and air missions
+- naval uses its own water-only placement pipeline
 
-Do not invent or assume support for:
-- industrial
-- roadside
-- rural
-- coastal
-- airport
-- harbor
-- custom tags not already implemented
+Only add a placement-specific metadata key if the framework is explicitly updated to read it.
+Do not invent unsupported placement tags such as roadside, rural, coastal, airport, harbor, or custom environment labels.
+If a mission idea needs a special feel, express it through the description, sceneVariant, compositionKey, and assetRules rather than fake placement metadata.
 
-If a mission idea needs a special environment, express it through the description, sceneVariant, and compositionKey rather than unsupported zone tags.
-
-8. Zone discipline rule (MANDATORY)
-Use the narrowest approved zone selection that correctly fits the mission concept.
-
-Do NOT broaden allowedZoneTypes for variety, flavor, fallback, or creativity.
-Do NOT add an extra approved zone type unless the mission concept explicitly requires it.
-
-Examples:
-- if town + factory is sufficient, use only town + factory
-- do not add military just because it also sounds plausible
-- do not add capital unless the mission concept specifically needs capital-scale placement
-
-9. Approved runtime sceneVariant families
+8. Approved runtime sceneVariant families
 Community missions should stay within the runtime-supported modern land sceneVariant style.
 
 Supply examples:
@@ -216,13 +198,13 @@ Disrupt examples:
 
 If a new sceneVariant is proposed, treat it as a request for framework/runtime support first, not as something the mission file can force by itself.
 
-10. Strict minimalism rule (MANDATORY)
+9. Strict minimalism rule (MANDATORY)
 Community mission templates must use the smallest correct implementation that fits the mission concept.
 
 The AI must NOT add extra flavor structure, broaden scope, or add optional metadata behavior unless it is explicitly required by the mission idea or explicitly supported by the framework.
 
 Prefer:
-- the smallest valid zone set
+- the simplest valid placement assumptions
 - the simplest valid sceneVariant
 - the most conservative runtime assumptions
 - the minimum necessary explanation in comments and assetRules
@@ -357,13 +339,12 @@ Community AI mission templates in _4–_99 must NOT:
 6. mirror the official gold-standard file structure
 7. use the exact params contract
 8. use the exact missionDefinition field order
-9. use only approved zone types
-10. use the narrowest valid zone set
-11. use no hardcoded classnames
-12. keep the mission mod agnostic
-13. avoid promising unsupported runtime behavior
-14. set fixed rewards
-15. save with matching filename / missionId / numeric call ID
+9. follow the shared placement model
+10. use no hardcoded classnames
+11. keep the mission mod agnostic
+12. avoid promising unsupported runtime behavior
+13. set fixed rewards
+14. save with matching filename / missionId / numeric call ID
 
 21. Final self-check (MANDATORY)
 Before finalizing the file, the AI must verify all of the following:
@@ -372,8 +353,8 @@ Before finalizing the file, the AI must verify all of the following:
 2. Did I use the correct path, prefix, and ID?
 3. Did I keep the exact params contract?
 4. Did I keep the exact field order?
-5. Did I use only approved zone types?
-6. Did I use the narrowest valid zone set?
+5. Did I follow the shared placement model?
+6. Did I avoid inventing unsupported placement metadata?
 7. Did I avoid inventing metadata keys?
 8. Did I avoid promising unsupported runtime behavior?
 9. Did I avoid hardcoded classnames?
@@ -401,7 +382,6 @@ private _missionDefinition = [
     ["description", "Example description."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Destroy a protected transfer rig moving strategic munitions between secure points."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital', 'factory']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

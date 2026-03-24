@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Cripple a motor pool service point before armored vehicles can be turned around."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Disable a protected relay chain feeding heavier OPFOR firesupport logic in the sector."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

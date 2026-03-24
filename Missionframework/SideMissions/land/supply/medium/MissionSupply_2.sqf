@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Overrun a field logistics hub and secure its reserve stores."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Map and expose an embedded clandestine network through a layered intelligence operation."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['capital', 'town', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

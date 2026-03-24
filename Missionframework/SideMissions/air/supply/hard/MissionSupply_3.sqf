@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Deliver or secure supplies tied to a resistance-aligned lifeline under pressure."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['town', 'rural', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

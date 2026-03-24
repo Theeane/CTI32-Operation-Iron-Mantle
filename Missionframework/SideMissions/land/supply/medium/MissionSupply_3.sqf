@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Seize the staging site of an enemy convoy before it rolls out."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'town']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

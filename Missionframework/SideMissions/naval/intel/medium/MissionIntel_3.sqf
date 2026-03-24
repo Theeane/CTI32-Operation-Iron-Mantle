@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Recover protected data drives from a guarded site before OPFOR can purge them."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

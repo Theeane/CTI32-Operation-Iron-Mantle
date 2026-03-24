@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Interrupt local communications and force OPFOR to reroute patrol coordination inside the selected zone."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

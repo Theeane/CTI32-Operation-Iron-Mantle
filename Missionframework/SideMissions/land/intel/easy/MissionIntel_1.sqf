@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Grab patrol notes and route tables from a lightly-defended field cache."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

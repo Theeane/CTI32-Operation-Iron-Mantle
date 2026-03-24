@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Recover the emergency medical cache before OPFOR relocates it."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

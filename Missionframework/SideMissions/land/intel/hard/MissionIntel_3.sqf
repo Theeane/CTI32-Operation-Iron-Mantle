@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Hit a live encryption cell and capture the latest decryption materials intact."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

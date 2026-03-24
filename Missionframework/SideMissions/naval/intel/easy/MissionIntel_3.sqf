@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Shadow a courier link and secure lightweight signal traffic tied to the current zone."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'military', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Pull a ledger from an unsafe contact point and bring back actionable intelligence for the command network."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['town', 'factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

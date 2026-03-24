@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Sabotage a radar support yard that keeps high-end sensors in the fight."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

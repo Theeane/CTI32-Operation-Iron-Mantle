@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Break a command relay site and force local enemy units onto slower backup channels."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

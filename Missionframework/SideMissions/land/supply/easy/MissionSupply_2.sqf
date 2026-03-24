@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Capture a lightly-guarded fuel stash and route it back into the rebel network."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['factory', 'town']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

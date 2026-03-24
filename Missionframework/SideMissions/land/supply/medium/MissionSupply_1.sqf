@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Hit a forward ammunition yard and move the stockpile into friendly hands."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

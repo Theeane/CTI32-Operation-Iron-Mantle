@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Recover files on sweep routes and detention plans from a local command team."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'town']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

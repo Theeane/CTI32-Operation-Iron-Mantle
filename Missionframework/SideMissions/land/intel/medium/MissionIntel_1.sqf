@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Steal fresh signals data from a staffed relay post."],
     ["category", "intel"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

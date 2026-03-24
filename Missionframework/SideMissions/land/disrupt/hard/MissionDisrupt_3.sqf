@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Knock out a major relay spine and leave the regional HQ blind and fragmented."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['capital', 'military']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

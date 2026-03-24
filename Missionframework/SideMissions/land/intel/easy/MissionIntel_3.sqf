@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Secure a courier handoff terminal and pull whatever was queued for transmission."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Smash a major route-control hub and force OPFOR to rebuild its security network from scratch."],
     ["category", "disrupt"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['capital', 'factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

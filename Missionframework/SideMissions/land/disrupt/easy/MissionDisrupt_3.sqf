@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Sabotage a field refuel point and slow local patrol rotations."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['factory', 'town']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

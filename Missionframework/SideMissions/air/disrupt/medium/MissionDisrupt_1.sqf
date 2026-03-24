@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Disrupt an active staging yard and deny OPFOR a prepared response posture in the mission zone."],
     ["category", "disrupt"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

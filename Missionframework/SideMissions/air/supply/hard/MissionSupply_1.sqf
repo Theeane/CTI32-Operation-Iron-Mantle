@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Take a frontline depot intact and convert a major hostile reserve into a BLUFOR supply gain."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

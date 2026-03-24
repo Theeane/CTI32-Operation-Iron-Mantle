@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Hit a soft checkpoint pattern and scatter low-tier security coverage before they stabilize the route."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

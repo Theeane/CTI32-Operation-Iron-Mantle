@@ -107,7 +107,6 @@ private _rewardTier = [_missionDefinition, "rewardTier", 0] call _getDefinitionV
 private _rewardThreatUndercover = [_missionDefinition, "rewardThreatUndercover", 0] call _getDefinitionValue;
 private _allowUndercover = [_missionDefinition, "allowUndercover", false] call _getDefinitionValue;
 private _compositionKey = [_missionDefinition, "compositionKey", ""] call _getDefinitionValue;
-private _zoneTypes = [_missionDefinition, "allowedZoneTypes", []] call _getDefinitionValue;
 private _compositionPath = if (_compositionKey isEqualTo "") then { "" } else { [_compositionKey, _domain, _category, missionNamespace getVariable ["MWF_CompositionType", "modern"]] call MWF_fnc_resolveCompositionPath };
 private _briefingLines = [
     _missionDescription,
@@ -126,9 +125,6 @@ if !(_compositionKey isEqualTo "") then {
     _briefingLines pushBack format ["Composition path: %1", if (_compositionPath isEqualTo "") then {"No staged composition resolved"} else {_compositionPath}];
 };
 
-if !(_zoneTypes isEqualTo []) then {
-    _briefingLines pushBack format ["Zone profile: %1", _zoneTypes joinString ", "];
-};
 
 private _taskId = format ["MWF_task_%1_%2_%3_%4", _category, _difficulty, _missionId, round serverTime];
 private _briefing = _briefingLines joinString "<br/>";

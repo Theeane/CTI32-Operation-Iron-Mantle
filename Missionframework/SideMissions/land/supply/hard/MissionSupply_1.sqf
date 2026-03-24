@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Crack a hardened armored resupply point and capture what survives the fight."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

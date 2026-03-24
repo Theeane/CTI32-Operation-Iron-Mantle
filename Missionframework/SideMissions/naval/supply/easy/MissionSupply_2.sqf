@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Recover a misplaced supply crate before hostile patrols reclaim or destroy it."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'factory', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

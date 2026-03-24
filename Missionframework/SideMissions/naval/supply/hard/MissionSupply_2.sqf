@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Intercept a protected resupply movement and claim its contents before reinforcements lock the route down."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

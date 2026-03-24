@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Disable a short-range relay mast and interrupt enemy coordination in the area."],
     ["category", "disrupt"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['military', 'town']],
     ["allowUndercover", false],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

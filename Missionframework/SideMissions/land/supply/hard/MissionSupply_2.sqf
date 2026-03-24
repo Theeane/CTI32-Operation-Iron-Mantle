@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Capture the heavy stockpile feeding the enemy front and deny it to future offensives."],
     ["category", "supply"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'factory']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

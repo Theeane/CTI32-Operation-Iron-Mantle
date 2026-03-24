@@ -24,7 +24,6 @@ private _missionDefinition = [
     ["description", "Steal recent air defense planning files from a protected operations room."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

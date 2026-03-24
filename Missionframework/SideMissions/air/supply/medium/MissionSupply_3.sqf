@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Recover mission-critical repair parts from a contested logistics node."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military', 'capital']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

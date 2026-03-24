@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Acquire a compartmentalized dossier from a heavily controlled annex tied to hostile command planning."],
     ["category", "intel"],
     ["difficulty", "hard"],
-    ["allowedZoneTypes", ['capital', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

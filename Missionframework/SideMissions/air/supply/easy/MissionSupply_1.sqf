@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Secure a light logistics cache and return critical supplies to the player network."],
     ["category", "supply"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'roadside']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

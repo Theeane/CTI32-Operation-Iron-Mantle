@@ -5,7 +5,8 @@
 
     Description:
     Refreshes the side mission board with a domain-aware mission layout.
-    Preserves active/completed slot state for matching mission keys across board rotations.
+    Preserves active slot state for matching mission keys across board rotations
+    without carrying stale completed entries forward into later boards.
 */
 
 if (!isServer) exitWith {[]};
@@ -245,7 +246,7 @@ private _previousStateMap = createHashMap;
     private _previousState = toLower (_x param [9, "available", [""]]);
     if (
         (_previousKey isNotEqualTo "") &&
-        {_previousState in ["active", "completed"]} &&
+        {_previousState isEqualTo "active"} &&
         {(_slots findIf { (_x # 4) isEqualTo _previousKey }) < 0}
     ) then {
         _slots pushBack (+_x);

@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Take control of a guarded reserve stockpile and fold it into the player economy."],
     ["category", "supply"],
     ["difficulty", "medium"],
-    ["allowedZoneTypes", ['factory', 'military']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],

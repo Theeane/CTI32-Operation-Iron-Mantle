@@ -25,7 +25,6 @@ private _missionDefinition = [
     ["description", "Approach an improvised meeting site, confirm the contact pattern, and leave with clean intelligence."],
     ["category", "intel"],
     ["difficulty", "easy"],
-    ["allowedZoneTypes", ['town', 'rural']],
     ["allowUndercover", true],
     ["usesOpfor", true],
     ["usesBluforSupport", false],
