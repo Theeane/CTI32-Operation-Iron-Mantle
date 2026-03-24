@@ -30,6 +30,11 @@ if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
 // Update resource display
 [] spawn MWF_fnc_updateResourceUI;
 
+// Lightweight local intro cinematic near mission start to cover script warmup.
+if (!isNil "MWF_fnc_playIntroCinematic") then {
+    [] spawn MWF_fnc_playIntroCinematic;
+};
+
 // Damage should interrupt sensitive interactions cleanly without granting invulnerability.
 if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
     player setVariable ["MWF_DamageInterruptEHAdded", true];

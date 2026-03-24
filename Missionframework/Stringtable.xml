@@ -14,6 +14,10 @@
                 <Original>0.01 Alpha</Original>
                 <English>0.01 Alpha</English>
             </Key>
+            <Key ID="STR_MWF_INTRO_WELCOME">
+                <Original>Welcome to</Original>
+                <English>Welcome to</English>
+            </Key>
         </Container>
     </Package>
 </Project>

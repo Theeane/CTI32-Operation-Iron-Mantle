@@ -204,6 +204,7 @@ missionNamespace setVariable ["MWF_EndgameRequiredDestroyedRoadblocks", missionN
 missionNamespace setVariable ["MWF_EndgameRequiredCompletedMainOps", missionNamespace getVariable ["MWF_EndgameRequiredCompletedMainOps", 1], true];
 missionNamespace setVariable ["MWF_EndgameMusicClass", missionNamespace getVariable ["MWF_EndgameMusicClass", ""], true];
 missionNamespace setVariable ["MWF_DeployMusicClass", missionNamespace getVariable ["MWF_DeployMusicClass", ""], true];
+missionNamespace setVariable ["MWF_IntroMusicClass", missionNamespace getVariable ["MWF_IntroMusicClass", ""], true];
 missionNamespace setVariable ["MWF_EndgameLeader_RedBeret", missionNamespace getVariable ["MWF_EndgameLeader_RedBeret", "H_Beret_Colonel"], true];
 missionNamespace setVariable ["MWF_EndgameLeader_VanillaFaces", missionNamespace getVariable ["MWF_EndgameLeader_VanillaFaces", ["WhiteHead_01", "WhiteHead_02", "WhiteHead_15"]], true];
 missionNamespace setVariable ["MWF_EndgameLeader_ASCZFaces", missionNamespace getVariable ["MWF_EndgameLeader_ASCZFaces", ["asczHead_price_A3", "asczHead_beardy_A3", "asczHead_mctavish_A3"]], true];

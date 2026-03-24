@@ -186,6 +186,11 @@ class CfgFunctions {
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
         };
 
+        class Cinematics {
+            file = "functions/cinematics";
+            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
+        };
+
         class Loadout {
             file = "functions/loadout";
             class applyRespawnLoadout { file = "functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
