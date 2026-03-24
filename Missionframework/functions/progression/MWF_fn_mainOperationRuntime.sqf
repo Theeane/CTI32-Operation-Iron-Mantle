@@ -108,6 +108,36 @@ private _rebuildPhaseTasks = {
     missionNamespace setVariable ["MWF_MainOperationRestoreMode", false, true];
 };
 
+private _abortRuntime = {
+    params [
+        ["_allRuntime", createHashMap, [createHashMap]],
+        ["_key", "", [""]],
+        ["_taskId", "", [""]],
+        ["_reason", "", [""]],
+        ["_markTaskFailed", false, [false]]
+    ];
+
+    ["STOP", _key] call MWF_fnc_mainOperationBackend;
+    if (_allRuntime isEqualType createHashMap) then {
+        _allRuntime deleteAt _key;
+        missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+    };
+
+    if (_markTaskFailed && {_taskId isNotEqualTo ""}) then {
+        [_taskId, "FAILED"] call BIS_fnc_taskSetState;
+    };
+
+    missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
+    missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
+    if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
+    if (_reason isNotEqualTo "") then {
+        diag_log format ["[MWF MainOp] Runtime aborted for %1: %2", _key, _reason];
+    };
+    true
+};
+
 switch (toUpper _mode) do {
     case "START": {
         _arg1 params [
@@ -141,7 +171,9 @@ switch (toUpper _mode) do {
             ["phaseIndex", 0],
             ["active", true],
             ["startedAt", serverTime],
-            ["armedTaskId", ""]
+            ["armedTaskId", ""],
+            ["armFailures", 0],
+            ["nextArmAttemptAt", 0]
         ];
 
         _runtimeMap set [_key, _record];
@@ -184,7 +216,9 @@ switch (toUpper _mode) do {
             ["phaseIndex", _safePhaseIndex],
             ["active", true],
             ["startedAt", _startedAt],
-            ["armedTaskId", ""]
+            ["armedTaskId", ""],
+            ["armFailures", 0],
+            ["nextArmAttemptAt", 0]
         ];
 
         _runtimeMap set [_key, _record];
@@ -223,25 +257,34 @@ switch (toUpper _mode) do {
             _phaseData params ["_taskId", "_nextState"];
 
             if !((_record getOrDefault ["armedTaskId", ""]) isEqualTo _taskId) then {
-                private _started = ["START_PHASE", [_key, _phaseIndex, _taskId, _record getOrDefault ["position", [0,0,0]]]] call MWF_fnc_mainOperationBackend;
-                if (_started) then {
-                    _record set ["armedTaskId", _taskId];
-                    _allRuntime set [_key, _record];
-                    missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                private _now = serverTime;
+                private _nextArmAttemptAt = _record getOrDefault ["nextArmAttemptAt", 0];
+                if (_now >= _nextArmAttemptAt) then {
+                    private _started = ["START_PHASE", [_key, _phaseIndex, _taskId, _record getOrDefault ["position", [0,0,0]]]] call MWF_fnc_mainOperationBackend;
+                    if (_started) then {
+                        _record set ["armedTaskId", _taskId];
+                        _record set ["armFailures", 0];
+                        _record set ["nextArmAttemptAt", 0];
+                        _allRuntime set [_key, _record];
+                        missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+                    } else {
+                        private _armFailures = (_record getOrDefault ["armFailures", 0]) + 1;
+                        private _backoff = ((_armFailures min 4) * 5) max 5;
+                        _record set ["armFailures", _armFailures];
+                        _record set ["nextArmAttemptAt", _now + _backoff];
+                        _allRuntime set [_key, _record];
+                        missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
+
+                        if (_armFailures >= 3) exitWith {
+                            [_allRuntime, _key, _taskId, format ["phase %1 failed to arm after %2 attempts", _phaseIndex, _armFailures], true] call _abortRuntime;
+                        };
+                    };
                 };
             };
 
             private _taskState = [_taskId] call BIS_fnc_taskState;
             if (_taskState in ["FAILED", "CANCELED"]) exitWith {
-                ["STOP", _key] call MWF_fnc_mainOperationBackend;
-                _allRuntime deleteAt _key;
-                missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
-                missionNamespace setVariable ["MWF_GrandOperationActive", false, true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperation", "", true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperationTitle", "", true];
-                missionNamespace setVariable ["MWF_CurrentGrandOperationPlacement", [], true];
-                if (!isNil "MWF_fnc_requestDelayedSave") then { [] call MWF_fnc_requestDelayedSave; };
-                true
+                [_allRuntime, _key, _taskId, format ["phase task entered %1 state", _taskState], false] call _abortRuntime;
             };
 
             if (_taskState isEqualTo "SUCCEEDED") then {
@@ -259,6 +302,8 @@ switch (toUpper _mode) do {
                 } else {
                     _record set ["phaseIndex", _phaseIndex + 1];
                     _record set ["armedTaskId", ""];
+                    _record set ["armFailures", 0];
+                    _record set ["nextArmAttemptAt", 0];
                     _allRuntime set [_key, _record];
                     missionNamespace setVariable ["MWF_MainOperationRuntime", _allRuntime, true];
                 };

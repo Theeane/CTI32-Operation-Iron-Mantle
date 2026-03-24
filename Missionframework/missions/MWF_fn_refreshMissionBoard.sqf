@@ -27,61 +27,13 @@ if (missionNamespace getVariable ["MWF_MissionDomainSupported_Land", false]) the
 if (missionNamespace getVariable ["MWF_MissionDomainSupported_Naval", false]) then { _supportedDomains pushBack "naval"; };
 if (missionNamespace getVariable ["MWF_MissionDomainSupported_Air", false]) then { _supportedDomains pushBack "air"; };
 
+private _emptyRetryDelay = 60;
 if (_registry isEqualTo [] || _placements isEqualTo [] || _supportedDomains isEqualTo []) exitWith {
     missionNamespace setVariable ["MWF_MissionBoardSlots", [], true];
     missionNamespace setVariable ["MWF_MissionBoardCreatedAt", serverTime, true];
-    missionNamespace setVariable ["MWF_MissionBoardExpiresAt", serverTime, true];
+    missionNamespace setVariable ["MWF_MissionBoardExpiresAt", serverTime + _emptyRetryDelay, true];
     missionNamespace setVariable ["MWF_MissionBoardMinimalMode", false, true];
     []
-};
-
-private _readMissionDefinition = {
-    params ["_missionPath"];
-
-    if !(fileExists _missionPath) exitWith { [] };
-
-    private _raw = loadFile _missionPath;
-    if (_raw isEqualTo "") exitWith { [] };
-
-    private _marker = "private _missionDefinition = ";
-    private _markerPos = _raw find _marker;
-    if (_markerPos < 0) exitWith { [] };
-
-    private _afterMarker = _markerPos + (count _marker);
-    private _tail = _raw select [_afterMarker];
-    private _localOpen = _tail find "[";
-    if (_localOpen < 0) exitWith { [] };
-
-    private _start = _afterMarker + _localOpen;
-    private _depth = 0;
-    private _inString = false;
-    private _end = -1;
-
-    for "_i" from _start to ((count _raw) - 1) do {
-        private _ch = _raw select [_i, 1];
-
-        if (_ch isEqualTo (toString [34])) then {
-            _inString = !_inString;
-        } else {
-            if (!_inString) then {
-                if (_ch isEqualTo "[") then {
-                    _depth = _depth + 1;
-                } else {
-                    if (_ch isEqualTo "]") then {
-                        _depth = _depth - 1;
-                        if (_depth <= 0) exitWith { _end = _i; };
-                    };
-                };
-            };
-        };
-    };
-
-    if (_end < _start) exitWith { [] };
-
-    private _arrayText = _raw select [_start, (_end - _start) + 1];
-    private _definition = call compile _arrayText;
-    if !(_definition isEqualType []) exitWith { [] };
-    _definition
 };
 
 private _distanceSteps = [1000, 750, 500, 250, 100];
@@ -153,7 +105,7 @@ private _buildSlots = {
         _chosenTemplate params ["_missionKey", "_templateCategory", "_templateDifficulty", "_missionId", "_missionPath", ["_templateDomain", "land", [""]]];
         _chosenPlacement params ["_placementMissionKey", "_position", "_areaId", "_areaName", ["_placementDomain", _templateDomain, [""]]];
 
-        private _missionDefinition = [_missionPath] call _readMissionDefinition;
+        private _missionDefinition = if (!isNil "MWF_fnc_readMissionDefinition") then { [_missionPath] call MWF_fnc_readMissionDefinition } else { [] };
 
         _slots pushBack [
             count _slots,

@@ -54,6 +54,10 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
 
     if (_templates isEqualTo []) then {
         diag_log "[MWF Missions] No mission templates discovered. Mission board will remain empty until templates exist.";
+        missionNamespace setVariable ["MWF_MissionBoardSlots", [], true];
+        missionNamespace setVariable ["MWF_MissionBoardCreatedAt", serverTime, true];
+        missionNamespace setVariable ["MWF_MissionBoardExpiresAt", serverTime + 60, true];
+        missionNamespace setVariable ["MWF_MissionBoardMinimalMode", false, true];
         missionNamespace setVariable ["MWF_MissionSystemReady", true, true];
     } else {
         if (!isNil "MWF_fnc_buildMissionSessionPlacements") then {
@@ -83,7 +87,9 @@ missionNamespace setVariable ["MWF_MissionSystemReady", false, true];
 
         if (_systemReady && {serverTime >= _expiresAt}) then {
             [] call MWF_fnc_refreshMissionBoard;
-            diag_log "[MWF Missions] Mission board rotated.";
+            if ((count (missionNamespace getVariable ["MWF_MissionBoardSlots", []])) > 0) then {
+                diag_log "[MWF Missions] Mission board rotated.";
+            };
         };
 
         uiSleep 5;

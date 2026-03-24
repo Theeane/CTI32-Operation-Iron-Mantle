@@ -309,8 +309,9 @@ switch (toUpper _mode) do {
         private _groups = [];
         private _primaryTarget = objNull;
 
+        private _guardAnchor = if (_type isEqualTo "extract") then { _objectivePos } else { _center };
         if (_guardCount > 0) then {
-            private _spawned = [_center, _guardCount, (_radius + 10), _addOfficer, false] call _spawnGuards;
+            private _spawned = [_guardAnchor, _guardCount, (_radius + 10), _addOfficer, false] call _spawnGuards;
             _units append (_spawned # 0);
             _groups append (_spawned # 1);
         };
@@ -355,6 +356,31 @@ switch (toUpper _mode) do {
                 _primaryTarget = (_spawnedInformant # 0) param [0, objNull];
             };
             default {};
+        };
+
+        private _startValid = switch (_type) do {
+            case "destroy_multi": { (count _objects) >= (_count max 1) };
+            case "interact";
+            case "secure_object";
+            case "kill_officer";
+            case "meet_informant": { !isNull _primaryTarget };
+            default { true };
+        };
+        if (!_startValid) exitWith {
+            {
+                if (!isNull _x) then { deleteVehicle _x; };
+            } forEach _objects;
+            {
+                if (!isNull _x) then { deleteVehicle _x; };
+            } forEach (_units select { alive _x });
+            {
+                if (!isNull _x) then {
+                    { if (!isNull _x) then { deleteVehicle _x; }; } forEach units _x;
+                    deleteGroup _x;
+                };
+            } forEach _groups;
+            diag_log format ["[MWF MainOp] START_PHASE failed validation for %1 phase %2 (%3).", _key, _phaseIndex, _type];
+            false
         };
 
         private _markerName = format ["MWF_MainOp_%1_%2", _key, round (serverTime * 10)];

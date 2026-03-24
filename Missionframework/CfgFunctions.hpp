@@ -170,6 +170,7 @@ class CfgFunctions {
             class getSideMissionRewardProfile { file = "missions/MWF_fn_getSideMissionRewardProfile.sqf"; };
             class initMissionSystem { file = "missions/MWF_fn_initMissionSystem.sqf"; };
             class refreshMissionBoard { file = "missions/MWF_fn_refreshMissionBoard.sqf"; };
+            class readMissionDefinition { file = "missions/MWF_fn_readMissionDefinition.sqf"; };
             class applyTutorialReward { file = "missions/MWF_fn_applyTutorialReward.sqf"; };
             class sideMissionRuntime { file = "missions/MWF_fn_sideMissionRuntime.sqf"; };
         };
