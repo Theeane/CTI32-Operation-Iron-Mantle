@@ -40,7 +40,10 @@ private _getPersistentValue = {
 private _lockedStartSupplies = ["MWF_Save_StartSupplies", "MWF_Param_StartSupplies", 200, "MWF_Locked_StartSupplies", 0, 100000] call _getPersistentValue;
 private _lockedSupplyTimer = ["MWF_Save_SupplyTimer", "MWF_Param_SupplyTimer", 10, "MWF_Locked_SupplyTimer", 1, 3600] call _getPersistentValue;
 private _lockedCivRep = ["MWF_Save_CivReputation", "MWF_Param_CivReputation", 0, "MWF_Locked_CivReputation", -1000, 1000] call _getPersistentValue;
-private _lockedNotorietyMult = ["MWF_Save_NotorietyMultiplier", "MWF_Param_NotorietyMultiplier", 1, "MWF_Locked_NotorietyMultiplier", 0, 100] call _getPersistentValue;
+private _lockedThreatGainMultiplier = ["MWF_Save_ThreatGainMultiplier", "MWF_Param_ThreatGainMultiplier", 1, "MWF_Locked_ThreatGainMultiplier", 0.1, 5] call _getPersistentValue;
+private _lockedThreatDecayMultiplier = ["MWF_Save_ThreatDecayMultiplier", "MWF_Param_ThreatDecayMultiplier", 1, "MWF_Locked_ThreatDecayMultiplier", 0, 5] call _getPersistentValue;
+private _lockedWorldTierMultiplier = ["MWF_Save_WorldTierMultiplier", "MWF_Param_WorldTierMultiplier", 1, "MWF_Locked_WorldTierMultiplier", 0.1, 5] call _getPersistentValue;
+private _lockedEndgameMapControl = ["MWF_Save_EndgameMapControl", "MWF_Param_EndgameMapControl", 75, "MWF_Locked_EndgameMapControlRequired", 1, 100] call _getPersistentValue;
 private _lockedBuildingMode = ["MWF_Save_BuildingMode", "MWF_Param_BuildingDamageMode", 0, "MWF_Locked_BuildingDamageMode", 0, 10] call _getPersistentValue;
 private _lockedIncomeMultiplier = ["MWF_Save_IncomeMultiplier", "MWF_Param_IncomeMultiplier", 1, "MWF_Locked_IncomeMultiplier", 0, 100] call _getPersistentValue;
 private _lockedMaxFOBs = ["MWF_Save_MaxFOBs", "MWF_Param_MaxFOBs", 5, "MWF_Locked_MaxFOBs", 0, 100] call _getPersistentValue;
@@ -50,6 +53,11 @@ missionNamespace setVariable ["MWF_LockedBuildingMode", _lockedBuildingMode, tru
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _lockedMaxFOBs, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _lockedIncomeMultiplier, true];
 missionNamespace setVariable ["MWF_Param_CompositionType", _lockedCompositionTypeChoice, true];
+missionNamespace setVariable ["MWF_ThreatGainMultiplier", _lockedThreatGainMultiplier, true];
+missionNamespace setVariable ["MWF_ThreatDecayMultiplier", _lockedThreatDecayMultiplier, true];
+missionNamespace setVariable ["MWF_ThreatDecayPerMinute", 2 * (_lockedThreatDecayMultiplier max 0), true];
+missionNamespace setVariable ["MWF_WorldTierMultiplier", _lockedWorldTierMultiplier, true];
+missionNamespace setVariable ["MWF_EndgameMapControlRequired", _lockedEndgameMapControl, true];
 
 private _compositionType = switch _lockedCompositionTypeChoice do {
     case 1: {"vietnam"};

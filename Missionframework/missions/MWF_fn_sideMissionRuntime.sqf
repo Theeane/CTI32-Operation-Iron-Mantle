@@ -360,7 +360,7 @@ private _actionTextForCategory = {
 
 private _pickGuardPool = {
     private _preset = missionNamespace getVariable ["MWF_OPFOR_Preset", createHashMap];
-    private _worldTier = (missionNamespace getVariable ["MWF_WorldTier", 1]) max 1 min 5;
+    private _worldTier = if (!isNil "MWF_fnc_getEffectiveEnemyTier") then { [missionNamespace getVariable ["MWF_WorldTier", 1]] call MWF_fnc_getEffectiveEnemyTier } else { (missionNamespace getVariable ["MWF_WorldTier", 1]) max 1 min 5 };
     private _pool = [];
     for "_tier" from 1 to _worldTier do {
         private _tierKey = format ["Infantry_T%1", _tier];
@@ -379,10 +379,11 @@ private _pickGuardPool = {
 private _pickOfficerClass = {
     private _preset = missionNamespace getVariable ["MWF_OPFOR_Preset", createHashMap];
     private _candidates = [];
-    {
-        private _list = _preset getOrDefault [_x, []];
+    private _maxTier = if (!isNil "MWF_fnc_getEffectiveEnemyTier") then { [missionNamespace getVariable ["MWF_WorldTier", 1]] call MWF_fnc_getEffectiveEnemyTier } else { (missionNamespace getVariable ["MWF_WorldTier", 1]) max 1 min 5 };
+    for "_tier" from _maxTier to 1 step -1 do {
+        private _list = _preset getOrDefault [format ["Infantry_T%1", _tier], []];
         if (_list isEqualType []) then { _candidates append _list; };
-    } forEach ["Infantry_T5", "Infantry_T4", "Infantry_T3", "Infantry_T2", "Infantry_T1"];
+    };
 
     private _preferred = _candidates select {
         private _cls = toLower str _x;

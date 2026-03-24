@@ -21,14 +21,15 @@ missionNamespace setVariable ["MWF_UndercoverHandlerStarted", true];
 
         [player] call MWF_fnc_checkUndercover;
 
-        private _undercoverState = player getVariable ["MWF_UndercoverState", "NONE"];
+        private _undercoverState = player getVariable ["MWF_UndercoverState", player getVariable ["MWF_UndercoverBaseState", "NONE"]];
         private _isUndercover = player getVariable ["MWF_isUndercover", false];
         private _isSuspicious = false;
-        private _eyeState = "RED";
+        private _eyeState = "OFF";
+        private _redHoldSeconds = missionNamespace getVariable ["MWF_UndercoverRedDecaySeconds", 45];
+        private _redUntil = player getVariable ["MWF_UndercoverRedUntil", 0];
+        private _redActive = _redUntil > diag_tickTime;
 
         if (_undercoverState isEqualTo "OPFOR") then {
-            _eyeState = "GREEN";
-
             private _nearEnemies = allUnits select {
                 alive _x && {side _x == east} && {_x distance player <= 8}
             };
@@ -49,37 +50,68 @@ missionNamespace setVariable ["MWF_UndercoverHandlerStarted", true];
                 };
 
                 if (_dist <= _detectRange) exitWith {
+                    _redUntil = diag_tickTime + _redHoldSeconds;
+                    _redActive = true;
                     _isUndercover = false;
                     missionNamespace setVariable ["MWF_Op_Detected", true, true];
-                    player setVariable ["MWF_OpforDisguiseCompromised", true, true];
                 };
             } forEach _nearEnemies;
 
             private _inspectionTime = player getVariable ["MWF_InspectionExposure", 0];
-            if (_inspectionActive && {_isUndercover}) then {
+            if (_inspectionActive && {!_redActive}) then {
                 _inspectionTime = _inspectionTime + 1;
                 player setVariable ["MWF_InspectionExposure", _inspectionTime];
                 if (_inspectionTime >= 10) then {
+                    _redUntil = diag_tickTime + _redHoldSeconds;
+                    _redActive = true;
                     _isUndercover = false;
                     missionNamespace setVariable ["MWF_Op_Detected", true, true];
-                    player setVariable ["MWF_OpforDisguiseCompromised", true, true];
                 };
             } else {
                 player setVariable ["MWF_InspectionExposure", 0 max (_inspectionTime - 2)];
             };
         } else {
             player setVariable ["MWF_InspectionExposure", 0];
-            if (_undercoverState isEqualTo "CIV") then {
-                _eyeState = "GREEN";
+        };
+
+        if (_redActive) then {
+            private _activeHostileSeen = false;
+            {
+                if (alive _x && {side _x == east} && {_x distance player <= 60}) then {
+                    private _targetPos = eyePos player;
+                    private _observerPos = eyePos _x;
+                    private _visibility = [_x, "VIEW"] checkVisibility [_observerPos, _targetPos];
+                    if (_visibility > 0.05 || {lineIntersectsSurfaces [_observerPos, _targetPos, _x, player] isEqualTo []}) exitWith {
+                        _activeHostileSeen = true;
+                    };
+                };
+            } forEach allUnits;
+
+            if (_activeHostileSeen) then {
+                _redUntil = diag_tickTime + 5;
+            };
+            _eyeState = "RED";
+            _isUndercover = false;
+        } else {
+            switch (_undercoverState) do {
+                case "OPFOR": {
+                    _eyeState = if (_isSuspicious) then {"YELLOW"} else {"GREEN"};
+                    _isUndercover = true;
+                };
+                case "CIV": {
+                    _eyeState = "GREEN";
+                    _isUndercover = true;
+                };
+                default {
+                    _eyeState = "OFF";
+                    _isUndercover = false;
+                };
             };
         };
 
-        if (_isUndercover && {_isSuspicious}) then {
-            _eyeState = "YELLOW";
-        };
-
+        player setVariable ["MWF_UndercoverRedUntil", _redUntil, true];
         player setVariable ["MWF_isUndercover", _isUndercover, true];
-        player setVariable ["MWF_UndercoverEyeState", _eyeState];
+        player setVariable ["MWF_UndercoverEyeState", _eyeState, true];
 
         if (_isUndercover) then {
             if (!captive player) then {

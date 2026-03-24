@@ -91,16 +91,18 @@ while { hasInterface } do {
 
         private _eyeCtrl = _display displayCtrl 9004;
         if (!isNull _eyeCtrl) then {
-            private _eyeState = toUpper (player getVariable ["MWF_UndercoverEyeState", if (player getVariable ["MWF_isUndercover", false]) then {"GREEN"} else {"RED"}]);
+            private _eyeState = toUpper (player getVariable ["MWF_UndercoverEyeState", if (player getVariable ["MWF_isUndercover", false]) then {"GREEN"} else {"OFF"}]);
             private _eyePath = switch (_eyeState) do {
                 case "GREEN": { "ui\eye_green.paa" };
                 case "YELLOW": { "ui\eye_yellow.paa" };
-                default { "ui\eye_red.paa" };
+                case "RED": { "ui\eye_red.paa" };
+                default { "" };
             };
             private _eyeTip = switch (_eyeState) do {
                 case "GREEN": { "Undercover secure" };
                 case "YELLOW": { "Undercover compromised risk" };
-                default { "Exposed" };
+                case "RED": { "Exposed / capture allowed" };
+                default { "Open BLUFOR presence / capture allowed" };
             };
             _eyeCtrl ctrlSetText _eyePath;
             _eyeCtrl ctrlSetTooltip _eyeTip;

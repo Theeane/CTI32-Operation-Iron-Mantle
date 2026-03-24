@@ -231,6 +231,11 @@ missionNamespace setVariable ["MWF_ThreatPatrolDensity", _scaledPatrolDensity, t
 missionNamespace setVariable ["MWF_ThreatQRFInterval", _scaledQrfInterval, true];
 missionNamespace setVariable ["MWF_ThreatMissionEscalation", _directives getOrDefault ["missionEscalation", "low"], true];
 
+private _zoneEnemyMultiplier = (1 + (_threatPercent / 100)) min 2;
+private _patrolUnitMultiplier = (1 + ((_threatPercent / 100) * 0.5)) min 1.5;
+missionNamespace setVariable ["MWF_AIZoneEnemyMultiplier", _zoneEnemyMultiplier, true];
+missionNamespace setVariable ["MWF_AIPatrolUnitMultiplier", _patrolUnitMultiplier, true];
+
 missionNamespace setVariable ["MWF_ZoneThreatIndex", _zoneThreatIndex, false];
 missionNamespace setVariable ["MWF_ThreatDirectives", _directives, false];
 missionNamespace setVariable ["MWF_ThreatPriorityTargets", _priorityTargetArray, false];

@@ -333,7 +333,10 @@ profileNamespace setVariable ["MWF_Save_CompletedMainOperations", +(missionNames
 profileNamespace setVariable ["MWF_Save_StartSupplies", missionNamespace getVariable ["MWF_Locked_StartSupplies", 200]];
 profileNamespace setVariable ["MWF_Save_SupplyTimer", missionNamespace getVariable ["MWF_Locked_SupplyTimer", 10]];
 profileNamespace setVariable ["MWF_Save_CivReputation", missionNamespace getVariable ["MWF_Locked_CivReputation", 0]];
-profileNamespace setVariable ["MWF_Save_NotorietyMultiplier", missionNamespace getVariable ["MWF_Locked_NotorietyMultiplier", 1]];
+profileNamespace setVariable ["MWF_Save_ThreatGainMultiplier", missionNamespace getVariable ["MWF_Locked_ThreatGainMultiplier", missionNamespace getVariable ["MWF_ThreatGainMultiplier", 1]]];
+profileNamespace setVariable ["MWF_Save_ThreatDecayMultiplier", missionNamespace getVariable ["MWF_Locked_ThreatDecayMultiplier", missionNamespace getVariable ["MWF_ThreatDecayMultiplier", 1]]];
+profileNamespace setVariable ["MWF_Save_WorldTierMultiplier", missionNamespace getVariable ["MWF_Locked_WorldTierMultiplier", missionNamespace getVariable ["MWF_WorldTierMultiplier", 1]]];
+profileNamespace setVariable ["MWF_Save_EndgameMapControl", missionNamespace getVariable ["MWF_Locked_EndgameMapControlRequired", missionNamespace getVariable ["MWF_EndgameMapControlRequired", 75]]];
 profileNamespace setVariable ["MWF_Save_BuildingMode", _buildingMode];
 profileNamespace setVariable ["MWF_Save_IncomeMultiplier", missionNamespace getVariable ["MWF_Locked_IncomeMultiplier", 1]];
 profileNamespace setVariable ["MWF_Save_MaxFOBs", missionNamespace getVariable ["MWF_Locked_MaxFOBs", 5]];

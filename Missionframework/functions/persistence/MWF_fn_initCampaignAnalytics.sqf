@@ -43,9 +43,11 @@ addMissionEventHandler ["EntityKilled", {
     private _markOpforDisguiseCompromised = {
         params ["_unit", ["_reason", "you attacked a protected target", [""]]];
         if (isNull _unit) exitWith {};
-        _unit setVariable ["MWF_OpforDisguiseCompromised", true, true];
+        private _hold = missionNamespace getVariable ["MWF_UndercoverRedDecaySeconds", 45];
+        _unit setVariable ["MWF_UndercoverRedUntil", diag_tickTime + _hold, true];
+        missionNamespace setVariable ["MWF_Op_Detected", true, true];
         if (isPlayer _unit) then {
-            [format ["Your OPFOR disguise is blown: %1.", _reason]] remoteExec ["systemChat", owner _unit];
+            [format ["You have been exposed: %1.", _reason]] remoteExec ["systemChat", owner _unit];
         };
     };
 

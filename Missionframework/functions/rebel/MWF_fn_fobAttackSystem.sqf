@@ -62,9 +62,13 @@ private _spawnWave = {
     private _resPreset = missionNamespace getVariable ["MWF_RES_Preset", createHashMap];
     private _pool = [];
     if (_resPreset isEqualType createHashMap) then {
-        {
-            _pool append (_resPreset getOrDefault [_x, []]);
-        } forEach ["Infantry_T1", "Infantry_T2", "Infantry_T3"];
+        private _maxTier = 3;
+        if (!isNil "MWF_fnc_getEffectiveEnemyTier") then {
+            _maxTier = [_maxTier] call MWF_fnc_getEffectiveEnemyTier;
+        };
+        for "_tier" from 1 to _maxTier do {
+            _pool append (_resPreset getOrDefault [format ["Infantry_T%1", _tier], []]);
+        };
     };
     if (_pool isEqualTo []) then {
         _pool = ["I_G_Soldier_F", "I_G_Soldier_lite_F", "I_G_Soldier_AR_F", "I_G_medic_F"];

@@ -8,7 +8,7 @@
     - OPFOR uniform: military disguise active and respawn-loadout saving blocked.
     - Civilian uniform: civilian disguise only if no vest and no carried weapons.
     - Backpack, headgear, facewear, NVG, binocular, GPS, map, compass and watch are ignored.
-    - OPFOR disguises can be permanently blown while the player keeps the OPFOR uniform equipped.
+    - Red exposure is handled separately by the undercover eye-state timer.
 */
 
 params [
@@ -37,22 +37,25 @@ if (!_hasOpforUniform && {_player getVariable ["MWF_OpforDisguiseCompromised", f
     _player setVariable ["MWF_OpforDisguiseCompromised", false, true];
 };
 
-private _isCompromised = _hasOpforUniform && {_player getVariable ["MWF_OpforDisguiseCompromised", false]};
-private _isUndercover = false;
-private _undercoverState = "NONE";
-
-if (_hasOpforUniform && {!_isCompromised}) then {
-    _isUndercover = true;
-    _undercoverState = "OPFOR";
+private _baseState = "NONE";
+private _isEligibleUndercover = false;
+if (_hasOpforUniform) then {
+    _isEligibleUndercover = true;
+    _baseState = "OPFOR";
 } else {
     if (_hasCivilianUniform && {!_hasVest} && {!_armed}) then {
-        _isUndercover = true;
-        _undercoverState = "CIV";
+        _isEligibleUndercover = true;
+        _baseState = "CIV";
     };
 };
 
+private _redUntil = _player getVariable ["MWF_UndercoverRedUntil", 0];
+private _redActive = _redUntil > diag_tickTime;
+private _isUndercover = _isEligibleUndercover && !_redActive;
+
 _player setVariable ["MWF_isUndercover", _isUndercover, true];
-_player setVariable ["MWF_UndercoverState", _undercoverState, true];
+_player setVariable ["MWF_UndercoverState", _baseState, true];
+_player setVariable ["MWF_UndercoverBaseState", _baseState, true];
 missionNamespace setVariable ["MWF_SaveLoadout_Enabled", !_hasOpforUniform, true];
 
 _isUndercover

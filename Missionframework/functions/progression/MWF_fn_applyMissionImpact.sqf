@@ -60,6 +60,7 @@ private _tierProgressBlockedUntil = missionNamespace getVariable ["MWF_WorldTier
 private _tierBlockImmuneUntil = missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0];
 private _mainOpThreatBlockedUntil = missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0];
 private _threatPercent = missionNamespace getVariable ["MWF_GlobalThreatPercent", 0];
+private _threatGainMultiplier = missionNamespace getVariable ["MWF_ThreatGainMultiplier", 1];
 
 private _grantedSupplies = _supplies;
 private _grantedIntel = _intel;
@@ -110,6 +111,10 @@ if (_kind isEqualTo "main") then {
 
 if (!_loud && {_effectiveThreatDelta > 0}) then {
     _effectiveThreatDelta = 0;
+};
+
+if (_effectiveThreatDelta > 0) then {
+    _effectiveThreatDelta = _effectiveThreatDelta * (_threatGainMultiplier max 0);
 };
 
 if (_effectiveTierDelta > 0 && {(_tierProgressBlockedUntil > _now) || (missionNamespace getVariable ["MWF_TierFreeze_Active", false])}) then {

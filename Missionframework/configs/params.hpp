@@ -11,7 +11,10 @@
     - Param_StartSupplies
     - Param_SupplyTimer
     - Param_CivReputation
-    - Param_NotorietyMultiplier
+    - MWF_Param_ThreatGainMultiplier
+    - MWF_Param_ThreatDecayMultiplier
+    - MWF_Param_WorldTierMultiplier
+    - MWF_Param_EndgameMapControl
     - Param_BuildingDamageMode
     - MWF_Param_IncomeMultiplier
     - MWF_Param_MaxFOBs
@@ -300,11 +303,51 @@ class Params {
         default = 0;
     };
 
-    class MWF_Param_NotorietyMultiplier {
-        title = "[PERSISTENT] Heat Decay per Tick";
-        values[] = {1, 2, 3, 5};
-        texts[] = {"1", "2", "3", "5"};
+    class MWF_Param_ThreatGainMultiplier {
+        title = "[PERSISTENT] Threat Tick Up";
+        values[] = {0.5, 1, 1.5, 2};
+        texts[] = {
+            "0.5x - Threat rises slower from combat, captures and missions",
+            "1.0x - Standard threat gain",
+            "1.5x - Threat rises faster",
+            "2.0x - Threat rises much faster"
+        };
         default = 1;
+    };
+
+    class MWF_Param_ThreatDecayMultiplier {
+        title = "[PERSISTENT] Threat Tick Down";
+        values[] = {0.5, 1, 1.5, 2};
+        texts[] = {
+            "0.5x - Threat falls slower over time",
+            "1.0x - Standard threat decay",
+            "1.5x - Threat falls faster",
+            "2.0x - Threat falls much faster"
+        };
+        default = 1;
+    };
+
+    class MWF_Param_WorldTierMultiplier {
+        title = "[PERSISTENT] Enemy World Tier Multiplier";
+        values[] = {0.5, 1, 1.5, 2};
+        texts[] = {
+            "0.5x - Weaker OPFOR / rebel content",
+            "1.0x - Standard enemy tier",
+            "1.5x - Stronger OPFOR / rebel content",
+            "2.0x - Much stronger OPFOR / rebel content"
+        };
+        default = 1;
+    };
+
+    class MWF_Param_EndgameMapControl {
+        title = "[PERSISTENT] Endgame Map Completion Requirement";
+        values[] = {55, 75, 95};
+        texts[] = {
+            "55% (Early endgame)",
+            "75% (Standard)",
+            "95% (Late endgame)"
+        };
+        default = 75;
     };
 
     class MWF_Param_SaveInterval {

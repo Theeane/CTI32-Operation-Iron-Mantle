@@ -36,7 +36,12 @@ while { !isNull _zone } do {
 
     private _friendlyUnits = allPlayers select {
         alive _x &&
-        { (_x distance2D _zonePos) < _zoneRange }
+        { (_x distance2D _zonePos) < _zoneRange } &&
+        {
+            private _eyeState = toUpper (_x getVariable ["MWF_UndercoverEyeState", if (_x getVariable ["MWF_isUndercover", false]) then {"GREEN"} else {"OFF"}]);
+            private _isUndercover = _x getVariable ["MWF_isUndercover", false];
+            (!_isUndercover) || {_eyeState isEqualTo "RED"}
+        }
     };
 
     private _enemyCount = count _enemyUnits;

@@ -50,6 +50,7 @@ missionNamespace setVariable ["MWF_EndgameRebelContact", missionNamespace getVar
 missionNamespace setVariable ["MWF_EndgameReservedZoneId", missionNamespace getVariable ["MWF_EndgameReservedZoneId", ""], true];
 missionNamespace setVariable ["MWF_EndgameState", missionNamespace getVariable ["MWF_EndgameState", []], true];
 missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false], true];
+missionNamespace setVariable ["MWF_UndercoverRedDecaySeconds", missionNamespace getVariable ["MWF_UndercoverRedDecaySeconds", 45], true];
 
 missionNamespace setVariable ["MWF_WorldTier", missionNamespace getVariable ["MWF_WorldTier", 1], true];
 missionNamespace setVariable ["MWF_WorldTierScore", missionNamespace getVariable ["MWF_WorldTierScore", 0], true];
@@ -86,6 +87,11 @@ missionNamespace setVariable ["MWF_GlobalThreatState", missionNamespace getVaria
 missionNamespace setVariable ["MWF_MainOpThreatProgressBlockedUntil", missionNamespace getVariable ["MWF_MainOpThreatProgressBlockedUntil", 0], true];
 missionNamespace setVariable ["MWF_WorldTierBlockImmuneUntil", missionNamespace getVariable ["MWF_WorldTierBlockImmuneUntil", 0], true];
 missionNamespace setVariable ["MWF_ThreatDecayPerMinute", missionNamespace getVariable ["MWF_ThreatDecayPerMinute", 2], true];
+missionNamespace setVariable ["MWF_ThreatGainMultiplier", missionNamespace getVariable ["MWF_ThreatGainMultiplier", 1], true];
+missionNamespace setVariable ["MWF_ThreatDecayMultiplier", missionNamespace getVariable ["MWF_ThreatDecayMultiplier", 1], true];
+missionNamespace setVariable ["MWF_WorldTierMultiplier", missionNamespace getVariable ["MWF_WorldTierMultiplier", 1], true];
+missionNamespace setVariable ["MWF_AIZoneEnemyMultiplier", missionNamespace getVariable ["MWF_AIZoneEnemyMultiplier", 1], true];
+missionNamespace setVariable ["MWF_AIPatrolUnitMultiplier", missionNamespace getVariable ["MWF_AIPatrolUnitMultiplier", 1], true];
 missionNamespace setVariable ["MWF_ThreatHotZones", missionNamespace getVariable ["MWF_ThreatHotZones", []], true];
 missionNamespace setVariable ["MWF_ThreatHotspotDuration", missionNamespace getVariable ["MWF_ThreatHotspotDuration", 900], true];
 missionNamespace setVariable ["MWF_ThreatLastDecayAt", missionNamespace getVariable ["MWF_ThreatLastDecayAt", -1], true];

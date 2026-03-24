@@ -9,6 +9,8 @@
 
 params ["_zonePos", "_tier"];
 
+private _effectiveTier = if (!isNil "MWF_fnc_getEffectiveEnemyTier") then { [_tier] call MWF_fnc_getEffectiveEnemyTier } else { (_tier max 1) min 5 };
+
 // 1. Fetch Tier settings from config
 private _tierData = MWF_Zone_Tier_Settings get _tier;
 private _multiplier = _tierData select 2;
@@ -27,7 +29,15 @@ private _enemyCount = if (!isNil "MWF_fnc_getAISpawnAllowance") then {
 };
 for "_i" from 1 to _enemyCount do {
     private _spawnPos = [_zonePos, 10, 150, 3, 0, 20, 0] call BIS_fnc_findSafePos;
-    private _unitClass = selectRandom MWF_Army_Infantry; 
+    private _opforPreset = missionNamespace getVariable ["MWF_OPFOR_Preset", createHashMap];
+    private _pool = [];
+    if (_opforPreset isEqualType createHashMap) then {
+        for "_tierIndex" from 1 to _effectiveTier do {
+            _pool append (_opforPreset getOrDefault [format ["Infantry_T%1", _tierIndex], []]);
+        };
+    };
+    if (_pool isEqualTo []) then { _pool = ["O_Soldier_F", "O_Soldier_AR_F", "O_Soldier_GL_F"]; };
+    private _unitClass = selectRandom _pool; 
     
     private _group = createGroup east;
     private _unit = _group createUnit [_unitClass, _spawnPos, [], 0, "NONE"];
@@ -86,4 +96,4 @@ for "_i" from 1 to _civCount do {
     [_group, _zonePos, 100] call bis_fnc_taskPatrol;
 };
 
-diag_log format ["[Iron Mantle] Zone Assets spawned at %1 with Tier %2 | Enemies: %3 | Civilians: %4 | Scaling: %5 | Unit cap: %6", _zonePos, _tier, _enemyCount, _civCount, missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"], missionNamespace getVariable ["MWF_DynamicUnitCap", 100]];
+diag_log format ["[Iron Mantle] Zone Assets spawned at %1 with Tier %2 (effective %3) | Enemies: %4 | Civilians: %5 | Scaling: %6 | Unit cap: %7", _zonePos, _tier, _effectiveTier, _enemyCount, _civCount, missionNamespace getVariable ["MWF_PlayerScalingLabel", "9-16 Players (Medium Group)"], missionNamespace getVariable ["MWF_DynamicUnitCap", 100]];

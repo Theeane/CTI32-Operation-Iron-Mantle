@@ -97,6 +97,9 @@ private _resPreset = missionNamespace getVariable ["MWF_RES_Preset", createHashM
 private _pool = [];
 private _repStrength = (abs _rep) max 25;
 private _maxTier = if (_repStrength >= 90) then {5} else {if (_repStrength >= 75) then {4} else {if (_repStrength >= 55) then {3} else {2}}};
+if (!isNil "MWF_fnc_getEffectiveEnemyTier") then {
+    _maxTier = [_maxTier] call MWF_fnc_getEffectiveEnemyTier;
+};
 for "_tier" from 1 to _maxTier do {
     private _key = format ["Infantry_T%1", _tier];
     private _tierPool = _resPreset getOrDefault [_key, []];

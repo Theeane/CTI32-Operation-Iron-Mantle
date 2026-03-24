@@ -170,7 +170,6 @@ class CfgFunctions {
             class getSideMissionRewardProfile { file = "missions/MWF_fn_getSideMissionRewardProfile.sqf"; };
             class initMissionSystem { file = "missions/MWF_fn_initMissionSystem.sqf"; };
             class refreshMissionBoard { file = "missions/MWF_fn_refreshMissionBoard.sqf"; };
-            class readMissionDefinition { file = "missions/MWF_fn_readMissionDefinition.sqf"; };
             class applyTutorialReward { file = "missions/MWF_fn_applyTutorialReward.sqf"; };
             class sideMissionRuntime { file = "missions/MWF_fn_sideMissionRuntime.sqf"; };
         };
@@ -184,11 +183,6 @@ class CfgFunctions {
             class collectRespawnPoints { file = "ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
             class refreshDataMap { file = "ui/datahub/MWF_fn_refreshDataMap.sqf"; };
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
-        };
-
-        class Cinematics {
-            file = "functions/cinematics";
-            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
         };
 
         class Loadout {
@@ -207,6 +201,7 @@ class CfgFunctions {
             class determineProgressionState { file = "functions/world/MWF_fn_determineProgressionState.sqf"; };
             class determineWorldTier { file = "functions/world/MWF_fn_determineWorldTier.sqf"; };
             class getWorldSnapshot { file = "functions/world/MWF_fn_getWorldSnapshot.sqf"; };
+            class getEffectiveEnemyTier { file = "functions/world/MWF_fn_getEffectiveEnemyTier.sqf"; };
             class markWorldDirty { file = "functions/world/MWF_fn_markWorldDirty.sqf"; };
             class recalculateWorldState { file = "functions/world/MWF_fn_recalculateWorldState.sqf"; };
             class worldManager { file = "functions/world/MWF_fn_worldManager.sqf"; };
@@ -221,7 +216,6 @@ class CfgFunctions {
             class evaluateBaseThreat { file = "functions/threat/MWF_fn_evaluateBaseThreat.sqf"; };
             class getThreatSnapshot { file = "functions/threat/MWF_fn_getThreatSnapshot.sqf"; };
             class markThreatDirty { file = "functions/threat/MWF_fn_markThreatDirty.sqf"; };
-            class opforFobPatrolSystem { file = "functions/threat/MWF_fn_opforFobPatrolSystem.sqf"; };
             class recalculateThreatState { file = "functions/threat/MWF_fn_recalculateThreatState.sqf"; };
             class registerThreatIncident { file = "functions/threat/MWF_fn_registerThreatIncident.sqf"; };
             class selectThreatTargets { file = "functions/threat/MWF_fn_selectThreatTargets.sqf"; };
