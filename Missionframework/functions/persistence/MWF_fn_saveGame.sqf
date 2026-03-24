@@ -166,16 +166,18 @@ private _leaderContext = if (
 
 private _attackState = missionNamespace getVariable ["MWF_FOBAttackState", ["idle"]];
 private _savedAttackState = [];
-if ((_attackState param [0, "idle"]) isEqualTo "active") then {
-    private _remaining = ((_attackState param [4, -1]) - diag_tickTime) max 0;
-    if (_remaining > 0) then {
-        _savedAttackState = [
-            "active",
-            _attackState param [1, []],
-            _attackState param [2, ""],
-            _attackState param [3, ""],
-            _remaining
-        ];
+if !(_blockRebelLeaderPersistence) then {
+    if ((_attackState param [0, "idle"]) isEqualTo "active") then {
+        private _remaining = ((_attackState param [4, -1]) - diag_tickTime) max 0;
+        if (_remaining > 0) then {
+            _savedAttackState = [
+                "active",
+                _attackState param [1, []],
+                _attackState param [2, ""],
+                _attackState param [3, ""],
+                _remaining
+            ];
+        };
     };
 };
 
@@ -235,21 +237,23 @@ private _revealedInfrastructureSites = [];
 } forEach _infrastructureRegistry;
 
 private _damagedFOBs = [];
-{
-    _x params [
-        ["_posASL", [], [[]]],
-        ["_displayName", "", [""]],
-        ["_marker", "", [""]],
-        ["_deadline", -1, [0]],
-        ["_repairCost", 0, [0]],
-        ["_originType", "TRUCK", [""]]
-    ];
+if !(_blockRebelLeaderPersistence) then {
+    {
+        _x params [
+            ["_posASL", [], [[]]],
+            ["_displayName", "", [""]],
+            ["_marker", "", [""]],
+            ["_deadline", -1, [0]],
+            ["_repairCost", 0, [0]],
+            ["_originType", "TRUCK", [""]]
+        ];
 
-    private _remaining = (_deadline - diag_tickTime) max 0;
-    if (_remaining > 0) then {
-        _damagedFOBs pushBack [_posASL, _displayName, _marker, _remaining, _repairCost, _originType];
-    };
-} forEach (missionNamespace getVariable ["MWF_DamagedFOBs", []]);
+        private _remaining = (_deadline - diag_tickTime) max 0;
+        if (_remaining > 0) then {
+            _damagedFOBs pushBack [_posASL, _displayName, _marker, _remaining, _repairCost, _originType];
+        };
+    } forEach (missionNamespace getVariable ["MWF_DamagedFOBs", []]);
+};
 
 profileNamespace setVariable ["MWF_Save_HasCampaign", true];
 profileNamespace setVariable ["MWF_Save_ZoneData", _zoneSaveData];

@@ -109,6 +109,12 @@ if (_mode == "DESPAWN") exitWith {
 };
 
 if (_mode == "RESTORE_PENDING") exitWith {
+    if ((missionNamespace getVariable ["MWF_EndgameActive", false]) || (missionNamespace getVariable ["MWF_EndgameCompleted", false])) exitWith {
+        missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
+        diag_log "[MWF Rebel] Pending damaged FOB restore skipped because endgame is active or completed.";
+        false
+    };
+
     private _pending = +(missionNamespace getVariable ["MWF_PendingDamagedFOBs", []]);
     if (_pending isEqualTo []) exitWith {false};
 

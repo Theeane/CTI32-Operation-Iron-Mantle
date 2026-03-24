@@ -163,12 +163,14 @@ missionNamespace setVariable ["MWF_RebelLeaderSettlementCount", [profileNamespac
 
 private _savedEndgameCompleted = profileNamespace getVariable ["MWF_Save_EndgameCompleted", false];
 private _savedRebelLeaderContext = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_RebelLeaderContext", []] };
+private _savedFOBAttackState = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_FOBAttackState", []] };
 private _savedRebelLeaderRespawnState = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_RebelLeaderRespawnState", []] };
+private _savedDamagedFOBs = if (_savedEndgameCompleted) then { [] } else { profileNamespace getVariable ["MWF_Save_DamagedFOBs", []] };
 
 missionNamespace setVariable ["MWF_PendingRebelLeaderContext", _savedRebelLeaderContext, true];
-missionNamespace setVariable ["MWF_PendingFOBAttackState", profileNamespace getVariable ["MWF_Save_FOBAttackState", []], true];
+missionNamespace setVariable ["MWF_PendingFOBAttackState", _savedFOBAttackState, true];
 missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", _savedRebelLeaderRespawnState, true];
-missionNamespace setVariable ["MWF_PendingDamagedFOBs", profileNamespace getVariable ["MWF_Save_DamagedFOBs", []], true];
+missionNamespace setVariable ["MWF_PendingDamagedFOBs", _savedDamagedFOBs, true];
 missionNamespace setVariable ["MWF_RebelLeaderEventActive", false, true];
 missionNamespace setVariable ["MWF_ActiveRebelLeader", objNull, true];
 missionNamespace setVariable ["MWF_RebelLeaderContext", [], true];

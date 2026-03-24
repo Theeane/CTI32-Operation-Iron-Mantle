@@ -291,6 +291,14 @@ if (_mode == "TERMINAL_DESTROYED") exitWith {
 if (_mode == "RESTORE_PENDING") exitWith {
     if (!isServer) exitWith {};
 
+    if ((missionNamespace getVariable ["MWF_EndgameActive", false]) || (missionNamespace getVariable ["MWF_EndgameCompleted", false])) exitWith {
+        missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+        missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+        missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
+        missionNamespace setVariable ["MWF_isUnderAttack", false, true];
+        diag_log "[MWF Rebel] Pending FOB attack restore skipped because endgame is active or completed.";
+    };
+
     private _pending = missionNamespace getVariable ["MWF_PendingFOBAttackState", []];
     if (_pending isEqualType [] && {count _pending >= 5}) then {
         missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];

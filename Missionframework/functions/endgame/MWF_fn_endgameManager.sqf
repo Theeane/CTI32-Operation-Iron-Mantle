@@ -199,6 +199,18 @@ private _clearServerState = {
     missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
     missionNamespace setVariable ["MWF_RebelLeaderRespawnState", [], true];
     missionNamespace setVariable ["MWF_PendingRebelLeaderRespawnState", [], true];
+    missionNamespace setVariable ["MWF_FOBAttackState", ["idle"], true];
+    missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+    missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
+    missionNamespace setVariable ["MWF_isUnderAttack", false, true];
+
+    {
+        private _terminal = _x param [1, objNull];
+        if (!isNull _terminal) then {
+            _terminal setVariable ["MWF_isUnderAttack", false, true];
+            _terminal allowDamage false;
+        };
+    } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
 
     missionNamespace setVariable ["MWF_EndgameLeader", objNull, true];
     missionNamespace setVariable ["MWF_EndgameLeaderGroup", grpNull, true];
