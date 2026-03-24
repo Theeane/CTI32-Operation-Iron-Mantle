@@ -60,6 +60,9 @@ if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;
 [] call MWF_fnc_threatManager;
+if (!isNil "MWF_fnc_opforFobPatrolSystem") then {
+    ["INIT"] call MWF_fnc_opforFobPatrolSystem;
+};
 [] spawn MWF_fnc_economy;
 [] call MWF_fnc_initMissionSystem;
 

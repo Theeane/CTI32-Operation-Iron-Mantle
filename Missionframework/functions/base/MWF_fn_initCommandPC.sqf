@@ -19,7 +19,7 @@ _laptop allowDamage false;
 private _condOpenWar = "(missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR'";
 private _condPeace = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
 private _condDamaged = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && !(_target getVariable ['MWF_isUnderAttack', false])";
+private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
 private _condAttack = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_isUnderAttack', false])";
 
 _laptop addAction [
@@ -100,8 +100,16 @@ _laptop addAction [
         private _displayName = _target getVariable ['MWF_FOB_DisplayName', 'FOB'];
         private _state = missionNamespace getVariable ['MWF_FOBAttackState', ['idle']];
         private _remainingText = "Unknown";
+        private _remaining = -1;
         if ((_state param [0, 'idle']) isEqualTo 'active') then {
-            private _remaining = ((_state param [4, diag_tickTime]) - diag_tickTime) max 0;
+            _remaining = ((_state param [4, diag_tickTime]) - diag_tickTime) max 0;
+        } else {
+            private _localEndAt = _target getVariable ['MWF_FOB_AttackEndAt', -1];
+            if (_localEndAt >= 0) then {
+                _remaining = (_localEndAt - diag_tickTime) max 0;
+            };
+        };
+        if (_remaining >= 0) then {
             private _minutes = floor (_remaining / 60);
             private _seconds = floor (_remaining mod 60);
             _remainingText = if (_minutes > 0) then {
@@ -110,7 +118,7 @@ _laptop addAction [
                 format ['%1s', _seconds]
             };
         };
-        hint format ["%1 is currently under attack. This FOB computer is locked until the assault ends.\n\nRemaining: %2\n\nThe MOB and other FOB computers remain usable.", _displayName, _remainingText];
+        hint format ["%1 is currently under attack. This FOB computer is locked until the assault ends.\n\nRemaining: %2\n\nIntel turn-in remains available during the assault. The MOB and other FOB computers remain usable.", _displayName, _remainingText];
     },
     nil, 6, true, true, "", _condAttack, 5
 ];

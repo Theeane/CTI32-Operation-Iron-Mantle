@@ -25,7 +25,8 @@ private _rebuilt = [];
         createMarker [_newMarkerName, getPosATL _terminal];
         _newMarkerName setMarkerType "b_hq";
         _newMarkerName setMarkerText _displayName;
-        _newMarkerName setMarkerColor "ColorBLUFOR";
+        private _markerColor = _terminal getVariable ["MWF_FOB_MarkerColor", "ColorBLUFOR"];
+        _newMarkerName setMarkerColor _markerColor;
 
         _terminal setVariable ["MWF_FOB_Marker", _newMarkerName, true];
         _rebuilt pushBack [_newMarkerName, _terminal, _displayName, _originType];

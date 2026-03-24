@@ -221,6 +221,7 @@ class CfgFunctions {
             class evaluateBaseThreat { file = "functions/threat/MWF_fn_evaluateBaseThreat.sqf"; };
             class getThreatSnapshot { file = "functions/threat/MWF_fn_getThreatSnapshot.sqf"; };
             class markThreatDirty { file = "functions/threat/MWF_fn_markThreatDirty.sqf"; };
+            class opforFobPatrolSystem { file = "functions/threat/MWF_fn_opforFobPatrolSystem.sqf"; };
             class recalculateThreatState { file = "functions/threat/MWF_fn_recalculateThreatState.sqf"; };
             class registerThreatIncident { file = "functions/threat/MWF_fn_registerThreatIncident.sqf"; };
             class selectThreatTargets { file = "functions/threat/MWF_fn_selectThreatTargets.sqf"; };

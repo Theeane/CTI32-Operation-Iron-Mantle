@@ -259,6 +259,40 @@ if (isNil { missionNamespace getVariable "MWF_isUnderAttack" }) then {
     missionNamespace setVariable ["MWF_isUnderAttack", false, true];
 };
 
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBState" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBState", ["idle"], true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBCooldownUntil" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBCooldownUntil", 0, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBNextCheckAt" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBNextCheckAt", diag_tickTime + 120, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBTrackedGroups" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBTrackedGroups", [], true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBAttackOfficer" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBAttackOfficer", objNull, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBPatrolCheckInterval" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBPatrolCheckInterval", 600, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBPatrolCooldown" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBPatrolCooldown", 1800, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBPrepDuration" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBPrepDuration", 1800, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBAttackDuration" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBAttackDuration", 900, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBReportDelay" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBReportDelay", 30, true];
+};
+if (isNil { missionNamespace getVariable "MWF_OPFORFOBPatrolSpawnDistance" }) then {
+    missionNamespace setVariable ["MWF_OPFORFOBPatrolSpawnDistance", 3000, true];
+};
+
 if (isNil { missionNamespace getVariable "MWF_PendingRebelLeaderContext" }) then {
     missionNamespace setVariable ["MWF_PendingRebelLeaderContext", [], true];
 };
