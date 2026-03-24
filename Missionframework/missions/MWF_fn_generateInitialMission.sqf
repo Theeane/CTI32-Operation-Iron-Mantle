@@ -51,13 +51,14 @@ switch (_stage) do {
             ["SUPPLY_RUN", "FOB deployed"] call MWF_fnc_setCampaignPhase;
         } else {
             missionNamespace setVariable ["MWF_Campaign_Phase", "SUPPLY_RUN", true];
+            missionNamespace setVariable ["MWF_current_stage", 2, true];
         };
 
         [
             west,
             "task_supply_run",
             [
-                "We are low on resources. Recover the nearby supply target and bring it back. Civilian clothing keeps you hidden only if you stay unarmed and wear no vest. Completing the run undercover grants bonus Intel.",
+                "We are low on resources. Recover the nearby supply target and bring it back to the deployed FOB. Civilian clothing keeps you hidden only if you stay unarmed and wear no vest. Completing the run undercover grants bonus Intel.",
                 "Conduct Supply Run",
                 ""
             ],
@@ -70,6 +71,13 @@ switch (_stage) do {
         ] call BIS_fnc_taskCreate;
 
         missionNamespace setVariable ["MWF_current_stage", 2, true];
+
+        if (!(missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false]) && {!(missionNamespace getVariable ["MWF_Tutorial_Running", false])}) then {
+            [] execVM "SideMissions/tutorial/TutorialMission.sqf";
+            diag_log "[MWF Tutorial] Supply-run runtime started.";
+        } else {
+            diag_log "[MWF Tutorial] Supply-run runtime already running or complete; stage 2 task refreshed only.";
+        };
     };
 
     case 3: {

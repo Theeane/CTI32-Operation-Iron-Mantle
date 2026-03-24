@@ -46,7 +46,21 @@ private _assetSiren    = missionNamespace getVariable ["MWF_FOB_Asset_Siren", "L
 private _assetLocker   = missionNamespace getVariable ["MWF_FOB_Asset_Locker", "Prop_Locker_01_F"];
 private _assetLamp     = missionNamespace getVariable ["MWF_FOB_Asset_Lamp", ""];
 
+if (!_isRestore) then {
+    private _canDeploy = ["CAN_DEPLOY", [ASLToATL _posAsl]] call MWF_fnc_baseManager;
+    if (!_canDeploy) exitWith {
+        if (!isNull _sourceObject) then {
+            _sourceObject setVariable ["MWF_FOB_PlacementInProgress", false, true];
+        };
+        diag_log format ["[MWF FOB] Deployment rejected at %1.", _posAsl];
+        objNull
+    };
+};
+
 if (!isNull _sourceObject) then {
+    if (_sourceObject == (missionNamespace getVariable ["MWF_InitialFOBAssetRef", objNull])) then {
+        missionNamespace setVariable ["MWF_InitialFOBAssetRef", objNull, true];
+    };
     deleteVehicle _sourceObject;
 };
 
@@ -157,16 +171,13 @@ if (!_isRestore) then {
 diag_log format ["[MWF FOB] %1 deployed at %2 (origin: %3, marker: %4).", _resolvedName, _posAsl, _originType, _markerName];
 
 if (!_isRestore) then {
-    [] spawn {
-        uiSleep 10;
+    _laptop setVariable ["MWF_FOB_PlacementInProgress", false, true];
 
-        private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
-        if (_currentStage == 1) then {
-            [2] call MWF_fnc_generateInitialMission;
-            diag_log "[MWF FOB] Tutorial mission advanced to post-deploy stage.";
-        } else {
-            diag_log format ["[MWF FOB] Tutorial mission post-deploy trigger skipped. Current stage: %1.", _currentStage];
-        };
+    private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+    private _currentStage = missionNamespace getVariable ["MWF_current_stage", 0];
+    if (_campaignPhase isEqualTo "TUTORIAL" || {_currentStage <= 1}) then {
+        [2] call MWF_fnc_generateInitialMission;
+        diag_log "[MWF FOB] Tutorial mission advanced to supply-run stage.";
     };
 };
 

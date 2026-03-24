@@ -33,7 +33,15 @@ private _fnc_isUnitUndercoverForTutorial = {
 };
 
 // === BASE ===
-private _fob = missionNamespace getVariable ["MWF_MainBase", objNull];
+private _registry = missionNamespace getVariable ["MWF_FOB_Registry", []];
+private _liveFobEntry = _registry select {
+    !isNull (_x param [1, objNull])
+};
+private _fob = if (_liveFobEntry isEqualTo []) then {
+    missionNamespace getVariable ["MWF_MainBase", objNull]
+} else {
+    (_liveFobEntry select 0) param [1, objNull]
+};
 private _fobPos = if (!isNull _fob) then { getPosATL _fob } else { getMarkerPos "respawn_west" };
 
 if (_fobPos isEqualTo [0,0,0]) exitWith {
@@ -129,10 +137,6 @@ if (!isNull _driver && {_driver in allPlayers}) then {
 private _undercover = [_carrier] call _fnc_isUnitUndercoverForTutorial;
 missionNamespace setVariable ["MWF_Tutorial_LastCompletionUndercover", _undercover, true];
 
-// === APPLY REWARD (CENTRAL SYSTEM) ===
-[_undercover] call MWF_fnc_applyTutorialReward;
-
 // === PROGRESSION ===
-missionNamespace setVariable ["MWF_Tutorial_SupplyRunDone", true, true];
-["SUPPLY_RUN", "Tutorial complete"] call MWF_fnc_setCampaignPhase;
+[3, _undercover] call MWF_fnc_generateInitialMission;
 missionNamespace setVariable ["MWF_Tutorial_Running", false, true];

@@ -21,15 +21,20 @@ _truck setVariable ["MWF_FOB_Type", _originType, true];
     "<t color='#00FF00'>Deploy FOB</t>",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
-    "_this distance _target < 10 && speed _target < 1 && (['CAN_DEPLOY', [getPosATL _target]] call MWF_fnc_baseManager)",
+    "_this distance _target < 10 && speed _target < 1 && !(_target getVariable ['MWF_FOB_PlacementInProgress', false])",
     "_caller distance _target < 10",
     {},
     {},
     {
         params ["_target", "_caller"];
-        [_target] remoteExec ["MWF_fnc_deployFOB", 2];
+        _target setVariable ["MWF_FOB_PlacementInProgress", true, true];
+        [_target] remoteExec ["MWF_fnc_startFOBPlacement", _caller];
     },
-    { hint "Deployment aborted."; },
+    {
+        params ["_target"];
+        _target setVariable ["MWF_FOB_PlacementInProgress", false, true];
+        hint "Deployment aborted.";
+    },
     [],
     10,
     0,
