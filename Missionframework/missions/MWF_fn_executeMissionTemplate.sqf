@@ -49,10 +49,6 @@ if (_category isEqualTo "") then { _category = _slotCategory; };
 if (_difficulty isEqualTo "") then { _difficulty = _slotDifficulty; };
 if (_missionId <= 0) then { _missionId = _slotMissionId; };
 
-if (_missionKey isEqualTo "") exitWith {
-    diag_log "[MWF Missions] executeMissionTemplate received invalid slot data without a mission key.";
-};
-
 private _setSlotState = {
     params ["_targetSlotIndex", "_newState"];
 
@@ -64,6 +60,33 @@ private _setSlotState = {
         _boardSlots set [_entryIndex, _entry];
         missionNamespace setVariable ["MWF_MissionBoardSlots", _boardSlots, true];
     };
+};
+
+private _removeActiveMission = {
+    params ["_targetMissionKey"];
+
+    private _activeMissions = + (missionNamespace getVariable ["MWF_ActiveSideMissions", []]);
+    private _missionIndex = _activeMissions findIf { (_x # 0) isEqualTo _targetMissionKey };
+    if (_missionIndex >= 0) then {
+        _activeMissions deleteAt _missionIndex;
+        missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
+    };
+};
+
+private _deleteTask = {
+    params ["_targetTaskId"];
+
+    if !(_targetTaskId isEqualTo "") then {
+        [_targetTaskId] call BIS_fnc_deleteTask;
+    };
+};
+
+
+if (_missionKey isEqualTo "") exitWith {
+    if (_slotIndex >= 0) then {
+        [_slotIndex, "available"] call _setSlotState;
+    };
+    diag_log "[MWF Missions] executeMissionTemplate received invalid slot data without a mission key.";
 };
 
 private _existingMission = (missionNamespace getVariable ["MWF_ActiveSideMissions", []]) findIf {
@@ -164,15 +187,33 @@ _activeMissions pushBack [
 ];
 missionNamespace setVariable ["MWF_ActiveSideMissions", _activeMissions, true];
 
-if (!isNil "MWF_fnc_requestDelayedSave") then {
-    [] call MWF_fnc_requestDelayedSave;
+private _runtimeStarted = true;
+if (!isNil "MWF_fnc_sideMissionRuntime") then {
+    _runtimeStarted = ["START", [_missionKey, _category, _difficulty, _missionId, _position, _zoneName, _taskId, _compositionPath, _missionDefinition]] call MWF_fnc_sideMissionRuntime;
 };
 
-if (!isNil "MWF_fnc_sideMissionRuntime") then {
-    ["START", [_missionKey, _category, _difficulty, _missionId, _position, _zoneName, _taskId, _compositionPath, _missionDefinition]] call MWF_fnc_sideMissionRuntime;
+if !(_runtimeStarted) exitWith {
+    [_missionKey] call _removeActiveMission;
+
+    if (!isNil "MWF_fnc_sideMissionRuntime") then {
+        ["CLEANUP", _missionKey] call MWF_fnc_sideMissionRuntime;
+    };
+
+    [_taskId] call _deleteTask;
+    [_slotIndex, "available"] call _setSlotState;
+
+    diag_log format ["[MWF Missions] Failed to start runtime for %1 (%2/%3/%4) at %5. Mission state rolled back.", _missionKey, _category, _difficulty, _missionId, _zoneName];
+
+    if (!isNull _caller) then {
+        [format ["%1 failed to start near %2. Slot reset.", _missionTitle, _zoneName]] remoteExec ["hint", owner _caller];
+    };
 };
 
 [_slotIndex, "active"] call _setSlotState;
+
+if (!isNil "MWF_fnc_requestDelayedSave") then {
+    [] call MWF_fnc_requestDelayedSave;
+};
 
 private _callerName = if (isNull _caller) then {"unknown"} else {name _caller};
 diag_log format ["[MWF Missions] Activated %1 (%2/%3/%4) by %5 at %6.", _missionKey, _category, _difficulty, _missionId, _callerName, _zoneName];

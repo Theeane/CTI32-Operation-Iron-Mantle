@@ -20,6 +20,9 @@ params [
 
 private _allowed = true;
 private _reason = "";
+private _missionStartInProgress = ((missionNamespace getVariable ["MWF_MissionBoardSlots", []]) findIf {
+    toLower (_x param [9, "available", [""]]) isEqualTo "starting"
+}) >= 0;
 
 switch (toUpper _actionType) do {
     case "MAIN_OPERATIONS": {
@@ -27,19 +30,29 @@ switch (toUpper _actionType) do {
             _allowed = false;
             _reason = "Main operation unavailable: another main operation is already active.";
         } else {
-            private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
-            if !(_activeSideMissions isEqualTo []) then {
+            if (_missionStartInProgress) then {
                 _allowed = false;
-                _reason = "Main operation unavailable: active side mission in progress.";
+                _reason = "Main operation unavailable: side mission startup in progress.";
+            } else {
+                private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
+                if !(_activeSideMissions isEqualTo []) then {
+                    _allowed = false;
+                    _reason = "Main operation unavailable: active side mission in progress.";
+                };
             };
         };
     };
 
     case "MISSION_HUB": {
-        private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
-        if !(_activeSideMissions isEqualTo []) then {
+        if (_missionStartInProgress) then {
             _allowed = false;
-            _reason = "Mission Hub unavailable: side mission already active.";
+            _reason = "Mission Hub unavailable: side mission startup in progress.";
+        } else {
+            private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
+            if !(_activeSideMissions isEqualTo []) then {
+                _allowed = false;
+                _reason = "Mission Hub unavailable: side mission already active.";
+            };
         };
     };
 };

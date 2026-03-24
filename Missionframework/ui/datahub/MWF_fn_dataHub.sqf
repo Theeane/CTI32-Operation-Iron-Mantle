@@ -200,10 +200,14 @@ private _showSelectedEntry = {
             private _description = _meta getOrDefault ["description", ""];
             private _access = ["MISSION_HUB"] call MWF_fnc_validateTerminalAccess;
             private _isAvailable = (_state isEqualTo "available") && (_access param [0, false]);
-            private _statusText = if (_state isEqualTo "active") then {
-                "Active"
-            } else {
-                if (_access param [0, false]) then { "Available" } else { _access param [1, "Unavailable"] };
+            private _statusText = switch (_state) do {
+                case "active": {"Active"};
+                case "starting": {"Starting"};
+                case "completed": {"Completed"};
+                case "missing": {"Missing Template"};
+                default {
+                    if (_access param [0, false]) then { "Available" } else { _access param [1, "Unavailable"] };
+                };
             };
             private _acceptTooltip = if (_isAvailable) then {
                 "Accept this side mission."
