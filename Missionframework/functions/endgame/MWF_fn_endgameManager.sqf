@@ -207,10 +207,17 @@ private _clearServerState = {
     {
         private _terminal = _x param [1, objNull];
         if (!isNull _terminal) then {
+            ["REMOVE", _terminal] remoteExec ["MWF_fnc_fobRepairInteraction", 0, true];
             _terminal setVariable ["MWF_isUnderAttack", false, true];
+            _terminal setVariable ["MWF_FOB_IsDamaged", false, true];
+            _terminal setVariable ["MWF_FOB_RepairCost", 0, true];
+            _terminal setVariable ["MWF_FOB_DespawnDeadline", -1, true];
+            _terminal setVariable ["MWF_FOB_DespawnTicket", "", true];
             _terminal allowDamage false;
+            _terminal setDamage 0;
         };
     } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
+    missionNamespace setVariable ["MWF_DamagedFOBs", [], true];
 
     missionNamespace setVariable ["MWF_EndgameLeader", objNull, true];
     missionNamespace setVariable ["MWF_EndgameLeaderGroup", grpNull, true];
