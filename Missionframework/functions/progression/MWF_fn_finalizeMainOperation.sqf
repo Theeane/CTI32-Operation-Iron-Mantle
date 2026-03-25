@@ -28,7 +28,11 @@ private _cooldownMap = missionNamespace getVariable ["MWF_MainOperationCooldowns
 if (isNil "_cooldownMap" || { !(_cooldownMap isEqualType createHashMap) }) then {
     _cooldownMap = createHashMap;
 };
-_cooldownMap set [_key, serverTime + _cooldownSeconds];
+if (missionNamespace getVariable ["MWF_DebugMode", false]) then {
+    _cooldownMap deleteAt _key;
+} else {
+    _cooldownMap set [_key, serverTime + _cooldownSeconds];
+};
 missionNamespace setVariable ["MWF_MainOperationCooldowns", _cooldownMap, true];
 
 missionNamespace setVariable ["MWF_GrandOperationActive", false, true];

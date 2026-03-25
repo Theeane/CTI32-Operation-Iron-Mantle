@@ -21,7 +21,7 @@ if (_currentTier >= 5) exitWith {
 
 private _cost = _upgradeCosts select _currentTier;
 
-if (_nextTier >= 5 && {!(missionNamespace getVariable ["MWF_Unlock_Tier5", false])}) exitWith {
+if (_nextTier >= 5 && {!( ["TIER5"] call MWF_fnc_hasProgressionAccess )}) exitWith {
     private _msg = "Tier 5 is locked. Complete Apex Predator before upgrading past Tier 4.";
     [_msg] remoteExec ["systemChat", remoteExecutedOwner];
 };

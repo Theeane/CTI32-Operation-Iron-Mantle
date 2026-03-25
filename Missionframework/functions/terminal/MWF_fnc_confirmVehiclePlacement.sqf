@@ -67,9 +67,9 @@ private _hasRequiredUpgradeStructure = {
 };
 
 private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
-    case "HELI": { missionNamespace getVariable ["MWF_Unlock_Heli", false] };
-    case "JETS": { missionNamespace getVariable ["MWF_Unlock_Jets", false] };
-    case "ARMOR": { missionNamespace getVariable ["MWF_Unlock_Armor", false] };
+    case "HELI": { ["HELI"] call MWF_fnc_hasProgressionAccess };
+    case "JETS": { ["JETS"] call MWF_fnc_hasProgressionAccess };
+    case "ARMOR": { ["ARMOR"] call MWF_fnc_hasProgressionAccess };
     default { true };
 };
 if !_unlockSatisfied exitWith {
@@ -77,7 +77,7 @@ if !_unlockSatisfied exitWith {
     false
 };
 
-if (_isTier5 && {!(missionNamespace getVariable ["MWF_Unlock_Tier5", false])}) exitWith {
+if (_isTier5 && {!( ["TIER5"] call MWF_fnc_hasProgressionAccess )}) exitWith {
     ["Vehicle purchase failed. Complete Apex Predator first."] remoteExec ["systemChat", remoteExecutedOwner];
     false
 };

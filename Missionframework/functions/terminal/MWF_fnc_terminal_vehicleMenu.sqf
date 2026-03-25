@@ -70,12 +70,13 @@ private _evaluateEntry = {
 
     private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
     private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
-    private _lockReason = "Ready to build.";
+    private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
+    private _lockReason = if (_debugMode) then {"Ready to build. DEBUG progression override active."} else {"Ready to build."};
     private _isLocked = false;
 
     if (_className isEqualTo "") exitWith { [true, "Empty preset placeholder.", false] };
 
-    if (_isTier5 && {!(missionNamespace getVariable ["MWF_Unlock_Tier5", false])}) then {
+    if (_isTier5 && {!( ["TIER5"] call MWF_fnc_hasProgressionAccess )}) then {
         _isLocked = true;
         _lockReason = "Requires main operation: Apex Predator.";
     };
@@ -83,13 +84,13 @@ private _evaluateEntry = {
     if (!_isLocked) then {
         switch (toUpper _requiredUnlock) do {
             case "ARMOR": {
-                if !(missionNamespace getVariable ["MWF_Unlock_Armor", false]) then {
+                if !(["ARMOR"] call MWF_fnc_hasProgressionAccess) then {
                     _isLocked = true;
                     _lockReason = "Requires main operation: Steel Rain.";
                 };
             };
             case "HELI": {
-                if !(missionNamespace getVariable ["MWF_Unlock_Heli", false]) then {
+                if !(["HELI"] call MWF_fnc_hasProgressionAccess) then {
                     _isLocked = true;
                     _lockReason = "Requires main operation: Sky Guardian.";
                 } else {
@@ -100,7 +101,7 @@ private _evaluateEntry = {
                 };
             };
             case "JETS": {
-                if !(missionNamespace getVariable ["MWF_Unlock_Jets", false]) then {
+                if !(["JETS"] call MWF_fnc_hasProgressionAccess) then {
                     _isLocked = true;
                     _lockReason = "Requires main operation: Point Blank.";
                 } else {

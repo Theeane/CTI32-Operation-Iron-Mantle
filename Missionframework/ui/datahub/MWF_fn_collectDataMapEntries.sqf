@@ -90,9 +90,12 @@ switch (_modeUpper) do {
         private _garageClass = missionNamespace getVariable ["MWF_Virtual_Garage", ""];
         private _heliBuilt = (_heliClass isNotEqualTo "") && {({ typeOf _x isEqualTo _heliClass } count (nearestObjects [_mobPos, [_heliClass], 120])) > 0};
         private _jetBuilt = (_jetClass isNotEqualTo "") && {({ typeOf _x isEqualTo _jetClass } count (nearestObjects [_mobPos, [_jetClass], 120])) > 0};
-        private _heliUnlocked = missionNamespace getVariable ["MWF_Unlock_Heli", false];
-        private _jetUnlocked = missionNamespace getVariable ["MWF_Unlock_Jets", false];
-        private _tier5Unlocked = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
+        private _heliUnlockedReal = missionNamespace getVariable ["MWF_Unlock_Heli", false];
+        private _jetUnlockedReal = missionNamespace getVariable ["MWF_Unlock_Jets", false];
+        private _tier5UnlockedReal = missionNamespace getVariable ["MWF_Unlock_Tier5", false];
+        private _heliUnlocked = ["HELI"] call MWF_fnc_hasProgressionAccess;
+        private _jetUnlocked = ["JETS"] call MWF_fnc_hasProgressionAccess;
+        private _tier5Unlocked = ["TIER5"] call MWF_fnc_hasProgressionAccess;
         private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
         private _isMobContext = _contextType isEqualTo "MOB";
         private _heliBuildCost = if (_heliClass isEqualTo "") then { 0 } else { [_heliClass] call MWF_fnc_getBuildAssetCost };
@@ -163,7 +166,7 @@ switch (_modeUpper) do {
                     ["isUnlocked", _heliUnlocked],
                     ["isBuilt", _heliBuilt],
                     ["statusText", if (!_heliUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_heliBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_isMobContext) then {if (_heliBuilt) then {"Helicopters are now available in the vehicle menu."} else {format ["Place the Helicopter Uplink with ghost placement at the MOB. Cost: %1 Supplies.", _heliBuildCost]}} else {_mobOnlyTooltip}}],
+                    ["tooltipText", if (!_heliUnlocked) then {"Requires main operation: Sky Guardian."} else {if (_isMobContext) then {if (_heliBuilt) then {if (_heliUnlockedReal) then {"Helicopters are now available in the vehicle menu."} else {"DEBUG override active. Helicopters are available for testing now, and Sky Guardian will still grant the normal unlock message when completed."}} else {if (_heliUnlockedReal) then {format ["Place the Helicopter Uplink with ghost placement at the MOB. Cost: %1 Supplies.", _heliBuildCost]} else {format ["DEBUG override active. Place the Helicopter Uplink with ghost placement at the MOB. Cost: %1 Supplies.", _heliBuildCost]}}} else {_mobOnlyTooltip}}],
                     ["actionMode", if (!_heliUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_heliBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
                 ]
             ],
@@ -181,7 +184,7 @@ switch (_modeUpper) do {
                     ["isUnlocked", _jetUnlocked],
                     ["isBuilt", _jetBuilt],
                     ["statusText", if (!_jetUnlocked) then {"Locked"} else {if (_isMobContext) then {if (_jetBuilt) then {"Ready"} else {"Unlocked - Build Required"}} else {"MOB Only"}}],
-                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_isMobContext) then {if (_jetBuilt) then {"Aircraft are now available in the vehicle menu."} else {format ["Place the Aircraft Control building with ghost placement at the MOB. Cost: %1 Supplies.", _jetBuildCost]}} else {_mobOnlyTooltip}}],
+                    ["tooltipText", if (!_jetUnlocked) then {"Requires main operation: Point Blank."} else {if (_isMobContext) then {if (_jetBuilt) then {if (_jetUnlockedReal) then {"Aircraft are now available in the vehicle menu."} else {"DEBUG override active. Aircraft are available for testing now, and Point Blank will still grant the normal unlock message when completed."}} else {if (_jetUnlockedReal) then {format ["Place the Aircraft Control building with ghost placement at the MOB. Cost: %1 Supplies.", _jetBuildCost]} else {format ["DEBUG override active. Place the Aircraft Control building with ghost placement at the MOB. Cost: %1 Supplies.", _jetBuildCost]}}} else {_mobOnlyTooltip}}],
                     ["actionMode", if (!_jetUnlocked) then {"LOCKED"} else {if (_isMobContext) then {if (_jetBuilt) then {"VEHICLE_MENU"} else {"BASE_BUILDING"}} else {"LOCKED"}}]
                 ]
             ],
@@ -197,7 +200,7 @@ switch (_modeUpper) do {
                     ["isUnlocked", _tier5Unlocked],
                     ["isBuilt", _tier5Unlocked && {_currentTier >= 5}],
                     ["statusText", if (!_tier5Unlocked) then {"Locked"} else {if (_currentTier >= 5) then {"Complete"} else {"Ready"}}],
-                    ["tooltipText", if (!_tier5Unlocked) then {"Requires main operation: Apex Predator."} else {if (_currentTier >= 5) then {"Tier 5 base progression is active. Tier 5 preset entries now appear at the bottom of the vehicle menu categories."} else {"Use [ UPGRADE BASE TIER ] at the Command Network to advance from Tier 4 to Tier 5."}}],
+                    ["tooltipText", if (!_tier5Unlocked) then {"Requires main operation: Apex Predator."} else {if (_currentTier >= 5) then {if (_tier5UnlockedReal) then {"Tier 5 base progression is active. Tier 5 preset entries now appear at the bottom of the vehicle menu categories."} else {"DEBUG override active. Tier 5 systems are available for testing now, and Apex Predator will still grant the normal unlock message when completed."}} else {if (_tier5UnlockedReal) then {"Use [ UPGRADE BASE TIER ] at the Command Network to advance from Tier 4 to Tier 5."} else {"DEBUG override active. You may upgrade into Tier 5 for testing now, and Apex Predator will still grant the normal unlock message when completed."}}}],
                     ["actionMode", if (_tier5Unlocked) then {"TIER5_INFO"} else {"LOCKED"}]
                 ]
             ]

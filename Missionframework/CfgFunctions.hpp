@@ -57,6 +57,7 @@ class CfgFunctions {
             file = "functions";
             class addIntel { file = "functions/compat/MWF_fn_addIntel.sqf"; };
             class checkUndercover { file = "functions/MWF_fnc_checkUndercover.sqf"; };
+            class hasProgressionAccess { file = "functions/MWF_fn_hasProgressionAccess.sqf"; };
             class globalStateManager { file = "functions/MWF_fnc_globalStateManager.sqf"; };
             class interruptSensitiveInteraction { file = "functions/MWF_fn_interruptSensitiveInteraction.sqf"; };
         };
@@ -183,7 +184,6 @@ class CfgFunctions {
             class collectRespawnPoints { file = "ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
             class refreshDataMap { file = "ui/datahub/MWF_fn_refreshDataMap.sqf"; };
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
-            class openGuide { file = "ui/guide/MWF_fn_openGuide.sqf"; };
         };
 
         class Loadout {
@@ -202,7 +202,6 @@ class CfgFunctions {
             class determineProgressionState { file = "functions/world/MWF_fn_determineProgressionState.sqf"; };
             class determineWorldTier { file = "functions/world/MWF_fn_determineWorldTier.sqf"; };
             class getWorldSnapshot { file = "functions/world/MWF_fn_getWorldSnapshot.sqf"; };
-            class getEffectiveEnemyTier { file = "functions/world/MWF_fn_getEffectiveEnemyTier.sqf"; };
             class markWorldDirty { file = "functions/world/MWF_fn_markWorldDirty.sqf"; };
             class recalculateWorldState { file = "functions/world/MWF_fn_recalculateWorldState.sqf"; };
             class worldManager { file = "functions/world/MWF_fn_worldManager.sqf"; };

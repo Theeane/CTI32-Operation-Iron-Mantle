@@ -59,8 +59,8 @@ private _isHeliUpgrade = (_heliClass isNotEqualTo "") && {_className isEqualTo _
 private _isJetUpgrade = (_jetClass isNotEqualTo "") && {_className isEqualTo _jetClass};
 private _isGarageUpgrade = (_garageClass isNotEqualTo "") && {_className isEqualTo _garageClass};
 
-if (_isHeliUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Heli", false])}) exitWith { ["Helicopter Uplink is locked. Complete Sky Guardian first."] call _notifyBuilder; };
-if (_isJetUpgrade && {!(missionNamespace getVariable ["MWF_Unlock_Jets", false])}) exitWith { ["Aircraft Control is locked. Complete Point Blank first."] call _notifyBuilder; };
+if (_isHeliUpgrade && {!( ["HELI"] call MWF_fnc_hasProgressionAccess )}) exitWith { ["Helicopter Uplink is locked. Complete Sky Guardian first."] call _notifyBuilder; };
+if (_isJetUpgrade && {!( ["JETS"] call MWF_fnc_hasProgressionAccess )}) exitWith { ["Aircraft Control is locked. Complete Point Blank first."] call _notifyBuilder; };
 
 private _resolveGarageBase = {
     params ["_garagePos"];

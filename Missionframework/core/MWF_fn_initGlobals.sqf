@@ -30,24 +30,9 @@ private _supplyTimer = missionNamespace getVariable [
     ["MWF_Param_SupplyTimer", 10] call BIS_fnc_getParamValue
 ];
 
-private _threatGainMultiplier = missionNamespace getVariable [
-    "MWF_Locked_ThreatGainMultiplier",
-    ["MWF_Param_ThreatGainMultiplier", 1] call BIS_fnc_getParamValue
-];
-
-private _threatDecayMultiplier = missionNamespace getVariable [
-    "MWF_Locked_ThreatDecayMultiplier",
-    ["MWF_Param_ThreatDecayMultiplier", 1] call BIS_fnc_getParamValue
-];
-
-private _worldTierMultiplier = missionNamespace getVariable [
-    "MWF_Locked_WorldTierMultiplier",
-    ["MWF_Param_WorldTierMultiplier", 1] call BIS_fnc_getParamValue
-];
-
-private _endgameMapControlRequired = missionNamespace getVariable [
-    "MWF_Locked_EndgameMapControlRequired",
-    ["MWF_Param_EndgameMapControl", 75] call BIS_fnc_getParamValue
+private _heatMult = missionNamespace getVariable [
+    "MWF_Locked_NotorietyMultiplier",
+    ["MWF_Param_NotorietyMultiplier", 1] call BIS_fnc_getParamValue
 ];
 
 private _maxFOBs = missionNamespace getVariable [
@@ -55,6 +40,10 @@ private _maxFOBs = missionNamespace getVariable [
     ["MWF_Param_MaxFOBs", 5] call BIS_fnc_getParamValue
 ];
 
+private _sideMissionTemplateLimit = missionNamespace getVariable [
+    "MWF_Locked_SideMissionTemplateLimit",
+    ["MWF_Param_SideMissionTemplateLimit", 24] call BIS_fnc_getParamValue
+];
 
 private _initialFOBType = missionNamespace getVariable [
     "MWF_Locked_InitialFOBType",
@@ -209,7 +198,7 @@ if (isNil { missionNamespace getVariable "MWF_LegacyZoneInformantsEnabled" }) th
 if (isNil { missionNamespace getVariable "MWF_CompletedMainOperations" }) then {
     missionNamespace setVariable ["MWF_CompletedMainOperations", [], true];
 };
-missionNamespace setVariable ["MWF_EndgameMapControlRequired", _endgameMapControlRequired, true];
+missionNamespace setVariable ["MWF_EndgameMapControlRequired", missionNamespace getVariable ["MWF_EndgameMapControlRequired", 75], true];
 missionNamespace setVariable ["MWF_EndgameRequiredDestroyedHQs", missionNamespace getVariable ["MWF_EndgameRequiredDestroyedHQs", 1], true];
 missionNamespace setVariable ["MWF_EndgameRequiredDestroyedRoadblocks", missionNamespace getVariable ["MWF_EndgameRequiredDestroyedRoadblocks", 1], true];
 missionNamespace setVariable ["MWF_EndgameRequiredCompletedMainOps", missionNamespace getVariable ["MWF_EndgameRequiredCompletedMainOps", 1], true];
@@ -306,16 +295,9 @@ missionNamespace setVariable ["MWF_Intel", _resolvedIntel, true];
 missionNamespace setVariable ["MWF_Supply", _resolvedSupplies, true];
 missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
 missionNamespace setVariable ["MWF_Economy_SupplyInterval", _supplyTimer, true];
-missionNamespace setVariable ["MWF_Economy_HeatMult", missionNamespace getVariable ["MWF_Economy_HeatMult", 1], true];
-missionNamespace setVariable ["MWF_ThreatGainMultiplier", _threatGainMultiplier, true];
-missionNamespace setVariable ["MWF_ThreatDecayMultiplier", _threatDecayMultiplier, true];
-missionNamespace setVariable ["MWF_ThreatDecayPerMinute", 2 * (_threatDecayMultiplier max 0), true];
-missionNamespace setVariable ["MWF_WorldTierMultiplier", _worldTierMultiplier, true];
-missionNamespace setVariable ["MWF_Locked_ThreatGainMultiplier", _threatGainMultiplier, true];
-missionNamespace setVariable ["MWF_Locked_ThreatDecayMultiplier", _threatDecayMultiplier, true];
-missionNamespace setVariable ["MWF_Locked_WorldTierMultiplier", _worldTierMultiplier, true];
-missionNamespace setVariable ["MWF_Locked_EndgameMapControlRequired", _endgameMapControlRequired, true];
+missionNamespace setVariable ["MWF_Economy_HeatMult", _heatMult, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _maxFOBs, true];
+missionNamespace setVariable ["MWF_Param_SideMissionTemplateLimit", (_sideMissionTemplateLimit max 9) min 99, true];
 missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];
@@ -323,7 +305,6 @@ missionNamespace setVariable ["MWF_LockedBuildingMode", _buildingMode, true];
 missionNamespace setVariable ["MWF_SpawnDistance", _sessionSpawnDistance, true];
 missionNamespace setVariable ["MWF_PlayerScalingBracket", _sessionScalingBracket, true];
 missionNamespace setVariable ["MWF_PlayerScalingLabel", _scalingLabel, true];
-missionNamespace setVariable ["MWF_UndercoverRedDecaySeconds", missionNamespace getVariable ["MWF_UndercoverRedDecaySeconds", 45], true];
 missionNamespace setVariable ["MWF_DynamicUnitCap", _sessionUnitCap, true];
 missionNamespace setVariable ["MWF_DebugMode", _sessionDebugMode, true];
 
@@ -343,7 +324,7 @@ if (_sessionDebugMode && {isServer}) then {
             missionNamespace setVariable ["MWF_DebugCommanderGuardStarted", false, true];
         };
     };
-    diag_log "[MWF Debug] Debug mode active. Supplies/Intel forced to 9999 and commander invulnerability guard enabled.";
+    diag_log "[MWF Debug] Debug mode active. Supplies/Intel forced to 9999, commander invulnerability guard enabled, and main-operation progression gates are bypassed for testing while real unlock feedback remains available.";
 };
 
 if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo "OPEN_WAR") then {
