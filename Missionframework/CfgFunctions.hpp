@@ -278,6 +278,11 @@ class CfgFunctions {
         };
 
 
+        class Cinematics {
+            file = "functions/cinematics";
+            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
+        };
+
         class Audio {
             file = "functions/endgame";
             class playSharedMusic { file = "functions/endgame/MWF_fn_playSharedMusic.sqf"; };
