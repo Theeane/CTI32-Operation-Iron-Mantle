@@ -8,6 +8,10 @@
     Re-attaches the named laptop and base lamp to the nearest MOB camping table,
     keeps them non-destructible/non-simulated, and exposes stable missionNamespace
     references for later systems.
+
+    Notes:
+    - The laptop and lamp use their default model pitch/roll. Only yaw is aligned to the table.
+    - Previous vector alignment forced bad transforms and placed the props under/against the table.
 */
 
 if (!isServer) exitWith { objNull };
@@ -59,8 +63,8 @@ if (!isNull _terminal) then {
     _terminal enableSimulationGlobal false;
 
     if (!isNull _table) then {
-        _terminal attachTo [_table, [0, 0, 0.60]];
-        _terminal setVectorDirAndUp [vectorDir _table, vectorUp _table];
+        _terminal attachTo [_table, [0.00, 0.03, 0.36]];
+        _terminal setDir ((getDir _table) + 180);
         _terminal setVariable ["MWF_AttachedTable", _table, true];
     };
 
@@ -73,8 +77,8 @@ if (!isNull _lamp) then {
     _lamp enableSimulationGlobal false;
 
     if (!isNull _table) then {
-        _lamp attachTo [_table, [-0.28, 0.05, -0.08]];
-        _lamp setVectorDirAndUp [vectorDir _table, vectorUp _table];
+        _lamp attachTo [_table, [-0.24, 0.08, 0.18]];
+        _lamp setDir (getDir _table);
     };
 
     missionNamespace setVariable ["MWF_Base_Light", _lamp, true];
