@@ -20,7 +20,7 @@ class MWF_BuildMenu {
     onLoad = "['LightVehicles'] spawn MWF_fnc_updateBuyCategory;";
 
     class ControlsBackground {
-        class Background: GUIBack {
+        class Background: IGUIBack {
             idc = -1;
             x = 0.35 * safezoneW + safezoneX;
             y = 0.25 * safezoneH + safezoneY;
