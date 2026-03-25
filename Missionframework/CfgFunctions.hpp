@@ -105,6 +105,7 @@ class CfgFunctions {
             class executeRepack { file = "functions/base/MWF_fn_executeRepack.sqf"; };
             class initCommandPC { file = "functions/base/MWF_fn_initCommandPC.sqf"; };
             class initFOB { file = "functions/base/MWF_fn_initFOB.sqf"; };
+            class initMOBAssets { file = "functions/base/MWF_fn_initMOBAssets.sqf"; };
             class initMobileRespawn { file = "functions/base/MWF_fn_initMobileRespawn.sqf"; };
             class vehicleIntelTransfer { file = "functions/base/MWF_fn_vehicleIntelTransfer.sqf"; };
             class spawnInitialFOBAsset { file = "functions/base/MWF_fn_spawnInitialFOBAsset.sqf"; };

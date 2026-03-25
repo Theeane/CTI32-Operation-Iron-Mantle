@@ -8,26 +8,19 @@
     then waits for server bootstrap before local/client startup continues.
 */
 
-// Always disable Arma engine saves/autosaves.
-// MWF uses its own persistence system and debug mode must never be able to save through Save & Exit.
 enableSaving [false, false];
 diag_log "[MWF] Engine saving disabled. Save & Exit must not create Arma save data for this mission.";
 
-// Wait for server to finish its critical boot sequence (Presets, Economy, Systems).
-// This ensures that global variables like MWF_Supplies are available before local UI/scripts start.
-waitUntil { missionNamespace getVariable ["MWF_ServerInitialized", false] };
+private _localBootDeadline = diag_tickTime + 90;
+waitUntil {
+    uiSleep 0.25;
+    (missionNamespace getVariable ["MWF_ServerInitialized", false]) ||
+    {diag_tickTime >= _localBootDeadline}
+};
 
-// Log start of local initialization.
+if (!(missionNamespace getVariable ["MWF_ServerInitialized", false])) then {
+    diag_log "[MWF] WARNING: init.sqf timed out waiting for server-ready flag. Continuing locally.";
+};
+
 diag_log "[MWF] INFO: Local initialization started.";
-
-/* NOTE:
-    Individual function preprocessing (preprocessFileLineNumbers) has been removed.
-    All functions are now handled via CfgFunctions.hpp using the 'MWF' tag.
-    Access them using: MWF_fnc_functionName
-*/
-
-// Client-side setup or local variables can be initialized here.
-// (Keep this clean to avoid conflicts with initPlayerLocal.sqf)
-
-// Log completion.
 diag_log "[MWF] SUCCESS: Local initialization complete.";

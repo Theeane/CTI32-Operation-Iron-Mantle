@@ -5,8 +5,8 @@
 
     Description:
     Authoritative server boot chain.
-    Brings persistence, zones, world, threat, economy, mission, FOB, and rebel layers online
-    before exposing the framework as ready to clients.
+    Starts the critical runtime first so clients are never hard-locked behind optional
+    restore/bootstrap work, then runs the remaining startup passes asynchronously.
 */
 
 if (!isServer) exitWith {};
@@ -14,10 +14,24 @@ if (missionNamespace getVariable ["MWF_ServerBootRunning", false]) exitWith {};
 
 missionNamespace setVariable ["MWF_ServerBootRunning", true, true];
 missionNamespace setVariable ["MWF_ServerInitialized", false, true];
+missionNamespace setVariable ["MWF_ServerBootStage", "BOOT_START", true];
+missionNamespace setVariable ["MWF_ServerSubsystemsReady", false, true];
 
-diag_log "[MWF] INFO: Server-side initialization started.";
+private _setBootStage = {
+    params ["_stage"];
+    missionNamespace setVariable ["MWF_ServerBootStage", _stage, true];
+    diag_log format ["[MWF] BOOT: %1", _stage];
+};
 
-[] call MWF_fnc_initGlobals;
+private _runStep = {
+    params ["_label", "_code"];
+    [_label] call _setBootStage;
+    diag_log format ["[MWF] STEP START: %1", _label];
+    call _code;
+    diag_log format ["[MWF] STEP END: %1", _label];
+};
+
+["INIT_GLOBALS", { [] call MWF_fnc_initGlobals; }] call _runStep;
 
 private _mobObject = missionNamespace getVariable ["MWF_MOB", objNull];
 missionNamespace setVariable ["MWF_MainBase", _mobObject, true];
@@ -46,91 +60,133 @@ if (markerColor _mainRespawnMarker isNotEqualTo "") then {
 } else {
     diag_log format ["[MWF] WARNING: Main Operating Base respawn marker %1 was not found during server init.", _mainRespawnMarker];
 };
-[] call MWF_fnc_initSystems;
-[] call MWF_fnc_initPersistence;
-[] call MWF_fnc_loadGame;
-[] call MWF_fnc_initCampaignAnalytics;
-[] call MWF_fnc_presetManager;
-[] call MWF_fnc_restoreSession;
-[] call MWF_fnc_restoreFOBs;
-if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
-    [] call MWF_fnc_restoreBuiltUpgradeStructures;
-};
-[] call MWF_fnc_spawnInitialFOBAsset;
 
-private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
-private _tutorialStage = missionNamespace getVariable ["MWF_current_stage", 0];
-private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
-
-if (_campaignPhase isEqualTo "TUTORIAL" && {_tutorialStage < 1}) then {
-    [1] call MWF_fnc_generateInitialMission;
-    diag_log "[MWF] Tutorial bootstrap: seeded Stage 1 task during server init.";
+if (!isNil "MWF_fnc_initMOBAssets") then {
+    ["LOCK_MOB_ASSETS", { [] call MWF_fnc_initMOBAssets; }] call _runStep;
 };
 
-if (_campaignPhase isEqualTo "SUPPLY_RUN" && {!_supplyRunDone} && {_tutorialStage < 2}) then {
-    [2] call MWF_fnc_generateInitialMission;
-    diag_log "[MWF] Tutorial bootstrap: seeded Stage 2 task during server init.";
-};
-[] call MWF_fnc_zoneManager;
-[] call MWF_fnc_worldManager;
-[] call MWF_fnc_threatManager;
+["INIT_SYSTEMS", { [] call MWF_fnc_initSystems; }] call _runStep;
+["INIT_PERSISTENCE", { [] call MWF_fnc_initPersistence; }] call _runStep;
+["LOAD_GAME", { [] call MWF_fnc_loadGame; }] call _runStep;
+["INIT_ANALYTICS", { [] call MWF_fnc_initCampaignAnalytics; }] call _runStep;
+["PRESET_MANAGER", { [] call MWF_fnc_presetManager; }] call _runStep;
+
+["ZONE_MANAGER", { [] call MWF_fnc_zoneManager; }] call _runStep;
+["WORLD_MANAGER", { [] call MWF_fnc_worldManager; }] call _runStep;
+["THREAT_MANAGER", { [] call MWF_fnc_threatManager; }] call _runStep;
+
 if (!isNil "MWF_fnc_opforFobPatrolSystem") then {
-    ["INIT"] call MWF_fnc_opforFobPatrolSystem;
-};
-[] spawn MWF_fnc_economy;
-[] call MWF_fnc_initMissionSystem;
-
-
-if (!isNil "MWF_fnc_infrastructureManager") then {
-    ["INIT"] call MWF_fnc_infrastructureManager;
-};
-if (!isNil "MWF_fnc_spawnManager") then {
-    ["BOOTSTRAP"] spawn MWF_fnc_spawnManager;
-};
-if (!isNil "MWF_fnc_cityMonitor") then {
-    [] spawn MWF_fnc_cityMonitor;
-};
-if (!isNil "MWF_fnc_civRepSupport") then {
-    ["SYNC_RELATIONS"] call MWF_fnc_civRepSupport;
-};
-if (!isNil "MWF_fnc_civRepInformant") then {
-    ["INIT"] call MWF_fnc_civRepInformant;
-};
-if (!isNil "MWF_fnc_endgameManager") then {
-    ["INIT"] spawn MWF_fnc_endgameManager;
+    ["OPFOR_FOB_PATROLS", { ["INIT"] call MWF_fnc_opforFobPatrolSystem; }] call _runStep;
 };
 
-if (!isNil "MWF_fnc_rebelLeaderSystem") then {
-    ["RESTORE_PENDING"] call MWF_fnc_rebelLeaderSystem;
-};
-if (!isNil "MWF_fnc_fobAttackSystem") then {
-    ["RESTORE_PENDING"] call MWF_fnc_fobAttackSystem;
-};
-if (!isNil "MWF_fnc_fobDespawnSystem") then {
-    ["RESTORE_PENDING"] call MWF_fnc_fobDespawnSystem;
-};
-
-private _bootDeadline = diag_tickTime + 180;
-waitUntil {
-    uiSleep 1;
-    (
-        missionNamespace getVariable ["MWF_ZoneSystemReady", false] &&
-        missionNamespace getVariable ["MWF_WorldSystemReady", false] &&
-        missionNamespace getVariable ["MWF_ThreatSystemReady", false]
-    ) || {diag_tickTime >= _bootDeadline}
-};
-
-if (!(missionNamespace getVariable ["MWF_ZoneSystemReady", false])) then {
-    diag_log "[MWF] WARNING: Zone system not fully ready before server-ready release.";
-};
-if (!(missionNamespace getVariable ["MWF_WorldSystemReady", false])) then {
-    diag_log "[MWF] WARNING: World system not fully ready before server-ready release.";
-};
-if (!(missionNamespace getVariable ["MWF_ThreatSystemReady", false])) then {
-    diag_log "[MWF] WARNING: Threat system not fully ready before server-ready release.";
-};
+["ECONOMY", { [] spawn MWF_fnc_economy; }] call _runStep;
+["MISSION_SYSTEM", { [] call MWF_fnc_initMissionSystem; }] call _runStep;
 
 missionNamespace setVariable ["MWF_ServerInitialized", true, true];
 missionNamespace setVariable ["MWF_ServerBootRunning", false, true];
+missionNamespace setVariable ["MWF_ServerBootStage", "CRITICAL_RELEASED", true];
+diag_log "[MWF] SUCCESS: Critical server initialization complete. Clients released.";
 
-diag_log "[MWF] SUCCESS: Server initialization complete. Core framework is ready.";
+private _spawnPostStep = {
+    params ["_label", "_code"];
+    [_label, _code] spawn {
+        params ["_localLabel", "_localCode"];
+        missionNamespace setVariable ["MWF_ServerPostBootStage", _localLabel, true];
+        diag_log format ["[MWF] POST STEP START: %1", _localLabel];
+        call _localCode;
+        diag_log format ["[MWF] POST STEP END: %1", _localLabel];
+    };
+};
+
+["RESTORE_SESSION", {
+    [] call MWF_fnc_restoreSession;
+}] call _spawnPostStep;
+
+["RESTORE_FOBS", {
+    [] call MWF_fnc_restoreFOBs;
+}] call _spawnPostStep;
+
+if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
+    ["RESTORE_BUILT_UPGRADES", {
+        [] call MWF_fnc_restoreBuiltUpgradeStructures;
+    }] call _spawnPostStep;
+};
+
+["INITIAL_FOB_ASSET", {
+    private _deadline = diag_tickTime + 15;
+    waitUntil {
+        uiSleep 0.25;
+        (missionNamespace getVariable ["MWF_FOBsRestored", false]) || {diag_tickTime >= _deadline}
+    };
+    [] call MWF_fnc_spawnInitialFOBAsset;
+}] call _spawnPostStep;
+
+["TUTORIAL_BOOTSTRAP", {
+    private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+    private _tutorialStage = missionNamespace getVariable ["MWF_current_stage", 0];
+    private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
+
+    if (_campaignPhase isEqualTo "TUTORIAL" && {_tutorialStage < 1}) then {
+        [1] call MWF_fnc_generateInitialMission;
+        diag_log "[MWF] Tutorial bootstrap: seeded Stage 1 task during server init.";
+    };
+
+    if (_campaignPhase isEqualTo "SUPPLY_RUN" && {!_supplyRunDone} && {_tutorialStage < 2}) then {
+        [2] call MWF_fnc_generateInitialMission;
+        diag_log "[MWF] Tutorial bootstrap: seeded Stage 2 task during server init.";
+    };
+}] call _spawnPostStep;
+
+if (!isNil "MWF_fnc_infrastructureManager") then {
+    ["INFRASTRUCTURE_MANAGER", { ["INIT"] call MWF_fnc_infrastructureManager; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_spawnManager") then {
+    ["SPAWN_MANAGER", { ["BOOTSTRAP"] spawn MWF_fnc_spawnManager; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_cityMonitor") then {
+    ["CITY_MONITOR", { [] spawn MWF_fnc_cityMonitor; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_civRepSupport") then {
+    ["CIVREP_SUPPORT", { ["SYNC_RELATIONS"] call MWF_fnc_civRepSupport; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_civRepInformant") then {
+    ["CIVREP_INFORMANT", { ["INIT"] call MWF_fnc_civRepInformant; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_endgameManager") then {
+    ["ENDGAME_MANAGER", { ["INIT"] spawn MWF_fnc_endgameManager; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_rebelLeaderSystem") then {
+    ["REBEL_LEADER_RESTORE", { ["RESTORE_PENDING"] call MWF_fnc_rebelLeaderSystem; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_fobAttackSystem") then {
+    ["FOB_ATTACK_RESTORE", { ["RESTORE_PENDING"] call MWF_fnc_fobAttackSystem; }] call _spawnPostStep;
+};
+if (!isNil "MWF_fnc_fobDespawnSystem") then {
+    ["FOB_DESPAWN_RESTORE", { ["RESTORE_PENDING"] call MWF_fnc_fobDespawnSystem; }] call _spawnPostStep;
+};
+
+[] spawn {
+    private _deadline = diag_tickTime + 180;
+    waitUntil {
+        uiSleep 1;
+        (
+            missionNamespace getVariable ["MWF_ZoneSystemReady", false] &&
+            missionNamespace getVariable ["MWF_WorldSystemReady", false] &&
+            missionNamespace getVariable ["MWF_ThreatSystemReady", false]
+        ) || {diag_tickTime >= _deadline}
+    };
+
+    if (!(missionNamespace getVariable ["MWF_ZoneSystemReady", false])) then {
+        diag_log "[MWF] WARNING: Zone system not fully ready before subsystem monitor timeout.";
+    };
+    if (!(missionNamespace getVariable ["MWF_WorldSystemReady", false])) then {
+        diag_log "[MWF] WARNING: World system not fully ready before subsystem monitor timeout.";
+    };
+    if (!(missionNamespace getVariable ["MWF_ThreatSystemReady", false])) then {
+        diag_log "[MWF] WARNING: Threat system not fully ready before subsystem monitor timeout.";
+    };
+
+    missionNamespace setVariable ["MWF_ServerSubsystemsReady", true, true];
+    missionNamespace setVariable ["MWF_ServerPostBootStage", "POST_BOOT_COMPLETE", true];
+    diag_log "[MWF] SUCCESS: Background subsystem monitor complete.";
+};
