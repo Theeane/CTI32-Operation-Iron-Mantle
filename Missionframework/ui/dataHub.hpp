@@ -125,10 +125,20 @@ class MWF_RscDataHub {
             h = 0.024 * safezoneH;
         };
 
+        class BtnGuide: RscButton {
+            idc = 12209;
+            text = "$STR_MWF_GUIDE_BUTTON";
+            x = 0.155 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.07 * safezoneW;
+            h = 0.04 * safezoneH;
+            action = "['CLOSE'] call MWF_fnc_dataHub; ['OPEN', 'START'] call MWF_fnc_openGuide;";
+        };
+
         class BtnVehicle: RscButton {
             idc = 12210;
             text = "Vehicle Menu";
-            x = 0.185 * safezoneW + safezoneX;
+            x = 0.232 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
@@ -137,7 +147,7 @@ class MWF_RscDataHub {
         class BtnBuild: RscButton {
             idc = 12211;
             text = "Base Building";
-            x = 0.298 * safezoneW + safezoneX;
+            x = 0.345 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
@@ -146,7 +156,7 @@ class MWF_RscDataHub {
         class BtnMainOps: RscButton {
             idc = 12212;
             text = "Main Operations";
-            x = 0.411 * safezoneW + safezoneX;
+            x = 0.458 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
@@ -155,7 +165,7 @@ class MWF_RscDataHub {
         class BtnSupport: RscButton {
             idc = 12213;
             text = "Build Support";
-            x = 0.524 * safezoneW + safezoneX;
+            x = 0.571 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
@@ -164,7 +174,7 @@ class MWF_RscDataHub {
         class BtnUpgrades: RscButton {
             idc = 12214;
             text = "Base Upgrades";
-            x = 0.637 * safezoneW + safezoneX;
+            x = 0.684 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;

@@ -55,10 +55,6 @@ private _maxFOBs = missionNamespace getVariable [
     ["MWF_Param_MaxFOBs", 5] call BIS_fnc_getParamValue
 ];
 
-private _sideMissionTemplateLimit = missionNamespace getVariable [
-    "MWF_Locked_SideMissionTemplateLimit",
-    ["MWF_Param_SideMissionTemplateLimit", 24] call BIS_fnc_getParamValue
-];
 
 private _initialFOBType = missionNamespace getVariable [
     "MWF_Locked_InitialFOBType",
@@ -320,7 +316,6 @@ missionNamespace setVariable ["MWF_Locked_ThreatDecayMultiplier", _threatDecayMu
 missionNamespace setVariable ["MWF_Locked_WorldTierMultiplier", _worldTierMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_EndgameMapControlRequired", _endgameMapControlRequired, true];
 missionNamespace setVariable ["MWF_Param_MaxFOBs", _maxFOBs, true];
-missionNamespace setVariable ["MWF_Param_SideMissionTemplateLimit", (_sideMissionTemplateLimit max 9) min 99, true];
 missionNamespace setVariable ["MWF_Param_InitialFOBType", _initialFOBType, true];
 missionNamespace setVariable ["MWF_Param_IncomeMultiplier", _incomeMultiplier, true];
 missionNamespace setVariable ["MWF_Locked_BuildingDamageMode", _buildingMode, true];

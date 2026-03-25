@@ -5,7 +5,7 @@
 
     Description:
     Discovers side mission templates from the domain-aware folder structure.
-    The mission pool is parameter-driven and only scans numbered templates.
+    The mission pool is auto-discovered and no longer depends on a lobby cap.
     Domain availability is feature-switch driven so naval and air can remain
     coded but disabled until their systems are ready.
 
@@ -29,7 +29,7 @@ if (missionNamespace getVariable ["MWF_Feature_AirEnabled", false]) then { _doma
 
 private _difficulties = ["easy", "medium", "hard"];
 private _templates = [];
-private _maxTemplateId = (missionNamespace getVariable ["MWF_Param_SideMissionTemplateLimit", 24]) max 1 min 99;
+private _maxTemplateId = 999;
 
 {
     private _domain = _x;
@@ -53,5 +53,5 @@ private _maxTemplateId = (missionNamespace getVariable ["MWF_Param_SideMissionTe
 } forEach _domains;
 
 missionNamespace setVariable ["MWF_MissionTemplateRegistry", _templates, true];
-diag_log format ["[MWF Missions] Discovered %1 side mission template(s). Enabled domains: %2 | Pool limit: %3.", count _templates, _domains, _maxTemplateId];
+diag_log format ["[MWF Missions] Discovered %1 side mission template(s). Enabled domains: %2 | Auto-scan max id: %3.", count _templates, _domains, _maxTemplateId];
 _templates

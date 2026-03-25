@@ -18,6 +18,99 @@
                 <Original>Welcome to</Original>
                 <English>Welcome to</English>
             </Key>
+
+            <Key ID="STR_MWF_GUIDE_BUTTON">
+                <Original>MWF Guide</Original>
+                <English>MWF Guide</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_HEADER">
+                <Original>MWF Guide</Original>
+                <English>MWF Guide</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_CLOSE">
+                <Original>Close</Original>
+                <English>Close</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_START">
+                <Original>Getting Started</Original>
+                <English>Getting Started</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_UNDERCOVER">
+                <Original>Undercover</Original>
+                <English>Undercover</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_THREAT">
+                <Original>Threat</Original>
+                <English>Threat</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_TIER">
+                <Original>World Tier</Original>
+                <English>World Tier</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_ZONES">
+                <Original>Zones &amp; Capture</Original>
+                <English>Zones &amp; Capture</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_SUPPLY">
+                <Original>Supply Production</Original>
+                <English>Supply Production</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_INTEL">
+                <Original>Intel</Original>
+                <English>Intel</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_MAINOPS">
+                <Original>Main Operations</Original>
+                <English>Main Operations</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_FOB">
+                <Original>FOB Attacks</Original>
+                <English>FOB Attacks</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_TOPIC_ENDGAME">
+                <Original>Endgame</Original>
+                <English>Endgame</English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_START">
+                <Original><![CDATA[<t color='#111111'>You are reading the field guide for Operation Iron Mantle.</t><br/><br/><t color='#111111'>The campaign opens with a tutorial: log in at the MOB, deploy your first FOB wherever you choose, complete the supply run, then return to the network for full terminal access.</t><br/><br/><t color='#111111'>After the tutorial, the campaign shifts into OPEN WAR. From there you expand territory, earn supplies and intel, run side missions, and launch main operations.</t><br/><br/><t color='#111111'>Use this guide whenever a system feels unclear. It is meant to explain the live campaign rules without forcing players to memorize them before stepping into the field.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>You are reading the field guide for Operation Iron Mantle.</t><br/><br/><t color='#111111'>The campaign opens with a tutorial: log in at the MOB, deploy your first FOB wherever you choose, complete the supply run, then return to the network for full terminal access.</t><br/><br/><t color='#111111'>After the tutorial, the campaign shifts into OPEN WAR. From there you expand territory, earn supplies and intel, run side missions, and launch main operations.</t><br/><br/><t color='#111111'>Use this guide whenever a system feels unclear. It is meant to explain the live campaign rules without forcing players to memorize them before stepping into the field.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_UNDERCOVER">
+                <Original><![CDATA[<t color='#111111'>Undercover is for infiltration and mission play, not for capturing zones.</t><br/><br/><t color='#66FF66'>GREEN EYE</t><t color='#111111'> - Safe disguise. Good for moving close to the enemy without immediately breaking cover.</t><br/><t color='#FFD966'>YELLOW EYE</t><t color='#111111'> - Suspicious. Enemies are more likely to recognize you.</t><br/><t color='#FF6666'>RED EYE</t><t color='#111111'> - Compromised. The enemy treats you as hostile.</t><br/><t color='#CCCCCC'>NO EYE</t><t color='#111111'> - Open BLUFOR presence or no disguise. You are not undercover.</t><br/><br/><t color='#111111'>Detection range while undercover:</t><br/><t color='#111111'>• Regular enemies: 1 m normally, 2 m when suspicious.</t><br/><t color='#111111'>• Officers: 3 m normally, 5 m when suspicious.</t><br/><br/><t color='#111111'>Zone capture never receives an undercover bonus. GREEN and YELLOW do not count for capture. Only RED EYE or NO EYE can help take a zone. If you drop back from RED to YELLOW or GREEN, your capture contribution stops immediately.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Undercover is for infiltration and mission play, not for capturing zones.</t><br/><br/><t color='#66FF66'>GREEN EYE</t><t color='#111111'> - Safe disguise. Good for moving close to the enemy without immediately breaking cover.</t><br/><t color='#FFD966'>YELLOW EYE</t><t color='#111111'> - Suspicious. Enemies are more likely to recognize you.</t><br/><t color='#FF6666'>RED EYE</t><t color='#111111'> - Compromised. The enemy treats you as hostile.</t><br/><t color='#CCCCCC'>NO EYE</t><t color='#111111'> - Open BLUFOR presence or no disguise. You are not undercover.</t><br/><br/><t color='#111111'>Detection range while undercover:</t><br/><t color='#111111'>• Regular enemies: 1 m normally, 2 m when suspicious.</t><br/><t color='#111111'>• Officers: 3 m normally, 5 m when suspicious.</t><br/><br/><t color='#111111'>Zone capture never receives an undercover bonus. GREEN and YELLOW do not count for capture. Only RED EYE or NO EYE can help take a zone. If you drop back from RED to YELLOW or GREEN, your capture contribution stops immediately.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_THREAT">
+                <Original><![CDATA[<t color='#111111'>Threat represents how much pressure the campaign is putting on your group right now.</t><br/><br/><t color='#111111'>Higher threat increases enemy activity: more patrols, denser zone pressure, and more aggressive reactions such as FOB search and attack behavior.</t><br/><br/><t color='#111111'>Threat is separate from World Tier. High threat does not make World Tier climb faster. Threat rises from loud or high-impact actions and falls over time when pressure drops.</t><br/><br/><t color='#111111'>Hosts can tune threat in the lobby with Threat Tick Up and Threat Tick Down. Tick Up changes how quickly threat rises. Tick Down changes how quickly it falls again over time.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Threat represents how much pressure the campaign is putting on your group right now.</t><br/><br/><t color='#111111'>Higher threat increases enemy activity: more patrols, denser zone pressure, and more aggressive reactions such as FOB search and attack behavior.</t><br/><br/><t color='#111111'>Threat is separate from World Tier. High threat does not make World Tier climb faster. Threat rises from loud or high-impact actions and falls over time when pressure drops.</t><br/><br/><t color='#111111'>Hosts can tune threat in the lobby with Threat Tick Up and Threat Tick Down. Tick Up changes how quickly threat rises. Tick Down changes how quickly it falls again over time.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_TIER">
+                <Original><![CDATA[<t color='#111111'>World Tier controls what enemy content is allowed to spawn.</t><br/><br/><t color='#111111'>As World Tier rises, OPFOR and rebel forces gain access to stronger infantry pools, vehicles, and heavier battlefield tools. It does not control how often enemies react; that is Threat.</t><br/><br/><t color='#111111'>World Tier rises from campaign progress such as capturing zones, completing side missions, and completing main operations. Special operations can also reduce or temporarily block enemy tier progression.</t><br/><br/><t color='#111111'>The World Tier Multiplier affects OPFOR and rebels only. It does not buff BLUFOR.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>World Tier controls what enemy content is allowed to spawn.</t><br/><br/><t color='#111111'>As World Tier rises, OPFOR and rebel forces gain access to stronger infantry pools, vehicles, and heavier battlefield tools. It does not control how often enemies react; that is Threat.</t><br/><br/><t color='#111111'>World Tier rises from campaign progress such as capturing zones, completing side missions, and completing main operations. Special operations can also reduce or temporarily block enemy tier progression.</t><br/><br/><t color='#111111'>The World Tier Multiplier affects OPFOR and rebels only. It does not buff BLUFOR.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_ZONES">
+                <Original><![CDATA[<t color='#111111'>Zones are the main way to expand control across the map.</t><br/><br/><t color='#111111'>To capture a zone, BLUFOR players must be present in a valid capture state while enemy control is being broken. Undercover players in GREEN or YELLOW do not count toward capture at all, even if friendly players are already fighting nearby.</t><br/><br/><t color='#111111'>Capture is allowed only while a player is openly hostile: RED EYE or NO EYE. If a player cools down from RED back to YELLOW or GREEN, that player stops contributing to capture immediately.</t><br/><br/><t color='#111111'>Captured towns, military sites, factories, and capitals also drive campaign progression and can unlock the road to the endgame.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Zones are the main way to expand control across the map.</t><br/><br/><t color='#111111'>To capture a zone, BLUFOR players must be present in a valid capture state while enemy control is being broken. Undercover players in GREEN or YELLOW do not count toward capture at all, even if friendly players are already fighting nearby.</t><br/><br/><t color='#111111'>Capture is allowed only while a player is openly hostile: RED EYE or NO EYE. If a player cools down from RED back to YELLOW or GREEN, that player stops contributing to capture immediately.</t><br/><br/><t color='#111111'>Captured towns, military sites, factories, and capitals also drive campaign progression and can unlock the road to the endgame.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_SUPPLY">
+                <Original><![CDATA[<t color='#111111'>Supplies are your main build and expansion resource.</t><br/><br/><t color='#111111'>Secure zones generate supplies over time. Factories add extra production as long as they are under friendly control and not disabled by an ongoing attack.</t><br/><br/><t color='#111111'>Supplies are spent on vehicles, support assets, upgrades, FOB repair, and other campaign infrastructure. If production feels too slow, the host can tune Starting Supplies, Income Multiplier, and the Supply Delivery Interval in the lobby.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Supplies are your main build and expansion resource.</t><br/><br/><t color='#111111'>Secure zones generate supplies over time. Factories add extra production as long as they are under friendly control and not disabled by an ongoing attack.</t><br/><br/><t color='#111111'>Supplies are spent on vehicles, support assets, upgrades, FOB repair, and other campaign infrastructure. If production feels too slow, the host can tune Starting Supplies, Income Multiplier, and the Supply Delivery Interval in the lobby.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_INTEL">
+                <Original><![CDATA[<t color='#111111'>Intel is collected in the field and then turned in through the network.</t><br/><br/><t color='#111111'>Searching officers, laptops, and other valid targets gives temporary intel. That intel is not truly banked until a player deposits it at a MOB or FOB computer, or stores and retrieves it through approved mobile respawn vehicles.</t><br/><br/><t color='#111111'>Turn-ins can reveal hidden enemy infrastructure such as HQs or roadblocks, and can rarely grant a free main operation charge. Intel is also the main currency for starting main operations.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Intel is collected in the field and then turned in through the network.</t><br/><br/><t color='#111111'>Searching officers, laptops, and other valid targets gives temporary intel. That intel is not truly banked until a player deposits it at a MOB or FOB computer, or stores and retrieves it through approved mobile respawn vehicles.</t><br/><br/><t color='#111111'>Turn-ins can reveal hidden enemy infrastructure such as HQs or roadblocks, and can rarely grant a free main operation charge. Intel is also the main currency for starting main operations.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_MAINOPS">
+                <Original><![CDATA[<t color='#111111'>Main Operations are the major campaign actions launched from the terminal.</t><br/><br/><t color='#111111'>They usually cost Intel to start unless your group has a free charge. Each operation has its own cooldown, so finishing one does not lock the whole category forever.</t><br/><br/><t color='#111111'>Main Operations unlock strategic rewards such as aircraft access, base progression, and special enemy progression effects. Some reduce enemy World Tier. Some temporarily block enemy tier growth instead of raising it further.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>Main Operations are the major campaign actions launched from the terminal.</t><br/><br/><t color='#111111'>They usually cost Intel to start unless your group has a free charge. Each operation has its own cooldown, so finishing one does not lock the whole category forever.</t><br/><br/><t color='#111111'>Main Operations unlock strategic rewards such as aircraft access, base progression, and special enemy progression effects. Some reduce enemy World Tier. Some temporarily block enemy tier growth instead of raising it further.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_FOB">
+                <Original><![CDATA[<t color='#111111'>FOBs can come under pressure from both rebel retaliation and OPFOR discovery.</t><br/><br/><t color='#111111'>At 50% threat and above, OPFOR can spawn search patrols that try to find player FOBs. If a patrol gets line of sight within 1 km and survives its report window, the FOB enters a prep phase before the attack starts.</t><br/><br/><t color='#111111'>During a FOB attack, the local FOB computer is offline for normal control actions, but temporary intel turn-in remains available. The attack ends if players hold out or kill the assault officer. Killing the rebel leader also triggers a rebel punishment attack.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>FOBs can come under pressure from both rebel retaliation and OPFOR discovery.</t><br/><br/><t color='#111111'>At 50% threat and above, OPFOR can spawn search patrols that try to find player FOBs. If a patrol gets line of sight within 1 km and survives its report window, the FOB enters a prep phase before the attack starts.</t><br/><br/><t color='#111111'>During a FOB attack, the local FOB computer is offline for normal control actions, but temporary intel turn-in remains available. The attack ends if players hold out or kill the assault officer. Killing the rebel leader also triggers a rebel punishment attack.</t>]]></English>
+            </Key>
+            <Key ID="STR_MWF_GUIDE_BODY_ENDGAME">
+                <Original><![CDATA[<t color='#111111'>The endgame unlocks only after strong campaign progress.</t><br/><br/><t color='#111111'>By default, the campaign requires 75% map control plus additional strategic progress such as destroying hidden infrastructure and completing at least one main operation. Hosts can change the map control target to 55%, 75%, or 95% before the campaign begins.</t><br/><br/><t color='#111111'>Once the final phase starts, the campaign moves toward the OPFOR leader confrontation. A regular ending is always possible. If rebel standing is positive and the surrender path is preserved, a rebel ending can also be achieved.</t>]]></Original>
+                <English><![CDATA[<t color='#111111'>The endgame unlocks only after strong campaign progress.</t><br/><br/><t color='#111111'>By default, the campaign requires 75% map control plus additional strategic progress such as destroying hidden infrastructure and completing at least one main operation. Hosts can change the map control target to 55%, 75%, or 95% before the campaign begins.</t><br/><br/><t color='#111111'>Once the final phase starts, the campaign moves toward the OPFOR leader confrontation. A regular ending is always possible. If rebel standing is positive and the surrender path is preserved, a rebel ending can also be achieved.</t>]]></English>
+            </Key>
         </Container>
     </Package>
 </Project>

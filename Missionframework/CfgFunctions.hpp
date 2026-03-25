@@ -183,6 +183,7 @@ class CfgFunctions {
             class collectRespawnPoints { file = "ui/datahub/MWF_fn_collectRespawnPoints.sqf"; };
             class refreshDataMap { file = "ui/datahub/MWF_fn_refreshDataMap.sqf"; };
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
+            class openGuide { file = "ui/guide/MWF_fn_openGuide.sqf"; };
         };
 
         class Loadout {
