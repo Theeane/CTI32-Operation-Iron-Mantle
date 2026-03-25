@@ -19,7 +19,18 @@ diag_log "[MWF] INFO: Server-side initialization started.";
 
 [] call MWF_fnc_initGlobals;
 
+private _mobAnchor = objNull;
+if (!isNil "MWF_fnc_initMOBAssets") then {
+    _mobAnchor = [] call MWF_fnc_initMOBAssets;
+};
+
 private _mobObject = missionNamespace getVariable ["MWF_MOB", objNull];
+if (isNull _mobObject) then {
+    _mobObject = missionNamespace getVariable ["MWF_MOB_Table", _mobAnchor];
+};
+if (isNull _mobObject) then {
+    _mobObject = missionNamespace getVariable ["MWF_Intel_Center", objNull];
+};
 missionNamespace setVariable ["MWF_MainBase", _mobObject, true];
 missionNamespace setVariable ["MWF_MOB_Object", _mobObject, true];
 

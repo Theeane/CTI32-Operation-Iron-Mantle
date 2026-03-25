@@ -11,8 +11,12 @@
 
 params [["_object", objNull, [objNull]]];
 
-// Allow callers to omit the MOB terminal object. In that case, search near the
-// main respawn marker for the nearest recognized laptop/terminal class.
+// Allow callers to omit the MOB terminal object. Prefer the named editor laptop
+// first, then fall back to a proximity search near the main respawn marker.
+if (isNull _object) then {
+    _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
+};
+
 if (isNull _object) then {
     private _mobPos = getMarkerPos "respawn_west";
     if !(_mobPos isEqualTo [0,0,0]) then {
@@ -23,7 +27,8 @@ if (isNull _object) then {
                 "RuggedTerminal_01_communications_F",
                 "Land_DataTerminal_01_F"
             ],
-            100
+            100,
+            true
         ];
         if (_candidates isNotEqualTo []) then {
             _object = _candidates # 0;
