@@ -32,7 +32,11 @@ missionNamespace setVariable ["MWF_SavedRespawnProfile", profileNamespace getVar
             missionNamespace setVariable ["MWF_InLoadoutZone", false];
 
             _boundPlayer = player;
-            [] call MWF_fnc_applyRespawnLoadout;
+
+            private _appliedSavedLoadout = [] call MWF_fnc_applyRespawnLoadout;
+            if (!_appliedSavedLoadout) then {
+                [] call MWF_fnc_applyBaselineLoadout;
+            };
         };
 
         private _zones = missionNamespace getVariable ["MWF_LoadoutZones", []];

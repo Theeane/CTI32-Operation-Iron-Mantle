@@ -47,7 +47,7 @@ if (_assetClass isEqualTo "") exitWith {
     objNull
 };
 
-private _spawnPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
+private _spawnPad = missionNamespace getVariable ["MWF_MOB_FobPad", missionNamespace getVariable ["MWF_FOB_Box_Spawn", objNull]];
 private _spawnPos = [];
 private _spawnDir = markerDir "respawn_west";
 
@@ -63,7 +63,7 @@ if (!isNull _spawnPad) then {
         _spawnPos = getPosATL _spawnPad;
         _spawnDir = getDir _spawnPad;
     } else {
-        _spawnPos = _mobMarkerPos;
+        _spawnPos = [_mobMarkerPos, 8, (_spawnDir + 90)] call BIS_fnc_relPos;
     };
 };
 

@@ -11,10 +11,29 @@
 
 params [["_object", objNull, [objNull]]];
 
-// Allow callers to omit the MOB terminal object. Prefer the named editor laptop
-// first, then fall back to a proximity search near the main respawn marker.
+// Allow callers to omit the MOB terminal object. Prefer the explicitly named
+// editor laptop, then fall back to a short-range search around the MOB table,
+// and only then around the respawn marker.
 if (isNull _object) then {
     _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
+};
+
+if (isNull _object) then {
+    private _table = missionNamespace getVariable ["MWF_MOB_Table", objNull];
+    if (!isNull _table) then {
+        private _candidates = nearestObjects [
+            getPosATL _table,
+            [
+                "Land_Laptop_unfolded_F",
+                "RuggedTerminal_01_communications_F",
+                "Land_DataTerminal_01_F"
+            ],
+            8
+        ];
+        if (_candidates isNotEqualTo []) then {
+            _object = _candidates # 0;
+        };
+    };
 };
 
 if (isNull _object) then {
@@ -27,8 +46,7 @@ if (isNull _object) then {
                 "RuggedTerminal_01_communications_F",
                 "Land_DataTerminal_01_F"
             ],
-            100,
-            true
+            25
         ];
         if (_candidates isNotEqualTo []) then {
             _object = _candidates # 0;

@@ -8,36 +8,26 @@
     so the rest of the mission can finish settling in. Text is sourced from Stringtable.xml.
     Optional music can be supplied through missionNamespace variable MWF_IntroMusicClass,
     which should point at a valid CfgMusic classname.
-
-    Notes:
-    - With respawnOnStart/MenuPosition enabled, Arma can execute local init before the
-      respawn UI closes. This function now waits for the visible spawn flow to finish
-      before marking the intro as played.
 */
 if (!hasInterface) exitWith { false };
+if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith { false };
+
+uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 
 [] spawn {
     waitUntil { !isNull player && {alive player} };
-    waitUntil {
-        uiSleep 0.1;
-        alive player && {!visibleMap}
+    sleep 0.25;
+
+    private _anchor = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_Intel_Center", objNull]];
+    if (isNull _anchor) then {
+        _anchor = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
     };
-    uiSleep 0.35;
-
-    if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith {};
-
-    private _joinWindow = 180;
-    if ((serverTime > 0) && {serverTime > _joinWindow}) exitWith {};
-
-    uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
-
-    private _anchor = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
     if (isNull _anchor) then {
         _anchor = player;
     };
 
-    private _anchorPos = getPosATL _anchor;
-    private _anchorDir = getDir _anchor;
+    private _anchorPos = if (_anchor isEqualTo player) then { getPosATL player } else { getPosATL _anchor };
+    private _anchorDir = if (_anchor isEqualTo player) then { getDir player } else { getDir _anchor };
 
     private _rotateOffset = {
         params ["_offset", ["_dir", 0, [0]]];

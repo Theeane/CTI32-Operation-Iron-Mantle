@@ -99,7 +99,6 @@ class CfgFunctions {
         class Base {
             file = "functions/base";
             class baseManager { file = "functions/base/MWF_fn_baseManager.sqf"; };
-            class initMOBAssets { file = "functions/base/MWF_fn_initMOBAssets.sqf"; };
             class commanderToggleRepack { file = "functions/base/MWF_fn_commanderToggleRepack.sqf"; };
             class deployFOB { file = "functions/base/MWF_fn_deployFOB.sqf"; };
             class depositIntel { file = "functions/base/MWF_fn_depositIntel.sqf"; };
@@ -187,9 +186,15 @@ class CfgFunctions {
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
         };
 
+        class Cinematics {
+            file = "functions/cinematics";
+            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
+        };
+
         class Loadout {
             file = "functions/loadout";
             class applyRespawnLoadout { file = "functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
+            class applyBaselineLoadout { file = "functions/loadout/MWF_fn_applyBaselineLoadout.sqf"; };
             class buildLoadoutCaches { file = "functions/loadout/MWF_fn_buildLoadoutCaches.sqf"; };
             class initLoadoutSystem { file = "functions/loadout/MWF_fn_initLoadoutSystem.sqf"; };
             class openLoadoutArsenal { file = "functions/loadout/MWF_fn_openLoadoutArsenal.sqf"; };
@@ -283,11 +288,6 @@ class CfgFunctions {
             file = "functions/endgame";
             class playSharedMusic { file = "functions/endgame/MWF_fn_playSharedMusic.sqf"; };
             class playConfiguredMusicLocal { file = "functions/endgame/MWF_fn_playConfiguredMusicLocal.sqf"; };
-        };
-
-        class Cinematics {
-            file = "functions/cinematics";
-            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
         };
 
         class Endgame {

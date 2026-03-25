@@ -19,22 +19,11 @@ diag_log "[MWF] INFO: Server-side initialization started.";
 
 [] call MWF_fnc_initGlobals;
 
-private _mobAnchor = objNull;
-if (!isNil "MWF_fnc_initMOBAssets") then {
-    _mobAnchor = [] call MWF_fnc_initMOBAssets;
-};
-
 private _mobObject = missionNamespace getVariable ["MWF_MOB", objNull];
-if (isNull _mobObject) then {
-    _mobObject = missionNamespace getVariable ["MWF_MOB_Table", _mobAnchor];
-};
-if (isNull _mobObject) then {
-    _mobObject = missionNamespace getVariable ["MWF_Intel_Center", objNull];
-};
 missionNamespace setVariable ["MWF_MainBase", _mobObject, true];
 missionNamespace setVariable ["MWF_MOB_Object", _mobObject, true];
 
-private _mobPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
+private _mobPad = missionNamespace getVariable ["MWF_MOB_FobPad", missionNamespace getVariable ["MWF_FOB_Box_Spawn", objNull]];
 if (isNull _mobPad) then {
     private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "respawn_west" };
     private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
@@ -68,6 +57,20 @@ if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
     [] call MWF_fnc_restoreBuiltUpgradeStructures;
 };
 [] call MWF_fnc_spawnInitialFOBAsset;
+
+private _campaignPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+private _tutorialStage = missionNamespace getVariable ["MWF_current_stage", 0];
+private _supplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
+
+if (_campaignPhase isEqualTo "TUTORIAL" && {_tutorialStage < 1}) then {
+    [1] call MWF_fnc_generateInitialMission;
+    diag_log "[MWF] Tutorial bootstrap: seeded Stage 1 task during server init.";
+};
+
+if (_campaignPhase isEqualTo "SUPPLY_RUN" && {!_supplyRunDone} && {_tutorialStage < 2}) then {
+    [2] call MWF_fnc_generateInitialMission;
+    diag_log "[MWF] Tutorial bootstrap: seeded Stage 2 task during server init.";
+};
 [] call MWF_fnc_zoneManager;
 [] call MWF_fnc_worldManager;
 [] call MWF_fnc_threatManager;
