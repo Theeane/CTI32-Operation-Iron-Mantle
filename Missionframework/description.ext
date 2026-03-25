@@ -15,15 +15,15 @@ disabledAI = 1;
 respawnTemplates[] = {"MenuPosition"};
 respawnTemplatesWest[] = {"MenuPosition"};
 
-#include "ui/defines.hpp"
+#include "ui\defines.hpp"
 #include "ui\dialogs.hpp"
-#include "configs/params.hpp"
+#include "configs\params.hpp"
 #include "CfgFunctions.hpp"
-#include "ui/buildMenu.hpp"
-#include "ui/buyMenu.hpp"
-#include "ui/dataHub.hpp"
-#include "ui/guide.hpp"
+#include "ui\buildMenu.hpp"
+#include "ui\buyMenu.hpp"
+#include "ui\dataHub.hpp"
+#include "ui\guide.hpp"
 
 class RscTitles {
-    #include "ui/resourceBar.hpp"
+    #include "ui\resourceBar.hpp"
 };
