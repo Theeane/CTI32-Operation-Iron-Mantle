@@ -243,13 +243,6 @@ class Params {
         default = 5;
     };
 
-    class MWF_Param_SideMissionTemplateLimit {
-        title = "[SESSION ONLY] Side Mission Template Pool";
-        values[] = {9, 18, 24, 36, 48, 72, 99};
-        texts[] = {"9", "18", "24", "36", "48", "72", "99"};
-        default = 24;
-    };
-
     class MWF_Param_InitialFOBType {
         title = "[SESSION ONLY] Initial FOB Asset";
         values[] = {0, 1};
