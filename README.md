@@ -1,4 +1,4 @@
-!!!!! Still under development so not avaliable for testing so far due to broken codes but around 95% there for alpha 001 release !!!!!
+!!!!! Still under development so not avaliable for testing so far due to broken codes but around 98% there for alpha 001 release !!!!!
 
 
 
