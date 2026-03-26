@@ -56,13 +56,20 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-        private _cinematicPlayed = false;
+
+        private _introPlayed = false;
         if (!isNil "MWF_fnc_playIntroCinematic") then {
-            _cinematicPlayed = [] call MWF_fnc_playIntroCinematic;
+            _introPlayed = [] call MWF_fnc_playIntroCinematic;
         } else {
-            _cinematicPlayed = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+            _introPlayed = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
         };
-        diag_log format ["[MWF] Intro cinematic result=%1 stage=%2", _cinematicPlayed, uiNamespace getVariable ["MWF_IntroCinematicStage", "UNKNOWN"]];
+
+        diag_log format [
+            "[MWF] Intro cinematic stage=%1 played=%2",
+            uiNamespace getVariable ["MWF_IntroCinematicStage", "UNKNOWN"],
+            _introPlayed
+        ];
+
         uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
 
         missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY"];
