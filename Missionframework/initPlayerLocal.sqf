@@ -42,15 +42,6 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         && {!isNull findDisplay 46}
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SYSTEMS"];
-    private _systemsDeadline = diag_tickTime + 60;
-    waitUntil {
-        uiSleep 0.25;
-        (missionNamespace getVariable ["MWF_systems_ready", false]) ||
-        (missionNamespace getVariable ["MWF_ServerSubsystemsReady", false]) ||
-        {diag_tickTime >= _systemsDeadline}
-    };
-
     uiSleep 0.5;
 
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
@@ -128,6 +119,13 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
 
         missionNamespace setVariable ["MWF_ClientInitStage", "RESOURCE_UI"];
         [] spawn MWF_fnc_updateResourceUI;
+
+        [] spawn {
+            uiSleep 5;
+            if (!isNil "MWF_fnc_setupInteractions") then {
+                [] call MWF_fnc_setupInteractions;
+            };
+        };
 
         if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
             missionNamespace setVariable ["MWF_ClientInitStage", "DAMAGE_EH"];
