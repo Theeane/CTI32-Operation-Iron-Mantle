@@ -6,7 +6,8 @@
     Description:
     Handles setup interactions for the core framework layer. For the MOB computer this
     routes through the campaign-phase login bridge, so a loaded OPEN_WAR campaign never
-    replays tutorial gates for any player. Prioritizes the named editor laptop first.
+    replays tutorial gates for any player. Interaction registration is local per client,
+    because BIS_fnc_holdActionAdd is local UI state.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -15,20 +16,33 @@ if (isNull _object) then {
     _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
 };
 
+if (isNull _object && {!isNil "MWF_Intel_Center"}) then {
+    _object = MWF_Intel_Center;
+};
+
 if (isNull _object) then {
-    private _searchOrigins = [];
+    private _anchorObjects = [];
 
-    private _table = missionNamespace getVariable ["MWF_MOB_Table", objNull];
-    if (!isNull _table) then { _searchOrigins pushBackUnique (getPosATL _table); };
+    if (!isNil "mob_deploy_pad") then {
+        _anchorObjects pushBackUnique mob_deploy_pad;
+    };
 
-    private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
-    if (!isNull _mainBase) then { _searchOrigins pushBackUnique (getPosATL _mainBase); };
+    private _mobTable = missionNamespace getVariable ["MWF_MOB_Table", objNull];
+    if (!isNull _mobTable) then {
+        _anchorObjects pushBackUnique _mobTable;
+    };
 
-    private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
-    if (!isNull _deployPad) then { _searchOrigins pushBackUnique (getPosATL _deployPad); };
+    private _anchorPositions = [];
+    {
+        if (!isNull _x) then {
+            _anchorPositions pushBackUnique (getPosATL _x);
+        };
+    } forEach _anchorObjects;
 
     private _mobPos = getMarkerPos "respawn_west";
-    if !(_mobPos isEqualTo [0,0,0]) then { _searchOrigins pushBackUnique _mobPos; };
+    if !(_mobPos isEqualTo [0,0,0]) then {
+        _anchorPositions pushBackUnique _mobPos;
+    };
 
     {
         private _candidates = nearestObjects [
@@ -43,16 +57,17 @@ if (isNull _object) then {
         if (_candidates isNotEqualTo []) exitWith {
             _object = _candidates # 0;
         };
-    } forEach _searchOrigins;
+    } forEach _anchorPositions;
 };
 
-if (isNull _object) exitWith {
-    diag_log "[MWF Setup] WARNING: No MOB interaction object found for client interaction setup.";
-};
-if (_object getVariable ["MWF_MOB_LoginInit", false]) exitWith {};
-_object setVariable ["MWF_MOB_LoginInit", true];
+if (isNull _object) exitWith {};
 
-[
+private _existingActionId = _object getVariable ["MWF_MOB_LoginActionId", -1];
+if (_existingActionId >= 0) then {
+    [_object, _existingActionId] call BIS_fnc_holdActionRemove;
+};
+
+private _actionId = [
     _object,
     "Login to Command Network",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
@@ -82,4 +97,5 @@ _object setVariable ["MWF_MOB_LoginInit", true];
     false
 ] call BIS_fnc_holdActionAdd;
 
-diag_log format ["[MWF Setup] Campaign-phase MOB login interaction added to %1.", _object];
+_object setVariable ["MWF_MOB_LoginActionId", _actionId];
+diag_log format ["[MWF Setup] Campaign-phase MOB login interaction added locally to %1 (action %2).", _object, _actionId];
