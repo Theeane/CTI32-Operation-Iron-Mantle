@@ -48,6 +48,17 @@ if (isNull _mobPad) then {
 };
 missionNamespace setVariable ["MWF_MOB_FobPad", _mobPad, true];
 
+private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
+if (isNull _deployPad) then {
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "respawn_west" };
+    private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
+    _pads = _pads select { !isNull _x && {_x != _mobPad} };
+    if !(_pads isEqualTo []) then {
+        _deployPad = _pads # 0;
+    };
+};
+missionNamespace setVariable ["MWF_MOB_DeployPad", _deployPad, true];
+
 private _mainRespawnMarker = "respawn_west";
 if (markerColor _mainRespawnMarker isNotEqualTo "") then {
     private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];

@@ -3,9 +3,9 @@
     File: initPlayerLocal.sqf
     Project: Military War Framework
     Description:
-    Handles client-side initialization for each player. The first-session intro now
-    plays before the initial respawn menu is opened. After the player closes/deploys
-    from that menu, local interactions and loadout systems come online.
+    Handles client-side initialization for each player. First join now stays on the
+    intro/island flow until the cinematic finishes, then the player is script-deployed
+    to the dedicated MOB deploy pad. Normal respawn remains a separate engine path.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER"];
@@ -32,7 +32,6 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
     waitUntil { !isNull player };
     waitUntil { alive player };
 
-    private _spawnPos = getMarkerPos "respawn_west";
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_WORLD_READY"];
     waitUntil {
         uiSleep 0.25;
@@ -40,7 +39,6 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         && {!visibleMap}
         && {!dialog}
         && {!isNull findDisplay 46}
-        && ((_spawnPos isEqualTo [0,0,0]) || {player distance2D _spawnPos < 40})
     };
 
     uiSleep 0.5;
@@ -49,20 +47,48 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
     [] call MWF_fnc_initUI;
 
     if !(uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]) then {
+        missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_LOCK"];
+        missionNamespace setVariable ["MWF_BlockRespawn", true];
+        disableUserInput true;
+
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-        [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+        if (!isNil "MWF_fnc_playIntroCinematic") then {
+            [] call MWF_fnc_playIntroCinematic;
+        } else {
+            [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+        };
         uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "OPEN_INITIAL_RESPAWN_MENU"];
-        if (!isNil "BIS_fnc_showRespawnMenu") then {
-            ["Open", true] call BIS_fnc_showRespawnMenu;
-            waitUntil {
-                uiSleep 0.25;
-                !dialog
-            };
-            uiSleep 0.5;
+        missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY"];
+        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
+        if (isNull _deployPad) then {
+            _deployPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
         };
+
+        private _deployed = false;
+        if (!isNull _deployPad) then {
+            private _deployPos = getPosATL _deployPad;
+            player setVehiclePosition [_deployPos, [], 0, "CAN_COLLIDE"];
+            player setDir (getDir _deployPad);
+            _deployed = true;
+        } else {
+            private _spawnPos = getMarkerPos "respawn_west";
+            if !(_spawnPos isEqualTo [0,0,0]) then {
+                player setVehiclePosition [_spawnPos, [], 0, "CAN_COLLIDE"];
+                player setDir (markerDir "respawn_west");
+                _deployed = true;
+            };
+        };
+
+        if (_deployed && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+            [] call MWF_fnc_applyBaselineLoadout;
+        };
+
+        uiSleep 0.25;
+        disableUserInput false;
+        missionNamespace setVariable ["MWF_BlockRespawn", false];
+        missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_DONE"];
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];

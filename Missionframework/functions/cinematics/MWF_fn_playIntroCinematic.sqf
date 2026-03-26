@@ -4,9 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Plays a lightweight local intro cinematic near the MOB or player spawn. This
-    version is intentionally synchronous so initPlayerLocal can wait for it to finish
-    before opening the initial respawn/deploy menu.
+    Plays a lightweight local intro cinematic near the MOB. This version is
+    intentionally synchronous so initPlayerLocal can hold first-join deployment until
+    the cinematic has finished and keep the escape/respawn path closed during playback.
 */
 
 if (!hasInterface) exitWith { false };
@@ -15,6 +15,29 @@ if (uiNamespace getVariable ["MWF_IntroCinematicActive", false]) exitWith { fals
 
 uiNamespace setVariable ["MWF_IntroCinematicStage", "ENTRY"];
 uiNamespace setVariable ["MWF_IntroCinematicActive", true];
+missionNamespace setVariable ["MWF_BlockRespawn", true];
+
+[] spawn {
+    while {
+        uiNamespace getVariable ["MWF_IntroCinematicActive", false] &&
+        {missionNamespace getVariable ["MWF_BlockRespawn", false]}
+    } do {
+        uiSleep 0.05;
+
+        if (visibleMap) then {
+            openMap [false, false];
+        };
+
+        if (dialog) then {
+            closeDialog 0;
+        };
+
+        private _interruptDisplay = findDisplay 49;
+        if (!isNull _interruptDisplay) then {
+            _interruptDisplay closeDisplay 2;
+        };
+    };
+};
 
 private _deadline = diag_tickTime + 45;
 uiNamespace setVariable ["MWF_IntroCinematicStage", "WAIT_WORLDVIEW"];
@@ -27,12 +50,14 @@ waitUntil {
 if (diag_tickTime >= _deadline) exitWith {
     uiNamespace setVariable ["MWF_IntroCinematicStage", "WAIT_TIMEOUT"];
     uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+    missionNamespace setVariable ["MWF_BlockRespawn", false];
     false
 };
 
 if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith {
     uiNamespace setVariable ["MWF_IntroCinematicStage", "ALREADY_PLAYED"];
     uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+    missionNamespace setVariable ["MWF_BlockRespawn", false];
     false
 };
 
@@ -77,6 +102,7 @@ private _cam = "camera" camCreate (_shotPositions # 0);
 if (isNull _cam) exitWith {
     uiNamespace setVariable ["MWF_IntroCinematicStage", "CAMERA_FAIL"];
     uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+    missionNamespace setVariable ["MWF_BlockRespawn", false];
     false
 };
 
@@ -118,4 +144,5 @@ if ((typeOf _anchor) isEqualTo "Logic" && {local _anchor}) then {
 
 uiNamespace setVariable ["MWF_IntroCinematicStage", "COMPLETE"];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+missionNamespace setVariable ["MWF_BlockRespawn", false];
 true
