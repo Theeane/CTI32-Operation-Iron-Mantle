@@ -19,16 +19,16 @@ missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_REINIT"];
         !isNull player && {alive player} && {!isNull findDisplay 46}
     };
 
+    private _appliedSaved = false;
     if (!isNil "MWF_fnc_applyRespawnLoadout") then {
-        private _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
-        private _shouldApplyBaseline = (!_appliedSaved) && {!isNil "MWF_fnc_applyBaselineLoadout"};
-        if (_shouldApplyBaseline) then {
-            [] call MWF_fnc_applyBaselineLoadout;
+        _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
+        if (isNil "_appliedSaved") then {
+            _appliedSaved = false;
         };
-    } else {
-        if (!isNil "MWF_fnc_applyBaselineLoadout") then {
-            [] call MWF_fnc_applyBaselineLoadout;
-        };
+    };
+
+    if (!_appliedSaved && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+        [] call MWF_fnc_applyBaselineLoadout;
     };
 
     if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
