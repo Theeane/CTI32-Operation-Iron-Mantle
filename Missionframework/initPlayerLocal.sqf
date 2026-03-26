@@ -50,7 +50,7 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
     missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
     if (!isNil "MWF_fnc_playIntroCinematic") then {
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-        [] spawn MWF_fnc_playIntroCinematic;
+        [] call MWF_fnc_playIntroCinematic;
     } else {
         uiNamespace setVariable ["MWF_IntroCinematicStage", "MISSING_FUNCTION"];
     };
