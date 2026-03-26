@@ -48,7 +48,7 @@ private _placeOnTable = {
     private _localPos = [
         _xy # 0,
         _xy # 1,
-        _tableTop - _objBottom + 0.03
+        _tableTop - _objBottom + 0.008
     ];
 
     _obj setDir ((getDir _tableObj) + _yawOffset);
@@ -58,10 +58,10 @@ private _placeOnTable = {
 [_table] call _lockObj;
 
 if (!isNull _table && !isNull _terminal) then {
-    [_table, _terminal, [0.17, -0.05], 0] call _placeOnTable;
+    [_table, _terminal, [0.14, -0.10], 0] call _placeOnTable;
 };
 if (!isNull _table && !isNull _lamp) then {
-    [_table, _lamp, [-0.17, 0.08], 0] call _placeOnTable;
+    [_table, _lamp, [-0.19, -0.07], 0] call _placeOnTable;
 };
 
 [_terminal] call _lockObj;
