@@ -4,8 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Stabilizes the editor-placed MOB props and nudges the laptop/lamp slightly upward so
-    they sit visibly on top of the table before being locked against damage/physics.
+    Stabilizes the editor-placed MOB props and places the laptop/lamp on top of the
+    table using fixed local offsets before locking them against damage/physics.
 */
 
 if (!isServer) exitWith { objNull };
@@ -37,19 +37,35 @@ private _lockObj = {
     _obj enableSimulationGlobal false;
 };
 
+private _placeOnTable = {
+    params ["_tableObj", "_obj", "_xy", ["_yawOffset", 0]];
+    if (isNull _tableObj || {isNull _obj}) exitWith {};
+
+    private _bboxTable = boundingBoxReal _tableObj;
+    private _bboxObj = boundingBoxReal _obj;
+    private _tableTop = (_bboxTable # 1) # 2;
+    private _objBottom = (_bboxObj # 0) # 2;
+    private _localPos = [
+        _xy # 0,
+        _xy # 1,
+        _tableTop - _objBottom + 0.008
+    ];
+
+    _obj setDir ((getDir _tableObj) + _yawOffset);
+    _obj setPosWorld (_tableObj modelToWorldWorld _localPos);
+};
+
 [_table] call _lockObj;
 
-if (!isNull _terminal) then {
-    private _pos = getPosATL _terminal;
-    _terminal setPosATL [_pos # 0, _pos # 1, (_pos # 2) + 0.035];
-    [_terminal] call _lockObj;
+if (!isNull _table && !isNull _terminal) then {
+    [_table, _terminal, [0.17, -0.03], 0] call _placeOnTable;
+};
+if (!isNull _table && !isNull _lamp) then {
+    [_table, _lamp, [-0.15, 0.06], 0] call _placeOnTable;
 };
 
-if (!isNull _lamp) then {
-    private _pos = getPosATL _lamp;
-    _lamp setPosATL [_pos # 0, _pos # 1, (_pos # 2) + 0.03];
-    [_lamp] call _lockObj;
-};
+[_terminal] call _lockObj;
+[_lamp] call _lockObj;
 
 if (!isNull _table) then { missionNamespace setVariable ["MWF_MOB_Table", _table, true]; };
 if (!isNull _terminal) then { missionNamespace setVariable ["MWF_Intel_Center", _terminal, true]; };
