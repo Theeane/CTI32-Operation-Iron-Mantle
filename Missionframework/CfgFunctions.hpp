@@ -105,7 +105,6 @@ class CfgFunctions {
             class executeRepack { file = "functions/base/MWF_fn_executeRepack.sqf"; };
             class initCommandPC { file = "functions/base/MWF_fn_initCommandPC.sqf"; };
             class initFOB { file = "functions/base/MWF_fn_initFOB.sqf"; };
-            class initMOBAssets { file = "functions/base/MWF_fn_initMOBAssets.sqf"; };
             class initMobileRespawn { file = "functions/base/MWF_fn_initMobileRespawn.sqf"; };
             class vehicleIntelTransfer { file = "functions/base/MWF_fn_vehicleIntelTransfer.sqf"; };
             class spawnInitialFOBAsset { file = "functions/base/MWF_fn_spawnInitialFOBAsset.sqf"; };
@@ -117,6 +116,7 @@ class CfgFunctions {
             class repackFOB { file = "functions/base/MWF_fn_repackFOB.sqf"; };
             class restoreFOBs { file = "functions/base/MWF_fn_restoreFOBs.sqf"; };
             class garageSystem { file = "functions/base/MWF_fn_garageSystem.sqf"; };
+            class initMOBAssets { file = "functions/base/MWF_fn_initMOBAssets.sqf"; };
             class setupGarageInteractions { file = "functions/base/MWF_fn_setupGarageInteractions.sqf"; };
             class unregisterFOB { file = "functions/base/MWF_fn_unregisterFOB.sqf"; };
             class updateBuyCategory { file = "functions/base/MWF_fn_updateBuyCategory.sqf"; };
@@ -187,15 +187,10 @@ class CfgFunctions {
             class uiGoBack { file = "ui/datahub/MWF_fnc_uiGoBack.sqf"; };
         };
 
-        class Cinematics {
-            file = "functions/cinematics";
-            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
-        };
-
         class Loadout {
             file = "functions/loadout";
-            class applyRespawnLoadout { file = "functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
             class applyBaselineLoadout { file = "functions/loadout/MWF_fn_applyBaselineLoadout.sqf"; };
+            class applyRespawnLoadout { file = "functions/loadout/MWF_fn_applyRespawnLoadout.sqf"; };
             class buildLoadoutCaches { file = "functions/loadout/MWF_fn_buildLoadoutCaches.sqf"; };
             class initLoadoutSystem { file = "functions/loadout/MWF_fn_initLoadoutSystem.sqf"; };
             class openLoadoutArsenal { file = "functions/loadout/MWF_fn_openLoadoutArsenal.sqf"; };
@@ -284,6 +279,12 @@ class CfgFunctions {
             class handleCivilianCasualty { file = "functions/reputation/MWF_fn_handleCivilianCasualty.sqf"; };
         };
 
+
+
+        class Cinematics {
+            file = "functions/cinematics";
+            class playIntroCinematic { file = "functions/cinematics/MWF_fn_playIntroCinematic.sqf"; };
+        };
 
         class Audio {
             file = "functions/endgame";

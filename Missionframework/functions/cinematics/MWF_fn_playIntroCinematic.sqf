@@ -4,30 +4,38 @@
     Project: Military War Framework
 
     Description:
-    Plays a lightweight local 30-second intro cinematic near the MOB or player spawn
-    so the rest of the mission can finish settling in. Text is sourced from Stringtable.xml.
-    Optional music can be supplied through missionNamespace variable MWF_IntroMusicClass,
-    which should point at a valid CfgMusic classname.
+    Plays a lightweight local intro cinematic near the MOB or player spawn so the rest
+    of the mission can finish settling in. Uses a generous join window and waits for the
+    real in-world view so respawn UI cannot consume the intro.
 */
+
 if (!hasInterface) exitWith { false };
 if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith { false };
 
-uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
+private _joinWindow = 900;
+if ((serverTime > 0) && {serverTime > _joinWindow}) exitWith { false };
 
 [] spawn {
-    waitUntil { !isNull player && {alive player} };
-    sleep 0.25;
-
-    private _anchor = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_Intel_Center", objNull]];
-    if (isNull _anchor) then {
-        _anchor = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
-    };
-    if (isNull _anchor) then {
-        _anchor = player;
+    waitUntil {
+        uiSleep 0.25;
+        !isNull player && {alive player} && {!visibleMap} && {!dialog} && {!isNull findDisplay 46}
     };
 
-    private _anchorPos = if (_anchor isEqualTo player) then { getPosATL player } else { getPosATL _anchor };
-    private _anchorDir = if (_anchor isEqualTo player) then { getDir player } else { getDir _anchor };
+    if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith {};
+    uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
+
+    private _anchor = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]]];
+    if (isNull _anchor) then {
+        private _markerPos = getMarkerPos "respawn_west";
+        if !(_markerPos isEqualTo [0,0,0]) then {
+            _anchor = createVehicleLocal ["Logic", _markerPos, [], 0, "CAN_COLLIDE"];
+        } else {
+            _anchor = player;
+        };
+    };
+
+    private _anchorPos = getPosATL _anchor;
+    private _anchorDir = getDir _anchor;
 
     private _rotateOffset = {
         params ["_offset", ["_dir", 0, [0]]];
@@ -42,10 +50,10 @@ uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
     };
 
     private _shotOffsets = [
-        [30, -22, 10],
-        [-24, -30, 13],
-        [-18, 26, 15],
-        [12, 34, 12]
+        [18, -10, 6],
+        [-14, -16, 7],
+        [-12, 14, 8],
+        [10, 18, 6]
     ];
     private _shotPositions = _shotOffsets apply { _anchorPos vectorAdd ([_x, _anchorDir] call _rotateOffset) };
     private _shotFovs = [0.78, 0.74, 0.70, 0.76];
@@ -63,12 +71,6 @@ uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
     cutText ["", "BLACK FADED", 0];
     sleep 0.1;
     cutText ["", "BLACK IN", 2];
-
-    private _introMusicClass = missionNamespace getVariable ["MWF_IntroMusicClass", ""];
-    private _startedMusic = false;
-    if (_introMusicClass isEqualType "" && {_introMusicClass isNotEqualTo ""} && {!isNil "MWF_fnc_playSharedMusic"}) then {
-        _startedMusic = ["PLAY", _introMusicClass] call MWF_fnc_playSharedMusic;
-    };
 
     [] spawn {
         sleep 10;
@@ -95,14 +97,14 @@ uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
         };
     };
 
-    if (_startedMusic && {!isNil "MWF_fnc_playSharedMusic"}) then {
-        ["STOP", ""] call MWF_fnc_playSharedMusic;
-    };
-
     _cam cameraEffect ["TERMINATE", "BACK"];
     camDestroy _cam;
     player switchCamera "INTERNAL";
     cutText ["", "BLACK IN", 0.5];
+
+    if ((typeOf _anchor) isEqualTo "Logic" && {local _anchor}) then {
+        deleteVehicle _anchor;
+    };
 };
 
 true

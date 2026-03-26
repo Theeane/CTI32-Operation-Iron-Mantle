@@ -4,9 +4,9 @@
     Project: Military War Framework (MWF)
 
     Description:
-    Authoritative server boot chain.
-    Starts the critical runtime first so clients are never hard-locked behind optional
-    restore/bootstrap work, then runs the remaining startup passes asynchronously.
+    Authoritative server boot chain. Starts the critical runtime first so clients are never
+    hard-locked behind optional restore/bootstrap work, then runs the remaining startup
+    passes asynchronously in the background.
 */
 
 if (!isServer) exitWith {};
@@ -15,6 +15,7 @@ if (missionNamespace getVariable ["MWF_ServerBootRunning", false]) exitWith {};
 missionNamespace setVariable ["MWF_ServerBootRunning", true, true];
 missionNamespace setVariable ["MWF_ServerInitialized", false, true];
 missionNamespace setVariable ["MWF_ServerBootStage", "BOOT_START", true];
+missionNamespace setVariable ["MWF_ServerPostBootStage", "IDLE", true];
 missionNamespace setVariable ["MWF_ServerSubsystemsReady", false, true];
 
 private _setBootStage = {
@@ -98,18 +99,11 @@ private _spawnPostStep = {
     };
 };
 
-["RESTORE_SESSION", {
-    [] call MWF_fnc_restoreSession;
-}] call _spawnPostStep;
-
-["RESTORE_FOBS", {
-    [] call MWF_fnc_restoreFOBs;
-}] call _spawnPostStep;
+["RESTORE_SESSION", { [] call MWF_fnc_restoreSession; }] call _spawnPostStep;
+["RESTORE_FOBS", { [] call MWF_fnc_restoreFOBs; }] call _spawnPostStep;
 
 if (!isNil "MWF_fnc_restoreBuiltUpgradeStructures") then {
-    ["RESTORE_BUILT_UPGRADES", {
-        [] call MWF_fnc_restoreBuiltUpgradeStructures;
-    }] call _spawnPostStep;
+    ["RESTORE_BUILT_UPGRADES", { [] call MWF_fnc_restoreBuiltUpgradeStructures; }] call _spawnPostStep;
 };
 
 ["INITIAL_FOB_ASSET", {
@@ -177,7 +171,7 @@ if (!isNil "MWF_fnc_fobDespawnSystem") then {
     };
 
     if (!(missionNamespace getVariable ["MWF_ZoneSystemReady", false])) then {
-        diag_log "[MWF] WARNING: Zone system not fully ready before subsystem monitor timeout.";
+        diag_log format ["[MWF] WARNING: Zone system not fully ready before subsystem monitor timeout. Stage=%1", missionNamespace getVariable ["MWF_ZoneManagerStage", "UNKNOWN"]];
     };
     if (!(missionNamespace getVariable ["MWF_WorldSystemReady", false])) then {
         diag_log "[MWF] WARNING: World system not fully ready before subsystem monitor timeout.";

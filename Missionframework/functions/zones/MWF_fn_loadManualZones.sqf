@@ -5,12 +5,16 @@
 
     Description:
     Loads mission maker defined zone objects and legacy zone markers into a unified zone object array.
+    Uses the presence of a non-empty MWF_zoneType value instead of the looser getVariable-exists check.
 */
 
 if (!isServer) exitWith {[]};
 
 private _manualZones = [];
-private _editorZones = entities "Logic" select { !isNil { _x getVariable "MWF_zoneType" } };
+private _editorZones = entities "Logic" select {
+    private _rawType = _x getVariable ["MWF_zoneType", ""];
+    (_rawType isEqualType "") && {_rawType isNotEqualTo ""}
+};
 
 {
     private _zone = _x;
