@@ -5,8 +5,7 @@
 
     Description:
     Builds the authoritative zone registry from manual overrides and automatic map generation,
-    applies persistence, and starts the zone runtime managers. Also exposes a lightweight
-    stage variable for live debugging.
+    applies persistence, and starts the zone runtime managers.
 */
 
 if (!isServer) exitWith {};
@@ -19,19 +18,19 @@ missionNamespace setVariable ["MWF_all_mission_zones", [], true];
 missionNamespace setVariable ["MWF_ActiveZones", [], true];
 
 private _manualZones = [];
-missionNamespace setVariable ["MWF_ZoneManagerStage", "LOAD_MANUAL", true];
 if (!isNil "MWF_fnc_loadManualZones") then {
+    missionNamespace setVariable ["MWF_ZoneManagerStage", "LOAD_MANUAL", true];
     _manualZones = [] call MWF_fnc_loadManualZones;
 };
 
 private _generatedZones = [];
-missionNamespace setVariable ["MWF_ZoneManagerStage", "GENERATE_AUTO", true];
 if (!isNil "MWF_fnc_generateZonesFromMap") then {
+    missionNamespace setVariable ["MWF_ZoneManagerStage", "GENERATE_MAP", true];
     _generatedZones = [_manualZones] call MWF_fnc_generateZonesFromMap;
 };
 
+missionNamespace setVariable ["MWF_ZoneManagerStage", "REGISTER_ZONES", true];
 private _allZones = [];
-missionNamespace setVariable ["MWF_ZoneManagerStage", "REGISTER", true];
 {
     private _zone = _x;
     if (!isNull _zone) then {
@@ -45,8 +44,8 @@ missionNamespace setVariable ["MWF_ZoneManagerStage", "REGISTER", true];
 missionNamespace setVariable ["MWF_all_mission_zones", _allZones, true];
 missionNamespace setVariable ["MWF_ActiveZones", _allZones, true];
 
-private _loadedZoneSaveData = missionNamespace getVariable ["MWF_LoadedZoneSaveData", []];
 missionNamespace setVariable ["MWF_ZoneManagerStage", "APPLY_SAVE", true];
+private _loadedZoneSaveData = missionNamespace getVariable ["MWF_LoadedZoneSaveData", []];
 if !(_loadedZoneSaveData isEqualTo []) then {
     [_loadedZoneSaveData] call MWF_fnc_applyZoneSaveData;
 } else {
@@ -62,12 +61,12 @@ if (!isNil "MWF_fnc_zoneHandler") then {
 };
 
 if (!isNil "MWF_fnc_abandonManager") then {
-    missionNamespace setVariable ["MWF_ZoneManagerStage", "SPAWN_ABANDON", true];
+    missionNamespace setVariable ["MWF_ZoneManagerStage", "SPAWN_ABANDON_MANAGER", true];
     [] spawn MWF_fnc_abandonManager;
 };
 
-missionNamespace setVariable ["MWF_ZoneManagerStage", "READY", true];
 missionNamespace setVariable ["MWF_ZoneSystemReady", true, true];
+missionNamespace setVariable ["MWF_ZoneManagerStage", "COMPLETE", true];
 
 diag_log format [
     "[MWF Zones] Zone manager initialized %1 zones. Manual: %2 | Generated: %3 | Runtime started.",
