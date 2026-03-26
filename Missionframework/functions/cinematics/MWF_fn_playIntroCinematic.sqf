@@ -4,9 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Plays a lightweight local intro cinematic near the MOB or player spawn.
-    This version is intentionally simple and parse-safe so it cannot die on a
-    late-stage camera command. It records explicit UI stage flags for debugging.
+    Plays a lightweight local intro cinematic near the MOB or player spawn so the rest
+    of the mission can finish settling in. Starts as early as possible once the in-world
+    view is available and records explicit stage flags for debugging.
 */
 
 if (!hasInterface) exitWith { false };
@@ -22,8 +22,9 @@ uiNamespace setVariable ["MWF_IntroCinematicActive", true];
     private _deadline = diag_tickTime + 45;
     waitUntil {
         uiSleep 0.1;
-        private _ready = !isNull player && alive player && !visibleMap && !dialog && !isNull findDisplay 46;
-        _ready || (diag_tickTime >= _deadline)
+        (
+            !isNull player && {alive player} && {!visibleMap} && {!dialog} && {!isNull findDisplay 46}
+        ) || {diag_tickTime >= _deadline}
     };
 
     if (diag_tickTime >= _deadline) exitWith {
@@ -39,13 +40,7 @@ uiNamespace setVariable ["MWF_IntroCinematicActive", true];
     uiNamespace setVariable ["MWF_IntroCinematicStage", "STARTING"];
     uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 
-    private _anchor = missionNamespace getVariable ["MWF_MOB_Table", objNull];
-    if (isNull _anchor) then {
-        _anchor = missionNamespace getVariable ["MWF_MainBase", objNull];
-    };
-    if (isNull _anchor) then {
-        _anchor = missionNamespace getVariable ["MWF_MOB", objNull];
-    };
+    private _anchor = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]]];
     if (isNull _anchor) then {
         private _markerPos = getMarkerPos "respawn_west";
         if !(_markerPos isEqualTo [0,0,0]) then {
@@ -76,14 +71,10 @@ uiNamespace setVariable ["MWF_IntroCinematicActive", true];
         [-10, 12, 7],
         [9, 16, 5]
     ];
-    private _shotFovs = [0.80, 0.75, 0.72, 0.78];
+    private _shotPositions = _shotOffsets apply { _anchorPos vectorAdd ([_x, _anchorDir] call _rotateOffset) };
+    private _shotFovs = [0.8, 0.75, 0.72, 0.78];
 
-    private _shotPositions = [];
-    {
-        _shotPositions pushBack (_anchorPos vectorAdd ([_x, _anchorDir] call _rotateOffset));
-    } forEach _shotOffsets;
-
-    private _cam = "camera" camCreate (_shotPositions select 0);
+    private _cam = "camera" camCreate (_shotPositions # 0);
     if (isNull _cam) exitWith {
         uiNamespace setVariable ["MWF_IntroCinematicStage", "CAMERA_FAIL"];
         uiNamespace setVariable ["MWF_IntroCinematicActive", false];
@@ -92,26 +83,26 @@ uiNamespace setVariable ["MWF_IntroCinematicActive", true];
     uiNamespace setVariable ["MWF_IntroCinematicStage", "CAMERA_ACTIVE"];
     showCinemaBorder false;
     _cam cameraEffect ["INTERNAL", "BACK"];
+    _cam camSetPos (_shotPositions # 0);
     _cam camSetTarget _anchor;
-    _cam camSetPos (_shotPositions select 0);
-    _cam camSetFov (_shotFovs select 0);
+    _cam camSetFov (_shotFovs # 0);
     _cam camCommit 0;
 
     cutText ["", "BLACK FADED", 0];
-    uiSleep 0.1;
+    sleep 0.1;
     cutText ["", "BLACK IN", 2];
 
     for "_i" from 1 to ((count _shotPositions) - 1) do {
         uiNamespace setVariable ["MWF_IntroCinematicStage", format ["SHOT_%1", _i]];
-        _cam camSetTarget _anchor;
-        _cam camSetPos (_shotPositions select _i);
-        _cam camSetFov (_shotFovs select _i);
-        _cam camCommit 7;
+        _cam camPreparePos (_shotPositions # _i);
+        _cam camPrepareTarget _anchor;
+        _cam camPrepareFov (_shotFovs # _i);
+        _cam camCommitPrepared 7;
 
         private _timeout = time + 7.5;
         waitUntil {
-            uiSleep 0.05;
-            (camCommitted _cam) || (time >= _timeout)
+            sleep 0.05;
+            camCommitted _cam || {time >= _timeout}
         };
     };
 

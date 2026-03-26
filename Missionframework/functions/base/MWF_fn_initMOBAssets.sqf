@@ -38,7 +38,7 @@ private _lockObj = {
 };
 
 private _placeOnTable = {
-    params ["_tableObj", "_obj", "_xy", ["_yawOffset", 0], ["_extraLift", 0]];
+    params ["_tableObj", "_obj", "_xy", ["_yawOffset", 0]];
     if (isNull _tableObj || {isNull _obj}) exitWith {};
 
     private _bboxTable = boundingBoxReal _tableObj;
@@ -48,21 +48,20 @@ private _placeOnTable = {
     private _localPos = [
         _xy # 0,
         _xy # 1,
-        _tableTop - _objBottom + 0.008
+        _tableTop - _objBottom + 0.03
     ];
 
     _obj setDir ((getDir _tableObj) + _yawOffset);
     _obj setPosWorld (_tableObj modelToWorldWorld _localPos);
-    _obj setVectorUp [0,0,1];
 };
 
 [_table] call _lockObj;
 
 if (!isNull _table && !isNull _terminal) then {
-    [_table, _terminal, [0.24, -0.12], 0, 0.0] call _placeOnTable;
+    [_table, _terminal, [0.17, -0.05], 0] call _placeOnTable;
 };
 if (!isNull _table && !isNull _lamp) then {
-    [_table, _lamp, [-0.22, 0.14], 0, 0.01] call _placeOnTable;
+    [_table, _lamp, [-0.17, 0.08], 0] call _placeOnTable;
 };
 
 [_terminal] call _lockObj;
