@@ -4,8 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Cleans up any leftover first-join cinematic locks and reapplies player-local
-    post-respawn setup without replaying the intro cinematic.
+    Clears any leftover intro lock state and reapplies player-local respawn setup
+    without replaying the intro cinematic.
 */
 
 missionNamespace setVariable ["MWF_BlockRespawn", false];
@@ -21,7 +21,8 @@ missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_REINIT"];
 
     if (!isNil "MWF_fnc_applyRespawnLoadout") then {
         private _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
-        if (!_appliedSaved && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+        private _shouldApplyBaseline = (!_appliedSaved) && {!isNil "MWF_fnc_applyBaselineLoadout"};
+        if (_shouldApplyBaseline) then {
             [] call MWF_fnc_applyBaselineLoadout;
         };
     } else {

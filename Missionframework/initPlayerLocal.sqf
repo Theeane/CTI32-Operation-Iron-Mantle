@@ -3,15 +3,16 @@
     File: initPlayerLocal.sqf
     Project: Military War Framework
     Description:
-    Handles client-side initialization for each player. First join now stays on the
+    Handles client-side initialization for each player. First join stays on the
     intro/island flow until the cinematic finishes, then the player is script-deployed
-    to the dedicated MOB deploy pad. Normal respawn remains a separate engine path.
+    to a dedicated MOB pad. Normal respawn remains a separate engine path.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER"];
 uiNamespace setVariable ["MWF_IntroCallAttempted", false];
 uiNamespace setVariable ["MWF_IntroCinematicStage", "NOT_CALLED"];
 uiNamespace setVariable ["MWF_InitialIntroSequenceDone", uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]];
+missionNamespace setVariable ["MWF_BlockRespawn", missionNamespace getVariable ["MWF_BlockRespawn", false]];
 
 private _clientBootDeadline = diag_tickTime + 120;
 waitUntil {
@@ -41,6 +42,15 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         && {!isNull findDisplay 46}
     };
 
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SYSTEMS"];
+    private _systemsDeadline = diag_tickTime + 60;
+    waitUntil {
+        uiSleep 0.25;
+        (missionNamespace getVariable ["MWF_systems_ready", false]) ||
+        (missionNamespace getVariable ["MWF_ServerSubsystemsReady", false]) ||
+        {diag_tickTime >= _systemsDeadline}
+    };
+
     uiSleep 0.5;
 
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
@@ -61,9 +71,13 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
 
         missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY"];
-        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
+
+        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
         if (isNull _deployPad) then {
-            _deployPad = missionNamespace getVariable ["MWF_MOB_FobPad", objNull];
+            _deployPad = missionNamespace getVariable ["mob_deploy_pad", objNull];
+        };
+        if (isNull _deployPad) then {
+            _deployPad = missionNamespace getVariable ["MWF_MOB_FobPad", missionNamespace getVariable ["MWF_FOB_Box_Spawn", objNull]];
         };
 
         private _deployed = false;
@@ -81,11 +95,14 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
             };
         };
 
-        if (_deployed && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
-            [] call MWF_fnc_applyBaselineLoadout;
+        if (_deployed) then {
+            missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_SETTLE"];
+            uiSleep 0.25;
+            if (!isNil "MWF_fnc_applyBaselineLoadout") then {
+                [] call MWF_fnc_applyBaselineLoadout;
+            };
         };
 
-        uiSleep 0.25;
         disableUserInput false;
         missionNamespace setVariable ["MWF_BlockRespawn", false];
         missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_DONE"];

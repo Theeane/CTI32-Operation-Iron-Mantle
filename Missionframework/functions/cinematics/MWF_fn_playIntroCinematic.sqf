@@ -5,8 +5,8 @@
 
     Description:
     Plays a lightweight local intro cinematic near the MOB. This version is
-    intentionally synchronous so initPlayerLocal can hold first-join deployment until
-    the cinematic has finished and keep the escape/respawn path closed during playback.
+    synchronous so initPlayerLocal can hold first-join deployment until the
+    cinematic finishes and keep the escape/respawn path closed during playback.
 */
 
 if (!hasInterface) exitWith { false };
