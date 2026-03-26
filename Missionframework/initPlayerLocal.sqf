@@ -3,14 +3,15 @@
     File: initPlayerLocal.sqf
     Project: Military War Framework
     Description:
-    Handles client-side initialization for each player. Uses a timeout and the
-    CRITICAL_RELEASED boot stage so local systems are never hard-locked behind
-    slower background server work.
+    Handles client-side initialization for each player. The first-session intro now
+    plays before the initial respawn menu is opened. After the player closes/deploys
+    from that menu, local interactions and loadout systems come online.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER"];
 uiNamespace setVariable ["MWF_IntroCallAttempted", false];
 uiNamespace setVariable ["MWF_IntroCinematicStage", "NOT_CALLED"];
+uiNamespace setVariable ["MWF_InitialIntroSequenceDone", uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]];
 
 private _clientBootDeadline = diag_tickTime + 120;
 waitUntil {
@@ -47,12 +48,21 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
     [] call MWF_fnc_initUI;
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
-    if (!isNil "MWF_fnc_playIntroCinematic") then {
+    if !(uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]) then {
+        missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-        [] call MWF_fnc_playIntroCinematic;
-    } else {
-        uiNamespace setVariable ["MWF_IntroCinematicStage", "MISSING_FUNCTION"];
+        [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+        uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+
+        missionNamespace setVariable ["MWF_ClientInitStage", "OPEN_INITIAL_RESPAWN_MENU"];
+        if (!isNil "BIS_fnc_showRespawnMenu") then {
+            ["Open", true] call BIS_fnc_showRespawnMenu;
+            waitUntil {
+                uiSleep 0.25;
+                !dialog
+            };
+            uiSleep 0.5;
+        };
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];
