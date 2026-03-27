@@ -13,13 +13,20 @@
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER"];
+missionNamespace setVariable ["MWF_ClientInitComplete", false];
 
-if !(uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]) then {
-    uiNamespace setVariable ["MWF_IntroCallAttempted", false];
-    uiNamespace setVariable ["MWF_IntroCinematicStage", "NOT_CALLED"];
-    uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
-    uiNamespace setVariable ["MWF_IntroCinematicActive", false];
-};
+/*
+    Fresh mission join should always start with a clean intro state.
+    onPlayerRespawn.sqf handles real respawns separately, so it is safe to hard-reset
+    these UI-scoped intro variables here.
+*/
+uiNamespace setVariable ["MWF_InitialIntroSequenceDone", false];
+uiNamespace setVariable ["MWF_IntroCallAttempted", false];
+uiNamespace setVariable ["MWF_IntroCinematicStage", "NOT_CALLED"];
+uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
+uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+missionNamespace setVariable ["MWF_IntroCallResult", false];
+missionNamespace setVariable ["MWF_IntroCallStage", "NOT_CALLED"];
 
 private _clientBootDeadline = diag_tickTime + 120;
 waitUntil {
@@ -74,21 +81,32 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
 
-        missionNamespace setVariable ["MWF_IntroCallResult", false];
+        private _introResult = false;
         if (!isNil "MWF_fnc_playIntroCinematic") then {
-            missionNamespace setVariable ["MWF_IntroCallResult", [] call MWF_fnc_playIntroCinematic];
+            _introResult = [] call MWF_fnc_playIntroCinematic;
         } else {
-            missionNamespace setVariable ["MWF_IntroCallResult", [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf"];
+            _introResult = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
         };
 
-        if (missionNamespace getVariable ["MWF_IntroCallResult", false]) then {
+        private _introStage = uiNamespace getVariable ["MWF_IntroCinematicStage", "UNKNOWN"];
+        missionNamespace setVariable ["MWF_IntroCallResult", _introResult];
+        missionNamespace setVariable ["MWF_IntroCallStage", _introStage];
+        diag_log format ["[MWF] Intro call result=%1 stage=%2", _introResult, _introStage];
+
+        if (_introResult && {_introStage isEqualTo "COMPLETE"}) then {
             uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+        } else {
+            diag_log format [
+                "[MWF] WARNING: Intro cinematic did not complete cleanly. Result=%1 Stage=%2. Falling back to direct deploy.",
+                _introResult,
+                _introStage
+            ];
         };
 
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DEPLOY"];
         private _deployPos = getMarkerPos "respawn_west";
         private _deployDir = markerDir "respawn_west";
-        private _deployPad = missionNamespace getVariable ["mob_deploy_pad", objNull];
+        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
 
         if (isNull _deployPad && {!isNil "mob_deploy_pad"}) then {
             _deployPad = mob_deploy_pad;
@@ -104,6 +122,10 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
             player setDir _deployDir;
         };
 
+        /*
+            First join must always start from baseline. The loadout monitor should not
+            immediately re-apply a saved respawn profile over this.
+        */
         if (!isNil "MWF_fnc_applyBaselineLoadout") then {
             [] call MWF_fnc_applyBaselineLoadout;
         };
@@ -111,10 +133,10 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         uiSleep 0.25;
         disableUserInput false;
         missionNamespace setVariable ["MWF_BlockRespawn", false];
-        if (missionNamespace getVariable ["MWF_IntroCallResult", false]) then {
+        if (_introResult && {_introStage isEqualTo "COMPLETE"}) then {
             missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DONE"];
         } else {
-            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_SKIPPED"];
+            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_FALLBACK_DEPLOY"];
         };
     };
 
@@ -126,6 +148,10 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         [] call MWF_fnc_setupInteractions;
         [] spawn {
             uiSleep 4;
+            [] call MWF_fnc_setupInteractions;
+        };
+        [] spawn {
+            uiSleep 12;
             [] call MWF_fnc_setupInteractions;
         };
 

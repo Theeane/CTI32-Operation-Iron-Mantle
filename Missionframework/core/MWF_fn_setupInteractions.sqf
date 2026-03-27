@@ -13,7 +13,7 @@
 params [["_object", objNull, [objNull]]];
 
 if (isNull _object) then {
-    private _deadline = diag_tickTime + 20;
+    private _deadline = diag_tickTime + 60;
 
     while {isNull _object && {diag_tickTime < _deadline}} do {
         if (isNull _object) then {
@@ -27,6 +27,11 @@ if (isNull _object) then {
         if (isNull _object) then {
             private _anchorObjects = [];
 
+            private _deployPadNs = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
+            if (!isNull _deployPadNs) then {
+                _anchorObjects pushBackUnique _deployPadNs;
+            };
+
             if (!isNil "mob_deploy_pad") then {
                 _anchorObjects pushBackUnique mob_deploy_pad;
             };
@@ -34,6 +39,17 @@ if (isNull _object) then {
             private _mobTable = missionNamespace getVariable ["MWF_MOB_Table", objNull];
             if (!isNull _mobTable) then {
                 _anchorObjects pushBackUnique _mobTable;
+            };
+            if (!isNil "MWF_MOB_Table") then {
+                _anchorObjects pushBackUnique MWF_MOB_Table;
+            };
+
+            private _mobObject = missionNamespace getVariable ["MWF_MOB_Object", objNull];
+            if (!isNull _mobObject) then {
+                _anchorObjects pushBackUnique _mobObject;
+            };
+            if (!isNil "MWF_MOB") then {
+                _anchorObjects pushBackUnique MWF_MOB;
             };
 
             private _anchorPositions = [];

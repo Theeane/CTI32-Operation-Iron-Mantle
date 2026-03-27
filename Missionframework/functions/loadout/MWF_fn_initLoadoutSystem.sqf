@@ -5,8 +5,12 @@
 
     Description:
     Client-side monitor that grants Virtual Arsenal and Save Respawn Loadout
-    access while the player is inside a registered loadout zone. On a fresh profile
-    with no saved respawn package, applies a uniform-only baseline once.
+    access while the player is inside a registered loadout zone.
+
+    Important:
+    - First join loadout is handled by initPlayerLocal.sqf.
+    - Real respawn loadout is handled by onPlayerRespawn.sqf.
+    - This monitor should only manage zone actions, not auto-apply gear on bind.
 */
 
 if (!hasInterface) exitWith {};
@@ -30,12 +34,7 @@ missionNamespace setVariable ["MWF_SavedRespawnProfile", _savedProfile];
             };
             missionNamespace setVariable ["MWF_LoadoutActionIds", []];
             missionNamespace setVariable ["MWF_InLoadoutZone", false];
-
             _boundPlayer = player;
-            private _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
-            if (!_appliedSaved && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
-                [] call MWF_fnc_applyBaselineLoadout;
-            };
         };
 
         private _zones = + (missionNamespace getVariable ["MWF_LoadoutZones", []]);
