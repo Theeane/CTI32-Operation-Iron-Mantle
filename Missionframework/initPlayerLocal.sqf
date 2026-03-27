@@ -7,7 +7,7 @@
     Client-side initialization for each player.
 
     Join flow (every new join):
-    island/holding area -> local intro cinematic -> optional server sync wait -> deploy to mob_deploy_pad -> baseline loadout -> local client systems
+    staging/holding area -> local deployment cinematic -> direct insertion at MOB -> baseline loadout -> local client systems
 
     Respawn flow:
     handled separately in onPlayerRespawn.sqf. Intro never replays on player death.
@@ -25,6 +25,10 @@ uiNamespace setVariable ["MWF_IntroCinematicStage", "RESET"];
 uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 missionNamespace setVariable ["MWF_IntroCallResult", false];
+
+if (hasInterface) then {
+    cutText ["", "BLACK FADED", 0];
+};
 
 private _clientBootDeadline = diag_tickTime + 120;
 waitUntil {
@@ -45,6 +49,10 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
     waitUntil { !isNull player };
     waitUntil { alive player };
 
+    if (hasInterface) then {
+        cutText ["", "BLACK FADED", 0];
+    };
+
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_WORLD_READY"];
     waitUntil {
         uiSleep 0.25;
@@ -54,7 +62,7 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         && {!isNull findDisplay 46}
     };
 
-    uiSleep 0.5;
+    uiSleep 0.25;
 
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
     [] call MWF_fnc_initUI;
@@ -111,48 +119,92 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
             missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DONE"];
         } else {
             missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_FAILED_FALLBACK"];
-            diag_log "[MWF] WARNING: Intro cinematic failed after retries. Continuing with fallback deploy.";
+            diag_log "[MWF] WARNING: Intro cinematic failed after retries. Continuing with direct MOB insertion fallback.";
         };
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SUBSYSTEMS"];
-        private _subsystemDeadline = diag_tickTime + 45;
+        missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INSERT_POINT"];
+        private _insertDeadline = diag_tickTime + 20;
         waitUntil {
             uiSleep 0.25;
-            (missionNamespace getVariable ["MWF_ServerSubsystemsReady", false])
-            || {
-                missionNamespace getVariable ["MWF_ZoneSystemReady", false]
-                && {missionNamespace getVariable ["MWF_WorldSystemReady", false]}
-                && {missionNamespace getVariable ["MWF_ThreatSystemReady", false]}
-            }
-            || {diag_tickTime >= _subsystemDeadline}
+            !isNull (missionNamespace getVariable ["MWF_MOB_DeployPad", objNull])
+            || {!isNil "mob_deploy_pad"}
+            || {markerColor "MWF_MOB_Marker" isNotEqualTo ""}
+            || {!isNull (missionNamespace getVariable ["MWF_MOB", objNull])}
+            || {diag_tickTime >= _insertDeadline}
         };
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DEPLOY"];
-        private _deployPos = getMarkerPos "respawn_west";
-        private _deployDir = markerDir "respawn_west";
-        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
+        missionNamespace setVariable ["MWF_ClientInitStage", "MOB_INSERT"];
+
+        private _insertPos = [0, 0, 0];
+        private _insertDir = 0;
+        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
 
         if (isNull _deployPad && {!isNil "mob_deploy_pad"}) then {
             _deployPad = mob_deploy_pad;
         };
 
         if (!isNull _deployPad) then {
-            _deployPos = getPosATL _deployPad;
-            _deployDir = getDir _deployPad;
+            _insertPos = getPosATL _deployPad;
+            _insertDir = getDir _deployPad;
         };
 
-        if !(_deployPos isEqualTo [0,0,0]) then {
-            player setVehiclePosition [_deployPos, [], 0, "NONE"];
-            player setDir _deployDir;
+        if ((_insertPos isEqualTo [0, 0, 0]) && {markerColor "MWF_MOB_Marker" isNotEqualTo ""}) then {
+            _insertPos = getMarkerPos "MWF_MOB_Marker";
+            _insertDir = markerDir "MWF_MOB_Marker";
+        };
+
+        if ((_insertPos isEqualTo [0, 0, 0])) then {
+            private _mobArea = missionNamespace getVariable ["MWF_MOB", objNull];
+            if (!isNull _mobArea) then {
+                _insertPos = getPosATL _mobArea;
+                _insertDir = getDir _mobArea;
+            };
+        };
+
+        if ((_insertPos isEqualTo [0, 0, 0])) then {
+            private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
+            if (!isNull _mainBase) then {
+                _insertPos = getPosATL _mainBase;
+                _insertDir = getDir _mainBase;
+            };
+        };
+
+        if ((_insertPos isEqualTo [0, 0, 0])) then {
+            _insertPos = getPosATL player;
+            _insertDir = getDir player;
+        };
+
+        if !(vehicle player isEqualTo player) then {
+            moveOut player;
+            uiSleep 0.1;
+        };
+
+        if !(_insertPos isEqualTo [0, 0, 0]) then {
+            player switchMove "";
+            player setVelocity [0, 0, 0];
+            player setPosATL _insertPos;
+            player setVehiclePosition [_insertPos, [], 0, "NONE"];
+            player setDir _insertDir;
         };
 
         if (!isNil "MWF_fnc_applyBaselineLoadout") then {
             [] call MWF_fnc_applyBaselineLoadout;
         };
 
+        if (!isNil "MWF_fnc_setupInteractions") then {
+            [] call MWF_fnc_setupInteractions;
+        };
+
+        if (!isNil "MWF_fnc_initLoadoutSystem") then {
+            [] call MWF_fnc_initLoadoutSystem;
+        };
+
         missionNamespace setVariable ["MWF_BlockRespawn", false];
         disableUserInput false;
+        cutText ["", "BLACK IN", 1.5];
         uiSleep 0.25;
+    } else {
+        cutText ["", "BLACK IN", 0.5];
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];

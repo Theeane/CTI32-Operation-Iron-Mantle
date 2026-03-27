@@ -11,21 +11,34 @@
 if (!isServer) exitWith { objNull };
 if (missionNamespace getVariable ["MWF_MOBAssetsInitialized", false]) exitWith { missionNamespace getVariable ["MWF_MOB_Table", objNull] };
 
-private _respawnPos = getMarkerPos "respawn_west";
+private _mobPos = [0, 0, 0];
+if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then {
+    _mobPos = getMarkerPos "MWF_MOB_Marker";
+};
+if ((_mobPos isEqualTo [0, 0, 0])) then {
+    private _mobArea = missionNamespace getVariable ["MWF_MOB", objNull];
+    if (!isNull _mobArea) then {
+        _mobPos = getPosATL _mobArea;
+    };
+};
+if ((_mobPos isEqualTo [0, 0, 0])) then {
+    _mobPos = getMarkerPos "respawn_west";
+};
+
 private _table = missionNamespace getVariable ["MWF_MOB_Table", objNull];
 private _terminal = missionNamespace getVariable ["MWF_Intel_Center", objNull];
 private _lamp = missionNamespace getVariable ["MWF_Base_Light", objNull];
 
-if (isNull _table && !(_respawnPos isEqualTo [0,0,0])) then {
-    private _tables = nearestObjects [_respawnPos, ["Land_CampingTable_small_F"], 20, true];
+if (isNull _table && !(_mobPos isEqualTo [0, 0, 0])) then {
+    private _tables = nearestObjects [_mobPos, ["Land_CampingTable_small_F"], 20, true];
     if (_tables isNotEqualTo []) then { _table = _tables # 0; };
 };
-if (isNull _terminal && !(_respawnPos isEqualTo [0,0,0])) then {
-    private _terminals = nearestObjects [_respawnPos, ["Land_Laptop_unfolded_F"], 20, true];
+if (isNull _terminal && !(_mobPos isEqualTo [0, 0, 0])) then {
+    private _terminals = nearestObjects [_mobPos, ["Land_Laptop_unfolded_F"], 20, true];
     if (_terminals isNotEqualTo []) then { _terminal = _terminals # 0; };
 };
-if (isNull _lamp && !(_respawnPos isEqualTo [0,0,0])) then {
-    private _lamps = nearestObjects [_respawnPos, ["Land_Camping_Light_F"], 20, true];
+if (isNull _lamp && !(_mobPos isEqualTo [0, 0, 0])) then {
+    private _lamps = nearestObjects [_mobPos, ["Land_Camping_Light_F"], 20, true];
     if (_lamps isNotEqualTo []) then { _lamp = _lamps # 0; };
 };
 

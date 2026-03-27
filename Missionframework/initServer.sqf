@@ -40,7 +40,10 @@ missionNamespace setVariable ["MWF_MOB_Object", _mobObject, true];
 
 private _mobPad = missionNamespace getVariable ["MWF_MOB_FobPad", missionNamespace getVariable ["MWF_FOB_Box_Spawn", objNull]];
 if (isNull _mobPad) then {
-    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "respawn_west" };
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" };
+    if (_searchOrigin isEqualTo [0, 0, 0]) then {
+        _searchOrigin = getMarkerPos "respawn_west";
+    };
     private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
     if !(_pads isEqualTo []) then {
         _mobPad = _pads # 0;
@@ -50,7 +53,10 @@ missionNamespace setVariable ["MWF_MOB_FobPad", _mobPad, true];
 
 private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
 if (isNull _deployPad) then {
-    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "respawn_west" };
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" };
+    if (_searchOrigin isEqualTo [0, 0, 0]) then {
+        _searchOrigin = getMarkerPos "respawn_west";
+    };
     private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
     _pads = _pads select { !isNull _x && {_x != _mobPad} };
     if !(_pads isEqualTo []) then {
@@ -59,8 +65,16 @@ if (isNull _deployPad) then {
 };
 missionNamespace setVariable ["MWF_MOB_DeployPad", _deployPad, true];
 
-private _mainRespawnMarker = "respawn_west";
-if (markerColor _mainRespawnMarker isNotEqualTo "") then {
+private _mainRespawnMarker = "";
+if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then {
+    _mainRespawnMarker = "MWF_MOB_Marker";
+} else {
+    if (markerColor "respawn_west" isNotEqualTo "") then {
+        _mainRespawnMarker = "respawn_west";
+    };
+};
+
+if (_mainRespawnMarker isNotEqualTo "") then {
     private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
     if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
         [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
@@ -70,7 +84,7 @@ if (markerColor _mainRespawnMarker isNotEqualTo "") then {
     missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
     diag_log format ["[MWF] Main Operating Base respawn registered on marker %1.", _mainRespawnMarker];
 } else {
-    diag_log format ["[MWF] WARNING: Main Operating Base respawn marker %1 was not found during server init.", _mainRespawnMarker];
+    diag_log "[MWF] WARNING: No valid Main Operating Base respawn marker was found during server init.";
 };
 
 if (!isNil "MWF_fnc_initMOBAssets") then {

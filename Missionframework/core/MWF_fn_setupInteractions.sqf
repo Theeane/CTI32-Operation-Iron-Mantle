@@ -50,9 +50,14 @@ if (isNull _object) then {
                 };
             } forEach _anchorObjects;
 
-            private _mobPos = getMarkerPos "respawn_west";
-            if !(_mobPos isEqualTo [0,0,0]) then {
-                _anchorPositions pushBackUnique _mobPos;
+            private _mobMarkerPos = if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then { getMarkerPos "MWF_MOB_Marker" } else { [0, 0, 0] };
+            if !(_mobMarkerPos isEqualTo [0, 0, 0]) then {
+                _anchorPositions pushBackUnique _mobMarkerPos;
+            };
+
+            private _respawnMarkerPos = getMarkerPos "respawn_west";
+            if ((_anchorPositions isEqualTo []) && {!(_respawnMarkerPos isEqualTo [0, 0, 0])}) then {
+                _anchorPositions pushBackUnique _respawnMarkerPos;
             };
 
             {
