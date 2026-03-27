@@ -9,7 +9,7 @@
 
 respawn = 3;
 respawnDelay = 5;
-respawnOnStart = 0;
+respawnOnStart = 1;
 disabledAI = 1;
 
 respawnTemplates[] = {"MenuPosition"};

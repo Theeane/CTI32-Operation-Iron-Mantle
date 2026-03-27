@@ -4,8 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Resolves the MOB terminal locally and initializes its direct terminal actions.
-    Computer login is no longer used as a gameplay gate.
+    Systems-first terminal setup.
+    Finds the MOB computer and initializes terminal actions directly.
+    Login is intentionally bypassed so the terminal is usable immediately.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -28,11 +29,9 @@ if (isNull _object) then {
             private _anchorObjects = [];
 
             {
-                if (!isNil _x) then {
-                    private _candidate = missionNamespace getVariable [_x, objNull];
-                    if (!isNull _candidate) then {
-                        _anchorObjects pushBackUnique _candidate;
-                    };
+                private _candidate = missionNamespace getVariable [_x, objNull];
+                if (!isNull _candidate) then {
+                    _anchorObjects pushBackUnique _candidate;
                 };
             } forEach ["MWF_MOB_Table", "MWF_MainBase", "MWF_MOB", "MWF_MOB_Object", "MWF_MOB_DeployPad", "MWF_MOB_FobPad"];
 
@@ -84,23 +83,18 @@ if (isNull _object) then {
 };
 
 if (isNull _object) exitWith {
-    diag_log "[MWF Setup] MOB terminal interaction setup skipped: no valid computer object found after retries.";
+    diag_log "[MWF Setup] Terminal setup skipped: no valid MOB computer object found after retries.";
     false
 };
 
-private _existingActionId = _object getVariable ["MWF_MOB_LoginActionId", -1];
-if (_existingActionId >= 0) then {
-    [_object, _existingActionId] call BIS_fnc_holdActionRemove;
-    _object setVariable ["MWF_MOB_LoginActionId", -1];
+missionNamespace setVariable ["MWF_system_active", true, true];
+player setVariable ["MWF_Player_Authenticated", true, true];
+
+if (!isNil "MWF_fnc_terminal_main") then {
+    ["INIT_SCROLL", _object] call MWF_fnc_terminal_main;
+    ["INIT_ACE", _object] call MWF_fnc_terminal_main;
 };
 
-if (isNil "MWF_fnc_terminal_main") exitWith {
-    diag_log "[MWF Setup] MOB terminal setup skipped: terminal_main function not loaded.";
-    false
-};
-
-["INIT_SCROLL", _object] call MWF_fnc_terminal_main;
-["INIT_ACE", _object] call MWF_fnc_terminal_main;
-
-diag_log format ["[MWF Setup] MOB direct terminal interactions initialized locally on %1.", _object];
+_object setVariable ["MWF_MOB_TerminalReady", true];
+diag_log format ["[MWF Setup] MOB terminal initialized locally on %1.", _object];
 true
