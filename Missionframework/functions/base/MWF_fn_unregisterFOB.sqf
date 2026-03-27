@@ -4,7 +4,8 @@
     Project: Military War Framework
 
     Description:
-    Removes a FOB from the active registry and persistence list and cleans up its marker.
+    Removes a FOB from the active registry and persistence list, cleans up its marker,
+    and removes its native Arma respawn position.
 */
 
 if (!isServer) exitWith {false};
@@ -23,6 +24,7 @@ if (_markerName isEqualTo "" && {!isNull _target}) then {
 };
 
 private _displayName = "";
+private _removedObject = _target;
 private _newRegistry = [];
 {
     _x params ["_entryMarker", "_entryObject", ["_entryName", "", [""]]];
@@ -33,12 +35,23 @@ private _newRegistry = [];
 
     if (_remove) then {
         _displayName = _entryName;
+        if (isNull _removedObject) then {
+            _removedObject = _entryObject;
+        };
     } else {
         _newRegistry pushBack _x;
     };
 } forEach _registry;
 
 missionNamespace setVariable ["MWF_FOB_Registry", _newRegistry, true];
+
+if (!isNull _removedObject) then {
+    private _respawnId = _removedObject getVariable ["MWF_FOB_RespawnId", -1];
+    if (_respawnId isEqualType 0 && {_respawnId >= 0}) then {
+        [west, _respawnId] call BIS_fnc_removeRespawnPosition;
+        _removedObject setVariable ["MWF_FOB_RespawnId", -1, true];
+    };
+};
 
 if (_markerName != "" && {!((markerShape _markerName) isEqualTo "")}) then {
     deleteMarker _markerName;
@@ -57,8 +70,8 @@ if (!(_matchPos isEqualTo [])) then {
 };
 missionNamespace setVariable ["MWF_FOB_Positions", _fobPosList, true];
 
-if (!isNull _target && {!isNil "MWF_fnc_unregisterLoadoutZone"}) then {
-    [_target] call MWF_fnc_unregisterLoadoutZone;
+if (!isNull _removedObject && {!isNil "MWF_fnc_unregisterLoadoutZone"}) then {
+    [_removedObject] call MWF_fnc_unregisterLoadoutZone;
 };
 
 if (_requestSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {

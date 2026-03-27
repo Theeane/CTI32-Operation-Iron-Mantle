@@ -5,8 +5,8 @@
 
     Description:
     Registers a live FOB terminal in the active registry, creates/refreshes its marker,
-    and updates the strategic persistence list used by save/load, threat, and rebel systems.
-    Campaign tutorial progression is handled by the deployment pipeline after a successful player-chosen deploy.
+    adds a native Arma respawn position for deploy selection, and updates the strategic
+    persistence list used by save/load, threat, and rebel systems.
 */
 
 if (!isServer) exitWith {[]};
@@ -47,6 +47,13 @@ _terminal setVariable ["MWF_isFOB", true, true];
 _terminal setVariable ["MWF_FOB_Marker", _markerName, true];
 _terminal setVariable ["MWF_FOB_DisplayName", _displayName, true];
 _terminal setVariable ["MWF_FOB_OriginType", _originType, true];
+
+private _existingRespawnId = _terminal getVariable ["MWF_FOB_RespawnId", -1];
+if (_existingRespawnId isEqualType 0 && {_existingRespawnId >= 0}) then {
+    [west, _existingRespawnId] call BIS_fnc_removeRespawnPosition;
+};
+private _respawnId = [west, _terminal, _displayName] call BIS_fnc_addRespawnPosition;
+_terminal setVariable ["MWF_FOB_RespawnId", _respawnId, true];
 
 _registry pushBack [_markerName, _terminal, _displayName, _originType];
 missionNamespace setVariable ["MWF_FOB_Registry", _registry, true];

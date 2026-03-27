@@ -4,25 +4,23 @@
     Project: Military War Framework
 
     Description:
-    Per-player startup flow.
+    Fresh-join deployment flow.
 
     Join flow:
-    black screen -> local deployment cinematic -> native Arma deploy/respawn menu ->
-    first playable spawn on MOB/FOB -> post-spawn systems.
+    black screen -> local deployment cinematic -> trigger native Arma respawn/deploy.
 
-    Respawn flow after the first playable spawn is handled in onPlayerRespawn.sqf.
+    Respawn flow:
+    handled separately in onPlayerRespawn.sqf. Intro never replays on player death.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "BOOT"];
 missionNamespace setVariable ["MWF_ClientInitComplete", false];
-missionNamespace setVariable ["MWF_BlockRespawn", true];
+missionNamespace setVariable ["MWF_BlockRespawn", false];
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_LoadoutSystemInitialized", false];
-missionNamespace setVariable ["MWF_InitialDeployMenuReleased", false];
-missionNamespace setVariable ["MWF_InitialDeployCompleted", false];
-missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", false];
+missionNamespace setVariable ["MWF_InitialDeployPending", false];
 missionNamespace setVariable ["MWF_IntroCallResult", false];
-missionNamespace setVariable ["MWF_system_active", false, true];
 
 uiNamespace setVariable ["MWF_InitialIntroSequenceDone", false];
 uiNamespace setVariable ["MWF_IntroCallAttempted", false];
@@ -31,11 +29,9 @@ uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 
 cutText ["", "BLACK FADED", 0];
-["close"] call BIS_fnc_showRespawnMenu;
 
 [] spawn {
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_PLAYER"];
-
     private _playerDeadline = diag_tickTime + 60;
     waitUntil {
         uiSleep 0.1;
@@ -45,15 +41,13 @@ cutText ["", "BLACK FADED", 0];
     if (isNull player || {!alive player}) exitWith {
         missionNamespace setVariable ["MWF_ClientInitStage", "PLAYER_TIMEOUT"];
         missionNamespace setVariable ["MWF_ClientInitComplete", false];
-        missionNamespace setVariable ["MWF_BlockRespawn", false];
         disableUserInput false;
         cutText ["", "BLACK IN", 0.5];
         diag_log "[MWF] ERROR: initPlayerLocal aborted because player was not ready in time.";
     };
 
-    player setVariable ["MWF_Player_Authenticated", false, true];
-
     missionNamespace setVariable ["MWF_ClientInitStage", "LOCK_PLAYER"];
+    missionNamespace setVariable ["MWF_BlockRespawn", true];
     player allowDamage false;
     player enableSimulation false;
     disableUserInput true;
@@ -62,13 +56,13 @@ cutText ["", "BLACK FADED", 0];
         moveOut player;
     };
 
+    missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
     if (!isNil "MWF_fnc_initUI") then {
-        missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
         [] call MWF_fnc_initUI;
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SOFT"];
-    private _serverDeadline = diag_tickTime + 5;
+    private _serverDeadline = diag_tickTime + 10;
     waitUntil {
         uiSleep 0.25;
         (missionNamespace getVariable ["MWF_ServerInitialized", false])
@@ -76,21 +70,21 @@ cutText ["", "BLACK FADED", 0];
         || {diag_tickTime >= _serverDeadline}
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
-    uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-
     [] spawn {
         uiSleep 90;
-        if (!(missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) && {(missionNamespace getVariable ["MWF_BlockRespawn", false])}) then {
+        if (missionNamespace getVariable ["MWF_BlockRespawn", false]) then {
+            player enableSimulation true;
+            player allowDamage true;
             missionNamespace setVariable ["MWF_BlockRespawn", false];
-            player enableSimulation false;
-            player allowDamage false;
-            disableUserInput false;
             uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+            disableUserInput false;
             cutText ["", "BLACK IN", 0.5];
             diag_log "[MWF] WARNING: Intro/deploy watchdog released client control after timeout.";
         };
     };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
+    uiNamespace setVariable ["MWF_IntroCallAttempted", true];
 
     private _introSucceeded = false;
     if (!isNil "MWF_fnc_playIntroCinematic") then {
@@ -100,31 +94,35 @@ cutText ["", "BLACK FADED", 0];
     };
     missionNamespace setVariable ["MWF_IntroCallResult", _introSucceeded];
 
-    if (!_introSucceeded) then {
-        diag_log "[MWF] WARNING: Intro cinematic returned false. Continuing to deploy menu release.";
-        cutText ["", "BLACK IN", 0.5];
-    } else {
+    if (_introSucceeded) then {
         uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+    } else {
+        diag_log "[MWF] WARNING: Intro cinematic returned false. Continuing to native deploy trigger.";
+        cutText ["", "BLACK IN", 0.5];
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "OPEN_DEPLOY_MENU"];
+    missionNamespace setVariable ["MWF_ClientInitStage", "TRIGGER_INITIAL_DEPLOY"];
+    player enableSimulation true;
+    player allowDamage true;
     missionNamespace setVariable ["MWF_BlockRespawn", false];
-    missionNamespace setVariable ["MWF_InitialDeployMenuReleased", true];
-
     disableUserInput false;
-    player allowDamage false;
-    player enableSimulation false;
-    player setVelocity [0, 0, 0];
+
+    missionNamespace setVariable ["MWF_InitialDeployPending", true];
+    missionNamespace setVariable ["MWF_ClientInitComplete", false];
+
+    cutText ["", "BLACK FADED", 0];
+    uiSleep 0.1;
+
+    setPlayerRespawnTime 0;
+    forceRespawn player;
 
     [] spawn {
-        private _deadline = diag_tickTime + 120;
-        while {
-            !(missionNamespace getVariable ["MWF_InitialDeployCompleted", false])
-            && {alive player}
-            && {diag_tickTime < _deadline}
-        } do {
-            ["open"] call BIS_fnc_showRespawnMenu;
-            uiSleep 5;
+        uiSleep 8;
+        if (missionNamespace getVariable ["MWF_InitialDeployPending", false]) then {
+            if (!isNull player && {alive player}) then {
+                player setDamage 1;
+                diag_log "[MWF] WARNING: forceRespawn fallback triggered via setDamage 1.";
+            };
         };
     };
 };

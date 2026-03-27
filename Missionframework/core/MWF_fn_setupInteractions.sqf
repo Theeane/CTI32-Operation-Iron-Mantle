@@ -4,15 +4,13 @@
     Project: Military War Framework
 
     Description:
-    Initializes the MOB terminal directly.
-    Computer login is retired; the terminal is available as soon as the player has
-    completed the intro/deploy flow and spawned into the world.
-
-    Interaction registration is local per client because addAction / ACE interaction
-    state is client-local for this use case.
+    Resolves the MOB terminal locally and initializes its direct terminal actions.
+    Computer login is no longer used as a gameplay gate.
 */
 
 params [["_object", objNull, [objNull]]];
+
+if (!hasInterface) exitWith { false };
 
 if (isNull _object) then {
     private _deadline = diag_tickTime + 60;
@@ -86,7 +84,8 @@ if (isNull _object) then {
 };
 
 if (isNull _object) exitWith {
-    diag_log "[MWF Setup] MOB terminal setup skipped: no valid computer object found after retries.";
+    diag_log "[MWF Setup] MOB terminal interaction setup skipped: no valid computer object found after retries.";
+    false
 };
 
 private _existingActionId = _object getVariable ["MWF_MOB_LoginActionId", -1];
@@ -95,15 +94,13 @@ if (_existingActionId >= 0) then {
     _object setVariable ["MWF_MOB_LoginActionId", -1];
 };
 
-missionNamespace setVariable ["MWF_system_active", true, true];
-player setVariable ["MWF_Player_Authenticated", true, true];
-
-if (!isNil "MWF_fnc_terminal_main") then {
-    ["INIT_SCROLL", _object] call MWF_fnc_terminal_main;
-    ["INIT_ACE", _object] call MWF_fnc_terminal_main;
-} else {
-    diag_log "[MWF Setup] WARNING: terminal_main not loaded during MOB terminal init.";
+if (isNil "MWF_fnc_terminal_main") exitWith {
+    diag_log "[MWF Setup] MOB terminal setup skipped: terminal_main function not loaded.";
+    false
 };
 
-diag_log format ["[MWF Setup] MOB terminal interactions initialized locally on %1.", _object];
+["INIT_SCROLL", _object] call MWF_fnc_terminal_main;
+["INIT_ACE", _object] call MWF_fnc_terminal_main;
+
+diag_log format ["[MWF Setup] MOB direct terminal interactions initialized locally on %1.", _object];
 true
