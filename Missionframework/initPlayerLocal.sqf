@@ -1,24 +1,25 @@
 /*
-    Author: Theeane / ChatGPT
+    Author: Theane / ChatGPT
     File: initPlayerLocal.sqf
     Project: Military War Framework
 
     Description:
-    Client-side initialization for each player.
+    Reliable fresh-join deployment flow.
 
-    Join flow (every new join):
-    staging/holding area -> local deployment cinematic -> direct insertion at MOB -> baseline loadout -> local client systems
+    Join flow:
+    black screen -> force move player to MOB/deploy pad immediately -> local intro cinematic ->
+    baseline loadout -> enable local systems.
 
     Respawn flow:
     handled separately in onPlayerRespawn.sqf. Intro never replays on player death.
 */
 
-missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER"];
+missionNamespace setVariable ["MWF_ClientInitStage", "BOOT"];
 missionNamespace setVariable ["MWF_ClientInitComplete", false];
 missionNamespace setVariable ["MWF_BlockRespawn", false];
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
+missionNamespace setVariable ["MWF_LoadoutSystemInitialized", false];
 
-/* Fresh mission join = always replay the local intro for this client. */
 uiNamespace setVariable ["MWF_InitialIntroSequenceDone", false];
 uiNamespace setVariable ["MWF_IntroCallAttempted", false];
 uiNamespace setVariable ["MWF_IntroCinematicStage", "RESET"];
@@ -26,186 +27,154 @@ uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 missionNamespace setVariable ["MWF_IntroCallResult", false];
 
-if (hasInterface) then {
-    cutText ["", "BLACK FADED", 0];
-};
-
-private _clientBootDeadline = diag_tickTime + 120;
-waitUntil {
-    uiSleep 0.25;
-    (missionNamespace getVariable ["MWF_ServerInitialized", false])
-    || {(missionNamespace getVariable ["MWF_ServerBootStage", ""]) isEqualTo "CRITICAL_RELEASED"}
-    || {diag_tickTime >= _clientBootDeadline}
-};
-
-if (!(missionNamespace getVariable ["MWF_ServerInitialized", false])) then {
-    diag_log "[MWF] WARNING: Client init timeout reached before server-ready flag. Continuing with local startup.";
-};
-
-diag_log format ["[MWF] INFO: Player initialization started for %1.", name player];
+cutText ["", "BLACK FADED", 0];
 
 [] spawn {
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_PLAYER"];
-    waitUntil { !isNull player };
-    waitUntil { alive player };
+    private _resolveDeployData = {
+        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
+        if (isNull _deployPad && {!isNil "mob_deploy_pad"}) then {
+            _deployPad = mob_deploy_pad;
+        };
 
-    if (hasInterface) then {
-        cutText ["", "BLACK FADED", 0];
+        private _anchorObj = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]]];
+        if (isNull _anchorObj && {!isNil "MWF_MOB_Table"}) then {
+            _anchorObj = MWF_MOB_Table;
+        };
+
+        private _deployPos = [0, 0, 0];
+        private _deployDir = 0;
+
+        if (!isNull _deployPad) then {
+            _deployPos = getPosATL _deployPad;
+            _deployDir = getDir _deployPad;
+        };
+
+        if (_deployPos isEqualTo [0, 0, 0] && {!isNull _anchorObj}) then {
+            _deployPos = getPosATL _anchorObj;
+            _deployDir = getDir _anchorObj;
+        };
+
+        if (_deployPos isEqualTo [0, 0, 0]) then {
+            private _markerPos = getMarkerPos "respawn_west";
+            if !(_markerPos isEqualTo [0, 0, 0]) then {
+                _deployPos = _markerPos;
+                _deployDir = markerDir "respawn_west";
+            };
+        };
+
+        if (_deployPos isEqualTo [0, 0, 0]) then {
+            _deployPos = getPosATL player;
+            _deployDir = getDir player;
+        };
+
+        [_deployPos, _deployDir]
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_WORLD_READY"];
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_PLAYER"];
+    private _playerDeadline = diag_tickTime + 60;
     waitUntil {
-        uiSleep 0.25;
-        alive player
-        && {!visibleMap}
-        && {!dialog}
-        && {!isNull findDisplay 46}
+        uiSleep 0.1;
+        (!isNull player && {alive player}) || {diag_tickTime >= _playerDeadline}
+    };
+
+    if (isNull player || {!alive player}) exitWith {
+        missionNamespace setVariable ["MWF_ClientInitStage", "PLAYER_TIMEOUT"];
+        missionNamespace setVariable ["MWF_ClientInitComplete", false];
+        disableUserInput false;
+        cutText ["", "BLACK IN", 0.5];
+        diag_log "[MWF] ERROR: initPlayerLocal aborted because player was not ready in time.";
+    };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "LOCK_PLAYER"];
+    missionNamespace setVariable ["MWF_BlockRespawn", true];
+    player allowDamage false;
+    player enableSimulation false;
+    disableUserInput true;
+
+    if (vehicle player != player) then {
+        moveOut player;
+    };
+
+    private _deployData = call _resolveDeployData;
+    private _deployPos = _deployData # 0;
+    private _deployDir = _deployData # 1;
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "FORCE_MOB_POSITION"];
+    if !(_deployPos isEqualTo [0, 0, 0]) then {
+        player setPosATL _deployPos;
+        player setVehiclePosition [_deployPos, [], 0, "CAN_COLLIDE"];
+        player setDir _deployDir;
+        player setVelocity [0, 0, 0];
     };
 
     uiSleep 0.25;
 
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
-    [] call MWF_fnc_initUI;
-
-    private _needsInitialIntro = !(uiNamespace getVariable ["MWF_InitialIntroSequenceDone", false]);
-    if (_needsInitialIntro) then {
-        missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_PREP"];
-        missionNamespace setVariable ["MWF_BlockRespawn", true];
-
-        [] spawn {
-            uiSleep 90;
-            if (missionNamespace getVariable ["MWF_BlockRespawn", false]) then {
-                disableUserInput false;
-                missionNamespace setVariable ["MWF_BlockRespawn", false];
-                uiNamespace setVariable ["MWF_IntroCinematicActive", false];
-                diag_log "[MWF] WARNING: Intro input lock watchdog released control after timeout.";
-            };
-        };
-
-        disableUserInput true;
-        uiSleep 0.1;
-
-        missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
-        uiNamespace setVariable ["MWF_IntroCallAttempted", true];
-
-        private _introSucceeded = false;
-        private _introAttempts = 0;
-        private _introDeadline = diag_tickTime + 90;
-
-        while {!_introSucceeded && {diag_tickTime < _introDeadline} && {alive player}} do {
-            _introAttempts = _introAttempts + 1;
-            uiNamespace setVariable ["MWF_IntroCinematicStage", format ["ATTEMPT_%1", _introAttempts]];
-            uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
-            uiNamespace setVariable ["MWF_IntroCinematicActive", false];
-
-            private _callResult = false;
-            if (!isNil "MWF_fnc_playIntroCinematic") then {
-                _callResult = [] call MWF_fnc_playIntroCinematic;
-            } else {
-                _callResult = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
-            };
-
-            missionNamespace setVariable ["MWF_IntroCallResult", _callResult];
-            _introSucceeded = _callResult;
-
-            if (!_introSucceeded) then {
-                diag_log format ["[MWF] WARNING: Intro attempt %1 failed. Retrying.", _introAttempts];
-                uiSleep 1;
-            };
-        };
-
-        if (_introSucceeded) then {
-            uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
-            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DONE"];
-        } else {
-            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_FAILED_FALLBACK"];
-            diag_log "[MWF] WARNING: Intro cinematic failed after retries. Continuing with direct MOB insertion fallback.";
-        };
-
-        missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INSERT_POINT"];
-        private _insertDeadline = diag_tickTime + 20;
-        waitUntil {
-            uiSleep 0.25;
-            !isNull (missionNamespace getVariable ["MWF_MOB_DeployPad", objNull])
-            || {!isNil "mob_deploy_pad"}
-            || {markerColor "MWF_MOB_Marker" isNotEqualTo ""}
-            || {!isNull (missionNamespace getVariable ["MWF_MOB", objNull])}
-            || {diag_tickTime >= _insertDeadline}
-        };
-
-        missionNamespace setVariable ["MWF_ClientInitStage", "MOB_INSERT"];
-
-        private _insertPos = [0, 0, 0];
-        private _insertDir = 0;
-        private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
-
-        if (isNull _deployPad && {!isNil "mob_deploy_pad"}) then {
-            _deployPad = mob_deploy_pad;
-        };
-
-        if (!isNull _deployPad) then {
-            _insertPos = getPosATL _deployPad;
-            _insertDir = getDir _deployPad;
-        };
-
-        if ((_insertPos isEqualTo [0, 0, 0]) && {markerColor "MWF_MOB_Marker" isNotEqualTo ""}) then {
-            _insertPos = getMarkerPos "MWF_MOB_Marker";
-            _insertDir = markerDir "MWF_MOB_Marker";
-        };
-
-        if ((_insertPos isEqualTo [0, 0, 0])) then {
-            private _mobArea = missionNamespace getVariable ["MWF_MOB", objNull];
-            if (!isNull _mobArea) then {
-                _insertPos = getPosATL _mobArea;
-                _insertDir = getDir _mobArea;
-            };
-        };
-
-        if ((_insertPos isEqualTo [0, 0, 0])) then {
-            private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
-            if (!isNull _mainBase) then {
-                _insertPos = getPosATL _mainBase;
-                _insertDir = getDir _mainBase;
-            };
-        };
-
-        if ((_insertPos isEqualTo [0, 0, 0])) then {
-            _insertPos = getPosATL player;
-            _insertDir = getDir player;
-        };
-
-        if !(vehicle player isEqualTo player) then {
-            moveOut player;
-            uiSleep 0.1;
-        };
-
-        if !(_insertPos isEqualTo [0, 0, 0]) then {
-            player switchMove "";
-            player setVelocity [0, 0, 0];
-            player setPosATL _insertPos;
-            player setVehiclePosition [_insertPos, [], 0, "NONE"];
-            player setDir _insertDir;
-        };
-
-        if (!isNil "MWF_fnc_applyBaselineLoadout") then {
-            [] call MWF_fnc_applyBaselineLoadout;
-        };
-
-        if (!isNil "MWF_fnc_setupInteractions") then {
-            [] call MWF_fnc_setupInteractions;
-        };
-
-        if (!isNil "MWF_fnc_initLoadoutSystem") then {
-            [] call MWF_fnc_initLoadoutSystem;
-        };
-
-        missionNamespace setVariable ["MWF_BlockRespawn", false];
-        disableUserInput false;
-        cutText ["", "BLACK IN", 1.5];
-        uiSleep 0.25;
-    } else {
-        cutText ["", "BLACK IN", 0.5];
+    if (!isNil "MWF_fnc_initUI") then {
+        [] call MWF_fnc_initUI;
     };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SOFT"];
+    private _serverDeadline = diag_tickTime + 5;
+    waitUntil {
+        uiSleep 0.25;
+        (missionNamespace getVariable ["MWF_ServerInitialized", false])
+        || {(missionNamespace getVariable ["MWF_ServerBootStage", ""]) isEqualTo "CRITICAL_RELEASED"}
+        || {diag_tickTime >= _serverDeadline}
+    };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
+    uiNamespace setVariable ["MWF_IntroCallAttempted", true];
+
+    [] spawn {
+        uiSleep 90;
+        if (missionNamespace getVariable ["MWF_BlockRespawn", false]) then {
+            player enableSimulation true;
+            player allowDamage true;
+            missionNamespace setVariable ["MWF_BlockRespawn", false];
+            uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+            disableUserInput false;
+            cutText ["", "BLACK IN", 0.5];
+            diag_log "[MWF] WARNING: Intro/deploy watchdog released client control after timeout.";
+        };
+    };
+
+    private _introSucceeded = false;
+    if (!isNil "MWF_fnc_playIntroCinematic") then {
+        _introSucceeded = [] call MWF_fnc_playIntroCinematic;
+    } else {
+        _introSucceeded = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+    };
+    missionNamespace setVariable ["MWF_IntroCallResult", _introSucceeded];
+
+    if (!_introSucceeded) then {
+        diag_log "[MWF] WARNING: Intro cinematic returned false. Continuing with forced MOB deploy release.";
+        cutText ["", "BLACK IN", 0.5];
+    } else {
+        uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+    };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "POST_INTRO_DEPLOY"];
+    _deployData = call _resolveDeployData;
+    _deployPos = _deployData # 0;
+    _deployDir = _deployData # 1;
+    if !(_deployPos isEqualTo [0, 0, 0]) then {
+        player setPosATL _deployPos;
+        player setVehiclePosition [_deployPos, [], 0, "CAN_COLLIDE"];
+        player setDir _deployDir;
+        player setVelocity [0, 0, 0];
+    };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", "BASELINE_LOADOUT"];
+    if (!isNil "MWF_fnc_applyBaselineLoadout") then {
+        [] call MWF_fnc_applyBaselineLoadout;
+    };
+
+    player enableSimulation true;
+    player allowDamage true;
+    missionNamespace setVariable ["MWF_BlockRespawn", false];
+    disableUserInput false;
+    uiSleep 0.25;
 
     missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];
     [] spawn {
