@@ -4,10 +4,12 @@
     Project: Military War Framework
 
     Description:
-    Handles setup interactions for the core framework layer. For the MOB computer this
-    routes through the campaign-phase login bridge.
+    Initializes the MOB terminal directly.
+    Computer login is retired; the terminal is available as soon as the player has
+    completed the intro/deploy flow and spawned into the world.
 
-    Interaction registration is local per client because BIS_fnc_holdActionAdd is local UI state.
+    Interaction registration is local per client because addAction / ACE interaction
+    state is client-local for this use case.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -84,43 +86,24 @@ if (isNull _object) then {
 };
 
 if (isNull _object) exitWith {
-    diag_log "[MWF Setup] MOB login interaction setup skipped: no valid computer object found after retries.";
+    diag_log "[MWF Setup] MOB terminal setup skipped: no valid computer object found after retries.";
 };
 
 private _existingActionId = _object getVariable ["MWF_MOB_LoginActionId", -1];
 if (_existingActionId >= 0) then {
     [_object, _existingActionId] call BIS_fnc_holdActionRemove;
+    _object setVariable ["MWF_MOB_LoginActionId", -1];
 };
 
-private _actionId = [
-    _object,
-    "Login to Command Network",
-    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
-    "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
-    "alive _caller && {_caller distance _target < 2}",
-    "alive _caller && {_caller distance _target < 2} && {!(missionNamespace getVariable ['MWF_BlockRespawn', false])}",
-    {
-        params ["_target", "_caller"];
-        _caller playMoveNow "AinvPknlMstpSnonWnonDnon_medic_1";
-        systemChat "Establishing encrypted connection...";
-    },
-    {},
-    {
-        params ["_target", "_caller"];
-        [_target, _caller] call MWF_fnc_MOBComputerLogin;
-        _caller switchMove "";
-    },
-    {
-        params ["_target", "_caller"];
-        _caller switchMove "";
-        systemChat "Login aborted.";
-    },
-    [],
-    8,
-    10,
-    false,
-    false
-] call BIS_fnc_holdActionAdd;
+missionNamespace setVariable ["MWF_system_active", true, true];
+player setVariable ["MWF_Player_Authenticated", true, true];
 
-_object setVariable ["MWF_MOB_LoginActionId", _actionId];
-diag_log format ["[MWF Setup] Campaign-phase MOB login interaction added locally to %1 (action %2).", _object, _actionId];
+if (!isNil "MWF_fnc_terminal_main") then {
+    ["INIT_SCROLL", _object] call MWF_fnc_terminal_main;
+    ["INIT_ACE", _object] call MWF_fnc_terminal_main;
+} else {
+    diag_log "[MWF Setup] WARNING: terminal_main not loaded during MOB terminal init.";
+};
+
+diag_log format ["[MWF Setup] MOB terminal interactions initialized locally on %1.", _object];
+true
