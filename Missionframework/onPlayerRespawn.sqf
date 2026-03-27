@@ -12,6 +12,8 @@ missionNamespace setVariable ["MWF_BlockRespawn", false];
 disableUserInput false;
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_REINIT"];
+uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 
 [] spawn {
     waitUntil {
@@ -43,5 +45,6 @@ missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_REINIT"];
         }];
     };
 
+    [] call MWF_fnc_setupInteractions;
     missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_READY"];
 };

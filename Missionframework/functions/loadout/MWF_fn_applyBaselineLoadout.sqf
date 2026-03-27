@@ -4,16 +4,13 @@
     Project: Military War Framework
 
     Description:
-    First-spawn fallback. Strips the player to uniform-only when no saved respawn
-    loadout exists yet. A later saved respawn package will override this automatically.
+    Join-loadout baseline. Every fresh join is stripped to uniform-only, regardless of any
+    saved respawn loadout. Saved respawn loadouts are only applied from onPlayerRespawn.sqf.
 */
 
 if (!hasInterface) exitWith { false };
 if (!alive player) exitWith { false };
 if (missionNamespace getVariable ["MWF_BaselineLoadoutApplied", false]) exitWith { false };
-
-private _payload = missionNamespace getVariable ["MWF_SavedRespawnProfile", profileNamespace getVariable ["MWF_SavedRespawnProfile", []]];
-if (_payload isEqualType [] && {count _payload >= 4}) exitWith { false };
 
 private _uniformClass = uniform player;
 removeAllWeapons player;

@@ -5,9 +5,9 @@
 
     Description:
     Handles setup interactions for the core framework layer. For the MOB computer this
-    routes through the campaign-phase login bridge, so a loaded OPEN_WAR campaign never
-    replays tutorial gates for any player. Interaction registration is local per client,
-    because BIS_fnc_holdActionAdd is local UI state.
+    routes through the campaign-phase login bridge.
+
+    Interaction registration is local per client because BIS_fnc_holdActionAdd is local UI state.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -27,29 +27,20 @@ if (isNull _object) then {
         if (isNull _object) then {
             private _anchorObjects = [];
 
-            private _deployPadNs = missionNamespace getVariable ["MWF_MOB_DeployPad", objNull];
-            if (!isNull _deployPadNs) then {
-                _anchorObjects pushBackUnique _deployPadNs;
-            };
+            {
+                if (!isNil _x) then {
+                    private _candidate = missionNamespace getVariable [_x, objNull];
+                    if (!isNull _candidate) then {
+                        _anchorObjects pushBackUnique _candidate;
+                    };
+                };
+            } forEach ["MWF_MOB_Table", "MWF_MainBase", "MWF_MOB", "MWF_MOB_Object", "MWF_MOB_DeployPad", "MWF_MOB_FobPad"];
 
             if (!isNil "mob_deploy_pad") then {
                 _anchorObjects pushBackUnique mob_deploy_pad;
             };
-
-            private _mobTable = missionNamespace getVariable ["MWF_MOB_Table", objNull];
-            if (!isNull _mobTable) then {
-                _anchorObjects pushBackUnique _mobTable;
-            };
             if (!isNil "MWF_MOB_Table") then {
                 _anchorObjects pushBackUnique MWF_MOB_Table;
-            };
-
-            private _mobObject = missionNamespace getVariable ["MWF_MOB_Object", objNull];
-            if (!isNull _mobObject) then {
-                _anchorObjects pushBackUnique _mobObject;
-            };
-            if (!isNil "MWF_MOB") then {
-                _anchorObjects pushBackUnique MWF_MOB;
             };
 
             private _anchorPositions = [];
@@ -72,7 +63,8 @@ if (isNull _object) then {
                         "RuggedTerminal_01_communications_F",
                         "Land_DataTerminal_01_F"
                     ],
-                    100
+                    100,
+                    true
                 ];
                 if (_candidates isNotEqualTo []) exitWith {
                     _object = _candidates # 0;
@@ -100,8 +92,8 @@ private _actionId = [
     "Login to Command Network",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
-    "_this distance _target < 2",
-    "_caller distance _target < 2",
+    "alive _caller && {_caller distance _target < 2}",
+    "alive _caller && {_caller distance _target < 2} && {!(missionNamespace getVariable ['MWF_BlockRespawn', false])}",
     {
         params ["_target", "_caller"];
         _caller playMoveNow "AinvPknlMstpSnonWnonDnon_medic_1";

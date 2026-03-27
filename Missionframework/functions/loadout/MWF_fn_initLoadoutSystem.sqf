@@ -7,10 +7,9 @@
     Client-side monitor that grants Virtual Arsenal and Save Respawn Loadout
     access while the player is inside a registered loadout zone.
 
-    Important:
-    - First join loadout is handled by initPlayerLocal.sqf.
-    - Real respawn loadout is handled by onPlayerRespawn.sqf.
-    - This monitor should only manage zone actions, not auto-apply gear on bind.
+    Important rule:
+    This system never applies any loadout on player bind. Join baseline is handled in
+    initPlayerLocal.sqf, and saved respawn loadouts are handled only in onPlayerRespawn.sqf.
 */
 
 if (!hasInterface) exitWith {};

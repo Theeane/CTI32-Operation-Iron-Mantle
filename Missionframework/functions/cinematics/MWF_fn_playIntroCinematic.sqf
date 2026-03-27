@@ -4,14 +4,13 @@
     Project: Military War Framework
 
     Description:
-    Plays a lightweight local intro cinematic near the MOB. This version is
-    synchronous so initPlayerLocal can hold first-join deployment until the
-    cinematic finishes and keep the escape/respawn path closed during playback.
+    Plays a lightweight local intro cinematic near the MOB for the joining player only.
+    Returns true only when the cinematic reached its normal cleanup path.
 */
 
 if (!hasInterface) exitWith { false };
-if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith { false };
 if (uiNamespace getVariable ["MWF_IntroCinematicActive", false]) exitWith { false };
+if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith { false };
 
 uiNamespace setVariable ["MWF_IntroCinematicStage", "ENTRY"];
 uiNamespace setVariable ["MWF_IntroCinematicActive", true];
@@ -53,16 +52,6 @@ if (diag_tickTime >= _deadline) exitWith {
     missionNamespace setVariable ["MWF_BlockRespawn", false];
     false
 };
-
-if (uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]) exitWith {
-    uiNamespace setVariable ["MWF_IntroCinematicStage", "ALREADY_PLAYED"];
-    uiNamespace setVariable ["MWF_IntroCinematicActive", false];
-    missionNamespace setVariable ["MWF_BlockRespawn", false];
-    false
-};
-
-uiNamespace setVariable ["MWF_IntroCinematicStage", "STARTING"];
-uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 
 private _anchor = missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]]];
 if (isNull _anchor) then {
@@ -118,7 +107,10 @@ cutText ["", "BLACK FADED", 0];
 uiSleep 0.1;
 cutText ["", "BLACK IN", 2];
 
+private _failed = false;
 for "_i" from 1 to ((count _shotPositions) - 1) do {
+    if (!alive player) exitWith { _failed = true; };
+
     uiNamespace setVariable ["MWF_IntroCinematicStage", format ["SHOT_%1", _i]];
     _cam camPreparePos (_shotPositions # _i);
     _cam camPrepareTarget _anchor;
@@ -142,7 +134,14 @@ if ((typeOf _anchor) isEqualTo "Logic" && {local _anchor}) then {
     deleteVehicle _anchor;
 };
 
-uiNamespace setVariable ["MWF_IntroCinematicStage", "COMPLETE"];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 missionNamespace setVariable ["MWF_BlockRespawn", false];
+
+if (_failed) exitWith {
+    uiNamespace setVariable ["MWF_IntroCinematicStage", "FAILED"];
+    false
+};
+
+uiNamespace setVariable ["MWF_IntroCinematicStage", "COMPLETE"];
+uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 true
