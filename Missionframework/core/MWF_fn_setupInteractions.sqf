@@ -13,54 +13,66 @@
 params [["_object", objNull, [objNull]]];
 
 if (isNull _object) then {
-    _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
-};
+    private _deadline = diag_tickTime + 20;
 
-if (isNull _object && {!isNil "MWF_Intel_Center"}) then {
-    _object = MWF_Intel_Center;
-};
-
-if (isNull _object) then {
-    private _anchorObjects = [];
-
-    if (!isNil "mob_deploy_pad") then {
-        _anchorObjects pushBackUnique mob_deploy_pad;
-    };
-
-    private _mobTable = missionNamespace getVariable ["MWF_MOB_Table", objNull];
-    if (!isNull _mobTable) then {
-        _anchorObjects pushBackUnique _mobTable;
-    };
-
-    private _anchorPositions = [];
-    {
-        if (!isNull _x) then {
-            _anchorPositions pushBackUnique (getPosATL _x);
+    while {isNull _object && {diag_tickTime < _deadline}} do {
+        if (isNull _object) then {
+            _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
         };
-    } forEach _anchorObjects;
 
-    private _mobPos = getMarkerPos "respawn_west";
-    if !(_mobPos isEqualTo [0,0,0]) then {
-        _anchorPositions pushBackUnique _mobPos;
-    };
-
-    {
-        private _candidates = nearestObjects [
-            _x,
-            [
-                "Land_Laptop_unfolded_F",
-                "RuggedTerminal_01_communications_F",
-                "Land_DataTerminal_01_F"
-            ],
-            100
-        ];
-        if (_candidates isNotEqualTo []) exitWith {
-            _object = _candidates # 0;
+        if (isNull _object && {!isNil "MWF_Intel_Center"}) then {
+            _object = MWF_Intel_Center;
         };
-    } forEach _anchorPositions;
+
+        if (isNull _object) then {
+            private _anchorObjects = [];
+
+            if (!isNil "mob_deploy_pad") then {
+                _anchorObjects pushBackUnique mob_deploy_pad;
+            };
+
+            private _mobTable = missionNamespace getVariable ["MWF_MOB_Table", objNull];
+            if (!isNull _mobTable) then {
+                _anchorObjects pushBackUnique _mobTable;
+            };
+
+            private _anchorPositions = [];
+            {
+                if (!isNull _x) then {
+                    _anchorPositions pushBackUnique (getPosATL _x);
+                };
+            } forEach _anchorObjects;
+
+            private _mobPos = getMarkerPos "respawn_west";
+            if !(_mobPos isEqualTo [0,0,0]) then {
+                _anchorPositions pushBackUnique _mobPos;
+            };
+
+            {
+                private _candidates = nearestObjects [
+                    _x,
+                    [
+                        "Land_Laptop_unfolded_F",
+                        "RuggedTerminal_01_communications_F",
+                        "Land_DataTerminal_01_F"
+                    ],
+                    100
+                ];
+                if (_candidates isNotEqualTo []) exitWith {
+                    _object = _candidates # 0;
+                };
+            } forEach _anchorPositions;
+        };
+
+        if (isNull _object) then {
+            uiSleep 1;
+        };
+    };
 };
 
-if (isNull _object) exitWith {};
+if (isNull _object) exitWith {
+    diag_log "[MWF Setup] MOB login interaction setup skipped: no valid computer object found after retries.";
+};
 
 private _existingActionId = _object getVariable ["MWF_MOB_LoginActionId", -1];
 if (_existingActionId >= 0) then {

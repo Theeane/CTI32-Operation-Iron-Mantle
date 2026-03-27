@@ -74,14 +74,16 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_CALL"];
         uiNamespace setVariable ["MWF_IntroCallAttempted", true];
 
-        private _introResult = false;
+        missionNamespace setVariable ["MWF_IntroCallResult", false];
         if (!isNil "MWF_fnc_playIntroCinematic") then {
-            _introResult = [] call MWF_fnc_playIntroCinematic;
+            missionNamespace setVariable ["MWF_IntroCallResult", [] call MWF_fnc_playIntroCinematic];
         } else {
-            _introResult = [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf";
+            missionNamespace setVariable ["MWF_IntroCallResult", [] call compile preprocessFileLineNumbers "functions\cinematics\MWF_fn_playIntroCinematic.sqf"];
         };
 
-        uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+        if (missionNamespace getVariable ["MWF_IntroCallResult", false]) then {
+            uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+        };
 
         missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DEPLOY"];
         private _deployPos = getMarkerPos "respawn_west";
@@ -109,7 +111,11 @@ diag_log format ["[MWF] INFO: Player initialization started for %1.", name playe
         uiSleep 0.25;
         disableUserInput false;
         missionNamespace setVariable ["MWF_BlockRespawn", false];
-        missionNamespace setVariable ["MWF_ClientInitStage", if (_introResult) then {"INTRO_DONE"} else {"INTRO_SKIPPED"}];
+        if (missionNamespace getVariable ["MWF_IntroCallResult", false]) then {
+            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_DONE"];
+        } else {
+            missionNamespace setVariable ["MWF_ClientInitStage", "INTRO_SKIPPED"];
+        };
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];
