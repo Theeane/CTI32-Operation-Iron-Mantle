@@ -25,10 +25,10 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
 [_isInitialDeploy] spawn {
     params ["_isInitialDeploy"];
 
-    private _spawnDeadline = diag_tickTime + 60;
+    private _spawnDeadline = diag_tickTime + 20;
     waitUntil {
         uiSleep 0.1;
-        (!isNull player && {alive player} && {!visibleMap} && {!isNull findDisplay 46}) || {diag_tickTime >= _spawnDeadline}
+        (!isNull player && {alive player} && {!isNull findDisplay 46}) || {diag_tickTime >= _spawnDeadline}
     };
 
     if (isNull player || {!alive player}) exitWith {
@@ -131,7 +131,7 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
             uiSleep _delay;
             call _code;
         };
-    } forEach [2, 5, 10, 20];
+    } forEach [1, 3, 6, 10];
 
     if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
         player setVariable ["MWF_DamageInterruptEHAdded", true];

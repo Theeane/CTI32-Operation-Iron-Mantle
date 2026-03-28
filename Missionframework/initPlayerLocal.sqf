@@ -65,7 +65,7 @@ cutText ["", "BLACK IN", 0.01];
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SOFT"];
-    private _serverDeadline = diag_tickTime + 45;
+    private _serverDeadline = diag_tickTime + 20;
     waitUntil {
         uiSleep 0.25;
         (missionNamespace getVariable ["MWF_ServerInitialized", false])
@@ -94,6 +94,9 @@ cutText ["", "BLACK IN", 0.01];
 
         {
             private _obj = missionNamespace getVariable [_x, objNull];
+            if (isNull _obj && {!isNil _x}) then {
+                _obj = call compile _x;
+            };
             if (!isNull _obj) then {
                 _anchorPositions pushBackUnique (getPosATL _obj);
             };
@@ -101,10 +104,13 @@ cutText ["", "BLACK IN", 0.01];
             "MWF_MainBase",
             "MWF_MOB",
             "MWF_MOB_Object",
+            "MWF_MOB_RespawnAnchor",
+            "MWF_MOB_AssetAnchor",
             "MWF_MOB_Table",
             "MWF_MOB_FobPad",
             "MWF_MOB_DeployPad",
-            "MWF_Intel_Center"
+            "MWF_Intel_Center",
+            "MWF_MOB_LoadoutTrigger"
         ];
 
         if (!isNil "MWF_Intel_Center") then {
@@ -122,7 +128,7 @@ cutText ["", "BLACK IN", 0.01];
 
         private _isNear = false;
         {
-            if (player distance2D _x <= 175) exitWith {
+            if (player distance2D _x <= 300) exitWith {
                 _isNear = true;
             };
         } forEach _anchorPositions;
@@ -130,8 +136,7 @@ cutText ["", "BLACK IN", 0.01];
         _isNear
     };
 
-    private _initialDeployDeadline = diag_tickTime + 180;
-    private _fallbackBootstrapAt = diag_tickTime + 8;
+    private _initialDeployDeadline = diag_tickTime + 30;
 
     waitUntil {
         uiSleep 0.1;
@@ -139,7 +144,7 @@ cutText ["", "BLACK IN", 0.01];
         if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith { true };
 
         private _playerReady = !isNull player && {alive player} && {!isNull findDisplay 46};
-        private _worldReady = _playerReady && {!visibleMap};
+        private _worldReady = _playerReady;
         private _nearAnchor = false;
 
         if (_worldReady) then {
@@ -147,7 +152,6 @@ cutText ["", "BLACK IN", 0.01];
         };
 
         (_worldReady && _nearAnchor)
-        || (_worldReady && {diag_tickTime >= _fallbackBootstrapAt})
         || {diag_tickTime >= _initialDeployDeadline}
     };
 

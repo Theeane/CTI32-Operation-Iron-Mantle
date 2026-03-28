@@ -4,9 +4,10 @@
     Project: Military War Framework
 
     Description:
-    Systems-first terminal setup.
-    Resolves the runtime MOB terminal directly from the new server-spawned asset set,
-    then falls back to short local searches around the dedicated asset anchor if needed.
+    Lightweight terminal setup for the server-spawned MOB/FOB asset pipeline.
+    This version does not block in a retry loop. It resolves the current terminal
+    from runtime references/anchors and lets the caller retry later if the asset
+    has not replicated to the client yet.
 */
 
 params [["_object", objNull, [objNull]]];
@@ -25,81 +26,67 @@ private _terminalClasses = [];
     "Land_DataTerminal_01_F"
 ];
 
+private _isValidTerminal = {
+    params ["_candidate", ["_classes", []]];
+    if (isNull _candidate) exitWith { false };
+    private _class = typeOf _candidate;
+    (_class in _classes)
+};
+
+if (!isNull _object && {!([_object, _terminalClasses] call _isValidTerminal)}) then {
+    _object = objNull;
+};
+
 if (isNull _object) then {
-    private _deadline = diag_tickTime + 30;
+    _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
+    if (isNull _object && {!isNil "MWF_Intel_Center"}) then {
+        _object = MWF_Intel_Center;
+    };
+    if (!isNull _object && {!([_object, _terminalClasses] call _isValidTerminal)}) then {
+        _object = objNull;
+    };
+};
 
-    while {isNull _object && {diag_tickTime < _deadline}} do {
-        if (isNull _object) then {
-            _object = missionNamespace getVariable ["MWF_Intel_Center", objNull];
-        };
+private _findAtAnchor = {
+    params ["_anchor", ["_radius", 12]];
+    if (isNull _anchor) exitWith { objNull };
+    private _candidates = nearestObjects [_anchor, _terminalClasses, _radius, true];
+    if (_candidates isEqualTo []) exitWith { objNull };
+    _candidates # 0
+};
 
-        if (isNull _object && {!isNil "MWF_Intel_Center"}) then {
-            _object = MWF_Intel_Center;
-        };
+if (isNull _object) then {
+    private _assetAnchor = missionNamespace getVariable ["MWF_MOB_AssetAnchor", objNull];
+    if (isNull _assetAnchor && {!isNil "MWF_MOB_AssetAnchor"}) then {
+        _assetAnchor = MWF_MOB_AssetAnchor;
+    };
+    _object = [_assetAnchor, 12] call _findAtAnchor;
+};
 
-        if (isNull _object) then {
-            private _assetAnchor = missionNamespace getVariable ["MWF_MOB_AssetAnchor", objNull];
-            if (isNull _assetAnchor && {!isNil "MWF_MOB_AssetAnchor"}) then {
-                _assetAnchor = MWF_MOB_AssetAnchor;
-            };
+if (isNull _object) then {
+    private _respawnAnchor = missionNamespace getVariable ["MWF_MOB_RespawnAnchor", objNull];
+    if (isNull _respawnAnchor && {!isNil "MWF_MOB_RespawnAnchor"}) then {
+        _respawnAnchor = MWF_MOB_RespawnAnchor;
+    };
+    _object = [_respawnAnchor, 20] call _findAtAnchor;
+};
 
-            if (!isNull _assetAnchor) then {
-                private _nearAnchor = nearestObjects [_assetAnchor, _terminalClasses, 12, true];
-                if (_nearAnchor isNotEqualTo []) then {
-                    _object = _nearAnchor # 0;
-                };
-            };
-        };
+if (isNull _object && {markerColor "MWF_MOB_Marker" isNotEqualTo ""}) then {
+    private _candidates = nearestObjects [getMarkerPos "MWF_MOB_Marker", _terminalClasses, 20, true];
+    if (_candidates isNotEqualTo []) then {
+        _object = _candidates # 0;
+    };
+};
 
-        if (isNull _object) then {
-            private _anchorPositions = [];
-
-            {
-                private _candidate = missionNamespace getVariable [_x, objNull];
-                if (!isNull _candidate) then {
-                    _anchorPositions pushBackUnique (getPosATL _candidate);
-                };
-            } forEach [
-                "MWF_MOB_AssetAnchor",
-                "MWF_MOB_RespawnAnchor",
-                "MWF_MOB_Table",
-                "MWF_MainBase",
-                "MWF_MOB",
-                "MWF_MOB_Object",
-                "MWF_MOB_DeployPad",
-                "MWF_MOB_FobPad"
-            ];
-
-            if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then {
-                private _mobMarkerPos = getMarkerPos "MWF_MOB_Marker";
-                if !(_mobMarkerPos isEqualTo [0, 0, 0]) then {
-                    _anchorPositions pushBackUnique _mobMarkerPos;
-                };
-            };
-
-            if ((_anchorPositions isEqualTo []) && {markerColor "respawn_west" isNotEqualTo ""}) then {
-                private _respawnPos = getMarkerPos "respawn_west";
-                if !(_respawnPos isEqualTo [0, 0, 0]) then {
-                    _anchorPositions pushBackUnique _respawnPos;
-                };
-            };
-
-            {
-                private _candidates = nearestObjects [_x, _terminalClasses, 40, true];
-                if (_candidates isNotEqualTo []) exitWith {
-                    _object = _candidates # 0;
-                };
-            } forEach _anchorPositions;
-        };
-
-        if (isNull _object) then {
-            uiSleep 0.5;
-        };
+if (isNull _object && {markerColor "respawn_west" isNotEqualTo ""}) then {
+    private _candidates = nearestObjects [getMarkerPos "respawn_west", _terminalClasses, 25, true];
+    if (_candidates isNotEqualTo []) then {
+        _object = _candidates # 0;
     };
 };
 
 if (isNull _object) exitWith {
-    diag_log "[MWF Setup] Terminal setup skipped: no valid MOB computer object found after retries.";
+    diag_log "[MWF Setup] Terminal setup deferred: no valid MOB terminal object resolved yet.";
     false
 };
 

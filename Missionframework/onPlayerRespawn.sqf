@@ -17,10 +17,10 @@ missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_TRIGGERED"];
 
 [] spawn {
-    private _deadline = diag_tickTime + 20;
+    private _deadline = diag_tickTime + 12;
     waitUntil {
         uiSleep 0.1;
-        (!isNull player && {alive player} && {!visibleMap} && {!isNull findDisplay 46}) || {diag_tickTime >= _deadline}
+        (!isNull player && {alive player} && {!isNull findDisplay 46}) || {diag_tickTime >= _deadline}
     };
 
     if (!isNil "MWF_fnc_handlePostSpawn") then {
