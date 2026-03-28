@@ -1,28 +1,49 @@
 /*
-    Author: Theeane / Gemini Guide / ChatGPT
+    Author: Theeane / Gemini Guide
     File: init.sqf
     Project: Military War Framework (MWF)
-
-    Description:
-    Local bootstrap guard. Keeps engine saving disabled and prevents clients from waiting
-    forever if the dedicated/server boot chain releases late.
+    Description: 
+    The master entry point. Handles server-side startup and client-side bootstrap.
 */
 
+// 1. Engine safety
 enableSaving [false, false];
-diag_log "[MWF] Engine saving disabled. Save & Exit must not create Arma save data for this mission.";
 
-private _localBootDeadline = diag_tickTime + 120;
-waitUntil {
-    uiSleep 0.25;
-    (missionNamespace getVariable ["MWF_ServerInitialized", false]) ||
-    {(missionNamespace getVariable ["MWF_ServerBootStage", ""]) isEqualTo "CRITICAL_RELEASED"} ||
-    {diag_tickTime >= _localBootDeadline}
+// --- SERVER INITIALIZATION ---
+if (isServer) then {
+    diag_log "[MWF] Server: Starting Global State Manager...";
+    
+    // Initialize economy, quests, and global variables
+    ["INIT"] call MWF_fnc_globalStateManager;
+    
+    // Signal to all players that the server is ready
+    missionNamespace setVariable ["MWF_ServerInitialized", true, true];
+    missionNamespace setVariable ["MWF_ServerBootStage", "CRITICAL_RELEASED", true];
+    
+    diag_log "[MWF] Server: Initialization complete and broadcasted.";
 };
 
-if (!(missionNamespace getVariable ["MWF_ServerInitialized", false])) then {
-    diag_log "[MWF] WARNING: init.sqf timed out waiting for server-ready flag. Continuing locally.";
+// --- CLIENT INITIALIZATION ---
+if (hasInterface) then {
+    diag_log "[MWF] Client: Waiting for server to be ready...";
+
+    private _localBootDeadline = diag_tickTime + 120;
+    waitUntil {
+        uiSleep 0.25;
+        (missionNamespace getVariable ["MWF_ServerInitialized", false]) || 
+        {diag_tickTime >= _localBootDeadline}
+    };
+
+    if (missionNamespace getVariable ["MWF_ServerInitialized", false]) then {
+        diag_log "[MWF] Client: Server ready. Starting intro cinematic.";
+        
+        // Starts the intro movie we checked earlier
+        [] spawn MWF_fnc_playIntroCinematic;
+    } else {
+        diag_log "[MWF] Client: WARNING! Server initialization timed out.";
+    };
+
+    missionNamespace setVariable ["MWF_LocalInitReady", true];
 };
 
-missionNamespace setVariable ["MWF_LocalInitReady", true];
-diag_log "[MWF] INFO: Local initialization started.";
-diag_log "[MWF] SUCCESS: Local initialization complete.";
+diag_log "[MWF] init.sqf execution finished.";
