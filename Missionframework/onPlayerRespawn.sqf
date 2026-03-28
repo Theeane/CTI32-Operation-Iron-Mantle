@@ -5,8 +5,8 @@
 
     Description:
     Function-first respawn hook.
-    Fires the same post-spawn/bootstrap path several times so normal death respawns
-    recover even if Arma delays one specific callback/frame.
+    Every real respawn increments a generation counter and re-runs the same brutal
+    post-spawn bootstrap several times.
 */
 
 missionNamespace setVariable ["MWF_BlockRespawn", false];
@@ -17,6 +17,7 @@ missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_TRIGGERED"];
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
 missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+missionNamespace setVariable ["MWF_PlayerSpawnGeneration", (missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) + 1];
 
 [] spawn {
     {
@@ -38,5 +39,5 @@ missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
                 [] spawn MWF_fnc_updateResourceUI;
             };
         };
-    } forEach [0, 1, 3, 6, 10];
+    } forEach [0, 1, 3, 6, 10, 20];
 };

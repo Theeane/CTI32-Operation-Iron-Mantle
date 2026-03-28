@@ -1,12 +1,14 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / Operation Iron Mantle
     File: initServer.sqf
     Project: Military War Framework (MWF)
 
     Description:
-    Authoritative server boot chain. Starts the critical runtime first so clients are never
-    hard-locked behind optional restore/bootstrap work, then runs the remaining startup
-    passes asynchronously in the background.
+    Function-first server boot.
+    Brings up the minimum viable world before clients continue:
+    presets -> core globals/systems -> MOB assets -> zones.
+    Every step runs in an isolated script so one runtime error does not abort the rest
+    of the boot chain.
 */
 
 if (!isServer) exitWith {};
@@ -18,6 +20,7 @@ missionNamespace setVariable ["MWF_ServerBootStage", "BOOT_START", true];
 missionNamespace setVariable ["MWF_ServerPostBootStage", "IDLE", true];
 missionNamespace setVariable ["MWF_ServerSubsystemsReady", false, true];
 missionNamespace setVariable ["MWF_ServerReady", false, true];
+missionNamespace setVariable ["MWF_ServerEssentialsReady", false, true];
 
 private _setBootStage = {
     params ["_stage"];
@@ -25,12 +28,61 @@ private _setBootStage = {
     diag_log format ["[MWF] BOOT: %1", _stage];
 };
 
+private _stepKey = {
+    params ["_label"];
+    format ["MWF_BootStep_%1_OK", _label]
+};
+
 private _runStep = {
     params ["_label", "_code"];
+
     [_label] call _setBootStage;
     diag_log format ["[MWF] STEP START: %1", _label];
-    call _code;
-    diag_log format ["[MWF] STEP END: %1", _label];
+
+    private _okKey = [_label] call _stepKey;
+    missionNamespace setVariable [_okKey, false];
+
+    private _handle = [_label, _code, _okKey] spawn {
+        params ["_label", "_code", "_okKey"];
+        call _code;
+        missionNamespace setVariable [_okKey, true];
+    };
+
+    waitUntil {
+        uiSleep 0.1;
+        scriptDone _handle
+    };
+
+    private _ok = missionNamespace getVariable [_okKey, false];
+    if (_ok) then {
+        diag_log format ["[MWF] STEP END: %1", _label];
+    } else {
+        diag_log format ["[MWF] ERROR: Step %1 aborted before completion. Boot will continue.", _label];
+    };
+
+    _ok
+};
+
+private _spawnPostStep = {
+    params ["_label", "_code"];
+    [_label, _code] spawn {
+        params ["_localLabel", "_localCode"];
+        missionNamespace setVariable ["MWF_ServerPostBootStage", _localLabel, true];
+        diag_log format ["[MWF] POST STEP START: %1", _localLabel];
+
+        private _ok = true;
+        private _handle = [_localCode] spawn {
+            params ["_localCode"];
+            call _localCode;
+        };
+
+        waitUntil {
+            uiSleep 0.1;
+            scriptDone _handle
+        };
+
+        diag_log format ["[MWF] POST STEP END: %1", _localLabel];
+    };
 };
 
 ["INIT_GLOBALS", { [] call MWF_fnc_initGlobals; }] call _runStep;
@@ -127,44 +179,44 @@ if (markerColor "respawn_west" isNotEqualTo "") then {
     };
 };
 
-["INIT_SYSTEMS", { [] call MWF_fnc_initSystems; }] call _runStep;
-["INIT_PERSISTENCE", { [] call MWF_fnc_initPersistence; }] call _runStep;
-["LOAD_GAME", { [] call MWF_fnc_loadGame; }] call _runStep;
-["INIT_ANALYTICS", { [] call MWF_fnc_initCampaignAnalytics; }] call _runStep;
-["PRESET_MANAGER", { [] call MWF_fnc_presetManager; }] call _runStep;
-
+private _presetOk = ["PRESET_MANAGER", { [] call MWF_fnc_presetManager; }] call _runStep;
+private _systemsOk = ["INIT_SYSTEMS", { [] call MWF_fnc_initSystems; }] call _runStep;
+private _mobAssetsOk = false;
 if (!isNil "MWF_fnc_initMOBAssets") then {
-    ["INIT_MOB_ASSETS", { [] call MWF_fnc_initMOBAssets; }] call _runStep;
+    _mobAssetsOk = ["INIT_MOB_ASSETS", { [] call MWF_fnc_initMOBAssets; }] call _runStep;
 };
+private _zoneOk = ["ZONE_MANAGER", { [] call MWF_fnc_zoneManager; }] call _runStep;
 
-["ZONE_MANAGER", { [] call MWF_fnc_zoneManager; }] call _runStep;
-["WORLD_MANAGER", { [] call MWF_fnc_worldManager; }] call _runStep;
-["THREAT_MANAGER", { [] call MWF_fnc_threatManager; }] call _runStep;
-
-if (!isNil "MWF_fnc_opforFobPatrolSystem") then {
-    ["OPFOR_FOB_PATROLS", { ["INIT"] call MWF_fnc_opforFobPatrolSystem; }] call _runStep;
-};
-
-["ECONOMY", { [] spawn MWF_fnc_economy; }] call _runStep;
-["MISSION_SYSTEM", { [] call MWF_fnc_initMissionSystem; }] call _runStep;
+missionNamespace setVariable [
+    "MWF_ServerEssentialsStatus",
+    [
+        ["PRESET_MANAGER", _presetOk],
+        ["INIT_SYSTEMS", _systemsOk],
+        ["INIT_MOB_ASSETS", _mobAssetsOk],
+        ["ZONE_MANAGER", _zoneOk]
+    ],
+    true
+];
 
 missionNamespace setVariable ["MWF_ServerInitialized", true, true];
 missionNamespace setVariable ["MWF_ServerBootRunning", false, true];
-missionNamespace setVariable ["MWF_ServerBootStage", "CRITICAL_RELEASED", true];
+missionNamespace setVariable ["MWF_ServerBootStage", "ESSENTIALS_READY", true];
 missionNamespace setVariable ["MWF_ServerReady", true, true];
-diag_log "[MWF] SUCCESS: Critical server initialization complete. Clients released.";
+missionNamespace setVariable ["MWF_ServerEssentialsReady", true, true];
+diag_log format ["[MWF] SUCCESS: Essentials released. Presets=%1 Systems=%2 MOBAssets=%3 Zones=%4", _presetOk, _systemsOk, _mobAssetsOk, _zoneOk];
 
-private _spawnPostStep = {
-    params ["_label", "_code"];
-    [_label, _code] spawn {
-        params ["_localLabel", "_localCode"];
-        missionNamespace setVariable ["MWF_ServerPostBootStage", _localLabel, true];
-        diag_log format ["[MWF] POST STEP START: %1", _localLabel];
-        call _localCode;
-        diag_log format ["[MWF] POST STEP END: %1", _localLabel];
-    };
+["INIT_PERSISTENCE", { [] call MWF_fnc_initPersistence; }] call _spawnPostStep;
+["LOAD_GAME", { [] call MWF_fnc_loadGame; }] call _spawnPostStep;
+["INIT_ANALYTICS", { [] call MWF_fnc_initCampaignAnalytics; }] call _spawnPostStep;
+["WORLD_MANAGER", { [] call MWF_fnc_worldManager; }] call _spawnPostStep;
+["THREAT_MANAGER", { [] call MWF_fnc_threatManager; }] call _spawnPostStep;
+
+if (!isNil "MWF_fnc_opforFobPatrolSystem") then {
+    ["OPFOR_FOB_PATROLS", { ["INIT"] call MWF_fnc_opforFobPatrolSystem; }] call _spawnPostStep;
 };
 
+["ECONOMY", { [] spawn MWF_fnc_economy; }] call _spawnPostStep;
+["MISSION_SYSTEM", { [] call MWF_fnc_initMissionSystem; }] call _spawnPostStep;
 ["RESTORE_SESSION", { [] call MWF_fnc_restoreSession; }] call _spawnPostStep;
 ["RESTORE_FOBS", { [] call MWF_fnc_restoreFOBs; }] call _spawnPostStep;
 

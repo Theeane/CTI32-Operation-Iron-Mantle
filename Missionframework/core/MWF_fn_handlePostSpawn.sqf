@@ -5,7 +5,9 @@
 
     Description:
     Brutal post-spawn bootstrap for both the initial deploy and later respawns.
-    Prioritizes waking systems over waiting for perfect UI/map conditions.
+    The initial deploy path refuses to complete until the player is actually near
+    a gameplay spawn position, so Arma's pre-deploy placeholder cannot consume the
+    startup pass.
 */
 
 params [
@@ -19,7 +21,7 @@ private _runningSince = missionNamespace getVariable ["MWF_PostSpawnInitSince", 
 if (
     missionNamespace getVariable ["MWF_PostSpawnInitRunning", false]
     && {_runningSince >= 0}
-    && {(_now - _runningSince) < 8}
+    && {(_now - _runningSince) < 3}
 ) exitWith { false };
 
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", true];
@@ -40,6 +42,52 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
         missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
         missionNamespace setVariable ["MWF_ClientInitStage", "POSTSPAWN_TIMEOUT"];
         diag_log "[MWF] ERROR: Post-spawn bootstrap timed out before the player became alive.";
+    };
+
+    private _getSpawnTargets = {
+        private _targets = [];
+
+        private _pushPos = {
+            params ["_value"];
+            if (_value isEqualType objNull) then {
+                if (!isNull _value) then {
+                    _targets pushBackUnique (getPosATL _value);
+                };
+            } else {
+                if (_value isEqualType "" && {_value isNotEqualTo ""} && {markerColor _value isNotEqualTo ""}) then {
+                    _targets pushBackUnique (getMarkerPos _value);
+                };
+            };
+        };
+
+        [missionNamespace getVariable ["MWF_MOB_RespawnAnchor", objNull]] call _pushPos;
+        [missionNamespace getVariable ["MWF_MOB_DeployPad", objNull]] call _pushPos;
+
+        if (!isNil "MWF_MOB_RespawnAnchor") then {
+            [MWF_MOB_RespawnAnchor] call _pushPos;
+        };
+        if (!isNil "MWF_MOB_DeployPad") then {
+            [MWF_MOB_DeployPad] call _pushPos;
+        };
+
+        ["respawn_west"] call _pushPos;
+        ["MWF_MOB_Marker"] call _pushPos;
+
+        _targets
+    };
+
+    private _landedAtGameplaySpawn = {
+        if (isNull player || {!alive player}) exitWith { false };
+        private _targets = call _getSpawnTargets;
+        if (_targets isEqualTo []) exitWith { true };
+        (_targets findIf { player distance2D _x <= 300 }) >= 0
+    };
+
+    if (_isInitialDeploy && {!call _landedAtGameplaySpawn} && {(missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) <= 0}) exitWith {
+        missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+        missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+        missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_WAIT_REAL_LANDING"];
+        diag_log "[MWF] Post-spawn bootstrap ignored a pre-deploy player state. Waiting for actual gameplay landing.";
     };
 
     missionNamespace setVariable ["MWF_BlockRespawn", false];
@@ -105,7 +153,7 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
                     };
                 };
             };
-        } forEach [1, 3, 6];
+        } forEach [1, 3, 6, 10, 20, 35];
     } else {
         if (!isNil "MWF_fnc_applyRespawnLoadout") then {
             _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
@@ -132,7 +180,7 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
                 call _code;
             };
         };
-    } forEach [1, 3, 6, 10, 20];
+    } forEach [1, 3, 6, 10, 20, 35];
 
     if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
         player setVariable ["MWF_DamageInterruptEHAdded", true];
