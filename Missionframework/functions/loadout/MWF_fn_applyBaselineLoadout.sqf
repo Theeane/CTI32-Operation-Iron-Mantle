@@ -22,7 +22,6 @@ if (!_force && {missionNamespace getVariable ["MWF_BaselineLoadoutApplied", fals
 private _uniformClass = uniform player;
 removeAllWeapons player;
 removeAllItems player;
-removeAllAssignedItems player;
 removeVest player;
 removeBackpack player;
 removeHeadgear player;
