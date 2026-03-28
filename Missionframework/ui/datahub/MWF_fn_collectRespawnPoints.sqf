@@ -34,9 +34,11 @@ private _pushEntry = {
 };
 
 private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+private _mobRespawnAnchor = missionNamespace getVariable ["MWF_MOB_RespawnAnchor", objNull];
 private _mobLabel = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
-private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
-["MOB", _mobLabel, _mobPos, _mainBase] call _pushEntry;
+private _mobSource = if (!isNull _mobRespawnAnchor) then { _mobRespawnAnchor } else { _mainBase };
+private _mobPos = if (!isNull _mobRespawnAnchor) then { getPosATL _mobRespawnAnchor } else { if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" } };
+["MOB", _mobLabel, _mobPos, _mobSource] call _pushEntry;
 
 {
     _x params ["", "_obj", ["_name", "FOB", [""]]];

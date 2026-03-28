@@ -18,6 +18,10 @@
                 <Original>Welcome to</Original>
                 <English>Welcome to</English>
             </Key>
+            <Key ID="STR_MWF_RESPAWN_MOB_DEFAULT">
+                <Original>Main Operation Base</Original>
+                <English>Main Operation Base</English>
+            </Key>
 
             <Key ID="STR_MWF_GUIDE_BUTTON">
                 <Original>MWF Guide</Original>
