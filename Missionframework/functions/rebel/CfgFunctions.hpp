@@ -1,9 +1,10 @@
-class Reputation {
-    file = "functions\reputation";
+class Rebel {
+    file = "functions\rebel";
 
-    class cityMonitor               { file = "functions\reputation\MWF_fn_cityMonitor.sqf"; };
-    class civRep                    { file = "functions\reputation\MWF_fn_civRep.sqf"; };
-    class civRepInformant           { file = "functions\reputation\MWF_fn_civRepInformant.sqf"; };
-    class civRepSupport             { file = "functions\reputation\MWF_fn_civRepSupport.sqf"; };
-    class handleCivilianCasualty    { file = "functions\reputation\MWF_fn_handleCivilianCasualty.sqf"; };
+    class fobAttackSystem       { file = "MWF_fn_fobAttackSystem.sqf"; };
+    class fobDespawnSystem      { file = "MWF_fn_fobDespawnSystem.sqf"; };
+    class fobRepairInteraction  { file = "MWF_fn_fobRepairInteraction.sqf"; };
+    class rebelLeaderDialogue   { file = "MWF_fn_rebelLeaderDialogue.sqf"; };
+    class rebelLeaderSystem     { file = "MWF_fn_rebelLeaderSystem.sqf"; };
+    class rebelManager           { file = "MWF_fn_rebelManager.sqf"; };
 };
