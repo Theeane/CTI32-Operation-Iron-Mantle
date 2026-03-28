@@ -31,12 +31,12 @@ class CfgFunctions {
             class scanZones { file = "core/MWF_fn_scanZones.sqf"; };
             class setupFOBInteractions { file = "core/MWF_fn_setupFOBInteractions.sqf"; };
             class setupInteractions { file = "core/MWF_fn_setupInteractions.sqf"; };
+            class handlePostSpawn { file = "core/MWF_fn_handlePostSpawn.sqf"; };
             class spawnFOBComposition { file = "core/MWF_fn_spawnFOBComposition.sqf"; };
             class startBuildPlacement { file = "core/MWF_fn_startBuildPlacement.sqf"; };
             class zoneManager { file = "core/MWF_fn_zoneManager.sqf"; };
             class addResource { file = "core/MWF_fn_addResource.sqf"; };
             class showNotification { file = "core/MWF_fn_showNotification.sqf"; };
-            class handlePostSpawn { file = "core/MWF_fn_handlePostSpawn.sqf"; };
             class MOBComputerLogin { file = "core/MWF_fn_MOBComputerLogin.sqf"; };
             class setCampaignPhase { file = "core/MWF_fn_setCampaignPhase.sqf"; };
             class syncEconomyState { file = "core/MWF_fn_syncEconomyState.sqf"; };

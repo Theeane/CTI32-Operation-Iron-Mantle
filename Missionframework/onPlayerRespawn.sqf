@@ -1,31 +1,29 @@
 /*
-    Author: Theane / ChatGPT
+    Author: OpenAI / Operation Iron Mantle
     File: onPlayerRespawn.sqf
     Project: Military War Framework
 
     Description:
-    Unified respawn entry point.
-    All real post-spawn work is handled centrally by MWF_fnc_handlePostSpawn.
-    The call is deferred slightly so Arma has time to finish the actual respawn.
+    Unified respawn entrypoint. This is now the main gameplay bootstrap hook for both
+    initial spawn (with respawnOnStart = 1) and later respawns.
 */
 
+if (!hasInterface) exitWith {};
+
 missionNamespace setVariable ["MWF_BlockRespawn", false];
-disableUserInput false;
-uiNamespace setVariable ["MWF_IntroCinematicActive", false];
-uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
-missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_TRIGGERED"];
+missionNamespace setVariable ["MWF_ClientInitComplete", false];
+missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_BOOTSTRAP"];
+uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+uiNamespace setVariable ["MWF_IntroCinematicStage", "DISABLED"];
+disableUserInput false;
 
 [] spawn {
-    private _deadline = diag_tickTime + 12;
-    waitUntil {
-        uiSleep 0.1;
-        (!isNull player && {alive player} && {!isNull findDisplay 46}) || {diag_tickTime >= _deadline}
-    };
-
+    uiSleep 0.1;
     if (!isNil "MWF_fnc_handlePostSpawn") then {
-        [false] call MWF_fnc_handlePostSpawn;
+        [false, "ONPLAYERRESPAWN"] call MWF_fnc_handlePostSpawn;
     } else {
-        diag_log "[MWF] ERROR: onPlayerRespawn could not call MWF_fnc_handlePostSpawn because the function is missing.";
+        diag_log "[MWF] ERROR: onPlayerRespawn could not call MWF_fnc_handlePostSpawn because the function is unavailable.";
     };
 };

@@ -32,57 +32,53 @@ private _runStep = {
     diag_log format ["[MWF] STEP END: %1", _label];
 };
 
+private _resolveNamedObject = {
+    params ["_varName"];
+    private _obj = missionNamespace getVariable [_varName, objNull];
+    if (isNull _obj && {!isNil _varName}) then {
+        _obj = call compile _varName;
+    };
+    _obj
+};
+
 ["INIT_GLOBALS", { [] call MWF_fnc_initGlobals; }] call _runStep;
 
-private _mobObject = missionNamespace getVariable ["MWF_MOB", objNull];
+private _mobObject = ["MWF_MOB"] call _resolveNamedObject;
 missionNamespace setVariable ["MWF_MainBase", _mobObject, true];
 missionNamespace setVariable ["MWF_MOB_Object", _mobObject, true];
 
-private _mobRespawnAnchor = missionNamespace getVariable ["MWF_MOB_RespawnAnchor", objNull];
-if (isNull _mobRespawnAnchor && {!isNil "MWF_MOB_RespawnAnchor"}) then {
-    _mobRespawnAnchor = MWF_MOB_RespawnAnchor;
+private _mobAssetAnchor = ["MWF_MOB_AssetAnchor"] call _resolveNamedObject;
+if (!isNull _mobAssetAnchor) then {
+    missionNamespace setVariable ["MWF_MOB_AssetAnchor", _mobAssetAnchor, true];
 };
-missionNamespace setVariable ["MWF_MOB_RespawnAnchor", _mobRespawnAnchor, true];
 
-private _mobAssetAnchor = missionNamespace getVariable ["MWF_MOB_AssetAnchor", objNull];
-if (isNull _mobAssetAnchor && {!isNil "MWF_MOB_AssetAnchor"}) then {
-    _mobAssetAnchor = MWF_MOB_AssetAnchor;
+private _mobRespawnAnchor = ["MWF_MOB_RespawnAnchor"] call _resolveNamedObject;
+if (!isNull _mobRespawnAnchor) then {
+    missionNamespace setVariable ["MWF_MOB_RespawnAnchor", _mobRespawnAnchor, true];
 };
-missionNamespace setVariable ["MWF_MOB_AssetAnchor", _mobAssetAnchor, true];
 
 private _mobPad = missionNamespace getVariable ["MWF_MOB_FobPad", missionNamespace getVariable ["MWF_FOB_Box_Spawn", objNull]];
 if (isNull _mobPad) then {
-    private _searchOrigin = if (!isNull _mobAssetAnchor) then {
-        getPosATL _mobAssetAnchor
-    } else {
-        if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" }
-    };
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" };
     if (_searchOrigin isEqualTo [0, 0, 0]) then {
         _searchOrigin = getMarkerPos "respawn_west";
     };
     private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
-    _pads = _pads select { !isNull _x && {_x != _mobRespawnAnchor} && {_x != _mobAssetAnchor} };
     if !(_pads isEqualTo []) then {
         _mobPad = _pads # 0;
     };
 };
 missionNamespace setVariable ["MWF_MOB_FobPad", _mobPad, true];
 
-private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["mob_deploy_pad", objNull]];
-if (isNull _deployPad && {!isNull _mobRespawnAnchor}) then {
-    _deployPad = _mobRespawnAnchor;
-};
+private _deployPad = missionNamespace getVariable ["MWF_MOB_DeployPad", missionNamespace getVariable ["MWF_MOB_RespawnAnchor", missionNamespace getVariable ["mob_deploy_pad", objNull]]];
+if (isNull _deployPad && {!isNull _mobRespawnAnchor}) then { _deployPad = _mobRespawnAnchor; };
 if (isNull _deployPad) then {
-    private _searchOrigin = if (!isNull _mobRespawnAnchor) then {
-        getPosATL _mobRespawnAnchor
-    } else {
-        if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" }
-    };
+    private _searchOrigin = if (!isNull _mobObject) then { getPosATL _mobObject } else { getMarkerPos "MWF_MOB_Marker" };
     if (_searchOrigin isEqualTo [0, 0, 0]) then {
         _searchOrigin = getMarkerPos "respawn_west";
     };
     private _pads = nearestObjects [_searchOrigin, ["Land_HelipadEmpty_F", "Land_HelipadSquare_F", "Land_HelipadCircle_F"], 75, true];
-    _pads = _pads select { !isNull _x && {_x != _mobPad} && {_x != _mobAssetAnchor} };
+    _pads = _pads select { !isNull _x && {_x != _mobPad} };
     if !(_pads isEqualTo []) then {
         _deployPad = _pads # 0;
     };
@@ -98,32 +94,17 @@ if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then {
     };
 };
 
-private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
-if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
-    [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
-};
+if (_mainRespawnMarker isNotEqualTo "") then {
+    private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
+    if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
+        [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
+    };
 
-if (markerColor "respawn_west" isNotEqualTo "") then {
-    missionNamespace setVariable ["MWF_MainRespawnPositionId", -1, true];
-    diag_log "[MWF] Native respawn_west/MenuPosition detected. Skipping scripted MOB respawn registration to avoid duplicate deploy entries.";
+    private _mainRespawnId = [west, _mainRespawnMarker, missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"]] call BIS_fnc_addRespawnPosition;
+    missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
+    diag_log format ["[MWF] Main Operating Base respawn registered on marker %1.", _mainRespawnMarker];
 } else {
-    private _mobRespawnTarget = objNull;
-    if (!isNull _mobRespawnAnchor) then {
-        _mobRespawnTarget = _mobRespawnAnchor;
-    } else {
-        if (_mainRespawnMarker isNotEqualTo "") then {
-            _mobRespawnTarget = _mainRespawnMarker;
-        };
-    };
-
-    if !(_mobRespawnTarget isEqualTo objNull && {_mainRespawnMarker isEqualTo ""}) then {
-        private _mainRespawnId = [west, _mobRespawnTarget, missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"]] call BIS_fnc_addRespawnPosition;
-        missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
-        diag_log format ["[MWF] Main Operating Base respawn registered on %1.", _mobRespawnTarget];
-    } else {
-        missionNamespace setVariable ["MWF_MainRespawnPositionId", -1, true];
-        diag_log "[MWF] WARNING: No valid Main Operating Base respawn target was found during server init.";
-    };
+    diag_log "[MWF] WARNING: No valid Main Operating Base respawn marker was found during server init.";
 };
 
 ["INIT_SYSTEMS", { [] call MWF_fnc_initSystems; }] call _runStep;
@@ -150,7 +131,7 @@ if (!isNil "MWF_fnc_opforFobPatrolSystem") then {
 missionNamespace setVariable ["MWF_ServerInitialized", true, true];
 missionNamespace setVariable ["MWF_ServerBootRunning", false, true];
 missionNamespace setVariable ["MWF_ServerBootStage", "CRITICAL_RELEASED", true];
- diag_log "[MWF] SUCCESS: Critical server initialization complete. Clients released.";
+diag_log "[MWF] SUCCESS: Critical server initialization complete. Clients released.";
 
 private _spawnPostStep = {
     params ["_label", "_code"];
