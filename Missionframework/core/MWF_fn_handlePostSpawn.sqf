@@ -1,14 +1,11 @@
 /*
     Author: OpenAI / ChatGPT
-    Function: MWF_fn_handlePostSpawn
+    Function: MWF_fnc_handlePostSpawn
     Project: Military War Framework
 
     Description:
-    Central post-spawn initializer used for the first playable deploy after the
-    intro cinematic and for later player respawns.
-
-    Params:
-    0: BOOL - true when this is the first playable spawn after the intro/deploy menu
+    Central post-spawn initializer used for the first playable deploy and for all
+    later death respawns.
 */
 
 params [
@@ -24,9 +21,16 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
 [_isInitialDeploy] spawn {
     params ["_isInitialDeploy"];
 
+    private _spawnDeadline = diag_tickTime + 60;
     waitUntil {
         uiSleep 0.1;
-        !isNull player && {alive player} && {!isNull findDisplay 46}
+        (!isNull player && {alive player} && {!isNull findDisplay 46}) || {diag_tickTime >= _spawnDeadline}
+    };
+
+    if (isNull player || {!alive player}) exitWith {
+        missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+        missionNamespace setVariable ["MWF_ClientInitStage", "POSTSPAWN_TIMEOUT"];
+        diag_log "[MWF] ERROR: Post-spawn bootstrap timed out before the player became playable.";
     };
 
     missionNamespace setVariable ["MWF_BlockRespawn", false];
@@ -38,11 +42,10 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
     disableUserInput false;
     uiNamespace setVariable ["MWF_IntroCinematicActive", false];
     uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+    cutText ["", "BLACK IN", 0.25];
     player allowDamage false;
     player enableSimulation true;
     player setVelocity [0, 0, 0];
-
-    ["close"] call BIS_fnc_showRespawnMenu;
 
     private _appliedSaved = false;
     if (_isInitialDeploy) then {
@@ -62,21 +65,38 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
         };
     };
 
+    if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
+        [player] remoteExecCall ["MWF_fnc_registerAuthenticatedPlayer", 2];
+    };
+
     [] call MWF_fnc_setupInteractions;
+    {
+        [_x] spawn {
+            params ["_delay"];
+            uiSleep _delay;
+            [] call MWF_fnc_setupInteractions;
+        };
+    } forEach [4, 10, 20];
 
-    if (!(missionNamespace getVariable ["MWF_LoadoutSystemInitialized", false])) then {
-        [] call MWF_fnc_initLoadoutSystem;
+    if (!(missionNamespace getVariable ["MWF_RuntimeSystemsInitialized", false])) then {
+        missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", true];
+
+        if (!isNil "MWF_fnc_initLoadoutSystem") then {
+            [] call MWF_fnc_initLoadoutSystem;
+        };
+
+        if (!isNil "MWF_fnc_undercoverHandler") then {
+            [] spawn MWF_fnc_undercoverHandler;
+        };
+
+        if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
+            [] spawn MWF_fnc_infrastructureMarkerManager;
+        };
     };
 
-    if (!(missionNamespace getVariable ["MWF_UndercoverHandlerStarted", false])) then {
-        [] spawn MWF_fnc_undercoverHandler;
+    if (!isNil "MWF_fnc_updateResourceUI") then {
+        [] spawn MWF_fnc_updateResourceUI;
     };
-
-    if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
-        [] spawn MWF_fnc_infrastructureMarkerManager;
-    };
-
-    [] spawn MWF_fnc_updateResourceUI;
 
     if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
         player setVariable ["MWF_DamageInterruptEHAdded", true];
@@ -84,13 +104,15 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
             params ["_unit", "_selection", "_damage", "_source", "_projectile"];
             private _currentDamage = damage _unit;
             if ((_damage > _currentDamage) || {(_projectile isEqualType "") && {_projectile isNotEqualTo ""}} || {(_source isEqualType objNull) && {!isNull _source}}) then {
-                [] call MWF_fnc_interruptSensitiveInteraction;
+                if (!isNil "MWF_fnc_interruptSensitiveInteraction") then {
+                    [] call MWF_fnc_interruptSensitiveInteraction;
+                };
             };
             _damage
         }];
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then {"INITIAL_DEPLOY_COMPLETE"} else {"RESPAWN_READY"}];
+    missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then {"INITIAL_DEPLOY_READY"} else {"RESPAWN_READY"}];
     missionNamespace setVariable ["MWF_ClientInitComplete", true];
 
     if (_isInitialDeploy) then {
@@ -100,6 +122,8 @@ missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then 
     uiSleep 0.25;
     player allowDamage true;
     missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+
+    diag_log format ["[MWF] SUCCESS: Post-spawn bootstrap completed for %1. Initial=%2", name player, _isInitialDeploy];
 };
 
 true

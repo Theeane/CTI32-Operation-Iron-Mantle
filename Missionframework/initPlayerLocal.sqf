@@ -4,14 +4,9 @@
     Project: Military War Framework
 
     Description:
-    Systems-first local bootstrap for debugging/stability.
-
-    Goal:
-    - no forced teleport
-    - no intro/cinematic gate
-    - no login gate
-    - let Arma native respawn/deploy own initial spawn flow
-    - get terminal/interactions/loadout/UI online as early and safely as possible
+    Systems-first local bootstrap.
+    Keeps startup minimal and defers all gameplay/runtime initialization until the
+    player has actually completed the first native Arma deploy spawn.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "BOOT"];
@@ -19,6 +14,9 @@ missionNamespace setVariable ["MWF_ClientInitComplete", false];
 missionNamespace setVariable ["MWF_BlockRespawn", false];
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_LoadoutSystemInitialized", false];
+missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", false];
+missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+missionNamespace setVariable ["MWF_InitialDeployCompleted", false];
 missionNamespace setVariable ["MWF_system_active", true, true];
 
 uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
@@ -43,7 +41,7 @@ cutText ["", "BLACK IN", 0.01];
 
     if (isNull player || {!alive player}) exitWith {
         missionNamespace setVariable ["MWF_ClientInitStage", "PLAYER_TIMEOUT"];
-        diag_log "[MWF] ERROR: systems-first initPlayerLocal aborted because player was not ready in time.";
+        diag_log "[MWF] ERROR: initPlayerLocal aborted because player was not ready in time.";
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
@@ -52,7 +50,7 @@ cutText ["", "BLACK IN", 0.01];
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_SOFT"];
-    private _serverDeadline = diag_tickTime + 20;
+    private _serverDeadline = diag_tickTime + 30;
     waitUntil {
         uiSleep 0.25;
         (missionNamespace getVariable ["MWF_ServerInitialized", false])
@@ -60,65 +58,30 @@ cutText ["", "BLACK IN", 0.01];
         || {diag_tickTime >= _serverDeadline}
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "ASYNC_SYSTEMS"];
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INITIAL_DEPLOY"];
 
-    [] spawn {
-        uiSleep 0.5;
+    private _startupUnit = player;
+    private _startupPos = getPosATL player;
+    private _initialDeployDeadline = diag_tickTime + 300;
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "SETUP_INTERACTIONS"];
-        if (!isNil "MWF_fnc_setupInteractions") then {
-            [] call MWF_fnc_setupInteractions;
-            [] spawn {
-                uiSleep 4;
-                [] call MWF_fnc_setupInteractions;
-            };
-            [] spawn {
-                uiSleep 10;
-                [] call MWF_fnc_setupInteractions;
-            };
-            [] spawn {
-                uiSleep 20;
-                [] call MWF_fnc_setupInteractions;
-            };
-        };
+    waitUntil {
+        uiSleep 0.1;
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "LOADOUT_INIT"];
-        if (!isNil "MWF_fnc_initLoadoutSystem") then {
-            [] call MWF_fnc_initLoadoutSystem;
-        };
+        if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith { true };
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "UNDERCOVER_INIT"];
-        if (!isNil "MWF_fnc_undercoverHandler") then {
-            [] spawn MWF_fnc_undercoverHandler;
-        };
+        private _unitChanged = player != _startupUnit;
+        private _movedFar = (player distance2D _startupPos) > 25;
 
-        if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
-            missionNamespace setVariable ["MWF_ClientInitStage", "INFRA_MARKERS"];
-            [] spawn MWF_fnc_infrastructureMarkerManager;
-        };
+        (_unitChanged || _movedFar) || {diag_tickTime >= _initialDeployDeadline}
+    };
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "RESOURCE_UI"];
-        if (!isNil "MWF_fnc_updateResourceUI") then {
-            [] spawn MWF_fnc_updateResourceUI;
-        };
+    if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith {};
 
-        if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
-            missionNamespace setVariable ["MWF_ClientInitStage", "DAMAGE_EH"];
-            player setVariable ["MWF_DamageInterruptEHAdded", true];
-            player addEventHandler ["HandleDamage", {
-                params ["_unit", "_selection", "_damage", "_source", "_projectile"];
-                private _currentDamage = damage _unit;
-                if ((_damage > _currentDamage) || {(_projectile isEqualType "") && {_projectile isNotEqualTo ""}} || {(_source isEqualType objNull) && {!isNull _source}}) then {
-                    if (!isNil "MWF_fnc_interruptSensitiveInteraction") then {
-                        [] call MWF_fnc_interruptSensitiveInteraction;
-                    };
-                };
-                _damage
-            }];
-        };
+    missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_DETECTED"];
 
-        missionNamespace setVariable ["MWF_ClientInitStage", "COMPLETE"];
-        missionNamespace setVariable ["MWF_ClientInitComplete", true];
-        diag_log format ["[MWF] SUCCESS: Systems-first local initialization completed for %1.", name player];
+    if (!isNil "MWF_fnc_handlePostSpawn") then {
+        [true] call MWF_fnc_handlePostSpawn;
+    } else {
+        diag_log "[MWF] ERROR: MWF_fnc_handlePostSpawn missing during initial deploy bootstrap.";
     };
 };

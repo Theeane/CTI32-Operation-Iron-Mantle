@@ -74,17 +74,23 @@ if (markerColor "MWF_MOB_Marker" isNotEqualTo "") then {
     };
 };
 
-if (_mainRespawnMarker isNotEqualTo "") then {
-    private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
-    if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
-        [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
-    };
+private _existingMainRespawnId = missionNamespace getVariable ["MWF_MainRespawnPositionId", -1];
+if (_existingMainRespawnId isEqualType 0 && {_existingMainRespawnId >= 0}) then {
+    [west, _existingMainRespawnId] call BIS_fnc_removeRespawnPosition;
+};
 
-    private _mainRespawnId = [west, _mainRespawnMarker, missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"]] call BIS_fnc_addRespawnPosition;
-    missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
-    diag_log format ["[MWF] Main Operating Base respawn registered on marker %1.", _mainRespawnMarker];
+if (markerColor "respawn_west" isNotEqualTo "") then {
+    missionNamespace setVariable ["MWF_MainRespawnPositionId", -1, true];
+    diag_log "[MWF] Native respawn_west/MenuPosition detected. Skipping scripted MOB respawn registration to avoid duplicate deploy entries.";
 } else {
-    diag_log "[MWF] WARNING: No valid Main Operating Base respawn marker was found during server init.";
+    if (_mainRespawnMarker isNotEqualTo "") then {
+        private _mainRespawnId = [west, _mainRespawnMarker, missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"]] call BIS_fnc_addRespawnPosition;
+        missionNamespace setVariable ["MWF_MainRespawnPositionId", _mainRespawnId, true];
+        diag_log format ["[MWF] Main Operating Base respawn registered on marker %1.", _mainRespawnMarker];
+    } else {
+        missionNamespace setVariable ["MWF_MainRespawnPositionId", -1, true];
+        diag_log "[MWF] WARNING: No valid Main Operating Base respawn marker was found during server init.";
+    };
 };
 
 if (!isNil "MWF_fnc_initMOBAssets") then {
