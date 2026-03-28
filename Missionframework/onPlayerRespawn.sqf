@@ -17,6 +17,7 @@ missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_TRIGGERED"];
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
 missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+missionNamespace setVariable ["MWF_DeployUiClosed", true];
 missionNamespace setVariable ["MWF_PlayerSpawnGeneration", (missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) + 1];
 
 [] spawn {
@@ -39,5 +40,5 @@ missionNamespace setVariable ["MWF_PlayerSpawnGeneration", (missionNamespace get
                 [] spawn MWF_fnc_updateResourceUI;
             };
         };
-    } forEach [0, 1, 3, 6, 10, 20];
+    } forEach [0, 1, 2, 4, 7, 12, 20];
 };

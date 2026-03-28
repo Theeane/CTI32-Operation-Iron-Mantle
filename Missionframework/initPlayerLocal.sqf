@@ -5,9 +5,8 @@
 
     Description:
     Function-first client bootstrap.
-    Waits for the actual gameplay landing near a valid respawn position before
-    running the first deploy bootstrap, so Arma's pre-deploy placeholder state
-    cannot consume the initial wake-up.
+    Waits for the actual deploy UI to close before consuming the first startup pass,
+    so pre-deploy placeholder states cannot burn the initial wake-up.
 */
 
 missionNamespace setVariable ["MWF_ClientInitStage", "BOOT"];
@@ -19,6 +18,7 @@ missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", false];
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
 missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
 missionNamespace setVariable ["MWF_InitialDeployCompleted", false];
+missionNamespace setVariable ["MWF_DeployUiClosed", false];
 missionNamespace setVariable ["MWF_system_active", true, true];
 missionNamespace setVariable ["MWF_UndercoverHandlerStarted", false];
 missionNamespace setVariable ["MWF_PlayerSpawnGeneration", 0];
@@ -53,95 +53,54 @@ cutText ["", "BLACK IN", 0.01];
     };
 
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_SERVER_READY"];
-    private _serverDeadline = diag_tickTime + 120;
+    private _serverDeadline = diag_tickTime + 180;
     waitUntil {
         uiSleep 0.25;
         (missionNamespace getVariable ["MWF_ServerReady", false])
-        || (missionNamespace getVariable ["MWF_ServerInitialized", false])
-        || {(missionNamespace getVariable ["MWF_ServerBootStage", ""]) in ["ESSENTIALS_READY", "CRITICAL_RELEASED"]}
         || {diag_tickTime >= _serverDeadline}
     };
 
     if (!(missionNamespace getVariable ["MWF_ServerReady", false])) then {
-        diag_log "[MWF] WARNING: Client bootstrap continued before explicit server-ready flag. Function-first fallback engaged.";
+        diag_log "[MWF] WARNING: Client bootstrap timed out waiting for explicit server-ready. Startup fallback engaged.";
     };
 
-    private _getSpawnTargets = {
-        private _targets = [];
-
-        private _pushPos = {
-            params ["_value"];
-            if (_value isEqualType objNull) then {
-                if (!isNull _value) then {
-                    _targets pushBackUnique (getPosATL _value);
-                };
-            } else {
-                if (_value isEqualType "" && {_value isNotEqualTo ""} && {markerColor _value isNotEqualTo ""}) then {
-                    _targets pushBackUnique (getMarkerPos _value);
-                };
-            };
-        };
-
-        [missionNamespace getVariable ["MWF_MOB_RespawnAnchor", objNull]] call _pushPos;
-        [missionNamespace getVariable ["MWF_MOB_DeployPad", objNull]] call _pushPos;
-
-        if (!isNil "MWF_MOB_RespawnAnchor") then {
-            [MWF_MOB_RespawnAnchor] call _pushPos;
-        };
-        if (!isNil "MWF_MOB_DeployPad") then {
-            [MWF_MOB_DeployPad] call _pushPos;
-        };
-
-        ["respawn_west"] call _pushPos;
-        ["MWF_MOB_Marker"] call _pushPos;
-
-        _targets
-    };
-
-    private _landedAtGameplaySpawn = {
-        if (isNull player || {!alive player}) exitWith { false };
-        private _targets = call _getSpawnTargets;
-        if (_targets isEqualTo []) exitWith { false };
-        (_targets findIf { player distance2D _x <= 300 }) >= 0
-    };
-
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INITIAL_LANDING"];
-    private _landingDeadline = diag_tickTime + 300;
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_DEPLOY_UI_CLOSE"];
+    private _uiDeadline = diag_tickTime + 240;
+    private _menuSeen = false;
     waitUntil {
-        uiSleep 0.25;
-        (
-            (!isNull player && {alive player} && {call _landedAtGameplaySpawn})
-            || {(missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) > 0}
-            || {diag_tickTime >= _landingDeadline}
-        )
+        uiSleep 0.1;
+        private _respawnDisplay = findDisplay 49;
+        private _mapVisible = visibleMap;
+        if (!isNull _respawnDisplay || {_mapVisible}) then {
+            _menuSeen = true;
+        };
+
+        private _uiClosed = _menuSeen && {isNull _respawnDisplay} && {!_mapVisible};
+        private _playerReady = !isNull player && {alive player};
+        (_playerReady && _uiClosed)
+        || {(missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) > 0}
+        || {diag_tickTime >= _uiDeadline}
     };
 
-    if (!(call _landedAtGameplaySpawn) && {(missionNamespace getVariable ["MWF_PlayerSpawnGeneration", 0]) <= 0}) then {
-        diag_log "[MWF] WARNING: Initial landing watchdog expired before a valid gameplay spawn was detected. Forcing startup anyway.";
-    };
-
+    missionNamespace setVariable ["MWF_DeployUiClosed", true];
     missionNamespace setVariable ["MWF_ClientInitStage", "INITIAL_DEPLOY_BOOTSTRAP"];
 
     {
         [_x] spawn {
             params ["_delay"];
             uiSleep _delay;
-
             if (isNull player || {!alive player}) exitWith {};
-
             if (!isNil "MWF_fnc_handlePostSpawn") then {
                 [true] call MWF_fnc_handlePostSpawn;
             };
-
             if (!isNil "MWF_fnc_setupInteractions") then {
                 [] spawn MWF_fnc_setupInteractions;
             };
-
             if (!isNil "MWF_fnc_updateResourceUI") then {
                 [] spawn MWF_fnc_updateResourceUI;
             };
         };
-    } forEach [0, 1, 3, 6, 10, 20, 35, 50, 70, 90];
+    } forEach [0, 1, 2, 4, 7, 12, 20, 35, 50];
 
     private _bootstrapDeadline = diag_tickTime + 120;
     waitUntil {
