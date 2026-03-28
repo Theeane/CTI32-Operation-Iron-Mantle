@@ -4,79 +4,117 @@
     Project: Military War Framework
 
     Description:
-    Systems-first client bootstrap.
-
-    This version intentionally removes the legacy forced-MOB move and intro ownership.
-    Arma native spawn/deploy owns the player's start. Actual gameplay initialization is
-    centralized in MWF_fnc_handlePostSpawn and triggered from respawn flow, with a
-    lightweight fallback here in case the first spawn event is not raised by the engine.
+    Function-first local bootstrap.
+    Starts client systems aggressively after the player becomes alive instead of
+    waiting for perfect world/map conditions that can be missed by Arma's first deploy.
 */
-
-if (!hasInterface) exitWith {};
 
 missionNamespace setVariable ["MWF_ClientInitStage", "BOOT"];
 missionNamespace setVariable ["MWF_ClientInitComplete", false];
 missionNamespace setVariable ["MWF_BlockRespawn", false];
 missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
 missionNamespace setVariable ["MWF_LoadoutSystemInitialized", false];
+missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", false];
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
-missionNamespace setVariable ["MWF_PostSpawnGeneration", 0];
-missionNamespace setVariable ["MWF_InitialSpawnHandled", false];
-missionNamespace setVariable ["MWF_UndercoverLoopStarted", false];
-missionNamespace setVariable ["MWF_InfrastructureMarkerLoopStarted", false];
+missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+missionNamespace setVariable ["MWF_InitialDeployCompleted", false];
+missionNamespace setVariable ["MWF_system_active", true, true];
+missionNamespace setVariable ["MWF_UndercoverHandlerStarted", false];
 
 uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
-uiNamespace setVariable ["MWF_IntroCallAttempted", false];
-uiNamespace setVariable ["MWF_IntroCinematicStage", "DISABLED"];
+uiNamespace setVariable ["MWF_IntroCallAttempted", true];
+uiNamespace setVariable ["MWF_IntroCinematicStage", "BYPASSED"];
 uiNamespace setVariable ["MWF_IntroCinematicPlayed", false];
 uiNamespace setVariable ["MWF_IntroCinematicActive", false];
 missionNamespace setVariable ["MWF_IntroCallResult", false];
+player setVariable ["MWF_Player_Authenticated", true, true];
 
 disableUserInput false;
-cutText ["", "BLACK IN", 0.25];
+cutText ["", "BLACK IN", 0.01];
 
 [] spawn {
     missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_PLAYER"];
-    private _playerDeadline = diag_tickTime + 60;
+
+    private _playerDeadline = diag_tickTime + 30;
     waitUntil {
         uiSleep 0.1;
-        (!isNull player && {player == player}) || {diag_tickTime >= _playerDeadline}
+        (!isNull player && {alive player}) || {diag_tickTime >= _playerDeadline}
     };
 
-    if (isNull player) exitWith {
+    if (isNull player || {!alive player}) exitWith {
         missionNamespace setVariable ["MWF_ClientInitStage", "PLAYER_TIMEOUT"];
-        diag_log "[MWF] ERROR: initPlayerLocal aborted because player object was not ready in time.";
+        diag_log "[MWF] ERROR: initPlayerLocal aborted because player was not ready in time.";
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "INIT_UI"];
     if (!isNil "MWF_fnc_initUI") then {
         [] call MWF_fnc_initUI;
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_LOCAL_READY"];
-    private _readyDeadline = diag_tickTime + 60;
+    missionNamespace setVariable ["MWF_ClientInitStage", "SOFT_WAIT_SERVER"];
+    private _serverSoftDeadline = diag_tickTime + 10;
     waitUntil {
         uiSleep 0.25;
-        (missionNamespace getVariable ["MWF_LocalInitReady", false])
+        (missionNamespace getVariable ["MWF_ServerReady", false])
         || (missionNamespace getVariable ["MWF_ServerInitialized", false])
         || {(missionNamespace getVariable ["MWF_ServerBootStage", ""]) isEqualTo "CRITICAL_RELEASED"}
-        || {diag_tickTime >= _readyDeadline}
+        || {diag_tickTime >= _serverSoftDeadline}
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_FIRST_SPAWN"];
-    private _fallbackDeadline = diag_tickTime + 25;
-    waitUntil {
-        uiSleep 0.25;
-        (missionNamespace getVariable ["MWF_PostSpawnGeneration", 0]) > 0
-        || {diag_tickTime >= _fallbackDeadline}
-    };
+    missionNamespace setVariable ["MWF_ClientInitStage", "FORCE_BOOTSTRAP"];
 
-    if ((missionNamespace getVariable ["MWF_PostSpawnGeneration", 0]) <= 0 && {!isNull player} && {alive player}) then {
-        missionNamespace setVariable ["MWF_ClientInitStage", "FIRST_SPAWN_FALLBACK"];
-        if (!isNil "MWF_fnc_handlePostSpawn") then {
-            [true, "INITPLAYERLOCAL_FALLBACK"] spawn MWF_fnc_handlePostSpawn;
-        } else {
-            diag_log "[MWF] WARNING: initPlayerLocal fallback could not start post-spawn bootstrap because MWF_fnc_handlePostSpawn is unavailable.";
+    private _kickLocalSystems = {
+        params [["_initial", true, [false]]];
+
+        if (isNull player || {!alive player}) exitWith {};
+
+        if (_initial && {!isNil "MWF_fnc_applyBaselineLoadout"} && {!(missionNamespace getVariable ["MWF_InitialDeployCompleted", false])}) then {
+            [true] call MWF_fnc_applyBaselineLoadout;
         };
+
+        if (!isNil "MWF_fnc_initUI") then {
+            [] call MWF_fnc_initUI;
+        };
+
+        if (!isNil "MWF_fnc_updateResourceUI") then {
+            [] spawn MWF_fnc_updateResourceUI;
+        };
+
+        if (!isNil "MWF_fnc_initLoadoutSystem") then {
+            [] call MWF_fnc_initLoadoutSystem;
+        };
+
+        if (!isNil "MWF_fnc_undercoverHandler") then {
+            [] spawn MWF_fnc_undercoverHandler;
+        };
+
+        if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
+            [] spawn MWF_fnc_infrastructureMarkerManager;
+        };
+
+        if (!isNil "MWF_fnc_setupInteractions") then {
+            [] spawn MWF_fnc_setupInteractions;
+        };
+
+        if (!isNil "MWF_fnc_handlePostSpawn") then {
+            [_initial] call MWF_fnc_handlePostSpawn;
+        };
+    };
+
+    {
+        [_x, _kickLocalSystems] spawn {
+            params ["_delay", "_code"];
+            uiSleep _delay;
+            [true] call _code;
+        };
+    } forEach [0, 1, 3, 6, 10, 20, 35];
+
+    private _bootstrapDeadline = diag_tickTime + 45;
+    waitUntil {
+        uiSleep 1;
+        (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) || {diag_tickTime >= _bootstrapDeadline}
+    };
+
+    if (!(missionNamespace getVariable ["MWF_InitialDeployCompleted", false])) then {
+        diag_log "[MWF] WARNING: Initial deploy watchdog expired before completion flag. Client bootstrap retries were still issued.";
     };
 };

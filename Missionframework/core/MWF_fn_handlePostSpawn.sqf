@@ -4,122 +4,163 @@
     Project: Military War Framework
 
     Description:
-    Centralized player-local post-spawn bootstrap.
-
-    Responsibilities:
-    - determine whether this is the first playable spawn
-    - apply baseline/respawn loadout
-    - initialize terminal interactions
-    - initialize player-local systems that should be active after a real spawn
+    Brutal post-spawn bootstrap for both the initial deploy and later respawns.
+    Prioritizes waking systems over waiting for perfect UI/map conditions.
 */
 
 params [
-    ["_isInitialHint", false, [false]],
-    ["_source", "UNKNOWN", [""]]
+    ["_isInitialDeploy", false, [false]]
 ];
 
 if (!hasInterface) exitWith { false };
 
-if (missionNamespace getVariable ["MWF_PostSpawnInitRunning", false]) exitWith {
-    diag_log format ["[MWF] PostSpawn skipped because bootstrap is already running. Source=%1", _source];
-    false
-};
+private _now = diag_tickTime;
+private _runningSince = missionNamespace getVariable ["MWF_PostSpawnInitSince", -1];
+if (
+    missionNamespace getVariable ["MWF_PostSpawnInitRunning", false]
+    && {_runningSince >= 0}
+    && {(_now - _runningSince) < 8}
+) exitWith { false };
 
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", true];
+missionNamespace setVariable ["MWF_PostSpawnInitSince", _now];
+missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then {"INITIAL_DEPLOY_WAIT_SPAWN"} else {"RESPAWN_WAIT_SPAWN"}];
 
-private _firstPlayableSpawn = _isInitialHint;
-if !(missionNamespace getVariable ["MWF_InitialSpawnHandled", false]) then {
-    _firstPlayableSpawn = true;
-    missionNamespace setVariable ["MWF_InitialSpawnHandled", true];
-};
+[_isInitialDeploy] spawn {
+    params ["_isInitialDeploy"];
 
-private _readyDeadline = diag_tickTime + 20;
-waitUntil {
-    uiSleep 0.1;
-    (!isNull player && {alive player} && {!isNull findDisplay 46}) || {diag_tickTime >= _readyDeadline}
-};
-
-if (isNull player || {!alive player}) exitWith {
-    missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
-    missionNamespace setVariable ["MWF_ClientInitStage", "POSTSPAWN_ABORTED"];
-    diag_log format ["[MWF] ERROR: PostSpawn aborted because player was not alive/ready in time. Source=%1", _source];
-    false
-};
-
-missionNamespace setVariable ["MWF_ClientInitStage", if (_firstPlayableSpawn) then {"INITIAL_POSTSPAWN"} else {"RESPAWN_POSTSPAWN"}];
-missionNamespace setVariable ["MWF_ClientInitComplete", false];
-missionNamespace setVariable ["MWF_BlockRespawn", false];
-disableUserInput false;
-
-if (!isNil "MWF_fnc_initUI") then {
-    [] call MWF_fnc_initUI;
-};
-
-private _appliedSaved = false;
-if (!_firstPlayableSpawn && {!isNil "MWF_fnc_applyRespawnLoadout"}) then {
-    _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
-    if (isNil "_appliedSaved") then {
-        _appliedSaved = false;
+    private _spawnDeadline = diag_tickTime + 20;
+    waitUntil {
+        uiSleep 0.1;
+        (!isNull player && {alive player}) || {diag_tickTime >= _spawnDeadline}
     };
-};
 
-if ((!_appliedSaved) && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
-    [] call MWF_fnc_applyBaselineLoadout;
-};
+    if (isNull player || {!alive player}) exitWith {
+        missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+        missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+        missionNamespace setVariable ["MWF_ClientInitStage", "POSTSPAWN_TIMEOUT"];
+        diag_log "[MWF] ERROR: Post-spawn bootstrap timed out before the player became alive.";
+    };
 
-missionNamespace setVariable ["MWF_ClientInitStage", "SETUP_INTERACTIONS"];
-[] call MWF_fnc_setupInteractions;
-[] spawn {
-    uiSleep 3;
-    [] call MWF_fnc_setupInteractions;
-};
-[] spawn {
-    uiSleep 8;
-    [] call MWF_fnc_setupInteractions;
-};
+    missionNamespace setVariable ["MWF_BlockRespawn", false];
+    missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then {"INITIAL_DEPLOY_POSTSPAWN"} else {"RESPAWN_POSTSPAWN"}];
+    missionNamespace setVariable ["MWF_BaselineLoadoutApplied", false];
+    missionNamespace setVariable ["MWF_system_active", true, true];
+    missionNamespace setVariable ["MWF_RuntimeSystemsInitialized", true];
+    player setVariable ["MWF_Player_Authenticated", true, true];
 
-missionNamespace setVariable ["MWF_ClientInitStage", "LOADOUT_INIT"];
-if (!isNil "MWF_fnc_initLoadoutSystem") then {
-    [] call MWF_fnc_initLoadoutSystem;
-};
+    disableUserInput false;
+    uiNamespace setVariable ["MWF_IntroCinematicActive", false];
+    uiNamespace setVariable ["MWF_InitialIntroSequenceDone", true];
+    cutText ["", "BLACK IN", 0.25];
+    player allowDamage false;
+    player enableSimulation true;
+    player setVelocity [0, 0, 0];
 
-if (!(missionNamespace getVariable ["MWF_UndercoverLoopStarted", false]) && {!isNil "MWF_fnc_undercoverHandler"}) then {
-    missionNamespace setVariable ["MWF_UndercoverLoopStarted", true];
-    [] spawn MWF_fnc_undercoverHandler;
-};
-
-if (!(missionNamespace getVariable ["MWF_InfrastructureMarkerLoopStarted", false]) && {!isNil "MWF_fnc_infrastructureMarkerManager"}) then {
-    missionNamespace setVariable ["MWF_InfrastructureMarkerLoopStarted", true];
-    [] spawn MWF_fnc_infrastructureMarkerManager;
-};
-
-if (!isNil "MWF_fnc_updateResourceUI") then {
-    [] spawn MWF_fnc_updateResourceUI;
-};
-
-if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
-    player setVariable ["MWF_DamageInterruptEHAdded", true];
-    player addEventHandler ["HandleDamage", {
-        params ["_unit", "_selection", "_damage", "_sourceObj", "_projectile"];
-        private _currentDamage = damage _unit;
-        if ((_damage > _currentDamage) || {(_projectile isEqualType "") && {_projectile isNotEqualTo ""}} || {(_sourceObj isEqualType objNull) && {!isNull _sourceObj}}) then {
-            [] call MWF_fnc_interruptSensitiveInteraction;
+    private _kickClientSystems = {
+        if (!isNil "MWF_fnc_initUI") then {
+            [] call MWF_fnc_initUI;
         };
-        _damage
-    }];
+
+        if (!isNil "MWF_fnc_updateResourceUI") then {
+            [] spawn MWF_fnc_updateResourceUI;
+        };
+
+        if (!isNil "MWF_fnc_initLoadoutSystem") then {
+            [] call MWF_fnc_initLoadoutSystem;
+        };
+
+        if (!isNil "MWF_fnc_undercoverHandler") then {
+            [] spawn MWF_fnc_undercoverHandler;
+        };
+
+        if (!isNil "MWF_fnc_infrastructureMarkerManager") then {
+            [] spawn MWF_fnc_infrastructureMarkerManager;
+        };
+
+        if (!isNil "MWF_fnc_setupInteractions") then {
+            [] spawn MWF_fnc_setupInteractions;
+        };
+    };
+
+    private _appliedSaved = false;
+    if (_isInitialDeploy) then {
+        if (!isNil "MWF_fnc_applyBaselineLoadout") then {
+            [true] call MWF_fnc_applyBaselineLoadout;
+        };
+
+        {
+            [_x] spawn {
+                params ["_delay"];
+                uiSleep _delay;
+                if (!isNull player && {alive player} && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+                    private _needsReapply = (currentWeapon player isNotEqualTo "")
+                        || {(vest player) isNotEqualTo ""}
+                        || {(backpack player) isNotEqualTo ""}
+                        || {(headgear player) isNotEqualTo ""}
+                        || {!((assignedItems player) isEqualTo [])}
+                        || {!((weapons player) isEqualTo [])};
+                    if (_needsReapply) then {
+                        [true] call MWF_fnc_applyBaselineLoadout;
+                    };
+                };
+            };
+        } forEach [1, 3, 6];
+    } else {
+        if (!isNil "MWF_fnc_applyRespawnLoadout") then {
+            _appliedSaved = [] call MWF_fnc_applyRespawnLoadout;
+            if (isNil "_appliedSaved") then {
+                _appliedSaved = false;
+            };
+        };
+
+        if (!_appliedSaved && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+            [false] call MWF_fnc_applyBaselineLoadout;
+        };
+    };
+
+    if (!isNil "MWF_fnc_registerAuthenticatedPlayer") then {
+        [player] remoteExecCall ["MWF_fnc_registerAuthenticatedPlayer", 2];
+    };
+
+    call _kickClientSystems;
+    {
+        [_x, _kickClientSystems] spawn {
+            params ["_delay", "_code"];
+            uiSleep _delay;
+            if (!isNull player && {alive player}) then {
+                call _code;
+            };
+        };
+    } forEach [1, 3, 6, 10, 20];
+
+    if !(player getVariable ["MWF_DamageInterruptEHAdded", false]) then {
+        player setVariable ["MWF_DamageInterruptEHAdded", true];
+        player addEventHandler ["HandleDamage", {
+            params ["_unit", "_selection", "_damage", "_source", "_projectile"];
+            private _currentDamage = damage _unit;
+            if ((_damage > _currentDamage) || {(_projectile isEqualType "") && {_projectile isNotEqualTo ""}} || {(_source isEqualType objNull) && {!isNull _source}}) then {
+                if (!isNil "MWF_fnc_interruptSensitiveInteraction") then {
+                    [] call MWF_fnc_interruptSensitiveInteraction;
+                };
+            };
+            _damage
+        }];
+    };
+
+    missionNamespace setVariable ["MWF_ClientInitStage", if (_isInitialDeploy) then {"INITIAL_DEPLOY_READY"} else {"RESPAWN_READY"}];
+    missionNamespace setVariable ["MWF_ClientInitComplete", true];
+
+    if (_isInitialDeploy) then {
+        missionNamespace setVariable ["MWF_InitialDeployCompleted", true];
+    };
+
+    uiSleep 0.5;
+    player allowDamage true;
+    missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
+    missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
+
+    diag_log format ["[MWF] SUCCESS: Post-spawn bootstrap completed for %1. Initial=%2", name player, _isInitialDeploy];
 };
-
-private _generation = (missionNamespace getVariable ["MWF_PostSpawnGeneration", 0]) + 1;
-missionNamespace setVariable ["MWF_PostSpawnGeneration", _generation];
-missionNamespace setVariable ["MWF_ClientInitStage", if (_firstPlayableSpawn) then {"INITIAL_READY"} else {"RESPAWN_READY"}];
-missionNamespace setVariable ["MWF_ClientInitComplete", true];
-missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
-
-diag_log format [
-    "[MWF] SUCCESS: PostSpawn bootstrap complete. Initial=%1 Source=%2 Generation=%3",
-    _firstPlayableSpawn,
-    _source,
-    _generation
-];
 
 true
