@@ -58,21 +58,50 @@ cutText ["", "BLACK IN", 0.01];
         || {diag_tickTime >= _serverDeadline}
     };
 
-    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INITIAL_DEPLOY"];
+    missionNamespace setVariable ["MWF_ClientInitStage", "WAIT_INITIAL_DEPLOY_UI"];
 
-    private _startupUnit = player;
-    private _startupPos = getPosATL player;
-    private _initialDeployDeadline = diag_tickTime + 300;
+    private _initialDeployDeadline = diag_tickTime + 180;
+    private _uiObserveDeadline = diag_tickTime + 20;
+    private _sawDeployUi = false;
 
     waitUntil {
         uiSleep 0.1;
 
         if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith { true };
 
-        private _unitChanged = player != _startupUnit;
-        private _movedFar = (player distance2D _startupPos) > 25;
+        if (dialog || {visibleMap}) then {
+            _sawDeployUi = true;
+        };
 
-        (_unitChanged || _movedFar) || {diag_tickTime >= _initialDeployDeadline}
+        _sawDeployUi || {diag_tickTime >= _uiObserveDeadline} || {diag_tickTime >= _initialDeployDeadline}
+    };
+
+    if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith {};
+
+    missionNamespace setVariable ["MWF_ClientInitStage", if (_sawDeployUi) then {"WAIT_INITIAL_DEPLOY_CLOSE"} else {"WAIT_INITIAL_DEPLOY_WORLDSTATE"}];
+
+    private _stableWorldSince = -1;
+    waitUntil {
+        uiSleep 0.1;
+
+        if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith { true };
+
+        private _worldReady = !isNull player
+            && {alive player}
+            && {!dialog}
+            && {!visibleMap}
+            && {!isNull findDisplay 46};
+
+        if (_worldReady) then {
+            if (_stableWorldSince < 0) then {
+                _stableWorldSince = diag_tickTime;
+            };
+        } else {
+            _stableWorldSince = -1;
+        };
+
+        ((_stableWorldSince >= 0) && {(diag_tickTime - _stableWorldSince) >= 1})
+        || {diag_tickTime >= _initialDeployDeadline}
     };
 
     if (missionNamespace getVariable ["MWF_InitialDeployCompleted", false]) exitWith {};
