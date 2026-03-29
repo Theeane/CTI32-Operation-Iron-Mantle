@@ -124,27 +124,27 @@ private _showSelectedEntry = {
             switch (_actionMode) do {
                 case "VEHICLE_MENU": {
                     [_actionCtrl, "Vehicle Menu", true, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
                 case "BASE_BUILDING": {
                     [_actionCtrl, "Build Upgrade", true, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
                 case "GARAGE_BUILD": {
                     [_actionCtrl, "Build Garage", true, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
                 case "GARAGE_INFO": {
                     [_actionCtrl, "Garage Ready", true, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
                 case "TIER5_INFO": {
                     [_actionCtrl, "Tier 5 Info", true, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
                 default {
                     [_actionCtrl, "Locked", false, _tooltipText] call _setButtonState;
-                    [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+                    [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
                 };
             };
         };
@@ -247,7 +247,7 @@ private _showSelectedEntry = {
             [_infoCtrl, _lines] call _setInfoText;
 
             [_actionCtrl, "Accept", _isAvailable, _acceptTooltip] call _setButtonState;
-            [_leftCtrl, "Main Ops", true, "Switch to main operations."] call _setButtonState;
+            [_leftCtrl, "Missions", true, "Switch to missions."] call _setButtonState;
         };
 
         case "MAIN_OPERATIONS": {
@@ -633,15 +633,7 @@ switch (_modeUpper) do {
             true
         };
 
-        if (_modeNow isEqualTo "UPGRADES") exitWith {
-            ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
-            true
-        };
-
-        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
-            ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
-            true
-        };
+        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith { false };
 
         ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
         true

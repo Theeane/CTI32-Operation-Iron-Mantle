@@ -46,10 +46,12 @@ if (!isNil "MWF_fnc_updateResourceUI") then {
 
 
 [] spawn {
-    uiSleep 0.05;
-    cutText ["", "BLACK IN", 0.15];
-    titleCut ["", "BLACK IN", 0.15];
     showCinemaBorder false;
+    for "_i" from 0 to 3 do {
+        uiSleep 0.08;
+        cutText ["", "BLACK IN", 0];
+        titleCut ["", "BLACK IN", 0];
+    };
     if (!isNull player) then {
         player switchCamera "INTERNAL";
     };

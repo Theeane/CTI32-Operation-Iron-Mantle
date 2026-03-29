@@ -74,13 +74,14 @@ if (!isNull _infoCtrl) then {
 if (!isNull _leftCtrl) then {
     private _leftText = switch (_modeUpper) do {
         case "SUPPORT": {"Build Group"};
-        case "SIDE_MISSIONS": {"Main Ops"};
-        case "UPGRADES": {"Main Ops"};
-        default {"Side Missions"};
+        case "SIDE_MISSIONS": {"Missions"};
+        case "UPGRADES": {"Missions"};
+        case "MAIN_OPERATIONS": {"Missions"};
+        default {"Missions"};
     };
 
     _leftCtrl ctrlSetText _leftText;
-    _leftCtrl ctrlEnable true;
+    _leftCtrl ctrlEnable !(_modeUpper isEqualTo "SIDE_MISSIONS");
 };
 
 if (!isNull _actionCtrl) then {
@@ -90,7 +91,7 @@ if (!isNull _actionCtrl) then {
         case "UPGRADES": {"Inspect"};
         case "SIDE_MISSIONS";
         case "MAIN_OPERATIONS": {"Accept"};
-        default {"Close"};
+        default {"Back"};
     };
 
     private _actionEnabled = !(_modeUpper in ["REDEPLOY", "SUPPORT", "SIDE_MISSIONS", "MAIN_OPERATIONS", "UPGRADES"]);

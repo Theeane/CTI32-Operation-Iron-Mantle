@@ -125,12 +125,12 @@ private _applyLayout = {
     private _positionMode = missionNamespace getVariable ["MWF_UI_Position", 0];
     private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.35];
 
-    private _groupW = 0.14;
-    private _groupH = 0.19;
+    private _groupW = 0.145;
+    private _groupH = 0.235;
     private _rightX = safeZoneX + safeZoneW - _groupW - 0.012;
     private _leftX = safeZoneX + 0.018;
     private _baseX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
-    private _baseY = safeZoneY + (safeZoneH * 0.40);
+    private _baseY = safeZoneY + (safeZoneH * 0.37);
 
     if (!isNull _resourceGroup) then {
         _resourceGroup ctrlSetPosition [_baseX, _baseY, _groupW, _groupH];

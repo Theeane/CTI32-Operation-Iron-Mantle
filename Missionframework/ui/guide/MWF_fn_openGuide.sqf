@@ -61,11 +61,11 @@ private _applyPage = {
     };
 
     if (!isNull _titleCtrl) then {
-        _titleCtrl ctrlSetStructuredText parseText format ["<t size='1.2' color='#1A1A1A'>%1</t>", localize _titleKey];
+        _titleCtrl ctrlSetStructuredText parseText format ["<t size='1.15' color='#F3F3F3' shadow='1'>%1</t>", localize _titleKey];
     };
 
     if (!isNull _bodyCtrl) then {
-        _bodyCtrl ctrlSetStructuredText parseText (localize _bodyKey);
+        _bodyCtrl ctrlSetStructuredText parseText format ["<t color='#F0F0F0' shadow='1'>%1</t>", localize _bodyKey];
     };
 
     uiNamespace setVariable ["MWF_Guide_CurrentPage", _resolvedKey];
@@ -75,6 +75,7 @@ private _applyPage = {
 switch (_modeUpper) do {
     case "OPEN": {
         if (!hasInterface) exitWith { false };
+        uiNamespace setVariable ["MWF_Guide_ReturnMode", uiNamespace getVariable ["MWF_Guide_ReturnMode", "ZONES"]];
         createDialog "MWF_RscGuide";
         private _display = findDisplay 12300;
         if (isNull _display) exitWith { false };
@@ -95,9 +96,11 @@ switch (_modeUpper) do {
 
     case "CLOSE": {
         private _display = uiNamespace getVariable ["MWF_Guide_Display", displayNull];
+        private _returnMode = uiNamespace getVariable ["MWF_Guide_ReturnMode", "ZONES"];
         if (!isNull _display) then { closeDialog 0; };
         uiNamespace setVariable ["MWF_Guide_Display", displayNull];
         uiNamespace setVariable ["MWF_Guide_CurrentPage", ""];
+        ["OPEN", _returnMode] call MWF_fnc_dataHub;
         true
     };
 

@@ -64,6 +64,7 @@ class RscButton {
     colorDisabled[] = {0.4,0.4,0.4,1};
     colorBackground[] = {0,0,0,0.7};
     colorBackgroundActive[] = {0,0,0,1};
+    colorBackgroundDisabled[] = {0,0,0,0};
     colorFocused[] = {0,0,0,1};
     colorShadow[] = {0,0,0,0};
     colorBorder[] = {0,0,0,1};
@@ -103,7 +104,7 @@ class MWF_RscTerminalButton : RscStandardButton {
     colorBackground[] = {0,0,0,0};
     colorBackgroundActive[] = {1,1,1,0.06};
     colorFocused[] = {1,1,1,0.06};
-    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 22) * 1)";
+    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 19) * 1)";
 };
 
 class RscStructuredText {

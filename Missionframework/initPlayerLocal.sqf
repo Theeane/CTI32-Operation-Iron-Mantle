@@ -57,3 +57,28 @@ if (!isNil "MWF_fnc_setupInteractions") then {
 if (!isNil "MWF_fnc_initWorldLocal") then { [] spawn MWF_fnc_initWorldLocal; };
 
 diag_log "[MWF] initPlayerLocal: Client handshake complete.";
+
+
+[] spawn {
+    waitUntil {
+        uiSleep 0.25;
+        uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]
+    };
+
+    uiSleep 3;
+    private _deadline = diag_tickTime + 45;
+    while {hasInterface && {diag_tickTime < _deadline}} do {
+        uiSleep 1;
+        if (!isNull player && {alive player}) then {
+            cutText ["", "BLACK IN", 0];
+            titleCut ["", "BLACK IN", 0];
+            showCinemaBorder false;
+
+            if (!(missionNamespace getVariable ["MWF_ClientInitComplete", false]) && {!isNil "MWF_fnc_handlePostSpawn"}) then {
+                [true] call MWF_fnc_handlePostSpawn;
+            };
+
+            if (missionNamespace getVariable ["MWF_ClientInitComplete", false]) exitWith {};
+        };
+    };
+};
