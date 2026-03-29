@@ -39,6 +39,23 @@ private _resolveObjectAnchor = {
     _obj
 };
 
+private _formatNumber = {
+    params [["_value", 0, [0]]];
+    [(_value max 0)] call BIS_fnc_numberText
+};
+
+private _toRoman = {
+    params [["_value", 1, [0]]];
+    switch (_value max 1 min 5) do {
+        case 1: { "I" };
+        case 2: { "II" };
+        case 3: { "III" };
+        case 4: { "IV" };
+        case 5: { "V" };
+        default { str _value };
+    }
+};
+
 private _collectAnchors = {
     private _anchors = [];
 
@@ -86,6 +103,7 @@ private _collectAnchors = {
 private _isPlayerNearHudAnchor = {
     if (isNull player) exitWith { false };
     if (uiNamespace getVariable ["MWF_IntroCinematicActive", false]) exitWith { false };
+    if ((missionNamespace getVariable ["MWF_UI_Position", 0]) isEqualTo 2) exitWith { false };
 
     private _anchors = call _collectAnchors;
     {
@@ -102,27 +120,22 @@ private _applyLayout = {
     if (isNull _display) exitWith {};
 
     private _resourceGroup = _display displayCtrl 9000;
-    private _notorietyGroup = _display displayCtrl 9200;
-    private _eyeGroup = _display displayCtrl 9100;
     private _resourceBg = _display displayCtrl 9005;
 
     private _positionMode = missionNamespace getVariable ["MWF_UI_Position", 0];
-    private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.5];
+    private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.35];
 
-    private _rightX = safeZoneX + safeZoneW - 0.236;
+    private _groupW = 0.14;
+    private _groupH = 0.19;
+    private _rightX = safeZoneX + safeZoneW - _groupW - 0.012;
     private _leftX = safeZoneX + 0.018;
-    private _baseY = safeZoneY + (safeZoneH * 0.45);
-    private _resourceX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
-    private _eyeX = if (_positionMode isEqualTo 1) then { _leftX + 0.172 } else { _rightX + 0.172 };
+    private _baseX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
+    private _baseY = safeZoneY + (safeZoneH * 0.40);
 
-    _resourceGroup ctrlSetPosition [_resourceX, _baseY, 0.23, 0.04];
-    _resourceGroup ctrlCommit 0;
-
-    _notorietyGroup ctrlSetPosition [_resourceX, _baseY + 0.045, 0.23, 0.04];
-    _notorietyGroup ctrlCommit 0;
-
-    _eyeGroup ctrlSetPosition [_eyeX, _baseY + 0.092, 0.06, 0.06];
-    _eyeGroup ctrlCommit 0;
+    if (!isNull _resourceGroup) then {
+        _resourceGroup ctrlSetPosition [_baseX, _baseY, _groupW, _groupH];
+        _resourceGroup ctrlCommit 0;
+    };
 
     if (!isNull _resourceBg) then {
         _resourceBg ctrlSetFade (1 - _opacity);
@@ -152,28 +165,17 @@ while { hasInterface } do {
         private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
         private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
         private _heat = missionNamespace getVariable ["MWF_res_notoriety", missionNamespace getVariable ["MWF_ThreatLevel", 0]];
+        private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
 
-        (_display displayCtrl 9001) ctrlSetText format ["SUP: %1", _supplies];
-        (_display displayCtrl 9002) ctrlSetText format ["INT: %1", _intel];
-        (_display displayCtrl 9003) ctrlSetText format ["HEAT: %1%%", _heat];
-
-        private _eyeCtrl = _display displayCtrl 9004;
-        if (!isNull _eyeCtrl) then {
-            private _eyeState = toUpper (player getVariable ["MWF_UndercoverEyeState", if (player getVariable ["MWF_isUndercover", false]) then {"GREEN"} else {"OFF"}]);
-            private _eyePath = switch (_eyeState) do {
-                case "GREEN": { "ui\eye_green.paa" };
-                case "YELLOW": { "ui\eye_yellow.paa" };
-                case "RED": { "ui\eye_red.paa" };
-                default { "" };
-            };
-            private _eyeTip = switch (_eyeState) do {
-                case "GREEN": { "Undercover secure" };
-                case "YELLOW": { "Undercover compromised risk" };
-                case "RED": { "Exposed / capture allowed" };
-                default { "Open BLUFOR presence / capture allowed" };
-            };
-            _eyeCtrl ctrlSetText _eyePath;
-            _eyeCtrl ctrlSetTooltip _eyeTip;
+        private _resourceText = _display displayCtrl 9001;
+        if (!isNull _resourceText) then {
+            _resourceText ctrlSetStructuredText parseText format [
+                "<t size='0.92' color='#FFFFFF'>Supplies:</t><br/><t size='1.06' color='#FFFFFF'>%1</t><br/><t size='0.92' color='#78D7FF'>Intel:</t><br/><t size='1.06' color='#78D7FF'>%2</t><br/><t size='0.92' color='#F4E29D'>World Tier:</t><br/><t size='1.06' color='#F4E29D'>%3</t><br/><t size='0.92' color='#FF5E73'>Threat:</t><br/><t size='1.06' color='#FF5E73'>%4%%</t>",
+                [_supplies] call _formatNumber,
+                [_intel] call _formatNumber,
+                [_worldTier] call _toRoman,
+                _heat
+            ];
         };
 
         if (_showHud != _lastHudVisible) then {
@@ -185,8 +187,8 @@ while { hasInterface } do {
                 };
             } forEach [
                 _display displayCtrl 9000,
-                _display displayCtrl 9200,
-                _display displayCtrl 9100
+                _display displayCtrl 9005,
+                _display displayCtrl 9001
             ];
             _lastHudVisible = _showHud;
         };

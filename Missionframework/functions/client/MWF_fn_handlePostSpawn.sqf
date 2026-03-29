@@ -44,6 +44,17 @@ if (!isNil "MWF_fnc_updateResourceUI") then {
     [] spawn MWF_fnc_updateResourceUI;
 };
 
+
+[] spawn {
+    uiSleep 0.05;
+    cutText ["", "BLACK IN", 0.15];
+    titleCut ["", "BLACK IN", 0.15];
+    showCinemaBorder false;
+    if (!isNull player) then {
+        player switchCamera "INTERNAL";
+    };
+};
+
 missionNamespace setVariable ["MWF_LastPostSpawnSignature", _signature];
 missionNamespace setVariable ["MWF_ClientInitComplete", true];
 missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];

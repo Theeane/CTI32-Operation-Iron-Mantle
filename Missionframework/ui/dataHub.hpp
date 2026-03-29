@@ -89,13 +89,13 @@ class MWF_RscDataHub {
     enableSimulation = true;
 
     class Controls {
-        class BackgroundOuter: RscText {
+        class BackgroundOuter: RscPicture {
             idc = 12201;
+            text = "ui	erminal_bg.paa";
             x = 0.12 * safezoneW + safezoneX;
             y = 0.12 * safezoneH + safezoneY;
             w = 0.76 * safezoneW;
             h = 0.72 * safezoneH;
-            colorBackground[] = {0.05, 0.05, 0.05, 0.92};
         };
 
         class BackgroundInner: RscText {
@@ -104,7 +104,7 @@ class MWF_RscDataHub {
             y = 0.145 * safezoneH + safezoneY;
             w = 0.73 * safezoneW;
             h = 0.67 * safezoneH;
-            colorBackground[] = {0.72, 0.72, 0.72, 0.92};
+            colorBackground[] = {0, 0, 0, 0};
         };
 
         class TerminalStatusBG: RscText {
@@ -125,9 +125,21 @@ class MWF_RscDataHub {
             h = 0.024 * safezoneH;
         };
 
+        class BtnGuideBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.155 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.07 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnGuide: RscButton {
             idc = 12209;
             text = "$STR_MWF_GUIDE_BUTTON";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.155 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.07 * safezoneW;
@@ -135,45 +147,105 @@ class MWF_RscDataHub {
             action = "['CLOSE'] call MWF_fnc_dataHub; ['OPEN', 'START'] call MWF_fnc_openGuide;";
         };
 
+        class BtnVehicleBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.232 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnVehicle: RscButton {
             idc = 12210;
             text = "Vehicle Menu";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.232 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', _terminal] call MWF_fnc_terminal_vehicleMenu;";
         };
+        class BtnBuildBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.345 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnBuild: RscButton {
             idc = 12211;
             text = "Base Building";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.345 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; [_terminal] spawn MWF_fnc_enterBuildMode;";
         };
+        class BtnMainOpsBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.458 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnMainOps: RscButton {
             idc = 12212;
             text = "Main Operations";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.458 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['SET_MODE','MAIN_OPERATIONS'] call MWF_fnc_dataHub;";
         };
+        class BtnSupportBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.571 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnSupport: RscButton {
             idc = 12213;
             text = "Build Support";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.571 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
             h = 0.04 * safezoneH;
             action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
         };
+        class BtnUpgradesBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.684 * safezoneW + safezoneX;
+            y = 0.192 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnUpgrades: RscButton {
             idc = 12214;
             text = "Base Upgrades";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.684 * safezoneW + safezoneX;
             y = 0.192 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
@@ -196,7 +268,8 @@ class MWF_RscDataHub {
             y = 0.25 * safezoneH + safezoneY;
             w = 0.71 * safezoneW;
             h = 0.46 * safezoneH;
-            onMouseButtonClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; }; if ((_this select 1) isEqualTo 1) then { ['BACK'] call MWF_fnc_dataHub; };";
+            onMouseButtonDblClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; };";
+            onMouseButtonClick = "if ((_this select 1) isEqualTo 1) then { ['BACK'] call MWF_fnc_dataHub; };";
         };
 
         class StatusText: RscText {
@@ -220,9 +293,21 @@ class MWF_RscDataHub {
             size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
         };
 
+        class BtnSideMissionsBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.155 * safezoneW + safezoneX;
+            y = 0.77 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnSideMissions: RscButton {
             idc = 12215;
             text = "Missions";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.155 * safezoneW + safezoneX;
             y = 0.77 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;
@@ -230,9 +315,21 @@ class MWF_RscDataHub {
             action = "['ACTION_SECONDARY'] call MWF_fnc_dataHub;";
         };
 
+        class BtnActionBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.745 * safezoneW + safezoneX;
+            y = 0.77 * safezoneH + safezoneY;
+            w = 0.11 * safezoneW;
+            h = 0.04 * safezoneH;
+        };
+
         class BtnAction: RscButton {
             idc = 12207;
             text = "Close";
+            colorBackground[] = {0,0,0,0};
+            colorBackgroundActive[] = {1,1,1,0.08};
+            colorFocused[] = {1,1,1,0.08};
             x = 0.745 * safezoneW + safezoneX;
             y = 0.77 * safezoneH + safezoneY;
             w = 0.11 * safezoneW;

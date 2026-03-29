@@ -22,6 +22,23 @@ private _setInfoText = {
     _ctrl ctrlSetStructuredText parseText (_lines joinString "<br/>");
 };
 
+private _formatNumber = {
+    params [["_value", 0, [0]]];
+    [(_value max 0)] call BIS_fnc_numberText
+};
+
+private _toRoman = {
+    params [["_value", 1, [0]]];
+    switch (_value max 1 min 5) do {
+        case 1: { "I" };
+        case 2: { "II" };
+        case 3: { "III" };
+        case 4: { "IV" };
+        case 5: { "V" };
+        default { str _value };
+    }
+};
+
 private _setButtonState = {
     params [
         ["_ctrl", controlNull, [controlNull]],
@@ -55,11 +72,11 @@ private _syncTerminalStatus = {
     };
 
     _ctrl ctrlSetStructuredText parseText format [
-        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>%7",
-        _supplies,
-        _intel,
-        _carriedIntel,
-        _worldTier,
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD %4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>%7",
+        [_supplies] call _formatNumber,
+        [_intel] call _formatNumber,
+        [_carriedIntel] call _formatNumber,
+        [_worldTier] call _toRoman,
         _baseTier,
         _phase,
         _debugText
