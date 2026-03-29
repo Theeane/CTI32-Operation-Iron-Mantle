@@ -5,7 +5,7 @@
 
     Description:
     Removes a FOB from the active registry and persistence list, cleans up its marker,
-    and removes its native Arma respawn position.
+    its HUD anchor, and removes its native Arma respawn position.
 */
 
 if (!isServer) exitWith {false};
@@ -45,12 +45,14 @@ private _newRegistry = [];
 
 missionNamespace setVariable ["MWF_FOB_Registry", _newRegistry, true];
 
+private _hudAnchor = objNull;
 if (!isNull _removedObject) then {
     private _respawnId = _removedObject getVariable ["MWF_FOB_RespawnId", -1];
     if (_respawnId isEqualType 0 && {_respawnId >= 0}) then {
         [west, _respawnId] call BIS_fnc_removeRespawnPosition;
         _removedObject setVariable ["MWF_FOB_RespawnId", -1, true];
     };
+    _hudAnchor = _removedObject getVariable ["MWF_HUD_Anchor", objNull];
 };
 
 if (_markerName != "" && {!((markerShape _markerName) isEqualTo "")}) then {
@@ -69,6 +71,17 @@ if (!(_matchPos isEqualTo [])) then {
     };
 };
 missionNamespace setVariable ["MWF_FOB_Positions", _fobPosList, true];
+
+private _hudRegistry = missionNamespace getVariable ["MWF_HUD_AnchorRegistry", []];
+_hudRegistry = _hudRegistry select {
+    private _anchor = _x param [0, objNull];
+    !isNull _anchor && {_anchor != _hudAnchor}
+};
+missionNamespace setVariable ["MWF_HUD_AnchorRegistry", _hudRegistry, true];
+
+if (!isNull _hudAnchor && {_hudAnchor != _removedObject}) then {
+    deleteVehicle _hudAnchor;
+};
 
 if (!isNull _removedObject && {!isNil "MWF_fnc_unregisterLoadoutZone"}) then {
     [_removedObject] call MWF_fnc_unregisterLoadoutZone;

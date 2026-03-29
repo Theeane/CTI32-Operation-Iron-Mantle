@@ -7,6 +7,7 @@
     Registers a live FOB terminal in the active registry, creates/refreshes its marker,
     adds a native Arma respawn position for deploy selection, and updates the strategic
     persistence list used by save/load, threat, and rebel systems.
+    Also maintains the shared HUD anchor registry used by clients for 500 m base HUD visibility.
 */
 
 if (!isServer) exitWith {[]};
@@ -48,6 +49,16 @@ _terminal setVariable ["MWF_FOB_Marker", _markerName, true];
 _terminal setVariable ["MWF_FOB_DisplayName", _displayName, true];
 _terminal setVariable ["MWF_FOB_OriginType", _originType, true];
 
+private _hudAnchor = _terminal getVariable ["MWF_HUD_Anchor", objNull];
+if (isNull _hudAnchor) then {
+    _hudAnchor = _terminal;
+    _terminal setVariable ["MWF_HUD_Anchor", _hudAnchor, true];
+};
+if (!isNull _hudAnchor) then {
+    _hudAnchor setVariable ["MWF_BaseType", "FOB", true];
+    _hudAnchor setVariable ["MWF_HUD_Radius", 500, true];
+};
+
 private _existingRespawnId = _terminal getVariable ["MWF_FOB_RespawnId", -1];
 if (_existingRespawnId isEqualType 0 && {_existingRespawnId >= 0}) then {
     [west, _existingRespawnId] call BIS_fnc_removeRespawnPosition;
@@ -57,6 +68,16 @@ _terminal setVariable ["MWF_FOB_RespawnId", _respawnId, true];
 
 _registry pushBack [_markerName, _terminal, _displayName, _originType];
 missionNamespace setVariable ["MWF_FOB_Registry", _registry, true];
+
+private _hudRegistry = missionNamespace getVariable ["MWF_HUD_AnchorRegistry", []];
+_hudRegistry = _hudRegistry select {
+    private _anchor = _x param [0, objNull];
+    !isNull _anchor && {_anchor != _hudAnchor}
+};
+if (!isNull _hudAnchor) then {
+    _hudRegistry pushBack [_hudAnchor, "FOB", 500];
+};
+missionNamespace setVariable ["MWF_HUD_AnchorRegistry", _hudRegistry, true];
 
 private _fobPosList = missionNamespace getVariable ["MWF_FOB_Positions", []];
 private _posAsl = getPosASL _terminal;

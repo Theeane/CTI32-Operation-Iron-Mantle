@@ -5,8 +5,9 @@
 
     Description:
     Starts or refreshes the resource bar HUD singleton.
-    HUD visibility is driven by proximity to the MOB or any FOB within 500 m,
-    with fallbacks for replicated loadout triggers and marker anchors.
+    HUD visibility is driven by distance to registered base anchors (MOB/FOB)
+    within 500 m. If the anchor registry has not propagated yet, the MOB anchor
+    and FOB terminals are used as fallbacks so the HUD fails open near base.
 */
 
 if (!hasInterface) exitWith { false };
@@ -20,7 +21,7 @@ if (missionNamespace getVariable ["MWF_UI_UpdateLoopRunning", false]) exitWith {
 missionNamespace setVariable ["MWF_UI_UpdateLoopRunning", true];
 missionNamespace setVariable ["MWF_UI_RefreshRequested", true];
 
-private _hudRadius = 500;
+private _defaultHudRadius = 500;
 private _lastHudVisible = -1;
 
 private _resolveObjectAnchor = {
@@ -38,66 +39,60 @@ private _resolveObjectAnchor = {
     _obj
 };
 
-private _collectAnchorPositions = {
-    private _positions = [];
+private _collectAnchors = {
+    private _anchors = [];
 
     {
-        private _obj = _x;
-        if (!isNull _obj) then {
-            _positions pushBackUnique (getPosATL _obj);
-        };
-    } forEach [
-        ["MWF_MOB_AssetAnchor", "MWF_MOB_AssetAnchor"] call _resolveObjectAnchor,
-        ["MWF_Intel_Center", "MWF_Intel_Center"] call _resolveObjectAnchor,
-        ["MWF_MainBase", "MWF_MainBase"] call _resolveObjectAnchor,
-        ["MWF_MOB_Table", "MWF_MOB_Table"] call _resolveObjectAnchor,
-        missionNamespace getVariable ["MWF_MOB", objNull]
-    ];
-
-    if ((markerColor "MWF_MOB_Marker") isNotEqualTo "") then {
-        _positions pushBackUnique (getMarkerPos "MWF_MOB_Marker");
-    };
-
-    if ((markerColor "respawn_west") isNotEqualTo "") then {
-        _positions pushBackUnique (getMarkerPos "respawn_west");
-    };
-
-    {
-        if (_x isEqualType [] && {count _x >= 2}) then {
-            private _markerName = _x param [0, ""];
-            private _terminal = _x param [1, objNull];
-
-            if (!isNull _terminal) then {
-                _positions pushBackUnique (getPosATL _terminal);
-            } else {
-                if (_markerName isEqualType "" && {markerShape _markerName isNotEqualTo ""}) then {
-                    _positions pushBackUnique (getMarkerPos _markerName);
-                };
+        if (_x isEqualType [] && {count _x >= 1}) then {
+            private _anchor = _x param [0, objNull];
+            private _radius = _x param [2, _defaultHudRadius];
+            if (!isNull _anchor) then {
+                _anchors pushBackUnique [_anchor, _radius max 25];
             };
         };
-    } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
+    } forEach (missionNamespace getVariable ["MWF_HUD_AnchorRegistry", []]);
 
-    _positions
+    if (_anchors isEqualTo []) then {
+        {
+            private _obj = _x;
+            if (!isNull _obj) then {
+                _anchors pushBackUnique [_obj, _defaultHudRadius];
+            };
+        } forEach [
+            ["MWF_MOB_AssetAnchor", "MWF_MOB_AssetAnchor"] call _resolveObjectAnchor,
+            ["MWF_MainBase", "MWF_MainBase"] call _resolveObjectAnchor,
+            ["MWF_Intel_Center", "MWF_Intel_Center"] call _resolveObjectAnchor,
+            ["MWF_MOB_Table", "MWF_MOB_Table"] call _resolveObjectAnchor,
+            missionNamespace getVariable ["MWF_MOB", objNull]
+        ];
+
+        {
+            if (_x isEqualType [] && {count _x >= 2}) then {
+                private _terminal = _x param [1, objNull];
+                if (!isNull _terminal) then {
+                    private _anchor = _terminal getVariable ["MWF_HUD_Anchor", objNull];
+                    if (isNull _anchor) then { _anchor = _terminal; };
+                    if (!isNull _anchor) then {
+                        _anchors pushBackUnique [_anchor, _defaultHudRadius];
+                    };
+                };
+            };
+        } forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
+    };
+
+    _anchors
 };
 
 private _isPlayerNearHudAnchor = {
     if (isNull player) exitWith { false };
     if (uiNamespace getVariable ["MWF_IntroCinematicActive", false]) exitWith { false };
 
-    private _loadoutZones = missionNamespace getVariable ["MWF_LoadoutZones", []];
+    private _anchors = call _collectAnchors;
     {
-        if (!isNull _x && {player inArea _x}) exitWith { true };
-    } forEach _loadoutZones;
-
-    private _mobHudTrigger = missionNamespace getVariable ["MWF_MOB_HUDTrigger", objNull];
-    if (!isNull _mobHudTrigger && {player inArea _mobHudTrigger}) exitWith { true };
-
-    private _mobLoadoutTrigger = missionNamespace getVariable ["MWF_MOB_LoadoutTrigger", objNull];
-    if (!isNull _mobLoadoutTrigger && {player inArea _mobLoadoutTrigger}) exitWith { true };
-
-    {
-        if (player distance2D _x <= _hudRadius) exitWith { true };
-    } forEach (call _collectAnchorPositions);
+        private _anchor = _x param [0, objNull];
+        private _radius = _x param [1, _defaultHudRadius];
+        if (!isNull _anchor && {player distance2D _anchor <= _radius}) exitWith { true };
+    } forEach _anchors;
 
     false
 };
@@ -114,19 +109,19 @@ private _applyLayout = {
     private _positionMode = missionNamespace getVariable ["MWF_UI_Position", 0];
     private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.5];
 
-    private _rightX = safeZoneX + safeZoneW - 0.238;
-    private _leftX = safeZoneX + 0.015;
-    private _topY = safeZoneY + 0.035;
+    private _rightX = safeZoneX + safeZoneW - 0.236;
+    private _leftX = safeZoneX + 0.018;
+    private _baseY = safeZoneY + (safeZoneH * 0.45);
     private _resourceX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
     private _eyeX = if (_positionMode isEqualTo 1) then { _leftX + 0.172 } else { _rightX + 0.172 };
 
-    _resourceGroup ctrlSetPosition [_resourceX, _topY, 0.23, 0.04];
+    _resourceGroup ctrlSetPosition [_resourceX, _baseY, 0.23, 0.04];
     _resourceGroup ctrlCommit 0;
 
-    _notorietyGroup ctrlSetPosition [_resourceX, _topY + 0.045, 0.23, 0.04];
+    _notorietyGroup ctrlSetPosition [_resourceX, _baseY + 0.045, 0.23, 0.04];
     _notorietyGroup ctrlCommit 0;
 
-    _eyeGroup ctrlSetPosition [_eyeX, _topY + 0.092, 0.06, 0.06];
+    _eyeGroup ctrlSetPosition [_eyeX, _baseY + 0.092, 0.06, 0.06];
     _eyeGroup ctrlCommit 0;
 
     if (!isNull _resourceBg) then {
@@ -139,7 +134,7 @@ while { hasInterface } do {
     private _display = uiNamespace getVariable ["MWF_ctrl_resBar", displayNull];
     if (isNull _display) then {
         "MWF_resLayer" cutRsc ["MWF_ResourceBar", "PLAIN"];
-        uiSleep 0.05;
+        uiSleep 0.1;
         _display = uiNamespace getVariable ["MWF_ctrl_resBar", displayNull];
         missionNamespace setVariable ["MWF_UI_RefreshRequested", true];
         _lastHudVisible = -1;
@@ -182,25 +177,17 @@ while { hasInterface } do {
         };
 
         if (_showHud != _lastHudVisible) then {
-            private _groupFade = if (_showHud) then { 0 } else { 1 };
-            private _notorietyFade = if (_showHud) then { 0 } else { 1 };
-
+            private _fade = if (_showHud) then { 0 } else { 1 };
             {
                 if (!isNull _x) then {
-                    _x ctrlSetFade _groupFade;
+                    _x ctrlSetFade _fade;
                     _x ctrlCommit 0.1;
                 };
             } forEach [
                 _display displayCtrl 9000,
+                _display displayCtrl 9200,
                 _display displayCtrl 9100
             ];
-
-            private _notorietyGroup = _display displayCtrl 9200;
-            if (!isNull _notorietyGroup) then {
-                _notorietyGroup ctrlSetFade _notorietyFade;
-                _notorietyGroup ctrlCommit 0.1;
-            };
-
             _lastHudVisible = _showHud;
         };
     };

@@ -31,10 +31,8 @@ private _cleanup = {
 
     player switchCamera "INTERNAL";
 
-    if (_keepBlack) then {
-        cutText ["", "BLACK FADED", 0];
-    } else {
-        cutText ["", "BLACK IN", 0.5];
+    if (!_keepBlack) then {
+        cutText ["", "BLACK IN", 0.35];
     };
 
     {
@@ -80,9 +78,7 @@ waitUntil {
     (!isNull findDisplay 46 && {!isNull player} && {alive player}) || {diag_tickTime >= _deadline}
 };
 if (diag_tickTime >= _deadline) exitWith {
-    call {
-        [false] call _cleanup;
-    };
+    [false] call _cleanup;
     false
 };
 
@@ -96,9 +92,7 @@ private _startedAt = diag_tickTime;
 
 _cam = "camera" camCreate (_center vectorAdd [0, -_radius, _height]);
 if (isNull _cam) exitWith {
-    call {
-        [false] call _cleanup;
-    };
+    [false] call _cleanup;
     false
 };
 

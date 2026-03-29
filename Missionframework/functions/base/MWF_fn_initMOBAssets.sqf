@@ -143,6 +143,14 @@ missionNamespace setVariable ["MWF_Base_Light", _lamp, true];
 missionNamespace setVariable ["MWF_MOB_Roof", _roof, true];
 missionNamespace setVariable ["MWF_MOB_Siren", _siren, true];
 missionNamespace setVariable ["MWF_MOB_AssetAnchor", _assetAnchor, true];
+missionNamespace setVariable ["MWF_MOB_HUDAnchor", _assetAnchor, true];
+_assetAnchor setVariable ["MWF_BaseType", "MOB", true];
+_assetAnchor setVariable ["MWF_HUD_Radius", 500, true];
+
+private _hudRegistry = missionNamespace getVariable ["MWF_HUD_AnchorRegistry", []];
+_hudRegistry = _hudRegistry select { !isNull (_x param [0, objNull]) && {(_x param [0, objNull]) != _assetAnchor} };
+_hudRegistry pushBack [_assetAnchor, "MOB", 500];
+missionNamespace setVariable ["MWF_HUD_AnchorRegistry", _hudRegistry, true];
 
 MWF_MOB_Table = _table;
 MWF_Intel_Center = _terminal;
@@ -167,6 +175,7 @@ missionNamespace setVariable [
     true
 ];
 missionNamespace setVariable ["MWF_MOBAssetsInitialized", true, true];
+
 
 if (!isNull _terminal) then {
     diag_log format [

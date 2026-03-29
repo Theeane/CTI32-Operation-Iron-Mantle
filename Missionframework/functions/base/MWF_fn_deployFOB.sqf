@@ -67,6 +67,14 @@ if (!isNull _sourceObject) then {
 
 private _posAtl = ASLToATL _posAsl;
 
+private _hudAnchor = createVehicle ["Land_HelipadEmpty_F", _posAtl, [], 0, "CAN_COLLIDE"];
+_hudAnchor setDir _dir;
+_hudAnchor setPosATL _posAtl;
+_hudAnchor allowDamage false;
+_hudAnchor enableSimulationGlobal false;
+_hudAnchor setVariable ["MWF_BaseType", "FOB", true];
+_hudAnchor setVariable ["MWF_HUD_Radius", 500, true];
+
 private _table = createVehicle [_assetTable, _posAtl, [], 0, "CAN_COLLIDE"];
 _table setDir _dir;
 _table setPosASL _posAsl;
@@ -123,6 +131,8 @@ _laptop setVariable ["MWF_AttachedRoof", _roofObj, true];
 _laptop setVariable ["MWF_AttachedSiren", _siren, true];
 _laptop setVariable ["MWF_AttachedLocker", _locker, true];
 _laptop setVariable ["MWF_AttachedLamp", _lamp, true];
+_laptop setVariable ["MWF_HUD_Anchor", _hudAnchor, true];
+_hudAnchor setVariable ["MWF_HUD_Terminal", _laptop, true];
 
 private _registration = [_laptop, _displayName, _originType, !_isRestore] call MWF_fnc_registerFOB;
 private _markerName = _registration param [0, ""];

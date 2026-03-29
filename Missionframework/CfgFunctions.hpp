@@ -14,6 +14,20 @@ class CfgFunctions {
             class spawnModifier                 { file = "MWF_fnc_spawnModifier.sqf"; };
         };
 
+
+        class UI {
+            file = "ui";
+
+            class initUI                  { file = "ui\MWF_fn_initUI.sqf"; };
+            class updateResourceUI        { file = "ui\MWF_fn_updateResourceUI.sqf"; };
+            class dataHub                 { file = "ui\datahub\MWF_fn_dataHub.sqf"; };
+            class refreshDataMap          { file = "ui\datahub\MWF_fn_refreshDataMap.sqf"; };
+            class collectDataMapEntries   { file = "ui\datahub\MWF_fn_collectDataMapEntries.sqf"; };
+            class collectRespawnPoints    { file = "ui\datahub\MWF_fn_collectRespawnPoints.sqf"; };
+            class uiGoBack                { file = "ui\datahub\MWF_fnc_uiGoBack.sqf"; };
+            class openGuide               { file = "ui\guide\MWF_fn_openGuide.sqf"; };
+        };
+
         // --- MODULAR SUBSYSTEMS ---
         #include "functions\base\CfgFunctions.hpp"
         #include "functions\cinematics\CfgFunctions.hpp"
