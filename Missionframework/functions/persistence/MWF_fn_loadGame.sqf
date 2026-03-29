@@ -110,6 +110,11 @@ private _loadFactionLock = {
 ["Civs", "MWF_Param_CivsSource", "MWF_Param_Civs", "MWF_Param_CustomCivs", 0] call _loadFactionLock;
 
 private _supplies = [profileNamespace getVariable ["MWF_Save_Supplies", _lockedStartSupplies], 0, 100000, _lockedStartSupplies] call _clampNumber;
+private _savedCampaignPhase = profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"];
+private _savedTutorialSupplyRunDone = profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false];
+if ((_supplies <= 0) && {_savedCampaignPhase isEqualTo "TUTORIAL"} && {!_savedTutorialSupplyRunDone}) then {
+    _supplies = _lockedStartSupplies max 200;
+};
 private _intel = [profileNamespace getVariable ["MWF_Save_Intel", 0], 0, 50000, 0] call _clampNumber;
 private _civRepState = [profileNamespace getVariable ["MWF_Save_CivRep_State", _lockedCivRep], -1000, 1000, _lockedCivRep] call _clampNumber;
 private _notoriety = [profileNamespace getVariable ["MWF_Save_Notoriety_State", 0], 0, 1000, 0] call _clampNumber;

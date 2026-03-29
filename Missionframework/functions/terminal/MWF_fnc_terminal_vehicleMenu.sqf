@@ -126,6 +126,17 @@ private _evaluateEntry = {
     [_isLocked, _lockReason, _supplies >= _cost]
 };
 
+private _readCatalogSnapshot = {
+    private _catalogRawLocal = [] call MWF_fnc_getVehicleCatalog;
+    private _metaBlockLocal = (_catalogRawLocal select { (_x param [0, ""]) isEqualTo "__META__" });
+    private _metaLocal = if (_metaBlockLocal isEqualTo []) then { [] } else { (_metaBlockLocal select 0) param [1, []] };
+    private _totalEntriesLocal = ((_metaLocal select { (_x param [0, ""]) isEqualTo "totalEntries" }) param [0, ["totalEntries", 0]]) param [1, 0];
+    private _emptyCategoriesLocal = ((_metaLocal select { (_x param [0, ""]) isEqualTo "emptyCategories" }) param [0, ["emptyCategories", []]]) param [1, []];
+    private _invalidEntriesLocal = ((_metaLocal select { (_x param [0, ""]) isEqualTo "invalidEntries" }) param [0, ["invalidEntries", 0]]) param [1, 0];
+    private _publicCatalogLocal = _catalogRawLocal select { (_x param [0, ""]) != "__META__" };
+    [_publicCatalogLocal, _totalEntriesLocal, _emptyCategoriesLocal, _invalidEntriesLocal]
+};
+
 private _formatTerminalStatus = {
     private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
     private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
@@ -197,7 +208,26 @@ private _updateHeader = {
 
 switch (_modeUpper) do {
     case "OPEN": {
-        if (_totalEntries <= 0) exitWith {
+        private _catalogSnapshot = call _readCatalogSnapshot;
+        private _openCatalog = _catalogSnapshot param [0, []];
+        private _openTotalEntries = _catalogSnapshot param [1, 0];
+        private _openEmptyCategories = _catalogSnapshot param [2, []];
+        private _openInvalidEntries = _catalogSnapshot param [3, 0];
+
+        if (_openTotalEntries <= 0) then {
+            private _deadline = diag_tickTime + 2;
+            waitUntil {
+                uiSleep 0.05;
+                _catalogSnapshot = call _readCatalogSnapshot;
+                _openCatalog = _catalogSnapshot param [0, []];
+                _openTotalEntries = _catalogSnapshot param [1, 0];
+                _openEmptyCategories = _catalogSnapshot param [2, []];
+                _openInvalidEntries = _catalogSnapshot param [3, 0];
+                (_openTotalEntries > 0) || {diag_tickTime >= _deadline}
+            };
+        };
+
+        if (_openTotalEntries <= 0) exitWith {
             [
                 ["VEHICLE MENU", "Active BLUFOR preset has no valid vehicle entries."],
                 "warning"
@@ -211,7 +241,7 @@ switch (_modeUpper) do {
         };
 
         missionNamespace setVariable ["MWF_VehicleMenu_LastTerminal", _terminal];
-        missionNamespace setVariable ["MWF_VehicleMenu_LastCatalog", _publicCatalog];
+        missionNamespace setVariable ["MWF_VehicleMenu_LastCatalog", _openCatalog];
 
         private _requestedCategory = toUpper (missionNamespace getVariable ["MWF_VehicleMenu_LastCategory", "LIGHT"]);
         private _validCategories = ["LIGHT", "APC", "TANKS", "HELIS", "JETS"];
@@ -220,9 +250,9 @@ switch (_modeUpper) do {
         };
 
         private _resolvedCategory = _requestedCategory;
-        if (([_publicCatalog, _resolvedCategory] call _getCategoryEntries) isEqualTo []) then {
+        if (([_openCatalog, _resolvedCategory] call _getCategoryEntries) isEqualTo []) then {
             {
-                if !(([_publicCatalog, _x] call _getCategoryEntries) isEqualTo []) exitWith {
+                if !(([_openCatalog, _x] call _getCategoryEntries) isEqualTo []) exitWith {
                     _resolvedCategory = _x;
                 };
             } forEach _validCategories;
@@ -239,12 +269,21 @@ switch (_modeUpper) do {
             systemChat "Vehicle Menu failed to open.";
             []
         };
+        _display displayAddEventHandler ["KeyDown", {
+            params ["_display", "_dikCode"];
+            if (_dikCode isEqualTo 1) exitWith {
+                closeDialog 0;
+                ["OPEN", "ZONES"] call MWF_fnc_dataHub;
+                true
+            };
+            false
+        }];
 
-        if (_emptyCategories isNotEqualTo []) then {
-            [["VEHICLE MENU", format ["Preset categories empty: %1", _emptyCategories joinString ", "]], "warning"] call MWF_fnc_showNotification;
+        if (_openEmptyCategories isNotEqualTo []) then {
+            [["VEHICLE MENU", format ["Preset categories empty: %1", _openEmptyCategories joinString ", "]], "warning"] call MWF_fnc_showNotification;
         };
-        if (_invalidEntries > 0) then {
-            [["VEHICLE MENU", format ["Invalid preset entries skipped: %1", _invalidEntries]], "warning"] call MWF_fnc_showNotification;
+        if (_openInvalidEntries > 0) then {
+            [["VEHICLE MENU", format ["Invalid preset entries skipped: %1", _openInvalidEntries]], "warning"] call MWF_fnc_showNotification;
         };
 
         [_display, _resolvedCategory, [], -1] call _updateHeader;

@@ -285,6 +285,13 @@ private _scalingLabel = switch (_sessionScalingBracket) do {
 private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", _startSupplies];
 private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", 0];
 
+private _tutorialBootstrapPhase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+private _tutorialBootstrapDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
+if ((_resolvedSupplies <= 0) && {_tutorialBootstrapPhase isEqualTo "TUTORIAL"} && {!_tutorialBootstrapDone}) then {
+    _resolvedSupplies = _startSupplies max 200;
+    missionNamespace setVariable ["MWF_Economy_Supplies", _resolvedSupplies, true];
+};
+
 if (_sessionDebugMode) then {
     _resolvedSupplies = 9999;
     _resolvedIntel = 9999;

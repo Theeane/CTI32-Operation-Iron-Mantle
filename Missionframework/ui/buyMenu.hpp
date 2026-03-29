@@ -167,7 +167,7 @@ class IronMantle_BuyMenu {
             y = 0.72 * safezoneH + safezoneY;
             w = 0.12 * safezoneW;
             h = 0.045 * safezoneH;
-            action = "closeDialog 0;";
+            action = "closeDialog 0; ['OPEN', 'ZONES'] call MWF_fnc_dataHub;";
         };
     };
 };

@@ -444,7 +444,15 @@ switch (_modeUpper) do {
             true
         };
 
-        [] call MWF_fnc_uiGoBack
+        private _currentMode = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
+        if (!(_currentMode isEqualTo "ZONES") && {[] call MWF_fnc_uiGoBack}) exitWith { true };
+        if (!(_currentMode isEqualTo "ZONES")) exitWith {
+            uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
+            ["SET_MODE", "ZONES"] call MWF_fnc_dataHub;
+            true
+        };
+
+        false
     };
 
     case "ACTION": {
