@@ -37,6 +37,16 @@ if (!(missionNamespace getVariable ["MWF_LoadoutSystemInitialized", false]) && {
     [] spawn MWF_fnc_initLoadoutSystem;
 };
 
+if (!isNil "MWF_fnc_updateResourceUI") then {
+    [] spawn {
+        waitUntil {
+            uiSleep 0.25;
+            !isNull findDisplay 46 && {!isNull player}
+        };
+        [] spawn MWF_fnc_updateResourceUI;
+    };
+};
+
 if (!isNil "MWF_fnc_setupInteractions") then {
     [] spawn {
         uiSleep 1;
