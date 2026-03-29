@@ -87,11 +87,23 @@ class RscButton {
 };
 
 class RscStandardButton : RscButton {
-    style = ST_CENTER + ST_PICTURE + ST_KEEP_ASPECT_RATIO;
+    style = ST_CENTER;
     colorBackground[] = {0,0,0,0};
-    colorBackgroundActive[] = {1,1,1,0.1};
-    text = "";
-    url = "ui\button_bg.paa";
+    colorBackgroundActive[] = {1,1,1,0.08};
+    colorFocused[] = {1,1,1,0.08};
+    colorBorder[] = {0,0,0,0};
+    borderSize = 0;
+    shadow = 0;
+    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 24) * 1)";
+};
+
+class MWF_RscTerminalButton : RscStandardButton {
+    colorText[] = {0.96,0.96,0.96,1};
+    colorDisabled[] = {0.7,0.7,0.7,0.7};
+    colorBackground[] = {0,0,0,0};
+    colorBackgroundActive[] = {1,1,1,0.06};
+    colorFocused[] = {1,1,1,0.06};
+    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 22) * 1)";
 };
 
 class RscStructuredText {

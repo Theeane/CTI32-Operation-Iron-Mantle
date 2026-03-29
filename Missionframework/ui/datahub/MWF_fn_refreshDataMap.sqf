@@ -15,23 +15,6 @@ params [
 
 if (isNull _display) exitWith { false };
 
-private _formatNumber = {
-    params [["_value", 0, [0]]];
-    [(_value max 0)] call BIS_fnc_numberText
-};
-
-private _toRoman = {
-    params [["_value", 1, [0]]];
-    switch (_value max 1 min 5) do {
-        case 1: { "I" };
-        case 2: { "II" };
-        case 3: { "III" };
-        case 4: { "IV" };
-        case 5: { "V" };
-        default { str _value };
-    }
-};
-
 private _modeUpper = toUpper _mode;
 private _markerNames = uiNamespace getVariable ["MWF_DataHub_Markers", []];
 { deleteMarkerLocal _x; } forEach _markerNames;
@@ -58,12 +41,12 @@ private _debugText = if (missionNamespace getVariable ["MWF_DebugMode", false]) 
 };
 if (!isNull _terminalStatusCtrl) then {
     _terminalStatusCtrl ctrlSetStructuredText parseText format [
-        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#B7FF9A'>FREE OP %4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD %5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%6</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %7</t>%8",
-        [_supplies] call _formatNumber,
-        [_intel] call _formatNumber,
-        [_carriedIntel] call _formatNumber,
-        [_freeMainOpCharges] call _formatNumber,
-        [_worldTier] call _toRoman,
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#B7FF9A'>FREE OP %4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%6</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %7</t>%8",
+        _supplies,
+        _intel,
+        _carriedIntel,
+        _freeMainOpCharges,
+        _worldTier,
         _baseTier,
         _phase,
         _debugText
@@ -79,7 +62,7 @@ if (!isNull _statusCtrl) then {
     private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
     private _statusText = format ["Mode: %1 | Entries: %2", _modeLabel, count _entries];
     if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "UPGRADES"]) then {
-        _statusText = _statusText + " | Double click marker for details | Right click / Esc = back.";
+        _statusText = _statusText + " | Double click marker for details | Esc = back.";
     };
     _statusCtrl ctrlSetText _statusText;
 };

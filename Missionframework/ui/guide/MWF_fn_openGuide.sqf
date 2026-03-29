@@ -40,8 +40,10 @@ private _applyPage = {
         private _ctrl = _display displayCtrl _idc;
         if (!isNull _ctrl) then {
             private _isActive = (_key isEqualTo _resolvedKey);
-            _ctrl ctrlSetText format ["%1 %2", if (_isActive) then {">"} else {""}, localize _buttonTextKey];
+            _ctrl ctrlSetText (localize _buttonTextKey);
             _ctrl ctrlEnable (!_isActive);
+            _ctrl ctrlSetTextColor (if (_isActive) then {[0.98, 0.84, 0.42, 1]} else {[0.94, 0.94, 0.94, 1]});
+            _ctrl ctrlSetBackgroundColor (if (_isActive) then {[1, 1, 1, 0.10]} else {[0, 0, 0, 0]});
             _ctrl ctrlSetTooltip localize _buttonTextKey;
         };
     } forEach _pagesDef;
@@ -59,7 +61,7 @@ private _applyPage = {
     };
 
     if (!isNull _titleCtrl) then {
-        _titleCtrl ctrlSetStructuredText parseText format ["<t size='1.2' color='#111111'>%1</t>", localize _titleKey];
+        _titleCtrl ctrlSetStructuredText parseText format ["<t size='1.2' color='#1A1A1A'>%1</t>", localize _titleKey];
     };
 
     if (!isNull _bodyCtrl) then {
