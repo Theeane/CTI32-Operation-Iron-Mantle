@@ -7,10 +7,10 @@ class MWF_RscGuide {
         class BackgroundOuter: RscPicture {
             idc = 12301;
             text = "ui\terminal_bg.paa";
-            x = 0.100 * safezoneW + safezoneX;
-            y = 0.085 * safezoneH + safezoneY;
-            w = 0.800 * safezoneW;
-            h = 0.770 * safezoneH;
+            x = 0.030 * safezoneW + safezoneX;
+            y = 0.040 * safezoneH + safezoneY;
+            w = 0.940 * safezoneW;
+            h = 0.900 * safezoneH;
         };
 
         class BackgroundInner: RscText {
@@ -43,19 +43,19 @@ class MWF_RscGuide {
         class BtnCloseBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.760 * safezoneW + safezoneX;
-            y = 0.154 * safezoneH + safezoneY;
-            w = 0.095 * safezoneW;
-            h = 0.050 * safezoneH;
+            x = 0.790 * safezoneW + safezoneX;
+            y = 0.142 * safezoneH + safezoneY;
+            w = 0.125 * safezoneW;
+            h = 0.072 * safezoneH;
         };
 
         class BtnClose: MWF_RscTerminalButton {
             idc = 12305;
             text = "Back";
-            x = 0.760 * safezoneW + safezoneX;
-            y = 0.154 * safezoneH + safezoneY;
-            w = 0.095 * safezoneW;
-            h = 0.050 * safezoneH;
+            x = 0.790 * safezoneW + safezoneX;
+            y = 0.142 * safezoneH + safezoneY;
+            w = 0.125 * safezoneW;
+            h = 0.072 * safezoneH;
             action = "['CLOSE'] call MWF_fnc_openGuide;";
         };
 
@@ -80,171 +80,171 @@ class MWF_RscGuide {
         class BtnStartBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.214 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.196 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnStart: MWF_RscTerminalButton {
             idc = 12310;
             text = "$STR_MWF_GUIDE_TOPIC_START";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.214 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.196 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','START'] call MWF_fnc_openGuide;";
         };
         class BtnUndercoverBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.264 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.254 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnUndercover: MWF_RscTerminalButton {
             idc = 12311;
             text = "$STR_MWF_GUIDE_TOPIC_UNDERCOVER";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.264 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.254 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','UNDERCOVER'] call MWF_fnc_openGuide;";
         };
         class BtnThreatBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.314 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.312 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnThreat: MWF_RscTerminalButton {
             idc = 12312;
             text = "$STR_MWF_GUIDE_TOPIC_THREAT";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.314 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.312 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','THREAT'] call MWF_fnc_openGuide;";
         };
         class BtnTierBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.364 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.370 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnTier: MWF_RscTerminalButton {
             idc = 12313;
             text = "$STR_MWF_GUIDE_TOPIC_TIER";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.364 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.370 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','WORLD_TIER'] call MWF_fnc_openGuide;";
         };
         class BtnZonesBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.414 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.428 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnZones: MWF_RscTerminalButton {
             idc = 12314;
             text = "$STR_MWF_GUIDE_TOPIC_ZONES";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.414 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.428 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','ZONES'] call MWF_fnc_openGuide;";
         };
         class BtnSupplyBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.464 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.486 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnSupply: MWF_RscTerminalButton {
             idc = 12315;
             text = "$STR_MWF_GUIDE_TOPIC_SUPPLY";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.464 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.486 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','SUPPLY'] call MWF_fnc_openGuide;";
         };
         class BtnIntelBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.514 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.544 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnIntel: MWF_RscTerminalButton {
             idc = 12316;
             text = "$STR_MWF_GUIDE_TOPIC_INTEL";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.514 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.544 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','INTEL'] call MWF_fnc_openGuide;";
         };
         class BtnMainOpsBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.564 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.602 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnMainOps: MWF_RscTerminalButton {
             idc = 12317;
             text = "$STR_MWF_GUIDE_TOPIC_MAINOPS";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.564 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.602 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','MAIN_OPS'] call MWF_fnc_openGuide;";
         };
         class BtnFOBBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.614 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.660 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnFOB: MWF_RscTerminalButton {
             idc = 12318;
             text = "$STR_MWF_GUIDE_TOPIC_FOB";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.614 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.660 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','FOB_ATTACKS'] call MWF_fnc_openGuide;";
         };
         class BtnEndgameBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.664 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.718 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
         };
         class BtnEndgame: MWF_RscTerminalButton {
             idc = 12319;
             text = "$STR_MWF_GUIDE_TOPIC_ENDGAME";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.664 * safezoneH + safezoneY;
-            w = 0.178 * safezoneW;
-            h = 0.052 * safezoneH;
+            x = 0.105 * safezoneW + safezoneX;
+            y = 0.718 * safezoneH + safezoneY;
+            w = 0.225 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_PAGE','ENDGAME'] call MWF_fnc_openGuide;";
         };
 
