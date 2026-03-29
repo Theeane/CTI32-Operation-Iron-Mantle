@@ -1,12 +1,13 @@
 /*
-    Author: OpenAI / repaired from patch
+    Author: OpenAI / Operation Iron Mantle
     Function: MWF_fnc_playIntroCinematic
     Project: Military War Framework
 
     Description:
     Reliable local orbital intro cinematic.
-    Runs once per client session after continue/join, orients around the active MOB
-    terminal/table, and cleans up safely on timeout or failure.
+    Runs once per client session after continue/join, strips the player's gear
+    during the camera move, and exits on a black screen so the engine can hand
+    over to the respawn menu cleanly.
 */
 
 if (!hasInterface) exitWith { false };
@@ -18,32 +19,46 @@ missionNamespace setVariable ["MWF_BlockRespawn", true];
 
 private _cleanupObjects = [];
 private _cam = objNull;
+private _gearWipeDone = false;
 
 private _cleanup = {
+    params [["_keepBlack", true, [true]]];
+
     if (!isNull _cam) then {
         _cam cameraEffect ["TERMINATE", "BACK"];
         camDestroy _cam;
     };
+
     player switchCamera "INTERNAL";
-    cutText ["", "BLACK IN", 0.5];
+
+    if (_keepBlack) then {
+        cutText ["", "BLACK FADED", 0];
+    } else {
+        cutText ["", "BLACK IN", 0.5];
+    };
+
     {
         if (!isNull _x) then { deleteVehicle _x; };
     } forEach _cleanupObjects;
+
     uiNamespace setVariable ["MWF_IntroCinematicActive", false];
     missionNamespace setVariable ["MWF_BlockRespawn", false];
 };
 
 private _resolveAnchor = {
     private _anchor = missionNamespace getVariable [
-        "MWF_Intel_Center",
+        "MWF_MOB_AssetAnchor",
         missionNamespace getVariable [
-            "MWF_MainBase",
-            missionNamespace getVariable ["MWF_MOB_Table", missionNamespace getVariable ["MWF_MOB", objNull]]
+            "MWF_Intel_Center",
+            missionNamespace getVariable [
+                "MWF_MOB_Table",
+                missionNamespace getVariable ["MWF_MOB", objNull]
+            ]
         ]
     ];
 
+    if (isNull _anchor && {!isNil "MWF_MOB_AssetAnchor"}) then { _anchor = MWF_MOB_AssetAnchor; };
     if (isNull _anchor && {!isNil "MWF_Intel_Center"}) then { _anchor = MWF_Intel_Center; };
-    if (isNull _anchor && {!isNil "MWF_MainBase"}) then { _anchor = MWF_MainBase; };
     if (isNull _anchor && {!isNil "MWF_MOB_Table"}) then { _anchor = MWF_MOB_Table; };
     if (isNull _anchor && {!isNil "mob_deploy_pad"}) then { _anchor = mob_deploy_pad; };
 
@@ -65,7 +80,9 @@ waitUntil {
     (!isNull findDisplay 46 && {!isNull player} && {alive player}) || {diag_tickTime >= _deadline}
 };
 if (diag_tickTime >= _deadline) exitWith {
-    call _cleanup;
+    call {
+        [false] call _cleanup;
+    };
     false
 };
 
@@ -79,7 +96,9 @@ private _startedAt = diag_tickTime;
 
 _cam = "camera" camCreate (_center vectorAdd [0, -_radius, _height]);
 if (isNull _cam) exitWith {
-    call _cleanup;
+    call {
+        [false] call _cleanup;
+    };
     false
 };
 
@@ -96,7 +115,8 @@ while {
     {diag_tickTime < (_startedAt + _duration)} &&
     {uiNamespace getVariable ["MWF_IntroCinematicActive", false]}
 } do {
-    private _progress = ((diag_tickTime - _startedAt) / _duration) max 0 min 1;
+    private _elapsed = diag_tickTime - _startedAt;
+    private _progress = (_elapsed / _duration) max 0 min 1;
     private _angle = _startAngle + (_progress * 360);
     private _targetCenter = getPosATL _anchor;
     private _camPos = [
@@ -105,12 +125,19 @@ while {
         (_targetCenter # 2) + _height
     ];
 
+    if (!_gearWipeDone && {_elapsed >= 0.75} && {!isNil "MWF_fnc_applyBaselineLoadout"}) then {
+        [player, true] call MWF_fnc_applyBaselineLoadout;
+        _gearWipeDone = true;
+    };
+
     _cam camSetPos _camPos;
     _cam camSetTarget _anchor;
     _cam camCommit 0;
     uiSleep 0.01;
 };
 
-call _cleanup;
+cutText ["", "BLACK OUT", 1];
+uiSleep 1;
+[true] call _cleanup;
 uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 true
