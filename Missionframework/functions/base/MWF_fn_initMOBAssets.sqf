@@ -1,13 +1,12 @@
 /*
-    Author: OpenAI / Operation Iron Mantle
+    Author: OpenAI / repaired from patch
     Function: MWF_fnc_initMOBAssets
     Project: Military War Framework
 
     Description:
     Server-spawns the MOB asset set from active BLUFOR preset values onto
-    MWF_MOB_AssetAnchor. Required assets (table, terminal, siren) always resolve
-    to a valid classname via fallback. Optional assets (lamp, roof) are skipped
-    when their preset entry is empty or invalid.
+    MWF_MOB_AssetAnchor. Also initializes the command PC and the permanent
+    MOB loadout zone.
 */
 
 if (!isServer) exitWith { objNull };
@@ -56,9 +55,7 @@ if (isNull _assetAnchor) exitWith {
 private _resolveRequiredClass = {
     params ["_varName", "_fallback"];
     private _cls = missionNamespace getVariable [_varName, ""];
-    if !(_cls isEqualType "") then {
-        _cls = "";
-    };
+    if !(_cls isEqualType "") then { _cls = ""; };
     if (_cls isEqualTo "" || {!isClass (configFile >> "CfgVehicles" >> _cls)}) then {
         diag_log format ["[MWF MOB] WARNING: %1 empty/invalid in preset. Using fallback %2.", _varName, _fallback];
         _cls = _fallback;
@@ -69,9 +66,7 @@ private _resolveRequiredClass = {
 private _resolveOptionalClass = {
     params ["_varName"];
     private _cls = missionNamespace getVariable [_varName, ""];
-    if !(_cls isEqualType "") then {
-        _cls = "";
-    };
+    if !(_cls isEqualType "") then { _cls = ""; };
     if (_cls isEqualTo "" || {!isClass (configFile >> "CfgVehicles" >> _cls)}) then {
         _cls = "";
     };
@@ -121,6 +116,7 @@ private _terminal = [_terminalClass, _anchorPos, _anchorDir] call _spawnAsset;
 [_table, _terminal, [0.14, -0.10], 0] call _placeOnTable;
 _terminal setVariable ["MWF_AssetRole", "TERMINAL", true];
 _terminal setVariable ["MWF_isTerminal", true, true];
+_terminal setVariable ["MWF_isCommandPC", true, true];
 
 private _sirenPos = _assetAnchor modelToWorld [0, -3, 0];
 private _siren = [_sirenClass, _sirenPos, _anchorDir] call _spawnAsset;
@@ -142,6 +138,7 @@ if (_roofClass isNotEqualTo "") then {
 
 missionNamespace setVariable ["MWF_MOB_Table", _table, true];
 missionNamespace setVariable ["MWF_Intel_Center", _terminal, true];
+missionNamespace setVariable ["MWF_MainBase", _terminal, true];
 missionNamespace setVariable ["MWF_Base_Light", _lamp, true];
 missionNamespace setVariable ["MWF_MOB_Roof", _roof, true];
 missionNamespace setVariable ["MWF_MOB_Siren", _siren, true];
@@ -152,6 +149,17 @@ MWF_Intel_Center = _terminal;
 MWF_Base_Light = _lamp;
 MWF_MOB_Roof = _roof;
 MWF_MOB_Siren = _siren;
+
+private _mobZoneTrigger = missionNamespace getVariable ["MWF_MOB_LoadoutTrigger", objNull];
+if (isNull _mobZoneTrigger && {!isNil "MWF_MOB_LoadoutTrigger"}) then {
+    _mobZoneTrigger = MWF_MOB_LoadoutTrigger;
+};
+private _registeredZone = [_terminal, 50, _mobName, _mobZoneTrigger, false] call MWF_fnc_registerLoadoutZone;
+if (!isNull _registeredZone) then {
+    missionNamespace setVariable ["MWF_MOB_LoadoutTrigger", _registeredZone, true];
+};
+
+[_terminal] remoteExec ["MWF_fnc_initCommandPC", 0, true];
 
 missionNamespace setVariable [
     "MWF_MOBAssetsLocked",

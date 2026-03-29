@@ -6,6 +6,7 @@ class Base {
     class deployFOB                  { file = "functions\base\MWF_fn_deployFOB.sqf"; };
     class depositIntel               { file = "functions\base\MWF_fn_depositIntel.sqf"; };
     class executeRepack              { file = "functions\base\MWF_fnc_executeRepack.sqf"; };
+    class fobMenuConfig              { file = "functions\base\MWF_fn_fobMenuConfig.sqf"; };
     class garageSystem               { file = "functions\base\MWF_fn_garageSystem.sqf"; };
     class initCommandPC              { file = "functions\base\MWF_fn_initCommandPC.sqf"; };
     class initFOB                    { file = "functions\base\MWF_fn_initFOB.sqf"; };

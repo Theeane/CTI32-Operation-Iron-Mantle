@@ -1,6 +1,6 @@
 /*
-    Author: Theane / ChatGPT
-    Function: fn_spawnInitialFOBAsset
+    Author: OpenAI / repaired from patch
+    Function: MWF_fnc_spawnInitialFOBAsset
     Project: Military War Framework
 
     Description:
@@ -35,12 +35,18 @@ private _paramValue = missionNamespace getVariable [
     ["MWF_Param_InitialFOBType", 0] call BIS_fnc_getParamValue
 ];
 
-private _assetClass = if (_paramValue == 1) then {
-    missionNamespace getVariable ["MWF_FOB_Box", "B_Slingload_01_Cargo_F"]
-} else {
-    missionNamespace getVariable ["MWF_FOB_Truck", "B_Truck_01_Repair_F"]
+private _assetOptions = missionNamespace getVariable ["MWF_FOB_AssetOptions", []];
+private _assetClass = "";
+if (_assetOptions isEqualType [] && {count _assetOptions > _paramValue}) then {
+    _assetClass = ((_assetOptions select _paramValue) param [1, "", [""]]);
 };
-
+if (_assetClass isEqualTo "") then {
+    _assetClass = if (_paramValue == 1) then {
+        missionNamespace getVariable ["MWF_FOB_Box", "B_Slingload_01_Cargo_F"]
+    } else {
+        missionNamespace getVariable ["MWF_FOB_Truck", "B_Truck_01_Repair_F"]
+    };
+};
 
 if (_assetClass isEqualTo "") exitWith {
     diag_log "[MWF FOB] Initial FOB asset spawn aborted because resolved asset class was empty.";
@@ -91,7 +97,7 @@ _asset setPosATL _spawnPos;
 _asset setVariable ["MWF_IsInitialFOBAsset", true, true];
 missionNamespace setVariable ["MWF_InitialFOBAssetRef", _asset, true];
 
-[_asset] call MWF_fnc_initFOB;
+[_asset] remoteExec ["MWF_fnc_initFOB", 0, true];
 
 diag_log format [
     "[MWF FOB] %1 FOB asset spawned: %2 (%3) at %4.",

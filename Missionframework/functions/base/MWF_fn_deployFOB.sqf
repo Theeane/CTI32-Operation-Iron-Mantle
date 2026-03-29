@@ -1,11 +1,12 @@
 /*
-    Author: Theane / ChatGPT
-    Function: fn_deployFOB
+    Author: OpenAI / repaired from patch
+    Function: MWF_fnc_deployFOB
     Project: Military War Framework
 
     Description:
     Server-side FOB deployment pipeline. Converts a deployable truck/container into
     a live FOB terminal and attached assets, then registers it for persistence.
+    Also registers the FOB loadout/arsenal zone.
 */
 
 if (!isServer) exitWith {objNull};
@@ -91,7 +92,6 @@ _laptop setVariable ["MWF_FOB_IsDamaged", false, true];
 _laptop setVariable ["MWF_FOB_RepairCost", 0, true];
 _laptop setVariable ["MWF_FOB_DespawnDeadline", -1, true];
 _laptop allowDamage false;
-[_laptop] remoteExec ["MWF_fnc_initCommandPC", 0, true];
 
 private _siren = objNull;
 if (_assetSiren != "") then {
@@ -103,6 +103,12 @@ if (_assetSiren != "") then {
 };
 
 private _locker = objNull;
+if (_assetLocker != "") then {
+    private _lockerPos = [ASLToATL _posAsl, 2.5, _dir + 180] call BIS_fnc_relPos;
+    _locker = createVehicle [_assetLocker, _lockerPos, [], 0, "NONE"];
+    _locker setDir _dir;
+    _locker allowDamage false;
+};
 
 private _lamp = objNull;
 if (_assetLamp != "") then {
@@ -121,6 +127,11 @@ _laptop setVariable ["MWF_AttachedLamp", _lamp, true];
 private _registration = [_laptop, _displayName, _originType, !_isRestore] call MWF_fnc_registerFOB;
 private _markerName = _registration param [0, ""];
 private _resolvedName = _registration param [1, "FOB"];
+
+private _zoneRadius = missionNamespace getVariable ["MWF_FOB_DeploymentRadius", 50];
+[_laptop, _zoneRadius, _resolvedName] call MWF_fnc_registerLoadoutZone;
+
+[_laptop] remoteExec ["MWF_fnc_initCommandPC", 0, true];
 
 _laptop addEventHandler ["HandleDamage", {
     params ["_unit", "_selection", "_damage", "_source", "_projectile"];
@@ -145,6 +156,7 @@ _laptop addEventHandler ["Killed", {
 
         if (_terminal getVariable ["MWF_FOB_IsDamaged", false]) exitWith {};
 
+        [_terminal] call MWF_fnc_unregisterLoadoutZone;
         [_terminal, "", true] call MWF_fnc_unregisterFOB;
 
         {
