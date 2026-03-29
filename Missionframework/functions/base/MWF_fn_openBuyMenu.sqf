@@ -5,7 +5,7 @@
 
     Description:
     Entry point for the Command Network.
-    This function bridges the physical terminal interaction to the unified Data Hub UI, defaulting to the zones overview.
+    This function bridges the physical terminal interaction to the unified Data Hub UI.
 */
 
 if (!hasInterface) exitWith { false };
@@ -24,8 +24,9 @@ if (isNull _terminal || isNull _caller) exitWith {
 missionNamespace setVariable ["MWF_CommandTerminal_Object", _terminal];
 missionNamespace setVariable ["MWF_CommandTerminal_User", _caller];
 
-// Open the Data Hub UI and default to the zones overview
-["OPEN", "ZONES"] call MWF_fnc_dataHub;
+// Open the Data Hub UI on the default zones/map view
+["OPEN"] call MWF_fnc_dataHub;
+["SET_MODE", "ZONES"] call MWF_fnc_dataHub;
 
 diag_log format ["[MWF] Command Network: UI opened by %1 at terminal %2.", name _caller, _terminal];
 

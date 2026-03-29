@@ -7,7 +7,29 @@
     The GUI tool can later restyle or replace this dialog while reusing the backend logic.
 */
 
-class MWF_RscMapControl: RscMapControl {
+class MWF_RscTerminalButton: RscButton {
+    style = ST_CENTER;
+    colorText[] = {1,1,1,1};
+    colorDisabled[] = {0.5,0.5,0.5,1};
+    colorBackground[] = {0,0,0,0};
+    colorBackgroundActive[] = {0,0,0,0};
+    colorFocused[] = {0,0,0,0};
+    colorShadow[] = {0,0,0,0};
+    colorBorder[] = {0,0,0,0};
+    soundEnter[] = {"",0.09,1};
+    soundPush[] = {"",0.09,1};
+    soundClick[] = {"",0.09,1};
+    soundEscape[] = {"",0.09,1};
+    shadow = 0;
+    borderSize = 0;
+    offsetX = 0;
+    offsetY = 0;
+    offsetPressedX = 0;
+    offsetPressedY = 0;
+    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 32) * 1)";
+};
+
+class MWF_RscMapControl {
     access = 0;
     type = 101;
     idc = -1;
@@ -56,6 +78,10 @@ class MWF_RscMapControl: RscMapControl {
     colorRoadsFill[] = {1,1,1,1};
     colorMainRoads[] = {0.9,0.75,0.45,1};
     colorMainRoadsFill[] = {1,0.95,0.75,1};
+    widthRailWay = 4;
+    widthRoads = 2;
+    widthMainRoads = 2.2;
+    widthPowerLines = 2;
     colorGrid[] = {0.1,0.1,0.1,0.6};
     colorGridMap[] = {0.1,0.1,0.1,0.6};
     font = "RobotoCondensed";
@@ -82,6 +108,168 @@ class MWF_RscMapControl: RscMapControl {
         sizeEx = "(((safezoneW / safezoneH) min 1.2) / 40)";
         colorBackground[] = {1,1,1,0.5};
         color[] = {0,0,0,1};
+    };
+    class ActiveMarker {
+        color[] = {0.3,0.1,0.9,1};
+        size = 50;
+    };
+    class Command {
+        icon = "\A3\ui_f\data\map\mapcontrol\waypoint_ca.paa";
+        color[] = {0,0,0,1};
+        size = 18;
+        importance = 1;
+        coefMin = 1;
+        coefMax = 1;
+    };
+    class Task {
+        icon = "\A3\ui_f\data\map\mapcontrol\taskIcon_CA.paa";
+        iconCreated = "\A3\ui_f\data\map\mapcontrol\taskIconCreated_CA.paa";
+        iconCanceled = "\A3\ui_f\data\map\mapcontrol\taskIconCanceled_CA.paa";
+        iconDone = "\A3\ui_f\data\map\mapcontrol\taskIconDone_CA.paa";
+        iconFailed = "\A3\ui_f\data\map\mapcontrol\taskIconFailed_CA.paa";
+        color[] = {1,1,1,1};
+        colorCreated[] = {1,1,1,1};
+        colorCanceled[] = {0.7,0.7,0.7,1};
+        colorDone[] = {0.7,1,0.3,1};
+        colorFailed[] = {1,0.3,0.2,1};
+        size = 27;
+        importance = 1;
+        coefMin = 1;
+        coefMax = 1;
+    };
+    class CustomMark {
+        icon = "\A3\ui_f\data\map\mapcontrol\custommark_ca.paa";
+        color[] = {1,1,1,1};
+        size = 24;
+        importance = 1;
+        coefMin = 1;
+        coefMax = 1;
+    };
+    class Tree {
+        icon = "\A3\ui_f\data\map\mapcontrol\tree_ca.paa";
+        color[] = {0.45,0.64,0.33,0.8};
+        size = 12;
+        importance = 0.9;
+        coefMin = 0.25;
+        coefMax = 4;
+    };
+    class SmallTree: Tree { size = 10; };
+    class Bush {
+        icon = "\A3\ui_f\data\map\mapcontrol\bush_ca.paa";
+        color[] = {0.45,0.64,0.33,0.8};
+        size = 12;
+        importance = 0.2;
+        coefMin = 0.25;
+        coefMax = 4;
+    };
+    class Church {
+        icon = "\A3\ui_f\data\map\mapcontrol\church_CA.paa";
+        color[] = {1,1,1,1};
+        size = 24;
+        importance = 1;
+        coefMin = 0.85;
+        coefMax = 1;
+    };
+    class Chapel: Church { icon = "\A3\ui_f\data\map\mapcontrol\Chapel_CA.paa"; };
+    class Cross: Church { icon = "\A3\ui_f\data\map\mapcontrol\Cross_CA.paa"; };
+    class Rock {
+        icon = "\A3\ui_f\data\map\mapcontrol\rock_ca.paa";
+        color[] = {0.1,0.1,0.1,0.8};
+        size = 12;
+        importance = 0.5;
+        coefMin = 0.25;
+        coefMax = 4;
+    };
+    class Bunker {
+        icon = "\A3\ui_f\data\map\mapcontrol\bunker_ca.paa";
+        color[] = {1,1,1,1};
+        size = 14;
+        importance = 1.5;
+        coefMin = 0.5;
+        coefMax = 4;
+    };
+    class Fortress: Bunker { icon = "\A3\ui_f\data\map\mapcontrol\fortress_ca.paa"; };
+    class Fountain {
+        icon = "\A3\ui_f\data\map\mapcontrol\fountain_ca.paa";
+        color[] = {1,1,1,1};
+        size = 12;
+        importance = 1;
+        coefMin = 0.25;
+        coefMax = 4;
+    };
+    class ViewTower {
+        icon = "\A3\ui_f\data\map\mapcontrol\viewtower_ca.paa";
+        color[] = {1,1,1,1};
+        size = 16;
+        importance = 2.5;
+        coefMin = 0.5;
+        coefMax = 4;
+    };
+    class Lighthouse: ViewTower { icon = "\A3\ui_f\data\map\mapcontrol\lighthouse_ca.paa"; };
+    class Quay {
+        icon = "\A3\ui_f\data\map\mapcontrol\quay_ca.paa";
+        color[] = {1,1,1,1};
+        size = 16;
+        importance = 1;
+        coefMin = 0.5;
+        coefMax = 4;
+    };
+    class Fuelstation {
+        icon = "\A3\ui_f\data\map\mapcontrol\fuelstation_ca.paa";
+        color[] = {1,1,1,1};
+        size = 16;
+        importance = 1;
+        coefMin = 0.75;
+        coefMax = 4;
+    };
+    class Hospital: Fuelstation { icon = "\A3\ui_f\data\map\mapcontrol\hospital_ca.paa"; };
+    class BusStop {
+        icon = "\A3\ui_f\data\map\mapcontrol\busstop_CA.paa";
+        color[] = {1,1,1,1};
+        size = 12;
+        importance = 1;
+        coefMin = 0.5;
+        coefMax = 4;
+    };
+    class Transmitter {
+        icon = "\A3\ui_f\data\map\mapcontrol\transmitter_CA.paa";
+        color[] = {1,1,1,1};
+        size = 20;
+        importance = 1;
+        coefMin = 0.5;
+        coefMax = 4;
+    };
+    class Stack {
+        icon = "\A3\ui_f\data\map\mapcontrol\stack_ca.paa";
+        color[] = {1,1,1,1};
+        size = 20;
+        importance = 2;
+        coefMin = 0.9;
+        coefMax = 4;
+    };
+    class Ruin {
+        icon = "\A3\ui_f\data\map\mapcontrol\ruin_ca.paa";
+        color[] = {1,1,1,1};
+        size = 16;
+        importance = 1.2;
+        coefMin = 1;
+        coefMax = 4;
+    };
+    class Tourism {
+        icon = "\A3\ui_f\data\map\mapcontrol\tourism_ca.paa";
+        color[] = {1,1,1,1};
+        size = 16;
+        importance = 1;
+        coefMin = 0.7;
+        coefMax = 4;
+    };
+    class Watertower {
+        icon = "\A3\ui_f\data\map\mapcontrol\watertower_ca.paa";
+        color[] = {1,1,1,1};
+        size = 20;
+        importance = 1.2;
+        coefMin = 0.75;
+        coefMax = 4;
     };
 };
 
