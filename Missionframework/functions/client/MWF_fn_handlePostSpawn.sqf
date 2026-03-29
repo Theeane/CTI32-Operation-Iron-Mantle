@@ -6,6 +6,8 @@
     Description:
     Centralized local post-spawn pass. Ensures HUD/actions are started once per
     player entity and applies the saved respawn loadout on non-initial spawns.
+    Black-screen release is intentionally disabled for now; this pass only
+    restores the local camera state.
 */
 
 params [["_isInitialSpawn", false, [false]]];
@@ -44,19 +46,13 @@ if (!isNil "MWF_fnc_updateResourceUI") then {
     [] spawn MWF_fnc_updateResourceUI;
 };
 
-
-if !(missionNamespace getVariable ["MWF_PostSpawnScreenReleased", false]) then {
+if (!(missionNamespace getVariable ["MWF_PostSpawnScreenReleased", false])) then {
     missionNamespace setVariable ["MWF_PostSpawnScreenReleased", true];
-    [] spawn {
-        uiSleep 0.05;
-        showCinemaBorder false;
-        cutText ["", "BLACK IN", 0.25];
-        titleCut ["", "BLACK IN", 0.25];
-        if (!isNull player) then {
-            player switchCamera "INTERNAL";
-        };
-    };
-} else {
+};
+
+[] spawn {
+    uiSleep 0.05;
+    showCinemaBorder false;
     if (!isNull player) then {
         player switchCamera "INTERNAL";
     };

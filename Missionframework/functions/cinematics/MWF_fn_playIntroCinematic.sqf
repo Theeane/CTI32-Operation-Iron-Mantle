@@ -31,9 +31,6 @@ private _cleanup = {
 
     player switchCamera "INTERNAL";
 
-    if (!_keepBlack) then {
-        cutText ["", "BLACK IN", 0.35];
-    };
 
     {
         if (!isNull _x) then { deleteVehicle _x; };
@@ -100,9 +97,6 @@ showCinemaBorder false;
 _cam cameraEffect ["INTERNAL", "BACK"];
 _cam camSetFov 0.78;
 _cam camCommit 0;
-cutText ["", "BLACK FADED", 0];
-uiSleep 0.1;
-cutText ["", "BLACK IN", 2];
 
 while {
     alive player &&
@@ -130,8 +124,6 @@ while {
     uiSleep 0.01;
 };
 
-cutText ["", "BLACK OUT", 1];
-uiSleep 1;
-[true] call _cleanup;
+[false] call _cleanup;
 uiNamespace setVariable ["MWF_IntroCinematicPlayed", true];
 true
