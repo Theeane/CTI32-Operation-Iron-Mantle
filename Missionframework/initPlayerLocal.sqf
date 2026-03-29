@@ -13,6 +13,7 @@ if (!hasInterface) exitWith {};
 missionNamespace setVariable ["MWF_ClientInitStage", "WAITING_FOR_SERVER"];
 missionNamespace setVariable ["MWF_ClientInitComplete", false];
 missionNamespace setVariable ["MWF_DeployUiClosed", false];
+missionNamespace setVariable ["MWF_PostSpawnScreenReleased", false];
 
 private _serverDeadline = diag_tickTime + 60;
 waitUntil {
@@ -65,20 +66,12 @@ diag_log "[MWF] initPlayerLocal: Client handshake complete.";
         uiNamespace getVariable ["MWF_IntroCinematicPlayed", false]
     };
 
-    uiSleep 3;
-    private _deadline = diag_tickTime + 45;
-    while {hasInterface && {diag_tickTime < _deadline}} do {
-        uiSleep 1;
-        if (!isNull player && {alive player}) then {
-            cutText ["", "BLACK IN", 0];
-            titleCut ["", "BLACK IN", 0];
-            showCinemaBorder false;
+    waitUntil {
+        uiSleep 0.2;
+        !isNull player && {alive player}
+    };
 
-            if (!(missionNamespace getVariable ["MWF_ClientInitComplete", false]) && {!isNil "MWF_fnc_handlePostSpawn"}) then {
-                [true] call MWF_fnc_handlePostSpawn;
-            };
-
-            if (missionNamespace getVariable ["MWF_ClientInitComplete", false]) exitWith {};
-        };
+    if (!(missionNamespace getVariable ["MWF_ClientInitComplete", false]) && {!isNil "MWF_fnc_handlePostSpawn"}) then {
+        [true] call MWF_fnc_handlePostSpawn;
     };
 };

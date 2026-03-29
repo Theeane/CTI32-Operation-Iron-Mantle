@@ -104,7 +104,7 @@ class MWF_RscTerminalButton : RscStandardButton {
     colorBackground[] = {0,0,0,0};
     colorBackgroundActive[] = {1,1,1,0.06};
     colorFocused[] = {1,1,1,0.06};
-    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 19) * 1)";
+    sizeEx = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 16.5) * 1)";
 };
 
 class RscStructuredText {

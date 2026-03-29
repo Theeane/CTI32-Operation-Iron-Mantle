@@ -45,13 +45,18 @@ if (!isNil "MWF_fnc_updateResourceUI") then {
 };
 
 
-[] spawn {
-    showCinemaBorder false;
-    for "_i" from 0 to 3 do {
-        uiSleep 0.08;
-        cutText ["", "BLACK IN", 0];
-        titleCut ["", "BLACK IN", 0];
+if !(missionNamespace getVariable ["MWF_PostSpawnScreenReleased", false]) then {
+    missionNamespace setVariable ["MWF_PostSpawnScreenReleased", true];
+    [] spawn {
+        uiSleep 0.05;
+        showCinemaBorder false;
+        cutText ["", "BLACK IN", 0.25];
+        titleCut ["", "BLACK IN", 0.25];
+        if (!isNull player) then {
+            player switchCamera "INTERNAL";
+        };
     };
+} else {
     if (!isNull player) then {
         player switchCamera "INTERNAL";
     };

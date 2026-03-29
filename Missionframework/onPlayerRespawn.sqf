@@ -16,6 +16,7 @@ missionNamespace setVariable ["MWF_PostSpawnInitRunning", false];
 missionNamespace setVariable ["MWF_PostSpawnInitSince", -1];
 missionNamespace setVariable ["MWF_ClientInitStage", "RESPAWN_TRIGGERED"];
 missionNamespace setVariable ["MWF_LastPostSpawnSignature", ""];
+missionNamespace setVariable ["MWF_PostSpawnScreenReleased", false];
 
 disableUserInput false;
 

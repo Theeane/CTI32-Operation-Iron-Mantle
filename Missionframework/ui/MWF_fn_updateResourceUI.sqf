@@ -125,12 +125,12 @@ private _applyLayout = {
     private _positionMode = missionNamespace getVariable ["MWF_UI_Position", 0];
     private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.35];
 
-    private _groupW = 0.145;
-    private _groupH = 0.235;
+    private _groupW = 0.152;
+    private _groupH = 0.272;
     private _rightX = safeZoneX + safeZoneW - _groupW - 0.012;
     private _leftX = safeZoneX + 0.018;
     private _baseX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
-    private _baseY = safeZoneY + (safeZoneH * 0.37);
+    private _baseY = safeZoneY + (safeZoneH * 0.355);
 
     if (!isNull _resourceGroup) then {
         _resourceGroup ctrlSetPosition [_baseX, _baseY, _groupW, _groupH];
@@ -170,7 +170,7 @@ while { hasInterface } do {
         private _resourceText = _display displayCtrl 9001;
         if (!isNull _resourceText) then {
             _resourceText ctrlSetStructuredText parseText format [
-                "<t size='0.92' color='#FFFFFF'>Supplies:</t><br/><t size='1.06' color='#FFFFFF'>%1</t><br/><t size='0.92' color='#78D7FF'>Intel:</t><br/><t size='1.06' color='#78D7FF'>%2</t><br/><t size='0.92' color='#F4E29D'>World Tier:</t><br/><t size='1.06' color='#F4E29D'>%3</t><br/><t size='0.92' color='#FF5E73'>Threat:</t><br/><t size='1.06' color='#FF5E73'>%4%%</t>",
+                "<t size='0.88' color='#FFFFFF'>Supplies:</t><br/><t size='0.98' color='#FFFFFF'>%1</t><br/><t size='0.88' color='#78D7FF'>Intel:</t><br/><t size='0.98' color='#78D7FF'>%2</t><br/><t size='0.88' color='#F4E29D'>World Tier:</t><br/><t size='0.98' color='#F4E29D'>%3</t><br/><t size='0.88' color='#FF5E73'>Threat:</t><br/><t size='0.98' color='#FF5E73'>%4%%</t>",
                 [_supplies] call _formatNumber,
                 [_intel] call _formatNumber,
                 [_worldTier] call _toRoman,
