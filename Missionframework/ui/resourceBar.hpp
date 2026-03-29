@@ -18,14 +18,14 @@ class MWF_ResourceBar {
             x = safeZoneX + safeZoneW - 0.172;
             y = safeZoneY + (safeZoneH * 0.355);
             w = 0.152;
-            h = 0.296;
+            h = 0.318;
             class Controls {
                 class Background: RscText {
                     idc = 9005;
                     x = 0;
                     y = 0;
                     w = 0.152;
-                    h = 0.296;
+                    h = 0.318;
                     colorBackground[] = {0,0,0,0.35};
                 };
                 class ResourceText: RscStructuredText {
@@ -34,7 +34,7 @@ class MWF_ResourceBar {
                     x = 0.008;
                     y = 0.006;
                     w = 0.136;
-                    h = 0.278;
+                    h = 0.300;
                     size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
                     class Attributes {
                         font = "RobotoCondensed";
