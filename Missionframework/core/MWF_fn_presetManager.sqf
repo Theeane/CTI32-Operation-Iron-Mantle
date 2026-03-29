@@ -295,13 +295,41 @@ saveProfileNamespace;
 diag_log "[MWF] Preset manager initialized.";
 
 
-// Optional Tier 5 vehicle categories. Always normalize + broadcast them after the
-// active BLUFOR preset has loaded so clients never inherit stale arrays.
+// Vehicle/support preset data must be JIP-safe after the active BLUFOR preset has loaded,
+// otherwise terminal vehicle menus on clients can see empty catalogs even though the server
+// resolved the preset correctly.
 {
-    missionNamespace setVariable [_x, + (missionNamespace getVariable [_x, []]), true];
+    private _value = missionNamespace getVariable [_x, nil];
+    if (isNil "_value") then {
+        _value = [];
+    } else {
+        if (_value isEqualType []) then {
+            _value = +_value;
+        } else {
+            if (_value isEqualType createHashMap) then {
+                _value = +_value;
+            };
+        };
+    };
+    missionNamespace setVariable [_x, _value, true];
 } forEach [
+    "MWF_Preset_Light",
+    "MWF_Preset_APC",
+    "MWF_Preset_Tanks",
+    "MWF_Preset_Helis",
+    "MWF_Preset_Jets",
     "MWF_Preset_Light_T5",
     "MWF_Preset_Armor_T5",
     "MWF_Preset_Helis_T5",
-    "MWF_Preset_Jets_T5"
+    "MWF_Preset_Jets_T5",
+    "MWF_Heli_Tower_Class",
+    "MWF_Jet_Control_Class",
+    "MWF_Respawn_Truck",
+    "MWF_Respawn_Heli",
+    "MWF_Support_Group1",
+    "MWF_Support_Group2",
+    "MWF_Support_Group3",
+    "MWF_Support_Group4",
+    "MWF_Support_Group5",
+    "MWF_Support_GroupMeta"
 ];

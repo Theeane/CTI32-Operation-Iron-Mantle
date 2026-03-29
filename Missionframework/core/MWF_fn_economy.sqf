@@ -15,8 +15,13 @@ if (missionNamespace getVariable ["MWF_EconomyLoopStarted", false]) exitWith {
 
 missionNamespace setVariable ["MWF_EconomyLoopStarted", true, true];
 
+private _lockedStartSupplies = missionNamespace getVariable ["MWF_Locked_StartSupplies", 200];
+private _phaseAtBoot = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+private _tutorialSupplyRunDone = missionNamespace getVariable ["MWF_Tutorial_SupplyRunDone", false];
+private _bootSupplyFloor = if ((_phaseAtBoot isEqualTo "TUTORIAL") && {!_tutorialSupplyRunDone}) then { 200 max _lockedStartSupplies } else { _lockedStartSupplies };
+
 if (isNil "MWF_Economy_Supplies") then {
-    missionNamespace setVariable ["MWF_Economy_Supplies", 0, true];
+    missionNamespace setVariable ["MWF_Economy_Supplies", _bootSupplyFloor, true];
 };
 if (isNil "MWF_res_intel") then {
     missionNamespace setVariable ["MWF_res_intel", 0, true];

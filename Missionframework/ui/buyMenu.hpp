@@ -81,7 +81,7 @@ class IronMantle_BuyMenu {
         };
 
         class BtnLight: RscButton {
-            text = "LIGHT";
+            text = "CARS";
             x = 0.18 * safezoneW + safezoneX;
             y = 0.235 * safezoneH + safezoneY;
             w = 0.078 * safezoneW;
@@ -167,7 +167,7 @@ class IronMantle_BuyMenu {
             y = 0.72 * safezoneH + safezoneY;
             w = 0.12 * safezoneW;
             h = 0.045 * safezoneH;
-            action = "closeDialog 0; ['OPEN', 'ZONES'] call MWF_fnc_dataHub;";
+            action = "closeDialog 0;";
         };
     };
 };
