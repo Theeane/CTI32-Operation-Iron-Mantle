@@ -236,41 +236,41 @@ class MWF_RscDataHub {
         };
 
         class MapFrame: RscText {
-            idc = 12204;
-            x = 0.140 * safezoneW + safezoneX;
-            y = 0.258 * safezoneH + safezoneY;
-            w = 0.720 * safezoneW;
-            h = 0.455 * safezoneH;
-            colorBackground[] = {0,0,0,0.2};
+    	idc = 12204;
+    	x = 0.186 * safezoneW + safezoneX;
+    	y = 0.254 * safezoneH + safezoneY;
+   	w = 0.628 * safezoneW;
+   	h = 0.356 * safezoneH;
+    	colorBackground[] = {0,0,0,0.2};
         };
 
-        class WorldMap: RscMapControl {
-            idc = 12205;
-            x = 0.145 * safezoneW + safezoneX;
-            y = 0.264 * safezoneH + safezoneY;
-            w = 0.710 * safezoneW;
-            h = 0.440 * safezoneH;
+        class WorldMap: MWF_RscDataHubMapControl {
+    	idc = 12205;
+    	x = 0.190 * safezoneW + safezoneX;
+    	y = 0.260 * safezoneH + safezoneY;
+    	w = 0.620 * safezoneW;
+    	h = 0.338 * safezoneH;
             onMouseButtonDblClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; };";
         };
 
         class StatusText: RscText {
-            idc = 12206;
-            text = "Mode: ZONES";
-            x = 0.145 * safezoneW + safezoneX;
-            y = 0.720 * safezoneH + safezoneY;
-            w = 0.450 * safezoneW;
-            h = 0.032 * safezoneH;
-            colorText[] = {0,0,0,1};
+    	idc = 12206;
+    	text = "Mode: ZONES";
+    	x = 0.190 * safezoneW + safezoneX;
+    	y = 0.614 * safezoneH + safezoneY;
+    	w = 0.300 * safezoneW;
+    	h = 0.030 * safezoneH;
+    	colorText[] = {1,1,1,1};
         };
 
         class InfoText: RscStructuredText {
-            idc = 12216;
-            text = "";
-            x = 0.595 * safezoneW + safezoneX;
-            y = 0.718 * safezoneH + safezoneY;
-            w = 0.260 * safezoneW;
-            h = 0.068 * safezoneH;
-            colorText[] = {0,0,0,1};
+    	idc = 12216;
+    	text = "";
+    	x = 0.514 * safezoneW + safezoneX;
+    	y = 0.612 * safezoneH + safezoneY;
+    	w = 0.296 * safezoneW;
+    	h = 0.050 * safezoneH;
+    	colorText[] = {1,1,1,1};
             size = "(((((safezoneW / safezoneH) min 1.2) / 1.2) / 34) * 1)";
         };
 
