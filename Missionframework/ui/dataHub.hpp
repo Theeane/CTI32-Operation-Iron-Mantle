@@ -3,19 +3,21 @@
     Project: Military War Framework
 
     Description:
-    Standalone prototype shell for the unified command/data map.
-    The GUI tool can later restyle or replace this dialog while reusing the backend logic.
+    Unified command/data hub terminal shell.
 */
 
-class RscMapControl {
+class MWF_RscDataHubMapControl {
     access = 0;
     type = 101;
     idc = -1;
     style = 48;
+    shadow = 0;
+
     x = 0;
     y = 0;
     w = 0.2;
     h = 0.2;
+
     moveOnEdges = 1;
     ptsPerSquareSea = 5;
     ptsPerSquareTxt = 20;
@@ -27,12 +29,14 @@ class RscMapControl {
     ptsPerSquareRoad = 6;
     ptsPerSquareObj = 9;
     showCountourInterval = 0;
+
     scaleMin = 0.001;
     scaleMax = 1;
     scaleDefault = 0.16;
     maxSatelliteAlpha = 0.85;
     alphaFadeStartScale = 0.15;
     alphaFadeEndScale = 0.29;
+
     colorBackground[] = {0.969,0.957,0.949,1};
     colorOutside[] = {0,0,0,1};
     colorText[] = {0,0,0,1};
@@ -62,6 +66,7 @@ class RscMapControl {
     widthTracks = 0.35;
     colorGrid[] = {0.1,0.1,0.1,0.6};
     colorGridMap[] = {0.1,0.1,0.1,0.6};
+
     font = "RobotoCondensed";
     sizeEx = 0.04;
     fontLabel = "RobotoCondensed";
@@ -76,6 +81,7 @@ class RscMapControl {
     sizeExInfo = 0.03;
     fontLevel = "RobotoCondensed";
     sizeExLevel = 0.03;
+
     text = "#(argb,8,8,3)color(1,1,1,1)";
 
     class Legend {
@@ -99,36 +105,36 @@ class MWF_RscDataHub {
         class BackgroundOuter: RscPicture {
             idc = 12201;
             text = "ui\terminal_bg.paa";
-            x = 0.030 * safezoneW + safezoneX;
-            y = 0.040 * safezoneH + safezoneY;
-            w = 0.940 * safezoneW;
-            h = 0.900 * safezoneH;
+            x = 0.014 * safezoneW + safezoneX;
+            y = 0.004 * safezoneH + safezoneY;
+            w = 0.972 * safezoneW;
+            h = 0.944 * safezoneH;
         };
 
         class BackgroundInner: RscText {
             idc = 12202;
-            x = 0.135 * safezoneW + safezoneX;
+            x = 0.160 * safezoneW + safezoneX;
             y = 0.145 * safezoneH + safezoneY;
-            w = 0.730 * safezoneW;
-            h = 0.670 * safezoneH;
-            colorBackground[] = {0, 0, 0, 0};
+            w = 0.660 * safezoneW;
+            h = 0.640 * safezoneH;
+            colorBackground[] = {0,0,0,0};
         };
 
         class TerminalStatusBG: RscText {
             idc = 12217;
-            x = 0.145 * safezoneW + safezoneX;
-            y = 0.155 * safezoneH + safezoneY;
-            w = 0.710 * safezoneW;
+            x = 0.164 * safezoneW + safezoneX;
+            y = 0.149 * safezoneH + safezoneY;
+            w = 0.652 * safezoneW;
             h = 0.032 * safezoneH;
-            colorBackground[] = {0.12, 0.12, 0.12, 0.88};
+            colorBackground[] = {0.12,0.12,0.12,0.88};
         };
 
         class TerminalStatusText: RscStructuredText {
             idc = 12218;
             text = "";
-            x = 0.151 * safezoneW + safezoneX;
-            y = 0.158 * safezoneH + safezoneY;
-            w = 0.700 * safezoneW;
+            x = 0.170 * safezoneW + safezoneX;
+            y = 0.153 * safezoneH + safezoneY;
+            w = 0.640 * safezoneW;
             h = 0.026 * safezoneH;
         };
 
@@ -255,7 +261,7 @@ class MWF_RscDataHub {
             colorBackground[] = {0,0,0,0.2};
         };
 
-        class WorldMap: RscMapControl {
+        class WorldMap: MWF_RscDataHubMapControl {
             idc = 12205;
             x = 0.190 * safezoneW + safezoneX;
             y = 0.260 * safezoneH + safezoneY;
