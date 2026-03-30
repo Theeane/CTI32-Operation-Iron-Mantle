@@ -81,7 +81,7 @@ class IronMantle_BuyMenu {
         };
 
         class BtnLight: RscButton {
-            text = "CARS";
+            text = "LIGHT";
             x = 0.18 * safezoneW + safezoneX;
             y = 0.235 * safezoneH + safezoneY;
             w = 0.078 * safezoneW;

@@ -24,9 +24,9 @@ if (isNull _terminal || isNull _caller) exitWith {
 missionNamespace setVariable ["MWF_CommandTerminal_Object", _terminal];
 missionNamespace setVariable ["MWF_CommandTerminal_User", _caller];
 
-// Open the Data Hub UI on the default zones/map view
+// Open the Data Hub UI and set it to the Upgrades/Buy category
 ["OPEN"] call MWF_fnc_dataHub;
-["SET_MODE", "ZONES"] call MWF_fnc_dataHub;
+["SET_MODE", "UPGRADES"] call MWF_fnc_dataHub;
 
 diag_log format ["[MWF] Command Network: UI opened by %1 at terminal %2.", name _caller, _terminal];
 

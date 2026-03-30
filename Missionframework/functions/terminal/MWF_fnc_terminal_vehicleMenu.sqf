@@ -213,7 +213,7 @@ switch (_modeUpper) do {
         missionNamespace setVariable ["MWF_VehicleMenu_LastTerminal", _terminal];
         missionNamespace setVariable ["MWF_VehicleMenu_LastCatalog", _publicCatalog];
 
-        private _requestedCategory = toUpper (_payload param [0, missionNamespace getVariable ["MWF_VehicleMenu_LastCategory", "LIGHT"], [""]]);
+        private _requestedCategory = toUpper (missionNamespace getVariable ["MWF_VehicleMenu_LastCategory", "LIGHT"]);
         private _validCategories = ["LIGHT", "APC", "TANKS", "HELIS", "JETS"];
         if !(_requestedCategory in _validCategories) then {
             _requestedCategory = "LIGHT";
