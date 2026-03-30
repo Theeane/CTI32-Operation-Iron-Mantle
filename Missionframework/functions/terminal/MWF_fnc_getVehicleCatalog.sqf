@@ -20,15 +20,12 @@ private _definitions = [
     ["JETS", "MWF_Preset_Jets", "MWF_Preset_Jets_T5", "JETS"]
 ];
 
-private _corePresetVars = [
-    "MWF_Preset_Light",
-    "MWF_Preset_APC",
-    "MWF_Preset_Tanks",
-    "MWF_Preset_Helis",
-    "MWF_Preset_Jets"
-];
+private _catalog = [];
+private _totalEntries = 0;
+private _emptyCategories = [];
+private _invalidEntries = 0;
 
-private _allPresetVars = [
+private _catalogVarNames = [
     "MWF_Preset_Light",
     "MWF_Preset_APC",
     "MWF_Preset_Tanks",
@@ -38,91 +35,55 @@ private _allPresetVars = [
     "MWF_Preset_Armor_T5",
     "MWF_Preset_Tanks_T5",
     "MWF_Preset_Helis_T5",
-    "MWF_Preset_Jets_T5",
-    "MWF_Heli_Tower_Class",
-    "MWF_Jet_Control_Class",
-    "MWF_Respawn_Truck",
-    "MWF_Respawn_Heli"
+    "MWF_Preset_Jets_T5"
 ];
 
-private _countValidPresetRows = {
-    params ["_source"];
-
-    private _count = 0;
+private _bootstrapPresetLocally = {
+    private _needsBootstrap = true;
     {
-        if (_x isEqualType [] && {(count _x) >= 2}) then {
-            private _className = _x param [0, "", [""]];
-            if !(_className isEqualTo "") then {
-                _count = _count + 1;
-            };
+        private _value = missionNamespace getVariable [_x, nil];
+        if (!isNil "_value" && {_value isEqualType []} && {(count _value) > 0}) exitWith {
+            _needsBootstrap = false;
         };
-    } forEach _source;
+    } forEach _catalogVarNames;
 
-    _count
-};
-
-private _readPresetVar = {
-    params ["_varName"];
-
-    private _value = missionNamespace getVariable [_varName, nil];
-    if (!isNil "_value") exitWith { _value };
-
-    if !(isNil _varName) exitWith { missionNamespace getVariable [_varName, call compile _varName] };
-
-    nil
-};
-
-private _ensureClientPresetData = {
-    if (isServer) exitWith { false };
-    if (missionNamespace getVariable ["MWF_VehicleMenu_PresetBootstrapAttempted", false]) exitWith { false };
-
-    private _hasAnyPresetData = false;
-    {
-        private _value = [_x] call _readPresetVar;
-        if (_value isEqualType [] && {([_value] call _countValidPresetRows) > 0}) exitWith {
-            _hasAnyPresetData = true;
-        };
-    } forEach _corePresetVars;
-
-    if (_hasAnyPresetData) exitWith { false };
-
-    missionNamespace setVariable ["MWF_VehicleMenu_PresetBootstrapAttempted", true];
+    if (!_needsBootstrap) exitWith { false };
 
     private _resolvedFile = missionNamespace getVariable ["MWF_Locked_BluforFile", ""];
+
     if (_resolvedFile isEqualTo "") then {
-        private _registry = missionNamespace getVariable ["MWF_FactionPresets", createHashMap];
-        if (_registry isEqualType createHashMap) then {
-            private _entry = _registry getOrDefault ["BLUFOR", createHashMap];
-            if (_entry isEqualType createHashMap) then {
-                _resolvedFile = _entry getOrDefault ["file", ""];
+        private _factionPresets = missionNamespace getVariable ["MWF_FactionPresets", createHashMap];
+        if (_factionPresets isEqualType createHashMap) then {
+            private _bluforInfo = _factionPresets getOrDefault ["BLUFOR", createHashMap];
+            if (_bluforInfo isEqualType createHashMap) then {
+                _resolvedFile = _bluforInfo getOrDefault ["file", ""];
             };
         };
     };
 
-    if (_resolvedFile isEqualTo "") exitWith { false };
-    if !(fileExists _resolvedFile) exitWith {
-        diag_log format ["[MWF] Vehicle catalog bootstrap failed. Missing preset file on client: %1", _resolvedFile];
-        false
+    if (_resolvedFile isEqualTo "") then {
+        _resolvedFile = "preset\blufor\NATO.sqf";
     };
+
+    if !(fileExists _resolvedFile) exitWith { false };
 
     call compile preprocessFileLineNumbers _resolvedFile;
 
     {
-        if (isNil { missionNamespace getVariable _x }) then {
-            missionNamespace setVariable [_x, []];
+        private _value = missionNamespace getVariable [_x, nil];
+        if (!isNil "_value") then {
+            if (_value isEqualType []) then {
+                missionNamespace setVariable [_x, +_value];
+            } else {
+                missionNamespace setVariable [_x, _value];
+            };
         };
-    } forEach _allPresetVars;
+    } forEach _catalogVarNames;
 
-    diag_log format ["[MWF] Vehicle catalog bootstrap loaded preset locally on client: %1", _resolvedFile];
     true
 };
 
-private _bootstrapTriggered = call _ensureClientPresetData;
-
-private _catalog = [];
-private _totalEntries = 0;
-private _emptyCategories = [];
-private _invalidEntries = 0;
+call _bootstrapPresetLocally;
 
 private _classMatchesCategory = {
     params ["_className", "_category", ["_isTier5", false, [false]]];
@@ -188,15 +149,13 @@ private _appendEntries = {
     _x params ["_category", "_varName", "_tier5VarName", "_requiredUnlock"];
 
     private _entries = [];
-    private _source = [_varName] call _readPresetVar;
-    if !(_source isEqualType []) then { _source = []; };
+    private _source = missionNamespace getVariable [_varName, []];
     _entries = [_entries, _source, _requiredUnlock, false, _category] call _appendEntries;
 
     private _tier5Source = if (_tier5VarName isEqualTo "") then {
         []
     } else {
-        private _tierSource = [_tier5VarName] call _readPresetVar;
-        if (_tierSource isEqualType []) then { _tierSource } else { [] };
+        missionNamespace getVariable [_tier5VarName, []]
     };
     _entries = [_entries, _tier5Source, _requiredUnlock, true, _category] call _appendEntries;
 
@@ -211,8 +170,7 @@ private _appendEntries = {
 _catalog pushBack ["__META__", [
     ["totalEntries", _totalEntries],
     ["emptyCategories", _emptyCategories],
-    ["invalidEntries", _invalidEntries],
-    ["bootstrapTriggered", _bootstrapTriggered]
+    ["invalidEntries", _invalidEntries]
 ]];
 
 _catalog
