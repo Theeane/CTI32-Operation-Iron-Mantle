@@ -32,6 +32,12 @@ class CfgFunctions {
             class uiGoBack                      { file = "ui\datahub\MWF_fnc_uiGoBack.sqf"; };
             class openGuide                     { file = "ui\guide\MWF_fn_openGuide.sqf"; };
             class vehicleMenuMode               { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuMode.sqf"; };
+            class vehicleMenuClear              { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuClear.sqf"; };
+            class vehicleMenuRefresh            { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuRefresh.sqf"; };
+            class vehicleMenuSetCategory        { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSetCategory.sqf"; };
+            class vehicleMenuSelectEntry        { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSelectEntry.sqf"; };
+            class vehicleMenuPrimaryAction      { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuPrimaryAction.sqf"; };
+            class vehicleMenuSecondaryAction    { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSecondaryAction.sqf"; };
             class missionsMode                  { file = "ui\Missions\MWF_fnc_missionsMode.sqf"; };
             class mainOperationsMode            { file = "ui\MainOperations\MWF_fnc_mainOperationsMode.sqf"; };
             class buildSupportMode              { file = "ui\BuildSupport\MWF_fnc_buildSupportMode.sqf"; };

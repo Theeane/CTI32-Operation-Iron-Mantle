@@ -3,4 +3,18 @@ params [
     ["_mode", "ZONES", [""]]
 ];
 
-[_display, _mode] call MWF_fnc_refreshDataMap
+if (isNull _display) exitWith { false };
+
+private _modeUpper = toUpper _mode;
+
+if !(_modeUpper isEqualTo "VEHICLE_MENU") then {
+    [] call MWF_fnc_vehicleMenuClear;
+};
+
+private _result = [_display, _modeUpper] call MWF_fnc_refreshDataMap;
+
+if (_modeUpper isEqualTo "VEHICLE_MENU") then {
+    [_display] call MWF_fnc_vehicleMenuRefresh;
+};
+
+_result

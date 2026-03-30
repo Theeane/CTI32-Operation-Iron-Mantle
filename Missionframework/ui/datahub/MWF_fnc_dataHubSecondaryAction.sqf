@@ -3,6 +3,10 @@ if (isNull _display) exitWith { false };
 
 private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
 
+if (_modeNow isEqualTo "VEHICLE_MENU") exitWith {
+    [] call MWF_fnc_vehicleMenuSecondaryAction
+};
+
 if (_modeNow isEqualTo "SUPPORT") exitWith {
     private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
     if (_selected isEqualTo []) exitWith { false };
