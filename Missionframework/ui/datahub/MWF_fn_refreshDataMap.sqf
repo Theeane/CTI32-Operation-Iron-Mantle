@@ -57,6 +57,7 @@ private _statusCtrl = _display displayCtrl 12206;
 private _actionCtrl = _display displayCtrl 12207;
 private _infoCtrl = _display displayCtrl 12216;
 private _leftCtrl = _display displayCtrl 12215;
+private _modeDefinition = [_modeUpper] call MWF_fnc_dataHubResolveModeDefinition;
 
 if (!isNull _statusCtrl) then {
     private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
@@ -72,31 +73,15 @@ if (!isNull _infoCtrl) then {
 };
 
 if (!isNull _leftCtrl) then {
-    private _leftText = switch (_modeUpper) do {
-        case "SUPPORT": {"Build Group"};
-        case "SIDE_MISSIONS": {"Missions"};
-        case "UPGRADES": {"Missions"};
-        case "MAIN_OPERATIONS": {"Missions"};
-        default {"Missions"};
-    };
-
-    _leftCtrl ctrlSetText _leftText;
-    _leftCtrl ctrlEnable !(_modeUpper isEqualTo "SIDE_MISSIONS");
+    _leftCtrl ctrlSetText (_modeDefinition getOrDefault ["secondaryLabel", "Missions"]);
+    _leftCtrl ctrlEnable (_modeDefinition getOrDefault ["secondaryEnabled", true]);
+    _leftCtrl ctrlSetTooltip (_modeDefinition getOrDefault ["secondaryTooltip", _modeDefinition getOrDefault ["secondaryLabel", "Missions"]]);
 };
 
 if (!isNull _actionCtrl) then {
-    private _actionText = switch (_modeUpper) do {
-        case "REDEPLOY": {"Redeploy"};
-        case "SUPPORT": {"Build Unit"};
-        case "UPGRADES": {"Inspect"};
-        case "SIDE_MISSIONS";
-        case "MAIN_OPERATIONS": {"Accept"};
-        default {"Back"};
-    };
-
-    private _actionEnabled = !(_modeUpper in ["REDEPLOY", "SUPPORT", "SIDE_MISSIONS", "MAIN_OPERATIONS", "UPGRADES"]);
-    _actionCtrl ctrlSetText _actionText;
-    _actionCtrl ctrlEnable _actionEnabled;
+    _actionCtrl ctrlSetText (_modeDefinition getOrDefault ["primaryLabel", "Back"]);
+    _actionCtrl ctrlEnable (_modeDefinition getOrDefault ["primaryEnabled", false]);
+    _actionCtrl ctrlSetTooltip (_modeDefinition getOrDefault ["primaryTooltip", _modeDefinition getOrDefault ["primaryLabel", "Back"]]);
 };
 
 private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];

@@ -352,7 +352,7 @@ switch (_modeUpper) do {
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         _display displayAddEventHandler ["KeyDown", { params ["_display", "_dikCode"]; if (_dikCode isEqualTo 1) exitWith { if !(["BACK"] call MWF_fnc_dataHub) then { ["CLOSE"] call MWF_fnc_dataHub; }; true }; false }];
 
-        ["SET_MODE", _initialMode] call MWF_fnc_dataHub;
+        [_initialMode] call MWF_fnc_dataHubSetMode;
         true
     };
 
@@ -372,22 +372,7 @@ switch (_modeUpper) do {
     };
 
     case "SET_MODE": {
-        private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
-        if (isNull _display) exitWith { false };
-
-        private _newMode = if (_payload isEqualType "") then { toUpper _payload } else { toUpper (_payload param [0, "", [""]]) };
-        if !(_newMode in ["ZONES", "UPGRADES", "SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT"]) exitWith { false };
-        private _currentMode = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
-        if !(_newMode isEqualTo _currentMode) then {
-            private _stack = uiNamespace getVariable ["MWF_DataHub_ViewStack", []];
-            _stack pushBack _currentMode;
-            uiNamespace setVariable ["MWF_DataHub_ViewStack", _stack];
-        };
-
-        uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
-        uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
-        [_display, _newMode] call MWF_fnc_refreshDataMap;
-        true
+        [_payload] call MWF_fnc_dataHubSetMode
     };
 
     case "MAP_CLICK": {
@@ -440,7 +425,7 @@ switch (_modeUpper) do {
         if !(_selected isEqualTo [] && {_selectedRespawn isEqualTo []}) exitWith {
             uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
             uiNamespace setVariable ["MWF_DataHub_SelectedRespawn", []];
-            [_display, uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"]] call MWF_fnc_refreshDataMap;
+            [_display, uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"]] call MWF_fnc_dataHubRefresh;
             true
         };
 
@@ -456,195 +441,11 @@ switch (_modeUpper) do {
     };
 
     case "ACTION": {
-        private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
-        if (isNull _display) exitWith { false };
-
-        private _statusCtrl = _display displayCtrl 12206;
-        private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
-
-        if (_modeNow isEqualTo "SUPPORT") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            ["BUILD_UNIT", _meta getOrDefault ["index", 1], player] call MWF_fnc_terminal_support;
-            true
-        };
-
-        if (_modeNow isEqualTo "REDEPLOY") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedRespawn", []];
-            private _result = [_selected] call _performRedeploy;
-            if (_result param [0, false]) then {
-                ["CLOSE"] call MWF_fnc_dataHub;
-                true
-            } else {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText (_result param [1, "Redeploy failed."]);
-                };
-                false
-            }
-        };
-
-
-        if (_modeNow isEqualTo "UPGRADES") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            private _actionMode = _meta getOrDefault ["actionMode", "LOCKED"];
-            private _tooltipText = _meta getOrDefault ["tooltipText", "Upgrade locked."];
-
-            switch (_actionMode) do {
-                case "VEHICLE_MENU": {
-                    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
-                    ["CLOSE"] call MWF_fnc_dataHub;
-                    ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu;
-                    true
-                };
-                case "BASE_BUILDING": {
-                    private _buildClass = _meta getOrDefault ["buildClass", ""];
-                    private _buildCost = _meta getOrDefault ["buildCost", 0];
-                    if (_buildClass isEqualTo "") exitWith {
-                        if (!isNull _statusCtrl) then {
-                            _statusCtrl ctrlSetText "Upgrade build data missing.";
-                        };
-                        false
-                    };
-                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    ["CLOSE"] call MWF_fnc_dataHub;
-                    [_buildClass, _buildCost] spawn MWF_fnc_startBuildPlacement;
-                    true
-                };
-                case "GARAGE_BUILD": {
-                    private _buildClass = _meta getOrDefault ["buildClass", ""];
-                    private _buildCost = _meta getOrDefault ["buildCost", 0];
-                    if (_buildClass isEqualTo "") exitWith {
-                        if (!isNull _statusCtrl) then {
-                            _statusCtrl ctrlSetText "Virtual garage build data missing.";
-                        };
-                        false
-                    };
-                    [["VIRTUAL GARAGE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    ["CLOSE"] call MWF_fnc_dataHub;
-                    [_buildClass, _buildCost] spawn MWF_fnc_startBuildPlacement;
-                    true
-                };
-                case "GARAGE_INFO": {
-                    [["VIRTUAL GARAGE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    if (!isNull _statusCtrl) then {
-                        _statusCtrl ctrlSetText _tooltipText;
-                    };
-                    false
-                };
-                case "TIER5_INFO": {
-                    [["BASE UPGRADE", _tooltipText], "info"] call MWF_fnc_showNotification;
-                    if (!isNull _statusCtrl) then {
-                        _statusCtrl ctrlSetText _tooltipText;
-                    };
-                    false
-                };
-                default {
-                    if (!isNull _statusCtrl) then {
-                        _statusCtrl ctrlSetText _tooltipText;
-                    };
-                    false
-                };
-            };
-        };
-
-        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            private _access = ["MISSION_HUB"] call MWF_fnc_validateTerminalAccess;
-            if !(_access param [0, false]) exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText (_access param [1, "Mission Hub unavailable."]);
-                };
-                false
-            };
-
-            private _state = toLower (_meta getOrDefault ["state", "available"]);
-            if !(_state isEqualTo "available") exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText format ["Mission not available: %1", _selected param [1, "Unknown"]];
-                };
-                false
-            };
-
-            private _slotIndex = _meta getOrDefault ["slotIndex", -1];
-            if (_slotIndex < 0) exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText "Mission slot metadata missing.";
-                };
-                false
-            };
-
-            ["CLOSE"] call MWF_fnc_dataHub;
-            [_slotIndex, player] remoteExecCall ["MWF_fnc_activateMissionBoardSlot", 2];
-            [["MISSION BOARD", format ["Requested mission: %1", _selected param [1, "Unknown"]]], "info"] call MWF_fnc_showNotification;
-            true
-        };
-
-        if (_modeNow isEqualTo "MAIN_OPERATIONS") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            private _access = ["MAIN_OPERATIONS"] call MWF_fnc_validateTerminalAccess;
-            if !(_access param [0, false]) exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText (_access param [1, "Main Operations unavailable."]);
-                };
-                false
-            };
-
-            private _key = _meta getOrDefault ["key", ""];
-            private _ops = [] call MWF_fnc_getMainOperationRegistry;
-            private _opIndex = _ops findIf { (_x # 0) isEqualTo _key };
-            if (_opIndex < 0) exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText "Main operation metadata missing.";
-                };
-                false
-            };
-
-            private _state = [_key, _ops # _opIndex] call MWF_fnc_getMainOperationState;
-            if !(_state getOrDefault ["isAvailable", false]) exitWith {
-                if (!isNull _statusCtrl) then {
-                    _statusCtrl ctrlSetText (_state getOrDefault ["tooltipText", "Operation unavailable."]);
-                };
-                false
-            };
-
-            ["CLOSE"] call MWF_fnc_dataHub;
-            ["START_SERVER", _opIndex, clientOwner] remoteExecCall ["MWF_fnc_terminal_mainOperations", 2];
-            [["MAIN OPERATION", format ["Requested operation: %1", _selected param [1, "Unknown"]]], "info"] call MWF_fnc_showNotification;
-            true
-        };
-
-        ["CLOSE"] call MWF_fnc_dataHub;
-        true
+        [] call MWF_fnc_dataHubPrimaryAction
     };
 
     case "ACTION_SECONDARY": {
-        private _display = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
-        if (isNull _display) exitWith { false };
-
-        private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
-
-        if (_modeNow isEqualTo "SUPPORT") exitWith {
-            private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
-            if (_selected isEqualTo []) exitWith { false };
-            private _meta = _selected param [3, createHashMap, [createHashMap]];
-            ["BUILD_GROUP", _meta getOrDefault ["index", 1], player] call MWF_fnc_terminal_support;
-            true
-        };
-
-        if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith { false };
-
-        ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
-        true
+        [] call MWF_fnc_dataHubSecondaryAction
     };
 
     default { false };
