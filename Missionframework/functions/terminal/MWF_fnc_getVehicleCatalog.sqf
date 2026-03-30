@@ -20,6 +20,105 @@ private _definitions = [
     ["JETS", "MWF_Preset_Jets", "MWF_Preset_Jets_T5", "JETS"]
 ];
 
+private _corePresetVars = [
+    "MWF_Preset_Light",
+    "MWF_Preset_APC",
+    "MWF_Preset_Tanks",
+    "MWF_Preset_Helis",
+    "MWF_Preset_Jets"
+];
+
+private _allPresetVars = [
+    "MWF_Preset_Light",
+    "MWF_Preset_APC",
+    "MWF_Preset_Tanks",
+    "MWF_Preset_Helis",
+    "MWF_Preset_Jets",
+    "MWF_Preset_Light_T5",
+    "MWF_Preset_Armor_T5",
+    "MWF_Preset_Tanks_T5",
+    "MWF_Preset_Helis_T5",
+    "MWF_Preset_Jets_T5",
+    "MWF_Heli_Tower_Class",
+    "MWF_Jet_Control_Class",
+    "MWF_Respawn_Truck",
+    "MWF_Respawn_Heli"
+];
+
+private _countValidPresetRows = {
+    params ["_source"];
+
+    private _count = 0;
+    {
+        if (_x isEqualType [] && {(count _x) >= 2}) then {
+            private _className = _x param [0, "", [""]];
+            if !(_className isEqualTo "") then {
+                _count = _count + 1;
+            };
+        };
+    } forEach _source;
+
+    _count
+};
+
+private _readPresetVar = {
+    params ["_varName"];
+
+    private _value = missionNamespace getVariable [_varName, nil];
+    if (!isNil "_value") exitWith { _value };
+
+    if !(isNil _varName) exitWith { missionNamespace getVariable [_varName, call compile _varName] };
+
+    nil
+};
+
+private _ensureClientPresetData = {
+    if (isServer) exitWith { false };
+    if (missionNamespace getVariable ["MWF_VehicleMenu_PresetBootstrapAttempted", false]) exitWith { false };
+
+    private _hasAnyPresetData = false;
+    {
+        private _value = [_x] call _readPresetVar;
+        if (_value isEqualType [] && {([_value] call _countValidPresetRows) > 0}) exitWith {
+            _hasAnyPresetData = true;
+        };
+    } forEach _corePresetVars;
+
+    if (_hasAnyPresetData) exitWith { false };
+
+    missionNamespace setVariable ["MWF_VehicleMenu_PresetBootstrapAttempted", true];
+
+    private _resolvedFile = missionNamespace getVariable ["MWF_Locked_BluforFile", ""];
+    if (_resolvedFile isEqualTo "") then {
+        private _registry = missionNamespace getVariable ["MWF_FactionPresets", createHashMap];
+        if (_registry isEqualType createHashMap) then {
+            private _entry = _registry getOrDefault ["BLUFOR", createHashMap];
+            if (_entry isEqualType createHashMap) then {
+                _resolvedFile = _entry getOrDefault ["file", ""];
+            };
+        };
+    };
+
+    if (_resolvedFile isEqualTo "") exitWith { false };
+    if !(fileExists _resolvedFile) exitWith {
+        diag_log format ["[MWF] Vehicle catalog bootstrap failed. Missing preset file on client: %1", _resolvedFile];
+        false
+    };
+
+    call compile preprocessFileLineNumbers _resolvedFile;
+
+    {
+        if (isNil { missionNamespace getVariable _x }) then {
+            missionNamespace setVariable [_x, []];
+        };
+    } forEach _allPresetVars;
+
+    diag_log format ["[MWF] Vehicle catalog bootstrap loaded preset locally on client: %1", _resolvedFile];
+    true
+};
+
+private _bootstrapTriggered = call _ensureClientPresetData;
+
 private _catalog = [];
 private _totalEntries = 0;
 private _emptyCategories = [];
@@ -89,13 +188,15 @@ private _appendEntries = {
     _x params ["_category", "_varName", "_tier5VarName", "_requiredUnlock"];
 
     private _entries = [];
-    private _source = missionNamespace getVariable [_varName, []];
+    private _source = [_varName] call _readPresetVar;
+    if !(_source isEqualType []) then { _source = []; };
     _entries = [_entries, _source, _requiredUnlock, false, _category] call _appendEntries;
 
     private _tier5Source = if (_tier5VarName isEqualTo "") then {
         []
     } else {
-        missionNamespace getVariable [_tier5VarName, []]
+        private _tierSource = [_tier5VarName] call _readPresetVar;
+        if (_tierSource isEqualType []) then { _tierSource } else { [] };
     };
     _entries = [_entries, _tier5Source, _requiredUnlock, true, _category] call _appendEntries;
 
@@ -110,7 +211,8 @@ private _appendEntries = {
 _catalog pushBack ["__META__", [
     ["totalEntries", _totalEntries],
     ["emptyCategories", _emptyCategories],
-    ["invalidEntries", _invalidEntries]
+    ["invalidEntries", _invalidEntries],
+    ["bootstrapTriggered", _bootstrapTriggered]
 ]];
 
 _catalog
