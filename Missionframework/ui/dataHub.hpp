@@ -4,6 +4,7 @@
 
     Description:
     Unified command/data hub terminal shell.
+    UI lock pass only.
 */
 
 class MWF_RscDataHubMapControl {
@@ -12,12 +13,10 @@ class MWF_RscDataHubMapControl {
     idc = -1;
     style = 48;
     shadow = 0;
-
     x = 0;
     y = 0;
     w = 0.2;
     h = 0.2;
-
     moveOnEdges = 1;
     ptsPerSquareSea = 5;
     ptsPerSquareTxt = 20;
@@ -29,14 +28,12 @@ class MWF_RscDataHubMapControl {
     ptsPerSquareRoad = 6;
     ptsPerSquareObj = 9;
     showCountourInterval = 0;
-
     scaleMin = 0.001;
     scaleMax = 1;
     scaleDefault = 0.16;
     maxSatelliteAlpha = 0.85;
     alphaFadeStartScale = 0.15;
     alphaFadeEndScale = 0.29;
-
     colorBackground[] = {0.969,0.957,0.949,1};
     colorOutside[] = {0,0,0,1};
     colorText[] = {0,0,0,1};
@@ -66,7 +63,6 @@ class MWF_RscDataHubMapControl {
     widthTracks = 0.35;
     colorGrid[] = {0.1,0.1,0.1,0.6};
     colorGridMap[] = {0.1,0.1,0.1,0.6};
-
     font = "RobotoCondensed";
     sizeEx = 0.04;
     fontLabel = "RobotoCondensed";
@@ -81,7 +77,6 @@ class MWF_RscDataHubMapControl {
     sizeExInfo = 0.03;
     fontLevel = "RobotoCondensed";
     sizeExLevel = 0.03;
-
     text = "#(argb,8,8,3)color(1,1,1,1)";
 
     class Legend {
@@ -138,117 +133,93 @@ class MWF_RscDataHub {
             h = 0.026 * safezoneH;
         };
 
-        class BtnGuideBG: RscPicture {
-            idc = -1;
-            text = "ui\button_bg.paa";
-            x = 0.110 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.130 * safezoneW;
-            h = 0.090 * safezoneH;
-        };
-
-        class BtnGuide: MWF_RscTerminalButton {
-            idc = 12209;
-            text = "$STR_MWF_GUIDE_BUTTON";
-            x = 0.110 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.130 * safezoneW;
-            h = 0.090 * safezoneH;
-            action = "uiNamespace setVariable ['MWF_Guide_ReturnMode', uiNamespace getVariable ['MWF_DataHub_Mode','ZONES']]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', 'START'] call MWF_fnc_openGuide;";
-        };
-
         class BtnVehicleBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.245 * safezoneW + safezoneX;
+            x = 0.170 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
         };
-
         class BtnVehicle: MWF_RscTerminalButton {
             idc = 12210;
             text = "Vehicle Menu";
-            x = 0.245 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            x = 0.178 * safezoneW + safezoneX;
+            y = 0.179 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', _terminal] call MWF_fnc_terminal_vehicleMenu;";
         };
 
         class BtnBuildBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.392 * safezoneW + safezoneX;
+            x = 0.300 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
         };
-
         class BtnBuild: MWF_RscTerminalButton {
             idc = 12211;
             text = "Base Building";
-            x = 0.392 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            x = 0.308 * safezoneW + safezoneX;
+            y = 0.179 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; [_terminal] spawn MWF_fnc_enterBuildMode;";
         };
 
         class BtnMainOpsBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.539 * safezoneW + safezoneX;
+            x = 0.430 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
         };
-
         class BtnMainOps: MWF_RscTerminalButton {
             idc = 12212;
             text = "Main Operations";
-            x = 0.539 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            x = 0.438 * safezoneW + safezoneX;
+            y = 0.179 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_MODE','MAIN_OPERATIONS'] call MWF_fnc_dataHub;";
         };
 
         class BtnSupportBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.686 * safezoneW + safezoneX;
+            x = 0.560 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
         };
-
         class BtnSupport: MWF_RscTerminalButton {
             idc = 12213;
             text = "Build Support";
-            x = 0.686 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.145 * safezoneW;
-            h = 0.090 * safezoneH;
+            x = 0.568 * safezoneW + safezoneX;
+            y = 0.179 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;";
         };
 
         class BtnUpgradesBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.833 * safezoneW + safezoneX;
+            x = 0.690 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
-            w = 0.130 * safezoneW;
-            h = 0.090 * safezoneH;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
         };
-
         class BtnUpgrades: MWF_RscTerminalButton {
             idc = 12214;
             text = "Base Upgrades";
-            x = 0.833 * safezoneW + safezoneX;
-            y = 0.168 * safezoneH + safezoneY;
-            w = 0.130 * safezoneW;
-            h = 0.090 * safezoneH;
+            x = 0.698 * safezoneW + safezoneX;
+            y = 0.179 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
             action = "['SET_MODE','UPGRADES'] call MWF_fnc_dataHub;";
         };
 
@@ -300,25 +271,6 @@ class MWF_RscDataHub {
             w = 0.144 * safezoneW;
             h = 0.090 * safezoneH;
         };
-
-        class BtnGuideBG: RscPicture {
-            idc = -1;
-            text = "ui\button_bg.paa";
-            x = 0.424 * safezoneW + safezoneX;
-            y = 0.698 * safezoneH + safezoneY;
-            w = 0.156 * safezoneW;
-            h = 0.090 * safezoneH;
-        };
-
-        class BtnActionBG: RscPicture {
-            idc = -1;
-            text = "ui\button_bg.paa";
-            x = 0.680 * safezoneW + safezoneX;
-            y = 0.698 * safezoneH + safezoneY;
-            w = 0.144 * safezoneW;
-            h = 0.090 * safezoneH;
-        };
-
         class BtnSideMissions: MWF_RscTerminalButton {
             idc = 12215;
             text = "Missions";
@@ -329,6 +281,14 @@ class MWF_RscDataHub {
             action = "['ACTION_SECONDARY'] call MWF_fnc_dataHub;";
         };
 
+        class BtnGuideBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.424 * safezoneW + safezoneX;
+            y = 0.698 * safezoneH + safezoneY;
+            w = 0.156 * safezoneW;
+            h = 0.090 * safezoneH;
+        };
         class BtnGuide: MWF_RscTerminalButton {
             idc = 12209;
             text = "$STR_MWF_GUIDE_BUTTON";
@@ -339,9 +299,17 @@ class MWF_RscDataHub {
             action = "uiNamespace setVariable ['MWF_Guide_ReturnMode', uiNamespace getVariable ['MWF_DataHub_Mode','ZONES']]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', 'START'] call MWF_fnc_openGuide;";
         };
 
+        class BtnActionBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.680 * safezoneW + safezoneX;
+            y = 0.698 * safezoneH + safezoneY;
+            w = 0.144 * safezoneW;
+            h = 0.090 * safezoneH;
+        };
         class BtnAction: MWF_RscTerminalButton {
             idc = 12207;
-            text = "Back";
+            text = "Redeploy";
             x = 0.692 * safezoneW + safezoneX;
             y = 0.709 * safezoneH + safezoneY;
             w = 0.118 * safezoneW;
