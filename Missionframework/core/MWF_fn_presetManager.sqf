@@ -320,6 +320,7 @@ diag_log "[MWF] Preset manager initialized.";
     "MWF_Preset_Jets",
     "MWF_Preset_Light_T5",
     "MWF_Preset_Armor_T5",
+    "MWF_Preset_Tanks_T5",
     "MWF_Preset_Helis_T5",
     "MWF_Preset_Jets_T5",
     "MWF_Heli_Tower_Class",

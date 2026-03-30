@@ -15,7 +15,7 @@
 private _definitions = [
     ["LIGHT", "MWF_Preset_Light", "MWF_Preset_Light_T5", ""],
     ["APC", "MWF_Preset_APC", "MWF_Preset_Armor_T5", "ARMOR"],
-    ["TANKS", "MWF_Preset_Tanks", "MWF_Preset_Armor_T5", "ARMOR"],
+    ["TANKS", "MWF_Preset_Tanks", "MWF_Preset_Tanks_T5", "TANKS"],
     ["HELIS", "MWF_Preset_Helis", "MWF_Preset_Helis_T5", "HELI"],
     ["JETS", "MWF_Preset_Jets", "MWF_Preset_Jets_T5", "JETS"]
 ];
