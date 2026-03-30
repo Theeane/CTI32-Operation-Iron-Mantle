@@ -5,7 +5,8 @@ private _statusCtrl = _display displayCtrl 12206;
 private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
 
 if (_modeNow isEqualTo "VEHICLE_MENU") exitWith {
-    [] call MWF_fnc_vehicleMenuPrimaryAction
+    private _terminal = uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]];
+    ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu
 };
 
 if (_modeNow isEqualTo "SUPPORT") exitWith {
@@ -59,7 +60,8 @@ if (_modeNow isEqualTo "UPGRADES") exitWith {
 
     switch (_actionMode) do {
         case "VEHICLE_MENU": {
-            ["SET_MODE", "VEHICLE_MENU"] call MWF_fnc_dataHub;
+            private _terminal = uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]];
+            ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu;
             true
         };
         case "BASE_BUILDING";
