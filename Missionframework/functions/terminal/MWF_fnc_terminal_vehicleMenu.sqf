@@ -318,10 +318,10 @@ switch (_modeUpper) do {
                 _listBox lbSetTooltip [_idx, _tooltip];
 
                 if (_isLocked) then {
-                    _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
+                    _listBox lbSetColor [_idx, [1, 0.25, 0.25, 1]];
                 } else {
                     if (!_canAfford) then {
-                        _listBox lbSetColor [_idx, [1, 0.3, 0.3, 1]];
+                        _listBox lbSetColor [_idx, [0.45, 0.45, 0.45, 1]];
                     };
                 };
             } forEach _entries;
@@ -425,8 +425,6 @@ switch (_modeUpper) do {
             false
         };
 
-        missionNamespace setVariable ["MWF_VehicleMenu_CurrentEntries", _entries];
-        missionNamespace setVariable ["MWF_VehicleMenu_LastTerminal", missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", _terminal]];
         [] spawn MWF_fnc_vehicleMenuPurchase
     };
 

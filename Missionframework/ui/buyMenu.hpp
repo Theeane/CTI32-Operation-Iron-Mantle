@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Separate terminal-style vehicle purchase dialog.
+    Preset-driven vehicle menu frontend for the ghost-build purchase flow.
 */
 
 #define IDD_VEHICLE_MENU 9050
@@ -15,257 +15,223 @@
 #define IDC_VEHICLE_BUILD_BUTTON 9055
 #define IDC_VEHICLE_LIST_STATUS 9056
 #define IDC_VEHICLE_TERMINAL_STATUS 9057
-#define IDC_VEHICLE_ICON_PICTURE 9058
-#define IDC_VEHICLE_BTN_LIGHT 9060
-#define IDC_VEHICLE_BTN_APC 9061
-#define IDC_VEHICLE_BTN_TANKS 9062
-#define IDC_VEHICLE_BTN_HELIS 9063
-#define IDC_VEHICLE_BTN_JETS 9064
 
 class IronMantle_BuyMenu {
     idd = IDD_VEHICLE_MENU;
     movingEnable = false;
     enableSimulation = true;
 
-    class Controls {
+    class ControlsBackground {
         class BackgroundOuter: RscPicture {
             idc = -1;
             text = "ui\terminal_bg.paa";
-            x = 0.018 * safezoneW + safezoneX;
-            y = 0.010 * safezoneH + safezoneY;
-            w = 0.964 * safezoneW;
-            h = 0.930 * safezoneH;
+            x = 0.014 * safezoneW + safezoneX;
+            y = 0.004 * safezoneH + safezoneY;
+            w = 0.972 * safezoneW;
+            h = 0.944 * safezoneH;
         };
 
-        class HeaderBG: RscText {
+        class MainBG: RscText {
             idc = -1;
             x = 0.160 * safezoneW + safezoneX;
             y = 0.145 * safezoneH + safezoneY;
             w = 0.660 * safezoneW;
+            h = 0.640 * safezoneH;
+            colorBackground[] = {0, 0, 0, 0};
+        };
+
+        class HeaderBG: RscText {
+            idc = -1;
+            x = 0.164 * safezoneW + safezoneX;
+            y = 0.149 * safezoneH + safezoneY;
+            w = 0.652 * safezoneW;
             h = 0.032 * safezoneH;
             colorBackground[] = {0.12, 0.12, 0.12, 0.88};
         };
 
-        class HeaderText: RscText {
+        class StatusBG: RscText {
+            idc = -1;
+            x = 0.186 * safezoneW + safezoneX;
+            y = 0.252 * safezoneH + safezoneY;
+            w = 0.628 * safezoneW;
+            h = 0.442 * safezoneH;
+            colorBackground[] = {0, 0, 0, 0.20};
+        };
+    };
+
+    class Controls {
+        class TerminalStatus: RscStructuredText {
+            idc = IDC_VEHICLE_TERMINAL_STATUS;
+            text = "";
+            x = 0.170 * safezoneW + safezoneX;
+            y = 0.153 * safezoneH + safezoneY;
+            w = 0.640 * safezoneW;
+            h = 0.026 * safezoneH;
+        };
+
+        class CategoryLabel: RscText {
             idc = IDC_VEHICLE_CATEGORY_TEXT;
             text = "Vehicle Menu";
-            x = 0.170 * safezoneW + safezoneX;
-            y = 0.149 * safezoneH + safezoneY;
-            w = 0.330 * safezoneW;
-            h = 0.026 * safezoneH;
+            x = 0.190 * safezoneW + safezoneX;
+            y = 0.614 * safezoneH + safezoneY;
+            w = 0.300 * safezoneW;
+            h = 0.030 * safezoneH;
         };
 
         class SupplyInfo: RscText {
             idc = IDC_VEHICLE_SUPPLY_COUNT;
             text = "Supplies: 0";
             style = 1;
-            x = 0.620 * safezoneW + safezoneX;
-            y = 0.149 * safezoneH + safezoneY;
-            w = 0.190 * safezoneW;
-            h = 0.026 * safezoneH;
-            colorText[] = {0.65, 1, 0.65, 1};
-        };
-
-        class TerminalStatusBG: RscText {
-            idc = -1;
-            x = 0.166 * safezoneW + safezoneX;
-            y = 0.183 * safezoneH + safezoneY;
-            w = 0.648 * safezoneW;
-            h = 0.040 * safezoneH;
-            colorBackground[] = {0.08, 0.08, 0.08, 0.78};
-        };
-
-        class TerminalStatusText: RscStructuredText {
-            idc = IDC_VEHICLE_TERMINAL_STATUS;
-            text = "";
-            x = 0.172 * safezoneW + safezoneX;
-            y = 0.190 * safezoneH + safezoneY;
-            w = 0.636 * safezoneW;
-            h = 0.026 * safezoneH;
+            x = 0.514 * safezoneW + safezoneX;
+            y = 0.614 * safezoneH + safezoneY;
+            w = 0.296 * safezoneW;
+            h = 0.030 * safezoneH;
+            colorText[] = {0, 1, 0, 1};
         };
 
         class BtnLightBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.170 * safezoneW + safezoneX;
-            y = 0.236 * safezoneH + safezoneY;
-            w = 0.106 * safezoneW;
-            h = 0.070 * safezoneH;
+            x = 0.186 * safezoneW + safezoneX;
+            y = 0.188 * safezoneH + safezoneY;
+            w = 0.108 * safezoneW;
+            h = 0.066 * safezoneH;
         };
         class BtnLight: MWF_RscTerminalButton {
-            idc = IDC_VEHICLE_BTN_LIGHT;
-            text = "Cars";
-            x = 0.178 * safezoneW + safezoneX;
-            y = 0.247 * safezoneH + safezoneY;
-            w = 0.090 * safezoneW;
-            h = 0.048 * safezoneH;
+            text = "LIGHT";
+            x = 0.194 * safezoneW + safezoneX;
+            y = 0.198 * safezoneH + safezoneY;
+            w = 0.092 * safezoneW;
+            h = 0.046 * safezoneH;
             action = "['CATEGORY', objNull, ['LIGHT']] call MWF_fnc_terminal_vehicleMenu;";
         };
-
         class BtnAPCBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.282 * safezoneW + safezoneX;
-            y = 0.236 * safezoneH + safezoneY;
-            w = 0.106 * safezoneW;
-            h = 0.070 * safezoneH;
+            x = 0.298 * safezoneW + safezoneX;
+            y = 0.188 * safezoneH + safezoneY;
+            w = 0.108 * safezoneW;
+            h = 0.066 * safezoneH;
         };
         class BtnAPC: MWF_RscTerminalButton {
-            idc = IDC_VEHICLE_BTN_APC;
             text = "APC";
-            x = 0.290 * safezoneW + safezoneX;
-            y = 0.247 * safezoneH + safezoneY;
-            w = 0.090 * safezoneW;
-            h = 0.048 * safezoneH;
+            x = 0.306 * safezoneW + safezoneX;
+            y = 0.198 * safezoneH + safezoneY;
+            w = 0.092 * safezoneW;
+            h = 0.046 * safezoneH;
             action = "['CATEGORY', objNull, ['APC']] call MWF_fnc_terminal_vehicleMenu;";
         };
-
         class BtnTanksBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.394 * safezoneW + safezoneX;
-            y = 0.236 * safezoneH + safezoneY;
-            w = 0.106 * safezoneW;
-            h = 0.070 * safezoneH;
+            x = 0.410 * safezoneW + safezoneX;
+            y = 0.188 * safezoneH + safezoneY;
+            w = 0.108 * safezoneW;
+            h = 0.066 * safezoneH;
         };
         class BtnTanks: MWF_RscTerminalButton {
-            idc = IDC_VEHICLE_BTN_TANKS;
-            text = "Tanks";
-            x = 0.402 * safezoneW + safezoneX;
-            y = 0.247 * safezoneH + safezoneY;
-            w = 0.090 * safezoneW;
-            h = 0.048 * safezoneH;
+            text = "TANKS";
+            x = 0.418 * safezoneW + safezoneX;
+            y = 0.198 * safezoneH + safezoneY;
+            w = 0.092 * safezoneW;
+            h = 0.046 * safezoneH;
             action = "['CATEGORY', objNull, ['TANKS']] call MWF_fnc_terminal_vehicleMenu;";
         };
-
         class BtnHelisBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.506 * safezoneW + safezoneX;
-            y = 0.236 * safezoneH + safezoneY;
-            w = 0.106 * safezoneW;
-            h = 0.070 * safezoneH;
+            x = 0.522 * safezoneW + safezoneX;
+            y = 0.188 * safezoneH + safezoneY;
+            w = 0.108 * safezoneW;
+            h = 0.066 * safezoneH;
         };
         class BtnHelis: MWF_RscTerminalButton {
-            idc = IDC_VEHICLE_BTN_HELIS;
-            text = "Helis";
-            x = 0.514 * safezoneW + safezoneX;
-            y = 0.247 * safezoneH + safezoneY;
-            w = 0.090 * safezoneW;
-            h = 0.048 * safezoneH;
+            text = "HELIS";
+            x = 0.530 * safezoneW + safezoneX;
+            y = 0.198 * safezoneH + safezoneY;
+            w = 0.092 * safezoneW;
+            h = 0.046 * safezoneH;
             action = "['CATEGORY', objNull, ['HELIS']] call MWF_fnc_terminal_vehicleMenu;";
         };
-
         class BtnJetsBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.618 * safezoneW + safezoneX;
-            y = 0.236 * safezoneH + safezoneY;
-            w = 0.106 * safezoneW;
-            h = 0.070 * safezoneH;
+            x = 0.634 * safezoneW + safezoneX;
+            y = 0.188 * safezoneH + safezoneY;
+            w = 0.108 * safezoneW;
+            h = 0.066 * safezoneH;
         };
         class BtnJets: MWF_RscTerminalButton {
-            idc = IDC_VEHICLE_BTN_JETS;
-            text = "Jets";
-            x = 0.626 * safezoneW + safezoneX;
-            y = 0.247 * safezoneH + safezoneY;
-            w = 0.090 * safezoneW;
-            h = 0.048 * safezoneH;
+            text = "JETS";
+            x = 0.642 * safezoneW + safezoneX;
+            y = 0.198 * safezoneH + safezoneY;
+            w = 0.092 * safezoneW;
+            h = 0.046 * safezoneH;
             action = "['CATEGORY', objNull, ['JETS']] call MWF_fnc_terminal_vehicleMenu;";
-        };
-
-        class ListBG: RscText {
-            idc = -1;
-            x = 0.168 * safezoneW + safezoneX;
-            y = 0.315 * safezoneH + safezoneY;
-            w = 0.360 * safezoneW;
-            h = 0.430 * safezoneH;
-            colorBackground[] = {0.03, 0.03, 0.03, 0.82};
-        };
-
-        class InfoBG: RscText {
-            idc = -1;
-            x = 0.538 * safezoneW + safezoneX;
-            y = 0.315 * safezoneH + safezoneY;
-            w = 0.276 * safezoneW;
-            h = 0.430 * safezoneH;
-            colorBackground[] = {0.03, 0.03, 0.03, 0.70};
         };
 
         class ListStatus: RscText {
             idc = IDC_VEHICLE_LIST_STATUS;
             text = "Entries: 0";
-            x = 0.176 * safezoneW + safezoneX;
-            y = 0.286 * safezoneH + safezoneY;
-            w = 0.340 * safezoneW;
-            h = 0.020 * safezoneH;
-            colorText[] = {0.82, 0.82, 0.82, 1};
+            style = 1;
+            x = 0.190 * safezoneW + safezoneX;
+            y = 0.260 * safezoneH + safezoneY;
+            w = 0.620 * safezoneW;
+            h = 0.028 * safezoneH;
+            colorText[] = {0.85, 0.85, 0.85, 1};
         };
 
         class ListBox: RscListBox {
             idc = IDC_VEHICLE_ITEM_LIST;
-            x = 0.176 * safezoneW + safezoneX;
-            y = 0.322 * safezoneH + safezoneY;
-            w = 0.344 * safezoneW;
-            h = 0.410 * safezoneH;
-            rowHeight = 0.040 * safezoneH;
-            colorBackground[] = {0, 0, 0, 0.20};
-            colorSelectBackground[] = {0.82, 0.82, 0.82, 0.18};
-            colorSelectBackground2[] = {0.82, 0.82, 0.82, 0.18};
+            x = 0.190 * safezoneW + safezoneX;
+            y = 0.292 * safezoneH + safezoneY;
+            w = 0.620 * safezoneW;
+            h = 0.300 * safezoneH;
             onLBSelChanged = "['SHOW_SELECTION'] call MWF_fnc_terminal_vehicleMenu;";
-        };
-
-        class InfoIcon: RscPicture {
-            idc = IDC_VEHICLE_ICON_PICTURE;
-            text = "";
-            x = 0.560 * safezoneW + safezoneX;
-            y = 0.338 * safezoneH + safezoneY;
-            w = 0.060 * safezoneW;
-            h = 0.070 * safezoneH;
         };
 
         class InfoText: RscStructuredText {
             idc = IDC_VEHICLE_INFO_TEXT;
             text = "";
-            x = 0.630 * safezoneW + safezoneX;
-            y = 0.334 * safezoneH + safezoneY;
-            w = 0.170 * safezoneW;
-            h = 0.360 * safezoneH;
+            x = 0.514 * safezoneW + safezoneX;
+            y = 0.612 * safezoneH + safezoneY;
+            w = 0.296 * safezoneW;
+            h = 0.090 * safezoneH;
         };
 
-        class BtnBackBG: RscPicture {
+        class BuildBtnBG: RscPicture {
             idc = -1;
             text = "ui\button_bg.paa";
-            x = 0.170 * safezoneW + safezoneX;
-            y = 0.748 * safezoneH + safezoneY;
+            x = 0.690 * safezoneW + safezoneX;
+            y = 0.708 * safezoneH + safezoneY;
             w = 0.126 * safezoneW;
-            h = 0.080 * safezoneH;
-        };
-        class CloseBtn: MWF_RscTerminalButton {
-            text = "Back";
-            x = 0.178 * safezoneW + safezoneX;
-            y = 0.759 * safezoneH + safezoneY;
-            w = 0.110 * safezoneW;
-            h = 0.058 * safezoneH;
-            action = "closeDialog 0;";
-        };
-
-        class BtnPurchaseBG: RscPicture {
-            idc = -1;
-            text = "ui\button_bg.paa";
-            x = 0.688 * safezoneW + safezoneX;
-            y = 0.748 * safezoneH + safezoneY;
-            w = 0.126 * safezoneW;
-            h = 0.080 * safezoneH;
+            h = 0.092 * safezoneH;
         };
         class BuildBtn: MWF_RscTerminalButton {
             idc = IDC_VEHICLE_BUILD_BUTTON;
-            text = "Purchase";
-            x = 0.696 * safezoneW + safezoneX;
-            y = 0.759 * safezoneH + safezoneY;
+            text = "PURCHASE";
+            x = 0.698 * safezoneW + safezoneX;
+            y = 0.719 * safezoneH + safezoneY;
             w = 0.110 * safezoneW;
-            h = 0.058 * safezoneH;
+            h = 0.070 * safezoneH;
             action = "[] spawn MWF_fnc_vehicleMenuPurchase;";
+        };
+
+        class CloseBtnBG: RscPicture {
+            idc = -1;
+            text = "ui\button_bg.paa";
+            x = 0.170 * safezoneW + safezoneX;
+            y = 0.708 * safezoneH + safezoneY;
+            w = 0.126 * safezoneW;
+            h = 0.092 * safezoneH;
+        };
+        class CloseBtn: MWF_RscTerminalButton {
+            text = "CLOSE";
+            x = 0.178 * safezoneW + safezoneX;
+            y = 0.719 * safezoneH + safezoneY;
+            w = 0.110 * safezoneW;
+            h = 0.070 * safezoneH;
+            action = "closeDialog 0;";
         };
     };
 };
