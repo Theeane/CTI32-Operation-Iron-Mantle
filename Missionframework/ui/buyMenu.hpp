@@ -214,7 +214,7 @@ class IronMantle_BuyMenu {
             y = 0.719 * safezoneH + safezoneY;
             w = 0.110 * safezoneW;
             h = 0.070 * safezoneH;
-            action = "[] spawn MWF_fnc_vehicleMenuPurchase;";
+            action = "[] call MWF_fnc_vehicleMenuPurchase;";
         };
 
         class CloseBtnBG: RscPicture {

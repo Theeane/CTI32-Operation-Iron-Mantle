@@ -4,8 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Derives ghost placement behavior directly from a vehicle class.
-    No class-specific hardcoding is used; profile is driven by config type and detected bounds.
+    Returns a safe placement profile derived from config without spawning probe objects.
 
     Returns:
     [vehicleType, surfaceRule, previewDistance, previewHeight, diameter, safetyRadius, [width, length, height]]
@@ -15,7 +14,10 @@ params [
     ["_className", "", [""]]
 ];
 
-if (_className isEqualTo "") exitWith { ["LAND", "LAND", 5, 0, 4, 3, [2, 2, 2]] };
+if (_className isEqualTo "") exitWith { ["LAND", "LAND", 8, 0.05, 4, 3, [2, 4, 2]] };
+
+private _cfg = configFile >> "CfgVehicles" >> _className;
+if !(isClass _cfg) exitWith { ["LAND", "LAND", 8, 0.05, 4, 3, [2, 4, 2]] };
 
 private _vehicleType = "LAND";
 private _surfaceRule = "LAND";
@@ -26,67 +28,38 @@ if (_className isKindOf ["Ship", configFile >> "CfgVehicles"]) then {
 } else {
     if (_className isKindOf ["Air", configFile >> "CfgVehicles"]) then {
         _vehicleType = "AIR";
-        _surfaceRule = "LAND";
     };
 };
 
 private _diameter = sizeOf _className;
-private _width = _diameter max 2;
-private _length = _diameter max 2;
-private _height = 2;
+if (_diameter <= 0) then { _diameter = 4; };
 
-private _probe = objNull;
-try {
-    _probe = createSimpleObject [_className, [0, 0, 0], true];
-} catch {
-    _probe = objNull;
-};
+private _width = (_diameter * 0.45) max 1.8;
+private _length = (_diameter * 0.90) max 3.2;
+private _height = 2.2;
 
-if (!isNull _probe) then {
-    private _bb = boundingBoxReal _probe;
-    if ((count _bb) >= 2) then {
-        private _min = _bb select 0;
-        private _max = _bb select 1;
-        _width = abs ((_max select 0) - (_min select 0));
-        _length = abs ((_max select 1) - (_min select 1));
-        _height = abs ((_max select 2) - (_min select 2));
-        _diameter = (_width max _length) max _diameter;
-    };
-    deleteVehicle _probe;
-};
-
-private _previewDistance = 5;
-private _previewHeight = 0;
-private _safetyRadius = ((_diameter max 2) * 0.5) + 1;
+private _previewDistance = (_diameter + 5) max 8;
+private _previewHeight = 0.05;
+private _safetyRadius = ((_diameter * 0.5) + 2) max 3;
 
 switch (_vehicleType) do {
     case "WATER": {
-        _previewDistance = (10 max (_diameter + 8));
-        _previewHeight = 1;
-        _safetyRadius = ((_diameter max 4) * 0.5) + 4;
-        if (_diameter >= 20) then {
-            _previewDistance = _diameter + 30;
-            _safetyRadius = (_diameter * 0.5) + 30;
-        };
+        _previewDistance = (_diameter + 10) max 14;
+        _previewHeight = 1.0;
+        _safetyRadius = ((_diameter * 0.5) + 5) max 6;
+        _height = 4.0;
     };
-
     case "AIR": {
-        _previewDistance = (12 max (_diameter + 6));
-        _previewHeight = 0;
-        _safetyRadius = ((_diameter max 6) * 0.5) + 3;
-        if (_diameter >= 20) then {
-            _previewDistance = _diameter + 12;
-            _safetyRadius = (_diameter * 0.5) + 8;
-        };
+        _previewDistance = (_diameter + 8) max 12;
+        _previewHeight = 0.15;
+        _safetyRadius = ((_diameter * 0.5) + 3) max 5;
+        _height = 3.5;
     };
-
     default {
-        _previewDistance = (5 max (_diameter + 2));
-        _previewHeight = 0;
-        _safetyRadius = ((_diameter max 2) * 0.5) + 1;
-        if (_diameter >= 20) then {
-            _previewDistance = _diameter + 10;
-            _safetyRadius = (_diameter * 0.5) + 8;
+        if (_className isKindOf ["Tank", configFile >> "CfgVehicles"]) then {
+            _previewDistance = (_diameter + 6) max 10;
+            _safetyRadius = ((_diameter * 0.5) + 3) max 4;
+            _height = 2.8;
         };
     };
 };
