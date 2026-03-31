@@ -269,11 +269,6 @@ switch (_modeUpper) do {
         missionNamespace setVariable ["MWF_VehicleMenu_CurrentCategory", _category];
         missionNamespace setVariable ["MWF_VehicleMenu_LastCategory", _category];
         missionNamespace setVariable ["MWF_VehicleMenu_CurrentEntries", _entries];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedIndex", -1];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedEntry", []];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedLocked", true];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedCanAfford", false];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedStatusText", "Select a vehicle entry."];
 
         if (!isNull _buildCtrl) then {
             _buildCtrl ctrlEnable false;
@@ -323,10 +318,10 @@ switch (_modeUpper) do {
                 _listBox lbSetTooltip [_idx, _tooltip];
 
                 if (_isLocked) then {
-                    _listBox lbSetColor [_idx, [1, 0.25, 0.25, 1]];
+                    _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
                 } else {
                     if (!_canAfford) then {
-                        _listBox lbSetColor [_idx, [0.45, 0.45, 0.45, 1]];
+                        _listBox lbSetColor [_idx, [1, 0.3, 0.3, 1]];
                     };
                 };
             } forEach _entries;
@@ -361,6 +356,8 @@ switch (_modeUpper) do {
         };
 
         private _entry = _entries select _selectedIndex;
+        missionNamespace setVariable ["MWF_VehicleMenu_SelectedIndex", _selectedIndex];
+        missionNamespace setVariable ["MWF_VehicleMenu_SelectedEntry", +_entry];
         _entry params ["_className", "_cost", "_minTier", "_displayName", "_requiredUnlock", "_isTier5"];
         private _evaluation = [_entry] call _evaluateEntry;
         private _isLocked = _evaluation param [0, false];
@@ -387,12 +384,6 @@ switch (_modeUpper) do {
                 _statusText
             ];
         };
-
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedIndex", _selectedIndex];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedEntry", +_entry];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedLocked", _isLocked];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedCanAfford", _canAfford];
-        missionNamespace setVariable ["MWF_VehicleMenu_SelectedStatusText", _statusText];
 
         if (!isNull _buildCtrl) then {
             _buildCtrl ctrlEnable (!_isLocked && _canAfford);
@@ -436,7 +427,9 @@ switch (_modeUpper) do {
             false
         };
 
-        [] spawn MWF_fnc_vehicleMenuPurchase
+        missionNamespace setVariable ["MWF_VehicleMenu_SelectedIndex", _selectedIndex];
+        missionNamespace setVariable ["MWF_VehicleMenu_SelectedEntry", +_entry];
+        [] call MWF_fnc_vehicleMenuPurchase
     };
 
     default {

@@ -10,35 +10,18 @@
 if (!hasInterface) exitWith { false };
 
 private _ghost = missionNamespace getVariable ["MWF_VehiclePlacement_Ghost", objNull];
-if (!isNull _ghost) then {
-    deleteVehicle _ghost;
-};
+if (!isNull _ghost) then { deleteVehicle _ghost; };
 
-
-private _rotateAction = missionNamespace getVariable ["MWF_VehiclePlacement_RotateAction", -1];
-if (_rotateAction >= 0) then {
-    player removeAction _rotateAction;
-};
-
-private _raiseAction = missionNamespace getVariable ["MWF_VehiclePlacement_RaiseAction", -1];
-if (_raiseAction >= 0) then {
-    player removeAction _raiseAction;
-};
-
-private _lowerAction = missionNamespace getVariable ["MWF_VehiclePlacement_LowerAction", -1];
-if (_lowerAction >= 0) then {
-    player removeAction _lowerAction;
-};
-
-private _confirmAction = missionNamespace getVariable ["MWF_VehiclePlacement_ConfirmAction", -1];
-if (_confirmAction >= 0) then {
-    player removeAction _confirmAction;
-};
-
-private _cancelAction = missionNamespace getVariable ["MWF_VehiclePlacement_CancelAction", -1];
-if (_cancelAction >= 0) then {
-    player removeAction _cancelAction;
-};
+{
+    private _id = missionNamespace getVariable [_x, -1];
+    if (_id >= 0) then { player removeAction _id; };
+} forEach [
+    "MWF_VehiclePlacement_RotateAction",
+    "MWF_VehiclePlacement_RaiseAction",
+    "MWF_VehiclePlacement_LowerAction",
+    "MWF_VehiclePlacement_ConfirmAction",
+    "MWF_VehiclePlacement_CancelAction"
+];
 
 missionNamespace setVariable ["MWF_VehiclePlacement_Active", false];
 missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", objNull];
@@ -48,19 +31,15 @@ missionNamespace setVariable ["MWF_VehiclePlacement_MinTier", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_Name", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_Profile", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", nil];
+missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_RotateAction", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_RaiseAction", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_LowerAction", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_SourceTerminal", nil];
+missionNamespace setVariable ["MWF_VehiclePlacement_RotateAction", -1];
+missionNamespace setVariable ["MWF_VehiclePlacement_RaiseAction", -1];
+missionNamespace setVariable ["MWF_VehiclePlacement_LowerAction", -1];
 missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", -1];
 missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", -1];
-if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then {
-    missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
-};
-
+if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then { missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil]; };
 true
