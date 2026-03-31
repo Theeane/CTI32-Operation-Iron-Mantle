@@ -425,12 +425,9 @@ switch (_modeUpper) do {
             false
         };
 
-        closeDialog 0;
-        [_entry, missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", _terminal]] spawn {
-            params ["_entryLocal", "_terminalLocal"];
-            uiSleep 0.05;
-            [_entryLocal, _terminalLocal] call MWF_fnc_beginVehiclePlacement;
-        }
+        missionNamespace setVariable ["MWF_VehicleMenu_CurrentEntries", _entries];
+        missionNamespace setVariable ["MWF_VehicleMenu_LastTerminal", missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", _terminal]];
+        [] spawn MWF_fnc_vehicleMenuPurchase
     };
 
     default {

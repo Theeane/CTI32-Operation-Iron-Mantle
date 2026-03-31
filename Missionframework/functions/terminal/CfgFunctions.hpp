@@ -18,6 +18,7 @@ class Terminal {
     class terminal_support            { file = "functions\terminal\MWF_fnc_terminal_support.sqf"; };
     class terminal_upload             { file = "functions\terminal\MWF_fnc_terminal_upload.sqf"; };
     class terminal_vehicleMenu        { file = "functions\terminal\MWF_fnc_terminal_vehicleMenu.sqf"; };
+    class vehicleMenuPurchase        { file = "functions\terminal\MWF_fnc_vehicleMenuPurchase.sqf"; };
     class updateVehicleGhost          { file = "functions\terminal\MWF_fnc_updateVehicleGhost.sqf"; };
     class validateTerminalAccess      { file = "functions\terminal\MWF_fnc_validateTerminalAccess.sqf"; };
     class validateVehiclePlacement    { file = "functions\terminal\MWF_fnc_validateVehiclePlacement.sqf"; };
