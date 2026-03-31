@@ -50,6 +50,7 @@ private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
     case "HELI": { ["HELI"] call MWF_fnc_hasProgressionAccess };
     case "JETS": { ["JETS"] call MWF_fnc_hasProgressionAccess };
     case "ARMOR": { ["ARMOR"] call MWF_fnc_hasProgressionAccess };
+    case "TANKS": { ["ARMOR"] call MWF_fnc_hasProgressionAccess };
     default { true };
 };
 if !_unlockSatisfied exitWith {
@@ -79,12 +80,22 @@ if (_currentTier < _minTier) exitWith {
 
 private _profile = [_className] call MWF_fnc_getVehiclePlacementProfile;
 private _ghost = _className createVehicleLocal [0, 0, 0];
+if (isNull _ghost) exitWith {
+    systemChat format ["Vehicle placement failed: could not create preview for %1.", _displayName];
+    false
+};
 
 _ghost setAllowDamage false;
 _ghost enableSimulation false;
 _ghost setVehicleLock "LOCKED";
 _ghost setAlpha 0.45;
 _ghost disableCollisionWith player;
+
+private _basePos = if (!isNull _terminal) then { getPosATL _terminal } else { getPosATL player };
+private _baseRadius = 500;
+if (!isNull _terminal && {_terminal getVariable ["MWF_isFOB", false]}) then {
+    _baseRadius = 500;
+};
 
 missionNamespace setVariable ["MWF_VehiclePlacement_Active", true];
 missionNamespace setVariable ["MWF_SensitiveInteraction_Type", "VEHICLE_PLACEMENT"];
@@ -97,13 +108,59 @@ missionNamespace setVariable ["MWF_VehiclePlacement_RequiredUnlock", _requiredUn
 missionNamespace setVariable ["MWF_VehiclePlacement_IsTier5", _isTier5];
 missionNamespace setVariable ["MWF_VehiclePlacement_Profile", _profile];
 missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", getDir player];
+missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", 0];
 missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement not yet validated."];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir player];
+missionNamespace setVariable ["MWF_VehiclePlacement_Terminal", _terminal];
+missionNamespace setVariable ["MWF_VehiclePlacement_BasePos", _basePos];
+missionNamespace setVariable ["MWF_VehiclePlacement_BaseRadius", _baseRadius];
+
+private _rotateAction = player addAction [
+    "<t color='#FFFFFF'>Rotate (45°)</t>",
+    {
+        private _rot = missionNamespace getVariable ["MWF_VehiclePlacement_Rotation", getDir player];
+        missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", _rot + 45];
+    },
+    nil,
+    103,
+    false,
+    true,
+    "",
+    "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
+];
+
+private _raiseAction = player addAction [
+    "<t color='#FFFFFF'>Raise</t>",
+    {
+        private _offset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
+        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", (_offset + 0.5) min 5];
+    },
+    nil,
+    102,
+    false,
+    true,
+    "",
+    "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
+];
+
+private _lowerAction = player addAction [
+    "<t color='#FFFFFF'>Lower</t>",
+    {
+        private _offset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
+        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", (_offset - 0.5) max -2];
+    },
+    nil,
+    101,
+    false,
+    true,
+    "",
+    "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
+];
 
 private _confirmAction = player addAction [
-    format ["<t color='#00FF66'>Confirm Vehicle Build: %1 (%2 Supplies)</t>", _displayName, _cost],
+    "<t color='#00FF66'>Confirm Placement</t>",
     { [] call MWF_fnc_confirmVehiclePlacement; },
     nil,
     100,
@@ -114,7 +171,7 @@ private _confirmAction = player addAction [
 ];
 
 private _cancelAction = player addAction [
-    "<t color='#FF5555'>Cancel Vehicle Build</t>",
+    "<t color='#FF5555'>Cancel</t>",
     { [] call MWF_fnc_cancelVehiclePlacement; },
     nil,
     99,
@@ -124,11 +181,14 @@ private _cancelAction = player addAction [
     "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
 ];
 
+missionNamespace setVariable ["MWF_VehiclePlacement_RotateAction", _rotateAction];
+missionNamespace setVariable ["MWF_VehiclePlacement_RaiseAction", _raiseAction];
+missionNamespace setVariable ["MWF_VehiclePlacement_LowerAction", _lowerAction];
 missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", _confirmAction];
 missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", _cancelAction];
 
 [
-    ["VEHICLE PLACEMENT", format ["Ghost build active for %1. Confirm or cancel from the action menu.", _displayName]],
+    ["VEHICLE PLACEMENT", format ["%1 ready. Use scroll menu: Rotate, Raise, Lower, Confirm Placement, Cancel.", _displayName]],
     "info"
 ] call MWF_fnc_showNotification;
 

@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Separate terminal-style vehicle purchase dialog.
+    Preset-driven vehicle menu controller with a lightweight list frontend.
     Keeps preset order intact, surfaces locked entries with reasons, and routes
     valid selections into the ghost-build placement flow.
 */
@@ -18,7 +18,9 @@ params [
 ];
 
 private _modeUpper = toUpper _mode;
+private _selectionMode = _modeUpper;
 if (_modeUpper isEqualTo "CATEGORY") then { _modeUpper = "REFRESH"; };
+if (_modeUpper isEqualTo "SELECT") then { _modeUpper = "PURCHASE"; };
 
 private _catalogRaw = [] call MWF_fnc_getVehicleCatalog;
 private _metaBlock = (_catalogRaw select { (_x param [0, ""]) isEqualTo "__META__" });
@@ -28,51 +30,12 @@ private _emptyCategories = ((_meta select { (_x param [0, ""]) isEqualTo "emptyC
 private _invalidEntries = ((_meta select { (_x param [0, ""]) isEqualTo "invalidEntries" }) param [0, ["invalidEntries", 0]]) param [1, 0];
 private _publicCatalog = _catalogRaw select { (_x param [0, ""]) != "__META__" };
 
-private _validCategories = ["LIGHT", "APC", "TANKS", "HELIS", "JETS"];
-private _buttonMap = [
-    ["LIGHT", 9060],
-    ["APC", 9061],
-    ["TANKS", 9062],
-    ["HELIS", 9063],
-    ["JETS", 9064]
-];
-
 private _getCategoryEntries = {
     params ["_catalog", ["_category", "LIGHT", [""]]];
     private _categoryUpper = toUpper _category;
     private _found = _catalog select { (_x param [0, ""]) isEqualTo _categoryUpper };
     if (_found isEqualTo []) exitWith { [] };
     (_found select 0) param [1, []]
-};
-
-private _getCategoryLabel = {
-    switch (toUpper (_this param [0, "LIGHT"])) do {
-        case "LIGHT": { "Cars" };
-        case "APC": { "APC" };
-        case "TANKS": { "Tanks" };
-        case "HELIS": { "Helis" };
-        case "JETS": { "Jets" };
-        default { toUpper (_this param [0, "LIGHT"]) };
-    };
-};
-
-private _getCategoryFallbackIcon = {
-    switch (toUpper (_this param [0, "LIGHT"])) do {
-        case "APC": { "\A3\ui_f\data\map\vehicleicons\iconAPC_ca.paa" };
-        case "TANKS": { "\A3\ui_f\data\map\vehicleicons\iconTank_ca.paa" };
-        case "HELIS": { "\A3\ui_f\data\map\vehicleicons\iconHelicopter_ca.paa" };
-        case "JETS": { "\A3\ui_f\data\map\vehicleicons\iconPlane_ca.paa" };
-        default { "\A3\ui_f\data\map\vehicleicons\iconCar_ca.paa" };
-    };
-};
-
-private _getEntryIcon = {
-    params ["_className", ["_category", "LIGHT", [""]]];
-    private _icon = getText (configFile >> "CfgVehicles" >> _className >> "icon");
-    if (_icon isEqualTo "") then {
-        _icon = [_category] call _getCategoryFallbackIcon;
-    };
-    _icon
 };
 
 private _hasRequiredUpgradeStructure = {
@@ -111,7 +74,7 @@ private _evaluateEntry = {
     private _lockReason = if (_debugMode) then {"Ready to build. DEBUG progression override active."} else {"Ready to build."};
     private _isLocked = false;
 
-    if (_className isEqualTo "") exitWith { [true, "Empty preset placeholder.", false, false] };
+    if (_className isEqualTo "") exitWith { [true, "Empty preset placeholder.", false] };
 
     if (_isTier5 && {!( ["TIER5"] call MWF_fnc_hasProgressionAccess )}) then {
         _isLocked = true;
@@ -156,13 +119,11 @@ private _evaluateEntry = {
         _lockReason = format ["Requires Base Tier %1.", _minTier];
     };
 
-    private _canAfford = _supplies >= _cost;
-    private _insufficientFunds = (!_isLocked && {!_canAfford});
-    if (_insufficientFunds) then {
+    if (!_isLocked && {_supplies < _cost}) then {
         _lockReason = format ["Insufficient Supplies: %1 needed.", _cost];
     };
 
-    [_isLocked, _lockReason, _canAfford, _insufficientFunds]
+    [_isLocked, _lockReason, _supplies >= _cost]
 };
 
 private _formatTerminalStatus = {
@@ -172,34 +133,22 @@ private _formatTerminalStatus = {
     private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
     private _baseTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
     private _phase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+    private _debugText = if (missionNamespace getVariable ["MWF_DebugMode", false]) then {
+        "<t color='#FFD27A'> | DEBUG</t>"
+    } else {
+        ""
+    };
 
     format [
-        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>",
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>%7",
         _supplies,
         _intel,
         _carriedIntel,
         _worldTier,
         _baseTier,
-        _phase
+        _phase,
+        _debugText
     ]
-};
-
-private _updateCategoryButtons = {
-    params [["_display", displayNull, [displayNull]], ["_activeCategory", "LIGHT", [""]]];
-    if (isNull _display) exitWith {};
-    {
-        _x params ["_category", "_idc"];
-        private _ctrl = _display displayCtrl _idc;
-        if (!isNull _ctrl) then {
-            if (_category isEqualTo _activeCategory) then {
-                _ctrl ctrlSetBackgroundColor [1, 1, 1, 0.08];
-                _ctrl ctrlSetTextColor [1, 1, 1, 1];
-            } else {
-                _ctrl ctrlSetBackgroundColor [0, 0, 0, 0];
-                _ctrl ctrlSetTextColor [0.94, 0.94, 0.94, 1];
-            };
-        };
-    } forEach _buttonMap;
 };
 
 private _updateHeader = {
@@ -225,7 +174,7 @@ private _updateHeader = {
     };
 
     if (!isNull _categoryCtrl) then {
-        _categoryCtrl ctrlSetText format ["Vehicle Menu | %1", [_category] call _getCategoryLabel];
+        _categoryCtrl ctrlSetText format ["Vehicle Menu | %1", _category];
     };
 
     if (!isNull _supplyCtrl) then {
@@ -233,20 +182,26 @@ private _updateHeader = {
     };
 
     if (!isNull _listStatusCtrl) then {
-        _listStatusCtrl ctrlSetText format ["Available entries in %1: %2", [_category] call _getCategoryLabel, _entryCount];
+        private _scrollHint = if (_entryCount > 12) then {
+            " | Use mouse wheel / PgUp / PgDn to scroll."
+        } else {
+            ""
+        };
+        _listStatusCtrl ctrlSetText format ["Entries in %1: %2%3", _category, _entryCount, _scrollHint];
     };
 
     if (!isNull _terminalStatusCtrl) then {
         _terminalStatusCtrl ctrlSetStructuredText parseText (call _formatTerminalStatus);
     };
-
-    [_display, _category] call _updateCategoryButtons;
 };
 
 switch (_modeUpper) do {
     case "OPEN": {
         if (_totalEntries <= 0) exitWith {
-            [["VEHICLE MENU", "Active BLUFOR preset has no valid vehicle entries."], "warning"] call MWF_fnc_showNotification;
+            [
+                ["VEHICLE MENU", "Active BLUFOR preset has no valid vehicle entries."],
+                "warning"
+            ] call MWF_fnc_showNotification;
             systemChat "Vehicle Menu unavailable: preset returned no valid vehicle entries.";
             []
         };
@@ -259,12 +214,17 @@ switch (_modeUpper) do {
         missionNamespace setVariable ["MWF_VehicleMenu_LastCatalog", _publicCatalog];
 
         private _requestedCategory = toUpper (missionNamespace getVariable ["MWF_VehicleMenu_LastCategory", "LIGHT"]);
-        if !(_requestedCategory in _validCategories) then { _requestedCategory = "LIGHT"; };
+        private _validCategories = ["LIGHT", "APC", "TANKS", "HELIS", "JETS"];
+        if !(_requestedCategory in _validCategories) then {
+            _requestedCategory = "LIGHT";
+        };
 
         private _resolvedCategory = _requestedCategory;
         if (([_publicCatalog, _resolvedCategory] call _getCategoryEntries) isEqualTo []) then {
             {
-                if !(([_publicCatalog, _x] call _getCategoryEntries) isEqualTo []) exitWith { _resolvedCategory = _x; };
+                if !(([_publicCatalog, _x] call _getCategoryEntries) isEqualTo []) exitWith {
+                    _resolvedCategory = _x;
+                };
             } forEach _validCategories;
         };
 
@@ -292,6 +252,10 @@ switch (_modeUpper) do {
         _publicCatalog
     };
 
+    case "GET_CATEGORY": {
+        [_publicCatalog, _payload param [0, missionNamespace getVariable ["MWF_VehicleMenu_CurrentCategory", "LIGHT"], [""]]] call _getCategoryEntries
+    };
+
     case "REFRESH": {
         private _display = findDisplay 9050;
         if (isNull _display) exitWith { [] };
@@ -301,7 +265,6 @@ switch (_modeUpper) do {
         private _listBox = _display displayCtrl 9052;
         private _infoCtrl = _display displayCtrl 9054;
         private _buildCtrl = _display displayCtrl 9055;
-        private _iconCtrl = _display displayCtrl 9058;
 
         missionNamespace setVariable ["MWF_VehicleMenu_CurrentCategory", _category];
         missionNamespace setVariable ["MWF_VehicleMenu_LastCategory", _category];
@@ -309,17 +272,14 @@ switch (_modeUpper) do {
 
         if (!isNull _buildCtrl) then {
             _buildCtrl ctrlEnable false;
-            _buildCtrl ctrlSetTooltip "Select an available vehicle to purchase.";
-            _buildCtrl ctrlSetText "Purchase";
+            _buildCtrl ctrlSetTooltip "Select a vehicle entry.";
         };
-
-        if (!isNull _iconCtrl) then { _iconCtrl ctrlSetText ""; };
 
         lbClear _listBox;
         if (_entries isEqualTo []) then {
             private _idx = _listBox lbAdd "No preset entries in this category.";
             _listBox lbSetData [_idx, "-1"];
-            _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
+            _listBox lbSetColor [_idx, [0.6, 0.6, 0.6, 1]];
             _listBox lbSetTooltip [_idx, "This category currently has no valid preset entries."];
             if (!isNull _infoCtrl) then {
                 _infoCtrl ctrlSetStructuredText parseText "<t color='#CCCCCC'>No vehicles configured in this category.</t>";
@@ -334,21 +294,34 @@ switch (_modeUpper) do {
                 private _isLocked = _evaluation param [0, false];
                 private _lockReason = _evaluation param [1, "Ready to build."];
                 private _canAfford = _evaluation param [2, true];
-                private _insufficientFunds = _evaluation param [3, false];
 
-                private _idx = _listBox lbAdd format ["%1  |  %2 Supplies", _displayName, _cost];
+                private _suffixParts = [format ["%1 S", _cost], format ["T%1", _minTier]];
+                if (_isTier5) then { _suffixParts pushBack "T5"; };
+                private _requiredUnlockUpper = toUpper _requiredUnlock;
+                if (_requiredUnlockUpper in ["ARMOR", "HELI", "JETS"]) then { _suffixParts pushBack _requiredUnlockUpper; };
+                if (_isLocked) then { _suffixParts pushBack "LOCKED"; };
+
+                private _label = format ["%1 [%2]", _displayName, _suffixParts joinString " | "];
+                private _idx = _listBox lbAdd _label;
                 _listBox lbSetData [_idx, str _forEachIndex];
                 _listBox lbSetValue [_idx, _cost];
-                _listBox lbSetPicture [_idx, [_className, _category] call _getEntryIcon];
-                _listBox lbSetTooltip [_idx, _lockReason];
+
+                private _tooltip = if (_isLocked) then {
+                    _lockReason
+                } else {
+                    if (_canAfford) then {
+                        "Ready to build."
+                    } else {
+                        _lockReason
+                    }
+                };
+                _listBox lbSetTooltip [_idx, _tooltip];
 
                 if (_isLocked) then {
-                    _listBox lbSetColor [_idx, [0.92, 0.25, 0.25, 1]];
+                    _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
                 } else {
-                    if (_insufficientFunds) then {
-                        _listBox lbSetColor [_idx, [0.45, 0.45, 0.45, 1]];
-                    } else {
-                        _listBox lbSetColor [_idx, [0.96, 0.96, 0.96, 1]];
+                    if (!_canAfford) then {
+                        _listBox lbSetColor [_idx, [1, 0.3, 0.3, 1]];
                     };
                 };
             } forEach _entries;
@@ -366,7 +339,6 @@ switch (_modeUpper) do {
         private _listBox = _display displayCtrl 9052;
         private _infoCtrl = _display displayCtrl 9054;
         private _buildCtrl = _display displayCtrl 9055;
-        private _iconCtrl = _display displayCtrl 9058;
         private _entries = missionNamespace getVariable ["MWF_VehicleMenu_CurrentEntries", []];
         private _category = missionNamespace getVariable ["MWF_VehicleMenu_CurrentCategory", "LIGHT"];
         private _selectedIndex = lbCurSel _listBox;
@@ -374,12 +346,11 @@ switch (_modeUpper) do {
         if (_selectedIndex < 0 || {_selectedIndex >= count _entries}) exitWith {
             if (!isNull _buildCtrl) then {
                 _buildCtrl ctrlEnable false;
-                _buildCtrl ctrlSetTooltip "Select an available vehicle to purchase.";
+                _buildCtrl ctrlSetTooltip "Select a vehicle entry.";
             };
             if (!isNull _infoCtrl) then {
                 _infoCtrl ctrlSetStructuredText parseText "<t color='#CCCCCC'>Select a vehicle entry.</t>";
             };
-            if (!isNull _iconCtrl) then { _iconCtrl ctrlSetText ""; };
             [_display, _category, _entries, -1] call _updateHeader;
             false
         };
@@ -390,30 +361,24 @@ switch (_modeUpper) do {
         private _isLocked = _evaluation param [0, false];
         private _lockReason = _evaluation param [1, "Ready to build."];
         private _canAfford = _evaluation param [2, true];
-        private _insufficientFunds = _evaluation param [3, false];
-        private _unlockPath = if (_requiredUnlock isEqualTo "") then { "Standard" } else { toUpper _requiredUnlock };
-        private _statusColor = if (_isLocked) then { "#FF5555" } else { if (_insufficientFunds) then { "#7A7A7A" } else { "#A7D7A7" } };
+        private _unlockPath = if (_requiredUnlock isEqualTo "") then { "None" } else { toUpper _requiredUnlock };
         private _statusText = if (_isLocked) then {
-            _lockReason
+            format ["Locked: %1", _lockReason]
         } else {
-            if (_insufficientFunds) then { _lockReason } else { "Ready to purchase and enter ghost placement." }
-        };
-
-        if (!isNull _iconCtrl) then {
-            _iconCtrl ctrlSetText ([_className, _category] call _getEntryIcon);
+            if (_canAfford) then { "Ready to build." } else { _lockReason }
         };
 
         if (!isNull _infoCtrl) then {
             _infoCtrl ctrlSetStructuredText parseText format [
-                "<t size='1.15' color='#FFFFFF'>%1</t><br/><t color='#D7D7D7'>Class: %2</t><br/><t color='#D7D7D7'>Category: %3</t><br/><t color='#D7D7D7'>Cost: %4 Supplies</t><br/><t color='#D7D7D7'>Required Base Tier: %5</t><br/><t color='#D7D7D7'>Unlock Path: %6</t><br/><t color='#D7D7D7'>Tier 5 Entry: %7</t><br/><br/><t color='%8'>%9</t>",
+                "<t size='1.1' color='#FFFFFF'>%1</t><br/><t color='#D7D7D7'>Class: %2</t><br/><t color='#D7D7D7'>Cost: %3 Supplies</t><br/><t color='#D7D7D7'>Required Base Tier: %4</t><br/><t color='#D7D7D7'>Unlock Path: %5</t><br/><t color='#D7D7D7'>Tier 5 Entry: %6</t><br/><t color='#D7D7D7'>List Row: %7/%8</t><br/><t color='#A7D7A7'>%9</t>",
                 _displayName,
                 _className,
-                [_category] call _getCategoryLabel,
                 _cost,
                 _minTier,
                 _unlockPath,
                 if (_isTier5) then { "Yes" } else { "No" },
-                _statusColor,
+                _selectedIndex + 1,
+                count _entries,
                 _statusText
             ];
         };
@@ -432,10 +397,15 @@ switch (_modeUpper) do {
         if (isNull _display) exitWith { false };
 
         private _entries = missionNamespace getVariable ["MWF_VehicleMenu_CurrentEntries", []];
-        private _selectedIndex = lbCurSel (_display displayCtrl 9052);
+        private _category = missionNamespace getVariable ["MWF_VehicleMenu_CurrentCategory", "LIGHT"];
+        private _selectedIndex = if (_selectionMode isEqualTo "SELECT") then {
+            _payload param [1, -1, [0]]
+        } else {
+            lbCurSel (_display displayCtrl 9052)
+        };
 
         if (_selectedIndex < 0 || {_selectedIndex >= count _entries}) exitWith {
-            systemChat "Vehicle Menu: invalid selection.";
+            systemChat format ["Vehicle Menu: invalid selection in category %1.", _category];
             false
         };
 
@@ -455,14 +425,12 @@ switch (_modeUpper) do {
             false
         };
 
-        private _terminalRef = missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", _terminal];
         closeDialog 0;
-        [_entry, _terminalRef] spawn {
+        [_entry, missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", _terminal]] spawn {
             params ["_entryLocal", "_terminalLocal"];
             uiSleep 0.05;
             [_entryLocal, _terminalLocal] call MWF_fnc_beginVehiclePlacement;
-        };
-        true
+        }
     };
 
     default {

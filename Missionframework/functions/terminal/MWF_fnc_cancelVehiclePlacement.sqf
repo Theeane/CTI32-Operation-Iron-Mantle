@@ -10,5 +10,8 @@
 if (!hasInterface) exitWith { false };
 
 [] call MWF_fnc_cleanupVehiclePlacement;
-systemChat "Vehicle placement cancelled.";
+[
+    ["VEHICLE PLACEMENT", "Placement cancelled."],
+    "warning"
+] call MWF_fnc_showNotification;
 true
