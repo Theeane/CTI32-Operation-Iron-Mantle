@@ -264,6 +264,7 @@ switch (_modeUpper) do {
         private _entries = [_publicCatalog, _category] call _getCategoryEntries;
         private _listBox = _display displayCtrl 9052;
         private _infoCtrl = _display displayCtrl 9054;
+        private _previewCtrl = _display displayCtrl 9058;
         private _buildCtrl = _display displayCtrl 9055;
 
         missionNamespace setVariable ["MWF_VehicleMenu_CurrentCategory", _category];
@@ -284,6 +285,7 @@ switch (_modeUpper) do {
             if (!isNull _infoCtrl) then {
                 _infoCtrl ctrlSetStructuredText parseText "<t color='#CCCCCC'>No vehicles configured in this category.</t>";
             };
+            if (!isNull _previewCtrl) then { _previewCtrl ctrlSetText ''; };
             [_display, _category, _entries, -1] call _updateHeader;
             []
         } else {
@@ -318,11 +320,19 @@ switch (_modeUpper) do {
                 _listBox lbSetTooltip [_idx, _tooltip];
 
                 if (_isLocked) then {
-                    _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
+                    _listBox lbSetColor [_idx, [1, 0.3, 0.3, 1]];
                 } else {
                     if (!_canAfford) then {
-                        _listBox lbSetColor [_idx, [1, 0.3, 0.3, 1]];
+                        _listBox lbSetColor [_idx, [0.55, 0.55, 0.55, 1]];
+                    } else {
+                        _listBox lbSetColor [_idx, [1, 1, 1, 1]];
                     };
+                };
+
+                private _iconPath = getText (configFile >> 'CfgVehicles' >> _className >> 'icon');
+                if !(_iconPath isEqualTo '') then {
+                    _listBox lbSetPicture [_idx, _iconPath];
+                    _listBox lbSetPictureColor [_idx, [1,1,1,0.95]];
                 };
             } forEach _entries;
 
@@ -338,6 +348,7 @@ switch (_modeUpper) do {
 
         private _listBox = _display displayCtrl 9052;
         private _infoCtrl = _display displayCtrl 9054;
+        private _previewCtrl = _display displayCtrl 9058;
         private _buildCtrl = _display displayCtrl 9055;
         private _entries = missionNamespace getVariable ["MWF_VehicleMenu_CurrentEntries", []];
         private _category = missionNamespace getVariable ["MWF_VehicleMenu_CurrentCategory", "LIGHT"];
@@ -351,6 +362,7 @@ switch (_modeUpper) do {
             if (!isNull _infoCtrl) then {
                 _infoCtrl ctrlSetStructuredText parseText "<t color='#CCCCCC'>Select a vehicle entry.</t>";
             };
+            if (!isNull _previewCtrl) then { _previewCtrl ctrlSetText ''; };
             [_display, _category, _entries, -1] call _updateHeader;
             false
         };
@@ -370,17 +382,27 @@ switch (_modeUpper) do {
             if (_canAfford) then { "Ready to build." } else { _lockReason }
         };
 
+        private _previewIcon = getText (configFile >> 'CfgVehicles' >> _className >> 'icon');
+        if (_previewIcon isEqualTo '') then {
+            _previewIcon = getText (configFile >> 'CfgVehicles' >> _className >> 'picture');
+        };
+        if (!isNull _previewCtrl) then {
+            _previewCtrl ctrlSetText _previewIcon;
+            _previewCtrl ctrlSetTextColor [1,1,1,0.95];
+        };
+
+        private _statusColor = if (_isLocked) then { '#FF5A5A' } else { if (_canAfford) then { '#A7D7A7' } else { '#888888' } };
         if (!isNull _infoCtrl) then {
             _infoCtrl ctrlSetStructuredText parseText format [
-                "<t size='1.1' color='#FFFFFF'>%1</t><br/><t color='#D7D7D7'>Class: %2</t><br/><t color='#D7D7D7'>Cost: %3 Supplies</t><br/><t color='#D7D7D7'>Required Base Tier: %4</t><br/><t color='#D7D7D7'>Unlock Path: %5</t><br/><t color='#D7D7D7'>Tier 5 Entry: %6</t><br/><t color='#D7D7D7'>List Row: %7/%8</t><br/><t color='#A7D7A7'>%9</t>",
+                "<t size='1.1' color='#FFFFFF'>%1</t><br/><t color='#D7D7D7'>Class: %2</t><br/><t color='#D7D7D7'>Category: %3</t><br/><t color='#D7D7D7'>Cost: %4 Supplies</t><br/><t color='#D7D7D7'>Required Base Tier: %5</t><br/><t color='#D7D7D7'>Unlock Path: %6</t><br/><t color='#D7D7D7'>Tier 5 Entry: %7</t><br/><br/><t color='%8'>%9</t>",
                 _displayName,
                 _className,
+                _category,
                 _cost,
                 _minTier,
                 _unlockPath,
-                if (_isTier5) then { "Yes" } else { "No" },
-                _selectedIndex + 1,
-                count _entries,
+                if (_isTier5) then { 'Yes' } else { 'No' },
+                _statusColor,
                 _statusText
             ];
         };
