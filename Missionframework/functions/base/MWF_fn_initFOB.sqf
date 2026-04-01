@@ -15,17 +15,21 @@ if (isNull _asset) exitWith {
     diag_log "[MWF FOB] initFOB called with null object.";
 };
 
-if (_asset getVariable ["MWF_FOB_InitComplete", false]) exitWith {};
-
 private _originType = if (typeOf _asset == (missionNamespace getVariable ["MWF_FOB_Truck", ""])) then { "TRUCK" } else { "BOX" };
 _asset setVariable ["MWF_FOB_Type", _originType, true];
+
+if (!hasInterface) exitWith {
+    diag_log format ["[MWF FOB] Server-side init skipped for %1; client hold action will initialize locally.", _asset];
+};
+
+if (_asset getVariable ["MWF_FOB_ClientInitComplete", false]) exitWith {};
 
 [
     _asset,
     "<t color='#00FF00'>Deploy FOB</t>",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_connect_ca.paa",
-    "_this distance _target < 10 && speed _target < 1 && !(_target getVariable ['MWF_FOB_PlacementInProgress', false])",
+    "_caller distance _target < 10 && speed _target < 1 && !(_target getVariable ['MWF_FOB_PlacementInProgress', false])",
     "_caller distance _target < 10",
     {},
     {},
@@ -135,5 +139,5 @@ _asset setVariable ["MWF_FOB_Type", _originType, true];
     false
 ] call BIS_fnc_holdActionAdd;
 
-_asset setVariable ["MWF_FOB_InitComplete", true, true];
-diag_log format ["[MWF FOB] Initialized %1 as deployable %2.", _asset, _originType];
+_asset setVariable ["MWF_FOB_ClientInitComplete", true];
+diag_log format ["[MWF FOB] Client initialized %1 as deployable %2.", _asset, _originType];

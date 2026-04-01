@@ -32,6 +32,9 @@ if (_entry isEqualTo [] || {(count _entry) < 4}) exitWith {
 private _terminal = missionNamespace getVariable ["MWF_VehicleMenu_LastTerminal", objNull];
 closeDialog 0;
 
+missionNamespace setVariable ["MWF_VehicleMenu_SelectedEntry", +_entry];
+missionNamespace setVariable ["MWF_VehicleMenu_LastTerminal", _terminal];
+
 [_entry, _terminal] spawn {
     params ["_entryLocal", "_terminalLocal"];
     uiSleep 0.05;
