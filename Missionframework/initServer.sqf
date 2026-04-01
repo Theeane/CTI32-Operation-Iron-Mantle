@@ -28,6 +28,13 @@ private _runStep = {
 };
 
 // 2. Sequential Essentials (Critical for Terminal & Systems)
+["LOAD_GAME", {
+    if (!isNil "MWF_fnc_loadGame") then {
+        [] call MWF_fnc_loadGame;
+    };
+    missionNamespace setVariable ["MWF_CampaignLoadApplied", true, true];
+    true
+}] call _runStep;
 ["INIT_GLOBALS", { [] call MWF_fnc_initGlobals; }] call _runStep;
 ["PRESET_MANAGER", { [] call MWF_fnc_presetManager; }] call _runStep;
 ["INIT_SYSTEMS", { [] call MWF_fnc_initSystems; }] call _runStep;

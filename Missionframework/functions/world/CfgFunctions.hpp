@@ -1,6 +1,7 @@
 class World {
     file = "functions\world";
 
+    class initWorld                 { file = "functions\world\MWF_fn_initWorld.sqf"; };
     class determineProgressionState { file = "functions\world\MWF_fn_determineProgressionState.sqf"; };
     class determineWorldTier        { file = "functions\world\MWF_fn_determineWorldTier.sqf"; };
     class getEffectiveEnemyTier     { file = "functions\world\MWF_fn_getEffectiveEnemyTier.sqf"; };

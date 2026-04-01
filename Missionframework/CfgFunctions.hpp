@@ -18,35 +18,19 @@ class CfgFunctions {
         class UI {
             file = "ui";
 
-            class initUI                        { file = "ui\MWF_fn_initUI.sqf"; };
-            class updateResourceUI              { file = "ui\MWF_fn_updateResourceUI.sqf"; };
-            class dataHub                       { file = "ui\datahub\MWF_fn_dataHub.sqf"; };
-            class dataHubSetMode                { file = "ui\datahub\MWF_fnc_dataHubSetMode.sqf"; };
-            class dataHubRefresh                { file = "ui\datahub\MWF_fnc_dataHubRefresh.sqf"; };
-            class dataHubPrimaryAction          { file = "ui\datahub\MWF_fnc_dataHubPrimaryAction.sqf"; };
-            class dataHubSecondaryAction        { file = "ui\datahub\MWF_fnc_dataHubSecondaryAction.sqf"; };
-            class dataHubResolveModeDefinition  { file = "ui\datahub\MWF_fnc_dataHubResolveModeDefinition.sqf"; };
-            class refreshDataMap                { file = "ui\datahub\MWF_fn_refreshDataMap.sqf"; };
-            class collectDataMapEntries         { file = "ui\datahub\MWF_fn_collectDataMapEntries.sqf"; };
-            class collectRespawnPoints          { file = "ui\datahub\MWF_fn_collectRespawnPoints.sqf"; };
-            class uiGoBack                      { file = "ui\datahub\MWF_fnc_uiGoBack.sqf"; };
-            class openGuide                     { file = "ui\guide\MWF_fn_openGuide.sqf"; };
-            class vehicleMenuMode               { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuMode.sqf"; };
-            class vehicleMenuClear              { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuClear.sqf"; };
-            class vehicleMenuRefresh            { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuRefresh.sqf"; };
-            class vehicleMenuSetCategory        { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSetCategory.sqf"; };
-            class vehicleMenuSelectEntry        { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSelectEntry.sqf"; };
-            class vehicleMenuPrimaryAction      { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuPrimaryAction.sqf"; };
-            class vehicleMenuSecondaryAction    { file = "ui\VehicleMenu\MWF_fnc_vehicleMenuSecondaryAction.sqf"; };
-            class missionsMode                  { file = "ui\Missions\MWF_fnc_missionsMode.sqf"; };
-            class mainOperationsMode            { file = "ui\MainOperations\MWF_fnc_mainOperationsMode.sqf"; };
-            class buildSupportMode              { file = "ui\BuildSupport\MWF_fnc_buildSupportMode.sqf"; };
-            class baseUpgradesMode              { file = "ui\BaseUpgrades\MWF_fnc_baseUpgradesMode.sqf"; };
-            class redeployMode                  { file = "ui\Redeploy\MWF_fnc_redeployMode.sqf"; };
-            class buildMenuMode                 { file = "ui\BuildMenu\MWF_fnc_buildMenuMode.sqf"; };
+            class initUI                  { file = "ui\MWF_fn_initUI.sqf"; };
+            class updateResourceUI        { file = "ui\MWF_fn_updateResourceUI.sqf"; };
+            class dataHub                 { file = "ui\datahub\MWF_fn_dataHub.sqf"; };
+            class refreshDataMap          { file = "ui\datahub\MWF_fn_refreshDataMap.sqf"; };
+            class collectDataMapEntries   { file = "ui\datahub\MWF_fn_collectDataMapEntries.sqf"; };
+            class collectRespawnPoints    { file = "ui\datahub\MWF_fn_collectRespawnPoints.sqf"; };
+            class uiGoBack                { file = "ui\datahub\MWF_fnc_uiGoBack.sqf"; };
+            class openGuide               { file = "ui\guide\MWF_fn_openGuide.sqf"; };
         };
 
         // --- MODULAR SUBSYSTEMS ---
+        #include "core\CfgFunctions.hpp"
+        #include "missions\CfgFunctions.hpp"
         #include "functions\base\CfgFunctions.hpp"
         #include "functions\cinematics\CfgFunctions.hpp"
         #include "functions\client\CfgFunctions.hpp"
