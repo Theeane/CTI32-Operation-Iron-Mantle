@@ -13,7 +13,7 @@ while { missionNamespace getVariable ["MWF_VehiclePlacement_Active", false] && a
     private _ghost = missionNamespace getVariable ["MWF_VehiclePlacement_Ghost", objNull];
     if (isNull _ghost) exitWith {};
     private _profile = missionNamespace getVariable ["MWF_VehiclePlacement_Profile", []];
-    if (_profile isEqualTo [] || {(count _profile) < 7}) exitWith {};
+    if (_profile isEqualTo [] || {(count _profile) < 4}) then { _profile = ["LAND", "LAND", 5, 0.25]; };
     _profile params ["_vehicleType", "_surfaceRule", "_previewDistance", "_previewHeight"];
     private _rotation = missionNamespace getVariable ["MWF_VehiclePlacement_Rotation", getDir player];
     private _heightOffset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];

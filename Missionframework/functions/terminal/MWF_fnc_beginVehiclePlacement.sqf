@@ -61,6 +61,31 @@ missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement prev
 missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir player];
 
+private _initialProfile = +_profile;
+if (_initialProfile isEqualTo [] || {(count _initialProfile) < 4}) then {
+    _initialProfile = ["LAND", "LAND", 5, 0.25];
+};
+_initialProfile params ["_initialVehicleType", "_initialSurfaceRule", "_initialPreviewDistance", "_initialPreviewHeight"];
+private _initialRotation = missionNamespace getVariable ["MWF_VehiclePlacement_Rotation", getDir player];
+private _initialHeightOffset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
+private _initialPosASL = AGLToASL (positionCameraToWorld [0, _initialPreviewDistance, 0]);
+if (_initialSurfaceRule isEqualTo "WATER") then {
+    _initialPosASL set [2, ((_initialPosASL select 2) max 0.5) + (_initialPreviewHeight max 0.5) + _initialHeightOffset];
+    _ghost setVectorUp [0, 0, 1];
+    _ghost setPosASL _initialPosASL;
+} else {
+    private _initialPosATL = ASLToATL _initialPosASL;
+    private _initialGroundATL = +_initialPosATL;
+    _initialGroundATL set [2, 0];
+    _initialPosATL set [2, (_initialPreviewHeight max 0.05) + _initialHeightOffset];
+    _ghost setVectorUp surfaceNormal _initialGroundATL;
+    _ghost setPosATL _initialPosATL;
+    _initialPosASL = AGLToASL _initialPosATL;
+};
+_ghost setDir _initialRotation;
+missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", _initialPosASL];
+missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", _initialRotation];
+
 private _rotateAction = player addAction ["Rotate (45°)", {
     private _rotation = missionNamespace getVariable ["MWF_VehiclePlacement_Rotation", 0];
     missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", _rotation + 45];
@@ -97,7 +122,7 @@ while {
     private _loopProfile = missionNamespace getVariable ["MWF_VehiclePlacement_Profile", _profile];
     private _loopGhost = missionNamespace getVariable ["MWF_VehiclePlacement_Ghost", _ghost];
     if (isNull _loopGhost) exitWith {};
-    if (_loopProfile isEqualTo [] || {(count _loopProfile) < 7}) then { _loopProfile = _profile; };
+    if (_loopProfile isEqualTo [] || {(count _loopProfile) < 4}) then { _loopProfile = _profile; };
     _loopProfile params ["_vehicleType", "_surfaceRule", "_previewDistance", "_previewHeight"];
 
     private _posASL = AGLToASL (positionCameraToWorld [0, _previewDistance, 0]);
