@@ -28,6 +28,7 @@ class CfgFunctions {
             class openGuide               { file = "ui\guide\MWF_fn_openGuide.sqf"; };
             #include "ui\datahub\CfgFunctions.hpp"
             #include "ui\VehicleMenu\CfgFunctions.hpp"
+            #include "ui\Redeploy\CfgFunctions.hpp"
         };
 
         // --- MODULAR SUBSYSTEMS ---

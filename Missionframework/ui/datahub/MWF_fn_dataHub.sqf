@@ -368,6 +368,8 @@ switch (_modeUpper) do {
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
         uiNamespace setVariable ["MWF_DataHub_ContextTerminal", objNull];
+        uiNamespace setVariable ["MWF_RedeployShell_Active", false];
+        uiNamespace setVariable ["MWF_RedeployShell_ReturnTerminal", objNull];
         true
     };
 

@@ -27,7 +27,7 @@ if !(_existing isEqualTo []) then {
 // 2. Configuration & Conditions
 // Only allow repacking if the base is not currently under attack or damaged.
 private _repackTime = missionNamespace getVariable ["MWF_FOB_RepackTime", 15];
-private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false]) && ((_target getVariable ['MWF_FOB_RepackExpiresAt', -1]) < 0 || {serverTime <= (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])}) && !(_target getVariable ['MWF_isUnderAttack', false])";
+private _condition = "alive _target && alive _this && _this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false]) && ((_target getVariable ['MWF_FOB_RepackExpiresAt', -1]) < 0 || {serverTime <= (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])}) && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
 private _actionIds = [];
 
 // 3. Action: Pack into Truck (Driveable)
@@ -43,7 +43,7 @@ private _truckActionId = [
     {
         params ["_target", "_caller"];
         // Execute the repack on the server
-        [_target, "truck"] remoteExec ["MWF_fnc_executeRepack", 2];
+        [_target, "truck", owner _caller] remoteExec ["MWF_fnc_executeRepack", 2];
     },
     { hint "Repack aborted."; },
     [],
@@ -66,7 +66,7 @@ private _boxActionId = [
     {
         params ["_target", "_caller"];
         // Execute the repack on the server
-        [_target, "box"] remoteExec ["MWF_fnc_executeRepack", 2];
+        [_target, "box", owner _caller] remoteExec ["MWF_fnc_executeRepack", 2];
     },
     { hint "Repack aborted."; },
     [],

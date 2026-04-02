@@ -15,6 +15,22 @@ if (_modeNow isEqualTo "SUPPORT") exitWith {
     true
 };
 
+if (_modeNow isEqualTo "REDEPLOY") exitWith {
+    if (uiNamespace getVariable ["MWF_RedeployShell_Active", false]) then {
+        private _terminal = uiNamespace getVariable ["MWF_RedeployShell_ReturnTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]];
+        uiNamespace setVariable ["MWF_RedeployShell_Active", false];
+        uiNamespace setVariable ["MWF_RedeployShell_ReturnTerminal", objNull];
+        ["CLOSE"] call MWF_fnc_dataHub;
+        if (!isNull _terminal) then {
+            [_terminal, player] spawn MWF_fnc_openBuyMenu;
+        };
+        true
+    } else {
+        ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
+        true
+    };
+};
+
 if (_modeNow isEqualTo "SIDE_MISSIONS") exitWith { false };
 
 ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;

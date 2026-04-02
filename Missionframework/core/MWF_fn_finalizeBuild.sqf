@@ -174,5 +174,8 @@ if (_isGarageUpgrade) then {
 };
 if (_isHeliUpgrade) then { [["BASE UPGRADE ONLINE", "Helicopter uplink constructed. Helicopters are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0]; };
 if (_isJetUpgrade) then { [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0]; };
+if (!isNil "MWF_fnc_requestDelayedSave") then {
+    [] call MWF_fnc_requestDelayedSave;
+};
 if (!isNull _builder) then { [format ["Asset deployed: -%1 Supplies", _resolvedPrice]] remoteExec ["systemChat", owner _builder]; };
 diag_log format ["[MWF Build] %1 spawned at %2 for %3 supplies (client hint %4).", _className, _pos, _resolvedPrice, _priceHint];

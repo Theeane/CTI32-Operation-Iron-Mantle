@@ -41,6 +41,9 @@ private _location = mapGridPosition _fob;
 // Notify players of the logistical change via system chat
 [format ["[LOGISTICS] FOB at %1: Repacking is now %2.", _location, _msg]] remoteExec ["systemChat", 0];
 
+if (!isNil "MWF_fnc_requestDelayedSave") then {
+    [] call MWF_fnc_requestDelayedSave;
+};
 diag_log format ["[MWF] Logistics: Repack status for FOB at %1 updated to %2.", _location, _status];
 
 true

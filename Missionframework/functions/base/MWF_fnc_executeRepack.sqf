@@ -13,7 +13,8 @@ if (!isServer) exitWith {};
 
 params [
     ["_fobObject", objNull, [objNull]],
-    ["_repackType", "box", [""]]
+    ["_repackType", "box", [""]],
+    ["_requesterOwner", 0, [0]]
 ];
 
 if (isNull _fobObject) exitWith {
@@ -22,7 +23,7 @@ if (isNull _fobObject) exitWith {
 
 private _canRepack = _fobObject getVariable ["MWF_FOB_CanRepack", true];
 if (!_canRepack) exitWith {
-    ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", 0];
+    ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", if (_requesterOwner > 0) then {_requesterOwner} else {0}];
     diag_log "[MWF] Repack aborted: Unauthorized by variable.";
 };
 
@@ -69,6 +70,9 @@ _newObject setVariable ["MWF_FOB_PlacementInProgress", false, true];
 _newObject setVariable ["MWF_FOB_CanRepack", false, true];
 _newObject setVariable ["MWF_FOB_RepackExpiresAt", -1, true];
 
+if (!isNil "MWF_fnc_requestDelayedSave") then {
+    [] call MWF_fnc_requestDelayedSave;
+};
 [format ["FOB repacked into %1.", _repackType]] remoteExec ["systemChat", 0];
 diag_log format ["[MWF] Base: FOB at %1 repacked into %2 (%3).", _pos, _repackType, _className];
 
