@@ -120,27 +120,14 @@ missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", _cancelAction
 
 [ ["VEHICLE PLACEMENT", format ["Ghost build active for %1.", _displayName]], "info" ] call MWF_fnc_showNotification;
 
+[] spawn MWF_fnc_updateVehicleGhost;
+
 while {
     missionNamespace getVariable ["MWF_VehiclePlacement_Active", false] &&
     !(missionNamespace getVariable ["MWF_VehiclePlacement_Confirmed", false]) &&
     !(missionNamespace getVariable ["MWF_VehiclePlacement_Cancelled", false]) &&
     alive player
 } do {
-    private _rotation = missionNamespace getVariable ["MWF_VehiclePlacement_Rotation", 0];
-    private _heightOffset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
-
-    private _targetPos = positionCameraToWorld [0, _previewDistance max 6, 0];
-    private _finalPosATL = ASLToATL (AGLToASL _targetPos);
-    _finalPosATL set [2, (_finalPosATL select 2) + _previewHeight + _heightOffset];
-
-    _ghost setPosATL _finalPosATL;
-    _ghost setDir (getDir player + _rotation);
-
-    missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", ATLToASL _finalPosATL];
-    missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir _ghost];
-    missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", true];
-    missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement preview active."];
-
     uiSleep 0.01;
 };
 

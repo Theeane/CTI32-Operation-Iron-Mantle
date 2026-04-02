@@ -32,6 +32,7 @@ _ghost setVehicleLock "LOCKED";
 _ghost disableCollisionWith player;
 
 missionNamespace setVariable ["MWF_BuildPlacement_Active", true];
+missionNamespace setVariable ["MWF_SensitiveInteraction_Type", "BUILD_PLACEMENT"];
 missionNamespace setVariable ["MWF_BuildPlacement_Ghost", _ghost];
 missionNamespace setVariable ["MWF_BuildPlacement_Class", _className];
 missionNamespace setVariable ["MWF_BuildPlacement_Cost", _price];

@@ -6,12 +6,12 @@ class CfgFunctions {
             file = "functions"; 
             
 
-	    class hasProgressionAccess          { file = "MWF_fn_hasProgressionAccess.sqf"; };
-            class interruptSensitiveInteraction { file = "MWF_fn_interruptSensitiveInteraction.sqf"; };
+	    class hasProgressionAccess          { file = "functions\MWF_fn_hasProgressionAccess.sqf"; };
+            class interruptSensitiveInteraction { file = "functions\MWF_fn_interruptSensitiveInteraction.sqf"; };
             class checkUndercover               { file = "MWF_fnc_checkUndercover.sqf"; }; // Denna saknades i din bild!
-            class globalStateManager            { file = "MWF_fnc_globalStateManager.sqf"; };
-            class onQuestComplete               { file = "MWF_fnc_onQuestComplete.sqf"; };
-            class spawnModifier                 { file = "MWF_fnc_spawnModifier.sqf"; };
+            class globalStateManager            { file = "functions\MWF_fnc_globalStateManager.sqf"; };
+            class onQuestComplete               { file = "functions\MWF_fnc_onQuestComplete.sqf"; };
+            class spawnModifier                 { file = "functions\MWF_fnc_spawnModifier.sqf"; };
         };
 
 
