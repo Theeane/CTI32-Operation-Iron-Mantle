@@ -46,17 +46,8 @@ private _actionId = _asset addAction [
         };
 
         _target setVariable ["MWF_FOB_PlacementInProgress", true, true];
-
-        [_target] spawn {
-            params [["_sourceObject", objNull, [objNull]]];
-            if (!hasInterface || {isNull _sourceObject}) exitWith {
-                if (!isNull _sourceObject) then {
-                    _sourceObject setVariable ["MWF_FOB_PlacementInProgress", false, true];
-                };
-            };
-
-            [_sourceObject] call MWF_fnc_startFOBPlacement;
-        };
+        [_target, getPosASL _target, getDir _target] remoteExec ["MWF_fnc_deployFOB", 2];
+        hint "FOB deployment requested.";
     },
     nil,
     10,

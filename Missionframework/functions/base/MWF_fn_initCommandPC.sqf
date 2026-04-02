@@ -182,21 +182,21 @@ _ids pushBack (_laptop addAction [
 ]);
 
 _ids pushBack (_laptop addAction [
-    "<t color='#ffaa00'>[ AUTHORIZE FOB REPACK ]</t>",
+    "<t color='#ffaa00'>[ COMMAND REPACK FOB ]</t>",
     {
         params ["_target", "_caller"];
         [_target, true] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
+    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (!(_target getVariable ['MWF_FOB_CanRepack', false]) || {serverTime > (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])}) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ]);
 
 _ids pushBack (_laptop addAction [
-    "<t color='#ff6600'>[ LOCK FOB REPACK ]</t>",
+    "<t color='#ff6600'>[ CANCEL FOB REPACK ]</t>",
     {
         params ["_target", "_caller"];
         [_target, false] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
+    nil, 4, true, true, "", "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_CanRepack', false]) && (serverTime <= (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])) && !(_target getVariable ['MWF_FOB_IsDamaged', false])"
 ]);
 
 _laptop setVariable ["MWF_CommandActionIds", _ids];

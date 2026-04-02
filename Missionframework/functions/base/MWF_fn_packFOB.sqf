@@ -27,13 +27,13 @@ if !(_existing isEqualTo []) then {
 // 2. Configuration & Conditions
 // Only allow repacking if the base is not currently under attack or damaged.
 private _repackTime = missionNamespace getVariable ["MWF_FOB_RepackTime", 15];
-private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_isUnderAttack', false])";
+private _condition = "_this distance _target < 10 && (_target getVariable ['MWF_FOB_CanRepack', false]) && ((_target getVariable ['MWF_FOB_RepackExpiresAt', -1]) < 0 || {serverTime <= (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])}) && !(_target getVariable ['MWF_isUnderAttack', false])";
 private _actionIds = [];
 
 // 3. Action: Pack into Truck (Driveable)
 private _truckActionId = [
     _fobObject,
-    "<t color='#FFCC00'>Repack: Truck (Mobile)</t>",
+    "<t color='#FFCC00'>Command Repack FOB: Truck</t>",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_unload_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_unload_ca.paa",
     _condition,
@@ -56,7 +56,7 @@ private _truckActionId = [
 // 4. Action: Pack into Container (Slingloadable)
 private _boxActionId = [
     _fobObject,
-    "<t color='#FFCC00'>Repack: Container (Slingload)</t>",
+    "<t color='#FFCC00'>Command Repack FOB: Container</t>",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_box_ca.paa",
     "\a3\ui_f\data\IGUI\Cfg\HoldActions\holdAction_box_ca.paa",
     _condition,

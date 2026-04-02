@@ -29,10 +29,13 @@ if (_status && _isUnderAttack) exitWith {
 
 // 2. State Update
 // Set the repack variable globally so all clients (and the pack action) see it.
+private _duration = missionNamespace getVariable ["MWF_FOB_RepackAuthorizeDuration", 900];
+private _expiresAt = if (_status) then { serverTime + _duration } else { -1 };
 _fob setVariable ["MWF_FOB_CanRepack", _status, true];
+_fob setVariable ["MWF_FOB_RepackExpiresAt", _expiresAt, true];
 
 // 3. Feedback and Logging
-private _msg = if (_status) then { "AUTHORIZED" } else { "LOCKED" };
+private _msg = if (_status) then { format ["AUTHORIZED for %1 minutes", round (_duration / 60)] } else { "LOCKED" };
 private _location = mapGridPosition _fob;
 
 // Notify players of the logistical change via system chat

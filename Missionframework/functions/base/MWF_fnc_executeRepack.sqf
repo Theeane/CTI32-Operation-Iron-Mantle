@@ -39,6 +39,8 @@ private _dir = getDir _fobObject;
 [_fobObject] call MWF_fnc_unregisterFOB;
 deleteVehicle _fobObject;
 
+missionNamespace setVariable ["MWF_CommandTerminal_Object", objNull];
+
 private _assetOptions = missionNamespace getVariable ["MWF_FOB_AssetOptions", []];
 private _className = "";
 
@@ -63,6 +65,9 @@ _newObject setDir _dir;
 _newObject setPosATL _pos;
 
 [_newObject] remoteExec ["MWF_fnc_initFOB", 0, true];
+_newObject setVariable ["MWF_FOB_PlacementInProgress", false, true];
+_newObject setVariable ["MWF_FOB_CanRepack", false, true];
+_newObject setVariable ["MWF_FOB_RepackExpiresAt", -1, true];
 
 [format ["FOB repacked into %1.", _repackType]] remoteExec ["systemChat", 0];
 diag_log format ["[MWF] Base: FOB at %1 repacked into %2 (%3).", _pos, _repackType, _className];

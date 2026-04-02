@@ -187,7 +187,8 @@ _laptop addEventHandler ["Killed", {
 }];
 
 if (!_isRestore) then {
-    ["TaskSucceeded", ["", format ["%1 deployed and active.", _resolvedName]]] remoteExec ["BIS_fnc_showNotification", 0];
+    ["TaskSucceeded", ["", format ["%1 deployed.", _resolvedName]]] remoteExec ["BIS_fnc_showNotification", 0];
+    [format ["%1 deployed.", _resolvedName]] remoteExec ["systemChat", 0];
 };
 
 diag_log format ["[MWF FOB] %1 deployed at %2 (origin: %3, marker: %4).", _resolvedName, _posAsl, _originType, _markerName];

@@ -43,9 +43,10 @@ if (_isFobAsset) then {
         hint parseText "<t color='#ff0000'>Pad Occupied</t><br/>Clear the MOB spawn pad before purchasing a new FOB asset.";
     };
 
-    private _canPurchaseFob = ["CAN_DEPLOY", [_spawnPadPos]] call MWF_fnc_baseManager;
-    if (!_canPurchaseFob) exitWith {
-        hint "Purchase failed. FOB deployment rules or FOB limits block another FOB asset right now.";
+    private _maxFobs = missionNamespace getVariable ["MWF_Param_MaxFOBs", 3];
+    private _activeFobs = missionNamespace getVariable ["MWF_FOB_Registry", []];
+    if ((count _activeFobs) >= _maxFobs) exitWith {
+        hint format ["Purchase failed. FOB limit reached (%1/%2 active).", count _activeFobs, _maxFobs];
     };
 };
 
