@@ -23,6 +23,7 @@ params [
 
 private _modeUpper = toUpper _mode;
 if (_modeUpper isEqualTo "VEHICLE") exitWith {
+    ["[MWF] Legacy vehicle ghost path redirected to KP preview."] call BIS_fnc_showSubtitle;
     [_payload, _sourceTerminal] spawn MWF_fnc_startVehicleBuildSession;
     true
 };

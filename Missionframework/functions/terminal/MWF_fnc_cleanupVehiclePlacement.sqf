@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Central cleanup for the new KP-based vehicle placement state.
+    Central cleanup for the KP-based vehicle placement state.
 */
 
 if (!hasInterface) exitWith { false };
@@ -48,7 +48,8 @@ player forceWalk false;
     "MWF_VehiclePlacement_ConfirmAction",
     "MWF_VehiclePlacement_CancelAction",
     "MWF_VehiclePlacement_PlaceRequested",
-    "MWF_VehiclePlacement_CancelRequested"
+    "MWF_VehiclePlacement_CancelRequested",
+    "MWF_VehiclePlacement_State"
 ];
 
 missionNamespace setVariable ["MWF_VehiclePlacement_Active", false];
@@ -57,14 +58,9 @@ if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqual
     missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
 };
 
-
-
-// Also nuke the old generic ghost-placement vehicle state so legacy code cannot leak through.
 private _legacyGhost = missionNamespace getVariable ["MWF_GhostPlacement_Ghost", objNull];
 if (!isNull _legacyGhost) then { deleteVehicle _legacyGhost; };
-{
-    if (_x >= 0) then { player removeAction _x; };
-} forEach (missionNamespace getVariable ["MWF_GhostPlacement_ActionIds", []]);
+{ if (_x >= 0) then { player removeAction _x; }; } forEach (missionNamespace getVariable ["MWF_GhostPlacement_ActionIds", []]);
 missionNamespace setVariable ["MWF_GhostPlacement_ActionIds", []];
 missionNamespace setVariable ["MWF_GhostPlacement_Active", false];
 
