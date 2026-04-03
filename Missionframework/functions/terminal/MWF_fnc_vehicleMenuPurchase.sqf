@@ -33,7 +33,7 @@ missionNamespace setVariable ["MWF_VehicleMenu_PendingTerminal", _terminal];
 [_entry, _terminal] spawn {
     params ["_entryLocal", "_terminalLocal"];
     uiSleep 0.05;
-    [_entryLocal, _terminalLocal] call MWF_fnc_beginVehiclePlacement;
+    ["vehicle", _entryLocal, _terminalLocal] call MWF_fnc_startGhostPlacement;
 };
 
 true

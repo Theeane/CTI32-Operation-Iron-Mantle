@@ -76,7 +76,8 @@ if (_modeNow isEqualTo "UPGRADES") exitWith {
             };
             [[if (_actionMode isEqualTo "GARAGE_BUILD") then {"VIRTUAL GARAGE"} else {"BASE UPGRADE"}, _tooltipText], "info"] call MWF_fnc_showNotification;
             ["CLOSE"] call MWF_fnc_dataHub;
-            [_buildClass, _buildCost] spawn MWF_fnc_startBuildPlacement;
+            private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
+            ["build", [_buildClass, _buildCost], _terminal] call MWF_fnc_startGhostPlacement;
             true
         };
         case "GARAGE_INFO";

@@ -1,7 +1,6 @@
 class Terminal {
     file = "functions\terminal";
 
-    class beginVehiclePlacement       { file = "functions\terminal\MWF_fnc_beginVehiclePlacement.sqf"; };
     class cancelVehiclePlacement      { file = "functions\terminal\MWF_fnc_cancelVehiclePlacement.sqf"; };
     class cleanupVehiclePlacement     { file = "functions\terminal\MWF_fnc_cleanupVehiclePlacement.sqf"; };
     class confirmVehiclePlacement     { file = "functions\terminal\MWF_fnc_confirmVehiclePlacement.sqf"; };
@@ -18,8 +17,8 @@ class Terminal {
     class terminal_support            { file = "functions\terminal\MWF_fnc_terminal_support.sqf"; };
     class terminal_upload             { file = "functions\terminal\MWF_fnc_terminal_upload.sqf"; };
     class terminal_vehicleMenu        { file = "functions\terminal\MWF_fnc_terminal_vehicleMenu.sqf"; };
-    class updateVehicleGhost          { file = "functions\terminal\MWF_fnc_updateVehicleGhost.sqf"; };
     class vehicleMenuPurchase         { file = "functions\terminal\MWF_fnc_vehicleMenuPurchase.sqf"; };
     class validateTerminalAccess      { file = "functions\terminal\MWF_fnc_validateTerminalAccess.sqf"; };
-    class validateVehiclePlacement    { file = "functions\terminal\MWF_fnc_validateVehiclePlacement.sqf"; };
+    class startGhostPlacement        { file = "functions\terminal\MWF_fnc_startGhostPlacement.sqf"; };
+    class validateGhostPlacement     { file = "functions\terminal\MWF_fnc_validateGhostPlacement.sqf"; };
 };
