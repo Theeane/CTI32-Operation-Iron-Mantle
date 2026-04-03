@@ -42,7 +42,7 @@ if (hasInterface && {_className isEqualTo ""}) exitWith {
     ];
 
     [] call MWF_fnc_cleanupVehiclePlacement;
-    _payload remoteExec ["MWF_fnc_confirmVehiclePlacement", 2];
+    _payload remoteExecCall ["MWF_fnc_serverPurchasePlacedVehicle", 2];
     systemChat "Vehicle build request sent to server.";
     true
 };
@@ -50,7 +50,4 @@ if (hasInterface && {_className isEqualTo ""}) exitWith {
 if (!isServer) exitWith { false };
 if (_className isEqualTo "") exitWith { false };
 
-// Legacy server handoff kept only for compatibility with any old remoteExec callers.
-[_className, _cost, _minTier, _posASL, _dir, _surfaceRule, _requiredUnlock, _isTier5] call MWF_fnc_serverPurchasePlacedVehicle;
-
-false
+[_className, _cost, _minTier, _posASL, _dir, _surfaceRule, _requiredUnlock, _isTier5] call MWF_fnc_serverPurchasePlacedVehicle

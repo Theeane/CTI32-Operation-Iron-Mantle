@@ -14,10 +14,6 @@ if !(canSuspend) exitWith {
     _this spawn MWF_fnc_startGhostPlacement;
     true
 };
-if (vehicle player != player) exitWith {
-    hint "Exit your vehicle before building.";
-    false
-};
 
 params [
     ["_mode", "vehicle", [""]],
@@ -26,13 +22,17 @@ params [
 ];
 
 private _modeUpper = toUpper _mode;
-if !(_modeUpper in ["VEHICLE", "BUILD"]) exitWith { false };
-
-// Hard cut: vehicles never use the legacy ghost core anymore.
 if (_modeUpper isEqualTo "VEHICLE") exitWith {
     [_payload, _sourceTerminal] spawn MWF_fnc_startVehicleBuildSession;
     true
 };
+
+if (vehicle player != player) exitWith {
+    hint "Exit your vehicle before building.";
+    false
+};
+
+if !(_modeUpper in ["BUILD"]) exitWith { false };
 
 // Cleanup previous session if one exists.
 private _cleanupIds = missionNamespace getVariable ["MWF_GhostPlacement_ActionIds", []];

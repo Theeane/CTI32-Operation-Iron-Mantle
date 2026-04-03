@@ -9,6 +9,11 @@
 */
 
 if (!hasInterface) exitWith { false };
+if !(canSuspend) exitWith {
+    _this spawn MWF_fnc_startVehicleBuildSession;
+    true
+};
+uiSleep 0.05;
 if (vehicle player != player) exitWith {
     hint "Exit your vehicle before placing a vehicle.";
     false
