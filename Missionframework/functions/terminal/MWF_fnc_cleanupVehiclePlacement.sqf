@@ -57,4 +57,38 @@ if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqual
     missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
 };
 
+
+
+// Also nuke the old generic ghost-placement vehicle state so legacy code cannot leak through.
+private _legacyGhost = missionNamespace getVariable ["MWF_GhostPlacement_Ghost", objNull];
+if (!isNull _legacyGhost) then { deleteVehicle _legacyGhost; };
+{
+    if (_x >= 0) then { player removeAction _x; };
+} forEach (missionNamespace getVariable ["MWF_GhostPlacement_ActionIds", []]);
+missionNamespace setVariable ["MWF_GhostPlacement_ActionIds", []];
+missionNamespace setVariable ["MWF_GhostPlacement_Active", false];
+
+{
+    missionNamespace setVariable [_x, nil];
+} forEach [
+    "MWF_GhostPlacement_Mode",
+    "MWF_GhostPlacement_Ghost",
+    "MWF_GhostPlacement_Class",
+    "MWF_GhostPlacement_DisplayName",
+    "MWF_GhostPlacement_Cost",
+    "MWF_GhostPlacement_MinTier",
+    "MWF_GhostPlacement_RequiredUnlock",
+    "MWF_GhostPlacement_IsTier5",
+    "MWF_GhostPlacement_Profile",
+    "MWF_GhostPlacement_Rotation",
+    "MWF_GhostPlacement_HeightOffset",
+    "MWF_GhostPlacement_IsValid",
+    "MWF_GhostPlacement_LastReason",
+    "MWF_GhostPlacement_LastPosASL",
+    "MWF_GhostPlacement_LastDir",
+    "MWF_GhostPlacement_SourceTerminal",
+    "MWF_GhostPlacement_Confirmed",
+    "MWF_GhostPlacement_Cancelled"
+];
+
 true

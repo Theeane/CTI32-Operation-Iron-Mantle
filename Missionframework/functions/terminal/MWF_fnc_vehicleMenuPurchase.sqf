@@ -34,7 +34,8 @@ uiNamespace setVariable ["MWF_VehicleMenu_SelectedIndex", _selectedIndex];
 [_entry, _terminal] spawn {
     params ["_entryLocal", "_terminalLocal"];
     uiSleep 0.05;
-    [_entryLocal, _terminalLocal] call MWF_fnc_startVehicleBuildSession;
+    ["[MWF] New vehicle preview path via buyMenu."] call BIS_fnc_showSubtitle;
+    [_entryLocal, _terminalLocal] spawn MWF_fnc_startVehicleBuildSession;
 };
 
 true

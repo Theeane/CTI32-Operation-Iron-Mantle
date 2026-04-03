@@ -25,7 +25,12 @@ if (_className isEqualTo "") exitWith { [false, "Placement data missing."] };
 private _posATL = ASLToATL _posASL;
 private _isWater = surfaceIsWater [_posATL # 0, _posATL # 1];
 private _modeUpper = toUpper _mode;
-
+if (_modeUpper isEqualTo "VEHICLE") exitWith {
+    private _profile = _context getOrDefault ["profile", []];
+    private _ghost = _context getOrDefault ["ghost", objNull];
+    private _terminal = _context getOrDefault ["terminal", objNull];
+    [_className, _posASL, _dir, _profile, _ghost, _terminal] call MWF_fnc_validateVehicleBuildPlacement
+};
 if (_modeUpper isEqualTo "VEHICLE") then {
     private _profile = _context getOrDefault ["profile", []];
     if (_profile isEqualTo []) exitWith { [false, "Vehicle placement profile missing."] };
