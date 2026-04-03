@@ -115,7 +115,6 @@ if (_surfaceRule isEqualTo "WATER") then {
     _spawnVehicle setVectorUp [0, 0, 1];
 } else {
     private _spawnATL = ASLToATL _posASL;
-    _spawnATL set [2, 0.2];
     _spawnVehicle setPosATL _spawnATL;
     _spawnVehicle setVectorUp surfaceNormal _spawnATL;
 };

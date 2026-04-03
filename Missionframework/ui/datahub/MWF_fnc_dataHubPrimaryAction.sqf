@@ -5,8 +5,7 @@ private _statusCtrl = _display displayCtrl 12206;
 private _modeNow = uiNamespace getVariable ["MWF_DataHub_Mode", "ZONES"];
 
 if (_modeNow isEqualTo "VEHICLE_MENU") exitWith {
-    private _terminal = uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]];
-    ["OPEN", _terminal] call MWF_fnc_terminal_vehicleMenu
+    [] call MWF_fnc_vehicleMenuPrimaryAction
 };
 
 if (_modeNow isEqualTo "SUPPORT") exitWith {

@@ -129,6 +129,20 @@ missionNamespace setVariable ["MWF_GhostPlacement_SourceTerminal", _sourceTermin
 missionNamespace setVariable ["MWF_GhostPlacement_Confirmed", false];
 missionNamespace setVariable ["MWF_GhostPlacement_Cancelled", false];
 
+// Legacy mirrors kept alive so older interruption / cleanup paths cannot silently kill the new flow.
+missionNamespace setVariable ["MWF_VehiclePlacement_Active", (_modeUpper isEqualTo "VEHICLE")];
+missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", if (_modeUpper isEqualTo "VEHICLE") then {_ghost} else {objNull}];
+missionNamespace setVariable ["MWF_VehiclePlacement_Class", _className];
+missionNamespace setVariable ["MWF_VehiclePlacement_Cost", _cost];
+missionNamespace setVariable ["MWF_VehiclePlacement_MinTier", _minTier];
+missionNamespace setVariable ["MWF_VehiclePlacement_Profile", _profile];
+missionNamespace setVariable ["MWF_VehiclePlacement_RequiredUnlock", _requiredUnlock];
+missionNamespace setVariable ["MWF_VehiclePlacement_IsTier5", _isTier5];
+missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
+missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement not yet validated."];
+missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player];
+missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir player];
+
 player forceWalk true;
 
 private _rotateAction = player addAction [
@@ -176,12 +190,18 @@ while {
     private _ghostNow = missionNamespace getVariable ["MWF_GhostPlacement_Ghost", objNull];
     if (isNull _ghostNow) exitWith { missionNamespace setVariable ["MWF_GhostPlacement_Cancelled", true]; };
 
-    private _targetPos = positionCameraToWorld [0, (_previewDistance max 6), 0];
-    private _finalPosATL = ASLToATL (AGLToASL _targetPos);
+    private _placementDistance = _previewDistance max ((((sizeOf _className) max 2) * 0.6) + 1);
+    private _playerDir = getDir player;
+    private _targetPos = [
+        ((getPosATL player) select 0) + (_placementDistance * sin _playerDir),
+        ((getPosATL player) select 1) + (_placementDistance * cos _playerDir),
+        (getPosATL player) select 2
+    ];
+    private _finalPosATL = +_targetPos;
     _finalPosATL set [2, (_finalPosATL select 2) + _previewHeight + _heightOffsetNow];
 
     _ghostNow setPosATL _finalPosATL;
-    _ghostNow setDir (getDir player + _rotationNow);
+    _ghostNow setDir (_playerDir + _rotationNow);
 
     private _context = createHashMapFromArray [
         ["profile", _profile],
@@ -196,6 +216,10 @@ while {
     missionNamespace setVariable ["MWF_GhostPlacement_LastDir", getDir _ghostNow];
     missionNamespace setVariable ["MWF_GhostPlacement_IsValid", _isValid];
     missionNamespace setVariable ["MWF_GhostPlacement_LastReason", _reason];
+    missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", ATLToASL _finalPosATL];
+    missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir _ghostNow];
+    missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", _isValid];
+    missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", _reason];
     [_ghostNow, _isValid] call _paintGhost;
 
     uiSleep 0.02;
@@ -217,6 +241,8 @@ player forceWalk false;
 private _ghostEnd = missionNamespace getVariable ["MWF_GhostPlacement_Ghost", objNull];
 if (!isNull _ghostEnd) then { deleteVehicle _ghostEnd; };
 missionNamespace setVariable ["MWF_GhostPlacement_Active", false];
+missionNamespace setVariable ["MWF_VehiclePlacement_Active", false];
+missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", objNull];
 
 if (_confirmed && _isValid) then {
     if (_modeUpper isEqualTo "VEHICLE") then {
@@ -264,7 +290,17 @@ if (_confirmed && _isValid) then {
     "MWF_GhostPlacement_LastDir",
     "MWF_GhostPlacement_SourceTerminal",
     "MWF_GhostPlacement_Confirmed",
-    "MWF_GhostPlacement_Cancelled"
+    "MWF_GhostPlacement_Cancelled",
+    "MWF_VehiclePlacement_Class",
+    "MWF_VehiclePlacement_Cost",
+    "MWF_VehiclePlacement_MinTier",
+    "MWF_VehiclePlacement_Profile",
+    "MWF_VehiclePlacement_RequiredUnlock",
+    "MWF_VehiclePlacement_IsTier5",
+    "MWF_VehiclePlacement_IsValid",
+    "MWF_VehiclePlacement_LastReason",
+    "MWF_VehiclePlacement_LastPosASL",
+    "MWF_VehiclePlacement_LastDir"
 ];
 
 true
