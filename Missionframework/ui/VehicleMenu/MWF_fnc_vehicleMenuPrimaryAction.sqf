@@ -25,5 +25,5 @@ if (_isLocked || {!_canAfford}) exitWith {
 
 private _terminal = uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]];
 ["CLOSE"] call MWF_fnc_dataHub;
-["vehicle", _entry, _terminal] spawn MWF_fnc_startGhostPlacement;
+[_entry, _terminal] spawn MWF_fnc_startVehicleBuildSession;
 true

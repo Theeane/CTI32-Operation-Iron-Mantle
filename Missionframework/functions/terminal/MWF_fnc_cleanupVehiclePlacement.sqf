@@ -4,7 +4,7 @@
     Project: Military War Framework
 
     Description:
-    Central cleanup for the vehicle ghost placement state.
+    Central cleanup for the new KP-based vehicle placement state.
 */
 
 if (!hasInterface) exitWith { false };
@@ -23,23 +23,38 @@ if (!isNull _ghost) then { deleteVehicle _ghost; };
     "MWF_VehiclePlacement_CancelAction"
 ];
 
+player forceWalk false;
+
+{
+    missionNamespace setVariable [_x, nil];
+} forEach [
+    "MWF_VehiclePlacement_Ghost",
+    "MWF_VehiclePlacement_Class",
+    "MWF_VehiclePlacement_Cost",
+    "MWF_VehiclePlacement_MinTier",
+    "MWF_VehiclePlacement_Name",
+    "MWF_VehiclePlacement_Profile",
+    "MWF_VehiclePlacement_SourceTerminal",
+    "MWF_VehiclePlacement_RequiredUnlock",
+    "MWF_VehiclePlacement_IsTier5",
+    "MWF_VehiclePlacement_Rotation",
+    "MWF_VehiclePlacement_HeightOffset",
+    "MWF_VehiclePlacement_LastReason",
+    "MWF_VehiclePlacement_LastPosASL",
+    "MWF_VehiclePlacement_LastDir",
+    "MWF_VehiclePlacement_RotateAction",
+    "MWF_VehiclePlacement_RaiseAction",
+    "MWF_VehiclePlacement_LowerAction",
+    "MWF_VehiclePlacement_ConfirmAction",
+    "MWF_VehiclePlacement_CancelAction",
+    "MWF_VehiclePlacement_PlaceRequested",
+    "MWF_VehiclePlacement_CancelRequested"
+];
+
 missionNamespace setVariable ["MWF_VehiclePlacement_Active", false];
-missionNamespace setVariable ["MWF_VehiclePlacement_Ghost", objNull];
-missionNamespace setVariable ["MWF_VehiclePlacement_Class", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_Cost", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_MinTier", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_Name", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_Profile", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_Rotation", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", nil];
 missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", nil];
-missionNamespace setVariable ["MWF_VehiclePlacement_RotateAction", -1];
-missionNamespace setVariable ["MWF_VehiclePlacement_RaiseAction", -1];
-missionNamespace setVariable ["MWF_VehiclePlacement_LowerAction", -1];
-missionNamespace setVariable ["MWF_VehiclePlacement_ConfirmAction", -1];
-missionNamespace setVariable ["MWF_VehiclePlacement_CancelAction", -1];
-if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then { missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil]; };
+if ((missionNamespace getVariable ["MWF_SensitiveInteraction_Type", ""]) isEqualTo "VEHICLE_PLACEMENT") then {
+    missionNamespace setVariable ["MWF_SensitiveInteraction_Type", nil];
+};
+
 true
