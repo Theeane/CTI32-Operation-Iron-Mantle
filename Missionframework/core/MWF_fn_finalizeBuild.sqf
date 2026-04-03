@@ -34,12 +34,26 @@ if (surfaceIsWater [_pos # 0, _pos # 1]) exitWith {
 private _diameter = sizeOf _className;
 if (_diameter <= 0) then { _diameter = 6; };
 private _safetyRadius = ((_diameter * 0.55) max 3.5) min 16;
-private _near = nearestObjects [_pos, ["Building", "House", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 6, true];
+private _near = nearestObjects [_pos, ["Building", "House", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 5, true];
 private _blocking = objNull;
 {
     if (!isNull _x && {_x != _builder}) then {
-        private _otherRadius = if (_x isKindOf "CAManBase") then { 1.2 } else { ((((sizeOf (typeOf _x)) max 2) * 0.45) + 0.75) max 1.5 };
-        if ((_x distance2D _pos) < ((_safetyRadius * 0.75) + _otherRadius)) exitWith { _blocking = _x; };
+        private _otherRadius = if (_x isKindOf "CAManBase") then {
+            0.9
+        } else {
+            private _otherDiameter = (sizeOf (typeOf _x)) max 2;
+            if (_x isKindOf "Building" || {_x isKindOf "House"}) then {
+                ((_otherDiameter * 0.30) + 0.35) max 1.2
+            } else {
+                ((_otherDiameter * 0.35) + 0.50) max 1.35
+            }
+        };
+        private _requiredSeparation = if (_x isKindOf "CAManBase") then {
+            (_safetyRadius * 0.30) + _otherRadius
+        } else {
+            (_safetyRadius * 0.45) + _otherRadius
+        };
+        if ((_x distance2D _pos) < _requiredSeparation) exitWith { _blocking = _x; };
     };
 } forEach _near;
 if (!isNull _blocking) exitWith {
