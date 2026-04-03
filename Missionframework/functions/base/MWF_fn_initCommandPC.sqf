@@ -52,14 +52,11 @@ if (_isMobTerminal) exitWith {
 };
 
 private _ids = [];
-private _condOperational = "alive _target && alive _this && _this distance _target < 3 && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condPeace = _condOperational;
-private _condCampaign = "alive _target && alive _this && _this distance _target < 3 && ((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condDamaged = "alive _target && alive _this && _this distance _target < 3 && (_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condIntel = "alive _target && alive _this && _this distance _target < 3 && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
-private _condAttack = "alive _target && alive _this && _this distance _target < 3 && (_target getVariable ['MWF_isUnderAttack', false])";
-private _condRepackAuthorize = "alive _target && alive _this && _this distance _target < 3 && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && (!(_target getVariable ['MWF_FOB_CanRepack', false]) || {serverTime > (_target getVariable ['MWF_FOB_RepackExpiresAt', -1])})";
-private _condRepackCancel = "alive _target && alive _this && _this distance _target < 3 && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && (_target getVariable ['MWF_FOB_CanRepack', false]) && (serverTime <= (_target getVariable ['MWF_FOB_RepackExpiresAt', -1]))";
+private _condPeace = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && !(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condDamaged = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condIntel = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (player getVariable ['MWF_carriedIntelValue', 0]) > 0 && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
+private _condAttack = "((missionNamespace getVariable ['MWF_Campaign_Phase', 'TUTORIAL']) isEqualTo 'OPEN_WAR') && (_target getVariable ['MWF_isUnderAttack', false])";
+private _condUtility = "!(_target getVariable ['MWF_isUnderAttack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false])";
 
 _ids pushBack (_laptop addAction [
     "<t color='#00FF00'>[ ACCESS COMMAND NETWORK ]</t>",
@@ -67,7 +64,7 @@ _ids pushBack (_laptop addAction [
         params ["_target", "_caller"];
         [_target, _caller] spawn MWF_fnc_openBuyMenu;
     },
-    nil, 10, true, true, "", _condOperational
+    nil, 10, true, true, "", _condPeace
 ]);
 
 _ids pushBack (_laptop addAction [
@@ -78,7 +75,7 @@ _ids pushBack (_laptop addAction [
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "SIDE_MISSIONS"] call MWF_fnc_dataHub;
     },
-    nil, 9, true, true, "", _condCampaign
+    nil, 9, true, true, "", _condPeace
 ]);
 
 _ids pushBack (_laptop addAction [
@@ -89,7 +86,7 @@ _ids pushBack (_laptop addAction [
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "MAIN_OPERATIONS"] call MWF_fnc_dataHub;
     },
-    nil, 8.5, true, true, "", _condCampaign
+    nil, 8.5, true, true, "", _condPeace
 ]);
 
 _ids pushBack (_laptop addAction [
@@ -99,7 +96,7 @@ _ids pushBack (_laptop addAction [
         missionNamespace setVariable ['MWF_CommandTerminal_User', _caller];
         [_target, _caller] call MWF_fnc_openRedeploy;
     },
-    nil, 8, true, true, "", _condPeace
+    nil, 8, true, true, "", _condUtility
 ]);
 
 _ids pushBack (_laptop addAction [
@@ -110,13 +107,13 @@ _ids pushBack (_laptop addAction [
         ["OPEN"] call MWF_fnc_dataHub;
         ["SET_MODE", "SUPPORT"] call MWF_fnc_dataHub;
     },
-    nil, 7.5, true, true, "", _condCampaign
+    nil, 7.5, true, true, "", _condPeace
 ]);
 
 _ids pushBack (_laptop addAction [
     "<t color='#00FFFF'>[ UPLOAD SECURED INTEL ]</t>",
     {
-     params ["_target", "_caller"];
+        params ["_target", "_caller"];
         [_target, _caller] remoteExecCall ["MWF_fnc_depositIntel", 2];
     },
     nil, 7, true, true, "", _condIntel
@@ -128,7 +125,7 @@ _ids pushBack (_laptop addAction [
         params ["_target", "_caller"];
         [_target, _caller] remoteExecCall ["MWF_fnc_upgradeBaseTier", 2];
     },
-    nil, 6.5, true, true, "", _condCampaign
+    nil, 6.5, true, true, "", _condPeace
 ]);
 
 _ids pushBack (_laptop addAction [
@@ -185,21 +182,21 @@ _ids pushBack (_laptop addAction [
 ]);
 
 _ids pushBack (_laptop addAction [
-    "<t color='#ffaa00'>[ COMMAND REPACK FOB ]</t>",
+    "<t color='#ffaa00'>[ AUTHORIZE FOB REPACK ]</t>",
     {
         params ["_target", "_caller"];
         [_target, true] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", _condRepackAuthorize
+    nil, 4, true, true, "", "!(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && !(_target getVariable ['MWF_isUnderAttack', false])"
 ]);
 
 _ids pushBack (_laptop addAction [
-    "<t color='#ff6600'>[ CANCEL FOB REPACK ]</t>",
+    "<t color='#ff6600'>[ LOCK FOB REPACK ]</t>",
     {
         params ["_target", "_caller"];
         [_target, false] remoteExec ["MWF_fnc_commanderToggleRepack", 2];
     },
-    nil, 4, true, true, "", _condRepackCancel
+    nil, 4, true, true, "", "(_target getVariable ['MWF_FOB_CanRepack', false]) && !(_target getVariable ['MWF_FOB_IsDamaged', false]) && !(_target getVariable ['MWF_isUnderAttack', false])"
 ]);
 
 _laptop setVariable ["MWF_CommandActionIds", _ids];

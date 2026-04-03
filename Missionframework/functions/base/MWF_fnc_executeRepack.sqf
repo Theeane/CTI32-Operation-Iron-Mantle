@@ -14,7 +14,7 @@ if (!isServer) exitWith {};
 params [
     ["_fobObject", objNull, [objNull]],
     ["_repackType", "box", [""]],
-    ["_requesterOwner", 0, [0]]
+    ["_caller", objNull, [objNull]]
 ];
 
 if (isNull _fobObject) exitWith {
@@ -23,7 +23,7 @@ if (isNull _fobObject) exitWith {
 
 private _canRepack = _fobObject getVariable ["MWF_FOB_CanRepack", true];
 if (!_canRepack) exitWith {
-    ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", if (_requesterOwner > 0) then {_requesterOwner} else {0}];
+    ["TaskFailed", ["", "Repack not authorized by Commander!"]] remoteExec ["BIS_fnc_showNotification", 0];
     diag_log "[MWF] Repack aborted: Unauthorized by variable.";
 };
 
@@ -39,8 +39,6 @@ private _dir = getDir _fobObject;
 
 [_fobObject] call MWF_fnc_unregisterFOB;
 deleteVehicle _fobObject;
-
-missionNamespace setVariable ["MWF_CommandTerminal_Object", objNull];
 
 private _assetOptions = missionNamespace getVariable ["MWF_FOB_AssetOptions", []];
 private _className = "";
@@ -61,19 +59,26 @@ if ((toLower _repackType) == "truck") then {
     };
 };
 
-private _newObject = createVehicle [_className, _pos, [], 0, "CAN_COLLIDE"];
+private _spawnPos = +_pos;
+if (!isNull _caller) then {
+    private _callerPos = getPosATL _caller;
+    private _callerDir = getDir _caller;
+    private _candidate = [_callerPos, 20, _callerDir] call BIS_fnc_relPos;
+    private _safe = [_candidate, 5, 18, 8, 0, 0.25, 0] call BIS_fnc_findSafePos;
+    if !(_safe isEqualTo [] || {_safe isEqualTo [0,0,0]}) then {
+        _spawnPos = _safe;
+    } else {
+        _spawnPos = _candidate;
+    };
+};
+
+private _newObject = createVehicle [_className, _spawnPos, [], 0, "CAN_COLLIDE"];
 _newObject setDir _dir;
-_newObject setPosATL _pos;
+_newObject setPosATL _spawnPos;
 
 [_newObject] remoteExec ["MWF_fnc_initFOB", 0, true];
-_newObject setVariable ["MWF_FOB_PlacementInProgress", false, true];
-_newObject setVariable ["MWF_FOB_CanRepack", false, true];
-_newObject setVariable ["MWF_FOB_RepackExpiresAt", -1, true];
 
-if (!isNil "MWF_fnc_requestDelayedSave") then {
-    [] call MWF_fnc_requestDelayedSave;
-};
 [format ["FOB repacked into %1.", _repackType]] remoteExec ["systemChat", 0];
-diag_log format ["[MWF] Base: FOB at %1 repacked into %2 (%3).", _pos, _repackType, _className];
+diag_log format ["[MWF] Base: FOB at %1 repacked into %2 (%3) at %4.", _pos, _repackType, _className, _spawnPos];
 
 true

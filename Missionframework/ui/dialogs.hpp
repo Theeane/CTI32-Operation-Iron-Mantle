@@ -59,7 +59,7 @@ class MWF_Terminal_Dialog {
             idc = 9107; text = "REDEPLOY";
             x = 0.67 * safezoneW + safezoneX; y = 0.82 * safezoneH + safezoneY;
             w = 0.14 * safezoneW; h = 0.07 * safezoneH;
-            onButtonClick = "closeDialog 0; ['OPEN', 'REDEPLOY'] call MWF_fnc_dataHub;";
+            onButtonClick = "closeDialog 0; [] call MWF_fnc_openRedeploy;";
         };
     };
 };

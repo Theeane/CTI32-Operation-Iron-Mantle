@@ -82,7 +82,7 @@ private _raiseAction = player addAction [
     "Raise",
     {
         private _offset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
-        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", _offset + 0.5];
+        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", _offset + 0.2];
     },
     nil, 97, false, true, "",
     "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
@@ -92,21 +92,21 @@ private _lowerAction = player addAction [
     "Lower",
     {
         private _offset = missionNamespace getVariable ["MWF_VehiclePlacement_HeightOffset", 0];
-        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", _offset - 0.5];
+        missionNamespace setVariable ["MWF_VehiclePlacement_HeightOffset", _offset - 0.2];
     },
     nil, 96, false, true, "",
     "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
 ];
 
 private _confirmAction = player addAction [
-    "Confirm Placement",
+    "Build",
     { missionNamespace setVariable ["MWF_VehiclePlacement_Confirmed", true]; },
     nil, 100, false, true, "",
     "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"
 ];
 
 private _cancelAction = player addAction [
-    "Cancel",
+    "Cancel Build",
     { missionNamespace setVariable ["MWF_VehiclePlacement_Cancelled", true]; },
     nil, 99, false, true, "",
     "missionNamespace getVariable ['MWF_VehiclePlacement_Active', false]"

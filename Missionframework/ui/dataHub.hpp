@@ -134,7 +134,7 @@ class MWF_RscDataHub {
         };
 
         class BtnVehicleBG: RscPicture {
-            idc = -1;
+            idc = 12230;
             text = "ui\button_bg.paa";
             x = 0.170 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
@@ -152,7 +152,7 @@ class MWF_RscDataHub {
         };
 
         class BtnBuildBG: RscPicture {
-            idc = -1;
+            idc = 12231;
             text = "ui\button_bg.paa";
             x = 0.300 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
@@ -170,7 +170,7 @@ class MWF_RscDataHub {
         };
 
         class BtnMainOpsBG: RscPicture {
-            idc = -1;
+            idc = 12232;
             text = "ui\button_bg.paa";
             x = 0.430 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
@@ -188,7 +188,7 @@ class MWF_RscDataHub {
         };
 
         class BtnSupportBG: RscPicture {
-            idc = -1;
+            idc = 12233;
             text = "ui\button_bg.paa";
             x = 0.560 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
@@ -206,7 +206,7 @@ class MWF_RscDataHub {
         };
 
         class BtnUpgradesBG: RscPicture {
-            idc = -1;
+            idc = 12234;
             text = "ui\button_bg.paa";
             x = 0.690 * safezoneW + safezoneX;
             y = 0.168 * safezoneH + safezoneY;
@@ -238,7 +238,8 @@ class MWF_RscDataHub {
             y = 0.260 * safezoneH + safezoneY;
             w = 0.620 * safezoneW;
             h = 0.338 * safezoneH;
-            onMouseButtonDblClick = "if ((_this select 1) isEqualTo 0) then { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; };";
+            onMouseButtonClick = "if ((_this select 1) isEqualTo 0 && {uiNamespace getVariable ['MWF_Redeploy_Active', false]}) then { [_this select 2, _this select 3] call MWF_fnc_redeploySelectEntry; };";
+            onMouseButtonDblClick = "if ((_this select 1) isEqualTo 0) then { if (uiNamespace getVariable ['MWF_Redeploy_Active', false]) then { [_this select 2, _this select 3] call MWF_fnc_redeploySelectEntry; } else { ['MAP_CLICK', [_this select 2, _this select 3]] call MWF_fnc_dataHub; }; };";
         };
 
         class StatusText: RscText {
@@ -264,55 +265,73 @@ class MWF_RscDataHub {
         };
 
         class BtnSideMissionsBG: RscPicture {
-            idc = -1;
+            idc = 12235;
             text = "ui\button_bg.paa";
             x = 0.186 * safezoneW + safezoneX;
             y = 0.698 * safezoneH + safezoneY;
-            w = 0.144 * safezoneW;
+            w = 0.136 * safezoneW;
             h = 0.090 * safezoneH;
         };
         class BtnSideMissions: MWF_RscTerminalButton {
             idc = 12215;
             text = "Missions";
-            x = 0.198 * safezoneW + safezoneX;
+            x = 0.196 * safezoneW + safezoneX;
             y = 0.709 * safezoneH + safezoneY;
-            w = 0.118 * safezoneW;
+            w = 0.116 * safezoneW;
             h = 0.060 * safezoneH;
             action = "['ACTION_SECONDARY'] call MWF_fnc_dataHub;";
         };
 
-        class BtnGuideBG: RscPicture {
-            idc = -1;
+        class BtnRedeployShellBG: RscPicture {
+            idc = 12236;
             text = "ui\button_bg.paa";
-            x = 0.424 * safezoneW + safezoneX;
+            x = 0.348 * safezoneW + safezoneX;
             y = 0.698 * safezoneH + safezoneY;
-            w = 0.156 * safezoneW;
+            w = 0.136 * safezoneW;
+            h = 0.090 * safezoneH;
+        };
+        class BtnRedeployShell: MWF_RscTerminalButton {
+            idc = 12208;
+            text = "Redeploy";
+            x = 0.358 * safezoneW + safezoneX;
+            y = 0.709 * safezoneH + safezoneY;
+            w = 0.116 * safezoneW;
+            h = 0.060 * safezoneH;
+            action = "[] call MWF_fnc_openRedeploy;";
+        };
+
+        class BtnGuideBG: RscPicture {
+            idc = 12237;
+            text = "ui\button_bg.paa";
+            x = 0.510 * safezoneW + safezoneX;
+            y = 0.698 * safezoneH + safezoneY;
+            w = 0.136 * safezoneW;
             h = 0.090 * safezoneH;
         };
         class BtnGuide: MWF_RscTerminalButton {
             idc = 12209;
             text = "$STR_MWF_GUIDE_BUTTON";
-            x = 0.437 * safezoneW + safezoneX;
+            x = 0.520 * safezoneW + safezoneX;
             y = 0.709 * safezoneH + safezoneY;
-            w = 0.130 * safezoneW;
+            w = 0.116 * safezoneW;
             h = 0.060 * safezoneH;
             action = "uiNamespace setVariable ['MWF_Guide_ReturnMode', uiNamespace getVariable ['MWF_DataHub_Mode','ZONES']]; ['CLOSE'] call MWF_fnc_dataHub; ['OPEN', 'START'] call MWF_fnc_openGuide;";
         };
 
         class BtnActionBG: RscPicture {
-            idc = -1;
+            idc = 12238;
             text = "ui\button_bg.paa";
-            x = 0.680 * safezoneW + safezoneX;
+            x = 0.672 * safezoneW + safezoneX;
             y = 0.698 * safezoneH + safezoneY;
-            w = 0.144 * safezoneW;
+            w = 0.136 * safezoneW;
             h = 0.090 * safezoneH;
         };
         class BtnAction: MWF_RscTerminalButton {
             idc = 12207;
             text = "Redeploy";
-            x = 0.692 * safezoneW + safezoneX;
+            x = 0.682 * safezoneW + safezoneX;
             y = 0.709 * safezoneH + safezoneY;
-            w = 0.118 * safezoneW;
+            w = 0.116 * safezoneW;
             h = 0.060 * safezoneH;
             action = "['ACTION'] call MWF_fnc_dataHub;";
         };

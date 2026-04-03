@@ -339,6 +339,8 @@ switch (_modeUpper) do {
             _contextTerminal = objNull;
         };
         uiNamespace setVariable ["MWF_DataHub_ContextTerminal", _contextTerminal];
+        uiNamespace setVariable ["MWF_Redeploy_Active", false];
+        uiNamespace setVariable ["MWF_Redeploy_Selected", []];
 
         createDialog "MWF_RscDataHub";
         private _display = findDisplay 12200;
@@ -368,8 +370,10 @@ switch (_modeUpper) do {
         uiNamespace setVariable ["MWF_DataHub_SelectedEntry", []];
         uiNamespace setVariable ["MWF_DataHub_ViewStack", []];
         uiNamespace setVariable ["MWF_DataHub_ContextTerminal", objNull];
-        uiNamespace setVariable ["MWF_RedeployShell_Active", false];
-        uiNamespace setVariable ["MWF_RedeployShell_ReturnTerminal", objNull];
+        uiNamespace setVariable ["MWF_Redeploy_Active", false];
+        uiNamespace setVariable ["MWF_Redeploy_Selected", []];
+        { deleteMarkerLocal _x; } forEach (uiNamespace getVariable ["MWF_Redeploy_Markers", []]);
+        uiNamespace setVariable ["MWF_Redeploy_Markers", []];
         true
     };
 

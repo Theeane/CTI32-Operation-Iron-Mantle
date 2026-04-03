@@ -5,7 +5,7 @@
 
     Description:
     Validates local ghost placement against surface rules and nearby object overlap.
-    Uses a footprint-aware safety radius so the ghost cannot be confirmed inside other vehicles.
+    Tuned to ignore small base props so vehicle ghost placement stays usable.
 
     Returns:
     [isValid, reason]
@@ -25,17 +25,11 @@ _profile params ["_vehicleType", "_surfaceRule", "_previewDistance", "_previewHe
 private _posATL = ASLToATL _posASL;
 private _isWater = surfaceIsWater [_posATL select 0, _posATL select 1];
 
-if (_surfaceRule isEqualTo "WATER" && {!_isWater}) exitWith {
-    [false, "Watercraft must be placed on water."]
-};
-
-if (_surfaceRule isEqualTo "LAND" && {_isWater}) exitWith {
-    [false, "This vehicle must be placed on land."]
-};
+if (_surfaceRule isEqualTo "WATER" && {!_isWater}) exitWith { [false, "Watercraft must be placed on water."] };
+if (_surfaceRule isEqualTo "LAND" && {_isWater}) exitWith { [false, "This vehicle must be placed on land."] };
 
 private _ghost = missionNamespace getVariable ["MWF_VehiclePlacement_Ghost", objNull];
-private _near = nearestObjects [_posATL, ["LandVehicle", "Ship", "Air", "Static", "Building", "Thing", "CAManBase"], _safetyRadius + 40, true];
-
+private _near = nearestObjects [_posATL, ["LandVehicle", "Ship", "Air", "Building", "House", "CAManBase"], _safetyRadius + 14, true];
 private _blockingObject = objNull;
 
 {
@@ -45,21 +39,17 @@ private _blockingObject = objNull;
         } else {
             private _otherDiameter = sizeOf (typeOf _x);
             if (_otherDiameter <= 0) then { _otherDiameter = 2; };
-            (_otherDiameter * 0.5) + 1
+            ((_otherDiameter * 0.45) + 0.75) max 1.5
         };
 
-        if ((_x distance2D _posATL) < (_safetyRadius + _otherRadius)) exitWith {
+        if ((_x distance2D _posATL) < ((_safetyRadius * 0.75) + _otherRadius)) exitWith {
             _blockingObject = _x;
         };
     };
 } forEach _near;
 
 if (!isNull _blockingObject) exitWith {
-    private _label = if (_blockingObject isKindOf "CAManBase") then {
-        "nearby unit"
-    } else {
-        typeOf _blockingObject
-    };
+    private _label = if (_blockingObject isKindOf "CAManBase") then { "nearby unit" } else { typeOf _blockingObject };
     [false, format ["Placement blocked by %1.", _label]]
 };
 

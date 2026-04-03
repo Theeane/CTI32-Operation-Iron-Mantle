@@ -14,6 +14,21 @@ if (!isNull _ghost) then {
     deleteVehicle _ghost;
 };
 
+private _rotateAction = missionNamespace getVariable ["MWF_BuildPlacement_RotateAction", -1];
+if (_rotateAction >= 0) then {
+    player removeAction _rotateAction;
+};
+
+private _raiseAction = missionNamespace getVariable ["MWF_BuildPlacement_RaiseAction", -1];
+if (_raiseAction >= 0) then {
+    player removeAction _raiseAction;
+};
+
+private _lowerAction = missionNamespace getVariable ["MWF_BuildPlacement_LowerAction", -1];
+if (_lowerAction >= 0) then {
+    player removeAction _lowerAction;
+};
+
 private _confirmAction = missionNamespace getVariable ["MWF_BuildPlacement_ConfirmAction", -1];
 if (_confirmAction >= 0) then {
     player removeAction _confirmAction;
@@ -33,6 +48,10 @@ if (_cancelAction >= 0) then {
     ["MWF_BuildPlacement_Cost", nil],
     ["MWF_BuildPlacement_UpgradeId", nil],
     ["MWF_BuildPlacement_Rotation", nil],
+    ["MWF_BuildPlacement_HeightOffset", nil],
+    ["MWF_BuildPlacement_RotateAction", -1],
+    ["MWF_BuildPlacement_RaiseAction", -1],
+    ["MWF_BuildPlacement_LowerAction", -1],
     ["MWF_BuildPlacement_IsValid", false],
     ["MWF_BuildPlacement_LastReason", nil],
     ["MWF_BuildPlacement_LastPosATL", nil],

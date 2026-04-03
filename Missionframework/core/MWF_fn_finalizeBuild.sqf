@@ -33,13 +33,13 @@ if (surfaceIsWater [_pos # 0, _pos # 1]) exitWith {
 
 private _diameter = sizeOf _className;
 if (_diameter <= 0) then { _diameter = 6; };
-private _safetyRadius = ((_diameter * 0.6) max 4) min 20;
-private _near = nearestObjects [_pos, ["Building", "House", "Static", "Thing", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 8, true];
+private _safetyRadius = ((_diameter * 0.55) max 3.5) min 16;
+private _near = nearestObjects [_pos, ["Building", "House", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 6, true];
 private _blocking = objNull;
 {
     if (!isNull _x && {_x != _builder}) then {
-        private _otherRadius = if (_x isKindOf "CAManBase") then { 1.2 } else { (((sizeOf (typeOf _x)) max 2) * 0.5) + 1 };
-        if ((_x distance2D _pos) < (_safetyRadius + _otherRadius)) exitWith { _blocking = _x; };
+        private _otherRadius = if (_x isKindOf "CAManBase") then { 1.2 } else { ((((sizeOf (typeOf _x)) max 2) * 0.45) + 0.75) max 1.5 };
+        if ((_x distance2D _pos) < ((_safetyRadius * 0.75) + _otherRadius)) exitWith { _blocking = _x; };
     };
 } forEach _near;
 if (!isNull _blocking) exitWith {
@@ -174,8 +174,5 @@ if (_isGarageUpgrade) then {
 };
 if (_isHeliUpgrade) then { [["BASE UPGRADE ONLINE", "Helicopter uplink constructed. Helicopters are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0]; };
 if (_isJetUpgrade) then { [["BASE UPGRADE ONLINE", "Aircraft control constructed. Planes are now available in the vehicle menu."], "success"] remoteExec ["MWF_fnc_showNotification", 0]; };
-if (!isNil "MWF_fnc_requestDelayedSave") then {
-    [] call MWF_fnc_requestDelayedSave;
-};
 if (!isNull _builder) then { [format ["Asset deployed: -%1 Supplies", _resolvedPrice]] remoteExec ["systemChat", owner _builder]; };
 diag_log format ["[MWF Build] %1 spawned at %2 for %3 supplies (client hint %4).", _className, _pos, _resolvedPrice, _priceHint];

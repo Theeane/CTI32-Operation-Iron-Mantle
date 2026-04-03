@@ -36,7 +36,7 @@ missionNamespace setVariable ["MWF_Op_GrandOpCooldown", 1800, true];
 
 // 5. Repack & Deployment Logic
 // Settings for the FOB "Repack" and "Deploy" sequences.
-missionNamespace setVariable ["MWF_FOB_RepackTime", 10, true]; // Time in seconds to repack a base
+missionNamespace setVariable ["MWF_FOB_RepackTime", 5, true]; // Time in seconds to repack a base
 missionNamespace setVariable ["MWF_FOB_DeploymentRadius", 50, true]; // Radius for the loadout zone
 
 diag_log "[MWF] Config: FOB Menu Configuration loaded successfully.";

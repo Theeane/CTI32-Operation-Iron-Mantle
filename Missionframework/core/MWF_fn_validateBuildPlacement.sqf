@@ -5,6 +5,7 @@
 
     Description:
     Validates physical base-upgrade ghost placement before the player confirms the build.
+    Tuned to ignore small decorative props so ghost build remains usable at FOB/MOB.
 
     Returns:
     [isValid, reason]
@@ -23,8 +24,8 @@ if (surfaceIsWater [_posATL # 0, _posATL # 1]) exitWith { [false, "This structur
 
 private _diameter = sizeOf _className;
 if (_diameter <= 0) then { _diameter = 6; };
-private _safetyRadius = ((_diameter * 0.6) max 4) min 20;
-private _near = nearestObjects [_posATL, ["Building", "House", "Static", "Thing", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 8, true];
+private _safetyRadius = ((_diameter * 0.55) max 3.5) min 16;
+private _near = nearestObjects [_posATL, ["Building", "House", "LandVehicle", "Air", "Ship", "CAManBase"], _safetyRadius + 6, true];
 private _blocking = objNull;
 
 {
@@ -34,17 +35,12 @@ private _blocking = objNull;
         } else {
             private _otherDiameter = sizeOf (typeOf _x);
             if (_otherDiameter <= 0) then { _otherDiameter = 2; };
-            (_otherDiameter * 0.5) + 1
+            ((_otherDiameter * 0.45) + 0.75) max 1.5
         };
 
-        if ((_x distance2D _posATL) < (_safetyRadius + _otherRadius)) exitWith {
-            _blocking = _x;
-        };
+        if ((_x distance2D _posATL) < ((_safetyRadius * 0.75) + _otherRadius)) exitWith { _blocking = _x; };
     };
 } forEach _near;
 
-if (!isNull _blocking) exitWith {
-    [false, format ["Placement blocked by %1.", typeOf _blocking]]
-};
-
+if (!isNull _blocking) exitWith { [false, format ["Placement blocked by %1", typeOf _blocking]] };
 [true, "Placement valid."]
