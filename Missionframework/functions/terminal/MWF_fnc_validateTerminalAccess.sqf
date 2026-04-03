@@ -1,0 +1,60 @@
+/*
+    Author: OpenAI / ChatGPT
+    Function: MWF_fnc_validateTerminalAccess
+    Project: Military War Framework
+
+    Description:
+    Centralized terminal lock validator for actions that should be unavailable
+    while certain operations are already active.
+
+    Params:
+    0: STRING - action key (MISSION_HUB / MAIN_OPERATIONS)
+
+    Returns:
+    [BOOL allowed, STRING reason]
+*/
+
+params [
+    ["_actionType", "", [""]]
+];
+
+private _allowed = true;
+private _reason = "";
+private _missionStartInProgress = ((missionNamespace getVariable ["MWF_MissionBoardSlots", []]) findIf {
+    toLower (_x param [9, "available", [""]]) isEqualTo "starting"
+}) >= 0;
+
+switch (toUpper _actionType) do {
+    case "MAIN_OPERATIONS": {
+        if (missionNamespace getVariable ["MWF_GrandOperationActive", false]) then {
+            _allowed = false;
+            _reason = "Main operation unavailable: another main operation is already active.";
+        } else {
+            if (_missionStartInProgress) then {
+                _allowed = false;
+                _reason = "Main operation unavailable: side mission startup in progress.";
+            } else {
+                private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
+                if !(_activeSideMissions isEqualTo []) then {
+                    _allowed = false;
+                    _reason = "Main operation unavailable: active side mission in progress.";
+                };
+            };
+        };
+    };
+
+    case "MISSION_HUB": {
+        if (_missionStartInProgress) then {
+            _allowed = false;
+            _reason = "Mission Hub unavailable: side mission startup in progress.";
+        } else {
+            private _activeSideMissions = missionNamespace getVariable ["MWF_ActiveSideMissions", []];
+            if !(_activeSideMissions isEqualTo []) then {
+                _allowed = false;
+                _reason = "Mission Hub unavailable: side mission already active.";
+            };
+        };
+    };
+};
+
+[_allowed, _reason]
