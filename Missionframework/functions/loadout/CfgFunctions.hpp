@@ -4,6 +4,7 @@ class Loadout {
     class applyBaselineLoadout      { file = "functions\loadout\MWF_fn_applyBaselineLoadout.sqf"; };
     class applyRespawnLoadout       { file = "functions\loadout\MWF_fn_applyRespawnLoadout.sqf"; };
     class buildLoadoutCaches        { file = "functions\loadout\MWF_fn_buildLoadoutCaches.sqf"; };
+    class clearRespawnLoadoutProfile { file = "functions\loadout\MWF_fn_clearRespawnLoadoutProfile.sqf"; };
     class initLoadoutSystem         { file = "functions\loadout\MWF_fn_initLoadoutSystem.sqf"; };
     class openLoadoutArsenal        { file = "functions\loadout\MWF_fn_openLoadoutArsenal.sqf"; };
     class registerLoadoutZone       { file = "functions\loadout\MWF_fn_registerLoadoutZone.sqf"; };
