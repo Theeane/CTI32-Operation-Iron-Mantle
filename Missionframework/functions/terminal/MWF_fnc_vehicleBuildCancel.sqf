@@ -1,2 +1,2 @@
 build_confirmed = 3;
-true
+hint "Placement cancelled.";

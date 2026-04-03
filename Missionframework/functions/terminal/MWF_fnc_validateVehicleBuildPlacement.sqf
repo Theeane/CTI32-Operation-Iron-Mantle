@@ -1,49 +1,50 @@
-/*
-    KP-style simple placement validation for vehicle ghost build.
-*/
 params [
     ["_className", "", [""]],
-    ["_posASL", [0,0,0], [[]]],
+    ["_truepos", [0,0,0], [[]]],
     ["_dir", 0, [0]],
-    ["_profile", [], [[]]],
     ["_ghost", objNull, [objNull]],
-    ["_sourceTerminal", objNull, [objNull]]
+    ["_sourceTerminal", objNull, [objNull]],
+    ["_vehicleType", "LAND", [""]]
 ];
 
-if (_className isEqualTo "") exitWith { [false, "Placement data missing."] };
+if (_className isEqualTo "") exitWith { [false, "No vehicle class selected."] };
+if (_vehicleType isEqualTo "WATER") then {
+    if !(surfaceIsWater _truepos) exitWith { [false, "Boats must be placed in water."] };
+} else {
+    if (surfaceIsWater _truepos) exitWith { [false, "Vehicle must be placed on land."] };
+};
 
-private _posATL = ASLToATL _posASL;
-private _surfaceRule = toUpper (_profile param [1, "LAND"]);
-private _diameter = _profile param [4, 4];
-private _dist = (0.6 * _diameter) max 3.5;
-private _isWater = surfaceIsWater _posATL;
+private _dist = 0.6 * (sizeOf _className);
+if (_dist < 3.5) then { _dist = 3.5; };
+_dist = _dist + 1;
+if (_vehicleType isEqualTo "WATER") then { _dist = _dist + 4; };
+if (_vehicleType isEqualTo "AIR") then { _dist = _dist + 2; };
 
-if (_surfaceRule isEqualTo "WATER" && {!_isWater}) exitWith { [false, "Boats must be placed in water."] };
-if (_surfaceRule isEqualTo "LAND" && {_isWater}) exitWith { [false, "This vehicle must be placed on land."] };
+private _near = _truepos nearObjects ["AllVehicles", _dist];
+if (_vehicleType != "AIR") then {
+    _near append (_truepos nearObjects ["Static", _dist]);
+};
 
-private _nearObjects = nearestObjects [_posATL, ["AllVehicles", "Static", "House", "Building"], _dist, true];
-private _blocking = [];
+private _filtered = [];
 {
-    private _type = typeOf _x;
+    private _obj = _x;
     if (
-        !isNull _x &&
-        {_x != _ghost} &&
-        {_x != player} &&
-        {_x != _sourceTerminal} &&
-        {!(_x isKindOf "CAManBase")} &&
-        {!(_x isKindOf "Animal")} &&
-        {!(_x isKindOf "Logic")} &&
-        {!(_x isKindOf "Land_HelipadEmpty_F")} &&
-        {!(_x getVariable ["MWF_GhostPreview", false])}
+        !isNull _obj &&
+        {_obj != _ghost} &&
+        {_obj != player} &&
+        {!(_obj isKindOf "Animal")} &&
+        {!(_obj isKindOf "CAManBase")} &&
+        {!isPlayer _obj} &&
+        {isNull _sourceTerminal || {_obj != _sourceTerminal}}
     ) then {
-        _blocking pushBack _x;
+        _filtered pushBackUnique _obj;
     };
-} forEach _nearObjects;
+} forEach _near;
 
-if ((count _blocking) > 0) exitWith {
-    private _name = getText (configFile >> "CfgVehicles" >> typeOf (_blocking select 0) >> "displayName");
-    if (_name isEqualTo "") then { _name = typeOf (_blocking select 0); };
-    [false, format ["Placement blocked by %1.", _name]]
+if ((count _filtered) > 0) exitWith {
+    private _label = getText (configFile >> "CfgVehicles" >> typeOf (_filtered # 0) >> "displayName");
+    if (_label isEqualTo "") then { _label = typeOf (_filtered # 0); };
+    [false, format ["Placement blocked by %1.", _label]]
 };
 
 [true, "Placement valid."]

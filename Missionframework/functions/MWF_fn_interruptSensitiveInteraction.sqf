@@ -17,8 +17,8 @@ missionNamespace setVariable ["MWF_SensitiveInterrupt_LastAt", diag_tickTime];
 
 private _interrupted = false;
 
-if (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) then {
-    [] call MWF_fnc_cleanupVehiclePlacement;
+if (missionNamespace getVariable ["MWF_VehicleBuild_Active", false]) then {
+    [] call MWF_fnc_cleanupVehicleBuildSession;
     _interrupted = true;
 };
 
