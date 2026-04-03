@@ -101,5 +101,9 @@ private _keys = [
 
 saveProfileNamespace;
 
+profileNamespace setVariable ["MWF_SavedRespawnProfile", nil];
+saveProfileNamespace;
+[] remoteExecCall ["MWF_fnc_clearRespawnLoadoutProfile", 0];
+
 diag_log "[MWF PERSISTENCE] All campaign data has been wiped. A fresh start is ready.";
 ["Campaign data reset. Please restart the mission for a clean slate.", "systemChat"] remoteExec ["bis_fnc_guiMessage", 0];

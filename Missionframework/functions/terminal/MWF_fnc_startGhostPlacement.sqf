@@ -10,6 +10,10 @@
 */
 
 if (!hasInterface) exitWith { false };
+if !(canSuspend) exitWith {
+    _this spawn MWF_fnc_startGhostPlacement;
+    true
+};
 if (vehicle player != player) exitWith {
     hint "Exit your vehicle before building.";
     false
@@ -92,6 +96,10 @@ if (isNull _ghost) exitWith { false };
 _ghost setAllowDamage false;
 _ghost setVehicleLock "LOCKED";
 _ghost enableSimulation false;
+clearWeaponCargoGlobal _ghost;
+clearMagazineCargoGlobal _ghost;
+clearItemCargoGlobal _ghost;
+clearBackpackCargoGlobal _ghost;
 _ghost disableCollisionWith player;
 
 private _paintGhost = {

@@ -248,7 +248,7 @@ class IronMantle_BuyMenu {
             y = 0.692 * safezoneH + safezoneY;
             w = 0.088 * safezoneW;
             h = 0.060 * safezoneH;
-            action = "[] call MWF_fnc_vehicleMenuPurchase;";
+            action = "[] spawn MWF_fnc_vehicleMenuPurchase;";
         };
     };
 };
