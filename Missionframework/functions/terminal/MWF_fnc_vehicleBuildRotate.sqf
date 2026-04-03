@@ -1,2 +1,2 @@
-missionNamespace setVariable ["MWF_VehicleBuild_Rotation", (missionNamespace getVariable ["MWF_VehicleBuild_Rotation", 0]) + 90];
+build_rotation = (if (isNil "build_rotation") then { 0 } else { build_rotation }) + 90;
 true

@@ -1,2 +1,2 @@
-missionNamespace setVariable ["MWF_VehicleBuild_Elevation", (missionNamespace getVariable ["MWF_VehicleBuild_Elevation", 0]) - 0.2];
+build_elevation = (if (isNil "build_elevation") then { 0 } else { build_elevation }) - 0.2;
 true
