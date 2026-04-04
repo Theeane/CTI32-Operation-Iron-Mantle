@@ -10,6 +10,14 @@
 */
 
 if (!hasInterface) exitWith { false };
+if (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) then {
+    [] call MWF_fnc_vehicleBuildCancel;
+    private _cancelTimeout = diag_tickTime + 3;
+    waitUntil {
+        uiSleep 0.05;
+        !(missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) || { diag_tickTime > _cancelTimeout }
+    };
+};
 if !(missionNamespace getVariable ["MWF_InLoadoutZone", false]) exitWith {
     hint "Du måste vara i en loadout-zon nära MOB eller FOB för att öppna arsenalen.";
     false

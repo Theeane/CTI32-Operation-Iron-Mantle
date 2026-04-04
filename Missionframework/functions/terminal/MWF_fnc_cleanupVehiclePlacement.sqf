@@ -36,6 +36,7 @@ build_elevation = 0;
     "MWF_VehiclePlacement_LastPosASL",
     "MWF_VehiclePlacement_LastDir",
     "MWF_VehiclePlacement_LastReason",
+    "MWF_VehiclePlacement_PurchaseRequestId",
     "MWF_VehiclePlacement_RotateAction",
     "MWF_VehiclePlacement_RaiseAction",
     "MWF_VehiclePlacement_LowerAction",

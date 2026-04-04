@@ -30,13 +30,39 @@ if (_displayName isEqualTo "") then {
 
 [] call MWF_fnc_cleanupVehiclePlacement;
 
+private _requestId = format ["%1_%2_%3", clientOwner, floor (diag_tickTime * 1000), floor (random 1000000)];
+missionNamespace setVariable ["MWF_VehiclePurchaseBegin_Result", nil];
+[player, _requestId, _className, _cost, _minTier, _requiredUnlock, _isTier5] remoteExecCall ["MWF_fnc_serverBeginVehiclePurchase", 2];
+
+private _waitTimeout = diag_tickTime + 10;
+waitUntil {
+    uiSleep 0.05;
+    private _result = missionNamespace getVariable ["MWF_VehiclePurchaseBegin_Result", []];
+    ((count _result) >= 4 && { (_result param [0, "", [""]]) isEqualTo _requestId }) || { diag_tickTime > _waitTimeout }
+};
+
+private _beginResult = missionNamespace getVariable ["MWF_VehiclePurchaseBegin_Result", []];
+missionNamespace setVariable ["MWF_VehiclePurchaseBegin_Result", nil];
+if ((count _beginResult) < 4) exitWith {
+    systemChat "Vehicle purchase failed. No server response.";
+    false
+};
+
+private _beginSuccess = _beginResult param [1, false, [false]];
+private _reservedCost = _beginResult param [2, _cost, [0]];
+if !(_beginSuccess) exitWith { false };
+_cost = _reservedCost;
+
 private _surfaceRule = if (_className isKindOf "Ship") then { "WATER" } else { "LAND" };
 private _ghostMarkerPos = if ((getMarkerColor "ghost_spot") != "") then { markerPos "ghost_spot" } else { markerPos "respawn_west" };
 private _ghostSpot = _ghostMarkerPos findEmptyPosition [0, 100, _className];
 if (_ghostSpot isEqualTo []) then { _ghostSpot = _ghostMarkerPos vectorAdd [0, 0, 1000]; };
 
 private _ghost = _className createVehicleLocal _ghostSpot;
-if (isNull _ghost) exitWith { false };
+if (isNull _ghost) exitWith {
+    [player, _requestId, "GHOST_CREATE_FAILED"] remoteExecCall ["MWF_fnc_serverCancelVehiclePurchase", 2];
+    false
+};
 
 _ghost allowDamage false;
 _ghost setVehicleLock "LOCKED";
@@ -74,6 +100,7 @@ missionNamespace setVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL playe
 missionNamespace setVariable ["MWF_VehiclePlacement_LastDir", getDir player];
 missionNamespace setVariable ["MWF_VehiclePlacement_LastReason", "Placement not yet validated."];
 missionNamespace setVariable ["MWF_VehiclePlacement_IsValid", false];
+missionNamespace setVariable ["MWF_VehiclePlacement_PurchaseRequestId", _requestId];
 missionNamespace setVariable ["MWF_SensitiveInteraction_Type", "VEHICLE_PLACEMENT"];
 
 private _idactcancel = player addAction ["<t color='#B0FF00'>Cancel Placement</t>", { [] call MWF_fnc_vehicleBuildCancel; }, "", -725, false, true, "", "build_confirmed == 1"];
@@ -141,13 +168,16 @@ private _finalValid = (build_invalid == 0) && (missionNamespace getVariable ["MW
 private _finalPosASL = missionNamespace getVariable ["MWF_VehiclePlacement_LastPosASL", getPosASL player];
 private _finalDir = missionNamespace getVariable ["MWF_VehiclePlacement_LastDir", getDir player];
 private _finalReason = missionNamespace getVariable ["MWF_VehiclePlacement_LastReason", "Placement invalid."];
+private _finalRequestId = missionNamespace getVariable ["MWF_VehiclePlacement_PurchaseRequestId", _requestId];
 
 [] call MWF_fnc_cleanupVehiclePlacement;
 
 if (_finalState == 2 && _finalValid) exitWith {
-    [_className, _cost, _minTier, _finalPosASL, _finalDir, _surfaceRule, _requiredUnlock, _isTier5] remoteExecCall ["MWF_fnc_serverPurchasePlacedVehicle", 2];
+    [player, _finalRequestId, _finalPosASL, _finalDir, _surfaceRule] remoteExecCall ["MWF_fnc_serverPurchasePlacedVehicle", 2];
     true
 };
+
+[player, _finalRequestId, if (_finalState == 3) then {"CANCELLED"} else {"ABORTED"}] remoteExecCall ["MWF_fnc_serverCancelVehiclePurchase", 2];
 
 if (_finalState == 2 && !_finalValid) exitWith {
     systemChat _finalReason;

@@ -22,6 +22,9 @@ class Terminal {
     class vehicleBuildLower            { file = "functions\terminal\MWF_fnc_vehicleBuildLower.sqf"; };
     class vehicleBuildPlace            { file = "functions\terminal\MWF_fnc_vehicleBuildPlace.sqf"; };
     class vehicleBuildCancel           { file = "functions\terminal\MWF_fnc_vehicleBuildCancel.sqf"; };
+    class clientVehiclePurchaseBeginResult { file = "functions\terminal\MWF_fnc_clientVehiclePurchaseBeginResult.sqf"; };
+    class serverBeginVehiclePurchase   { file = "functions\terminal\MWF_fnc_serverBeginVehiclePurchase.sqf"; };
+    class serverCancelVehiclePurchase  { file = "functions\terminal\MWF_fnc_serverCancelVehiclePurchase.sqf"; };
     class serverPurchasePlacedVehicle  { file = "functions\terminal\MWF_fnc_serverPurchasePlacedVehicle.sqf"; };
     class validateTerminalAccess       { file = "functions\terminal\MWF_fnc_validateTerminalAccess.sqf"; };
     class startGhostPlacement          { file = "functions\terminal\MWF_fnc_startGhostPlacement.sqf"; };
