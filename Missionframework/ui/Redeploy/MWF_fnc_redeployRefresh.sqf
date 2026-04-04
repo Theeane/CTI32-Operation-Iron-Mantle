@@ -34,9 +34,8 @@ if (!isNull _infoCtrl) then { _infoCtrl ctrlSetStructuredText parseText "<t colo
 
 private _terminalStatusCtrl = _display displayCtrl 12218;
 if (!isNull _terminalStatusCtrl) then {
-    private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-    private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-    _terminalStatusCtrl ctrlSetStructuredText parseText format ["<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>REDEPLOY NETWORK</t>", _supplies, _intel];
+    private _status = [] call MWF_fnc_getHudStatusData;
+    _terminalStatusCtrl ctrlSetStructuredText parseText ([_status, createHashMapFromArray [["trailingLabel", "REDEPLOY NETWORK"]]] call MWF_fnc_formatTerminalStatus);
 };
 
 private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];

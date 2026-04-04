@@ -217,8 +217,8 @@ class Params {
 
     class MWF_Param_StartSupplies {
         title = "[PERSISTENT] Starting Supplies";
-        values[] = {200, 400, 600, 800, 1100};
-        texts[] = {"200", "400", "600", "800", "1100"};
+        values[] = {200, 400, 600, 800};
+        texts[] = {"200", "400", "600", "800"};
         default = 200;
     };
 

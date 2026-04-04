@@ -1,11 +1,10 @@
 /*
-    Author: Theane / ChatGPT
-    Function: MWF_fn_clientApplyEconomyState
+    Author: OpenAI
+    Function: MWF_fnc_clientApplyEconomyState
     Project: Military War Framework
 
     Description:
-    Applies the authoritative economy snapshot on each client and forces a local
-    HUD/UI refresh without waiting for publicVariable propagation timing.
+    Applies the latest server economy values locally, then refreshes the HUD.
 */
 
 if (!hasInterface) exitWith { false };
@@ -31,13 +30,5 @@ if (_notoriety >= 0) then {
     missionNamespace setVariable ["MWF_res_notoriety", _notoriety];
 };
 
-missionNamespace setVariable ["MWF_Currency", (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + (missionNamespace getVariable ["MWF_res_intel", 0])];
-missionNamespace setVariable ["MWF_UI_RefreshRequested", true];
-
-if (missionNamespace getVariable ["MWF_UI_UpdateLoopRunning", false]) then {
-    [] call MWF_fnc_updateResourceUI;
-} else {
-    [] spawn MWF_fnc_updateResourceUI;
-};
-
+[] call MWF_fnc_updateResourceUI;
 true

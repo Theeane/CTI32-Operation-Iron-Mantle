@@ -20,6 +20,9 @@ class CfgFunctions {
 
             class initUI                  { file = "ui\MWF_fn_initUI.sqf"; };
             class updateResourceUI        { file = "ui\MWF_fn_updateResourceUI.sqf"; };
+            class getHudStatusData       { file = "ui\MWF_fn_getHudStatusData.sqf"; };
+            class formatTerminalStatus   { file = "ui\MWF_fn_formatTerminalStatus.sqf"; };
+            class formatSidebarStatus    { file = "ui\MWF_fn_formatSidebarStatus.sqf"; };
             class dataHub                 { file = "ui\datahub\MWF_fn_dataHub.sqf"; };
             class refreshDataMap          { file = "ui\datahub\MWF_fn_refreshDataMap.sqf"; };
             class collectDataMapEntries   { file = "ui\datahub\MWF_fn_collectDataMapEntries.sqf"; };

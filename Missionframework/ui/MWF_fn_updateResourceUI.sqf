@@ -161,22 +161,11 @@ while { hasInterface } do {
 
         private _showHud = call _isPlayerNearHudAnchor;
         player setVariable ["MWF_isNearFOB", _showHud];
-
-        private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-        private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-        private _heat = missionNamespace getVariable ["MWF_res_notoriety", missionNamespace getVariable ["MWF_ThreatLevel", 0]];
-        private _heatDisplay = (floor (((_heat max 0) min 100) / 10)) * 10;
-        private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
+        private _status = [] call MWF_fnc_getHudStatusData;
 
         private _resourceText = _display displayCtrl 9001;
         if (!isNull _resourceText) then {
-            _resourceText ctrlSetStructuredText parseText format [
-                "<t size='0.88' color='#FFFFFF'>Supplies:</t><br/><t size='0.98' color='#FFFFFF'>%1</t><br/><t size='0.88' color='#78D7FF'>Intel:</t><br/><t size='0.98' color='#78D7FF'>%2</t><br/><t size='0.88' color='#F4E29D'>World Tier:</t><br/><t size='0.98' color='#F4E29D'>%3</t><br/><t size='0.88' color='#FF5E73'>Threat:</t><br/><t size='0.98' color='#FF5E73'>%4%%</t>",
-                [_supplies] call _formatNumber,
-                [_intel] call _formatNumber,
-                [_worldTier] call _toRoman,
-                _heatDisplay
-            ];
+            _resourceText ctrlSetStructuredText ([_status] call MWF_fnc_formatSidebarStatus);
         };
 
         if (_showHud != _lastHudVisible) then {

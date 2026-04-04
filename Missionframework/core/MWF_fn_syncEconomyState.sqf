@@ -62,7 +62,8 @@ missionNamespace setVariable ["MWF_res_notoriety", _resolvedNotoriety, true];
 missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
 
 if (_refreshUI) then {
-    [_resolvedSupplies, _resolvedIntel, _resolvedNotoriety] remoteExecCall ["MWF_fnc_clientApplyEconomyState", 0, "MWF_EconomyState"];
+    [_resolvedSupplies, _resolvedIntel, _resolvedNotoriety] remoteExecCall ["MWF_fnc_clientApplyEconomyState", 0, false];
+    remoteExec ["MWF_fnc_updateResourceUI", -2];
 };
 
 if (_queueSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {
