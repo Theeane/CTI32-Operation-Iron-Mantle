@@ -15,6 +15,7 @@ class CoreRuntime {
     class getBuildAssetCost       { file = "core\MWF_fn_getBuildAssetCost.sqf"; };
     class isBuildAssetAllowed     { file = "core\MWF_fn_isBuildAssetAllowed.sqf"; };
     class syncEconomyState        { file = "core\MWF_fn_syncEconomyState.sqf"; };
+    class clientApplyEconomyState { file = "core\MWF_fn_clientApplyEconomyState.sqf"; };
     class zoneCapture             { file = "core\MWF_fn_zoneCapture.sqf"; };
     class zoneManager             { file = "core\MWF_fn_zoneManager.sqf"; };
 };

@@ -11,6 +11,8 @@
 
 if (!hasInterface) exitWith { false };
 if (missionNamespace getVariable ["MWF_VehiclePlacement_Active", false]) then {
+    diag_log "[MWF VEHICLE DBG][ARSENAL] arsenal opened during active vehicle placement; forcing cancel";
+    systemChat "[MWF DBG] Arsenal opened during placement. Cancelling and refunding vehicle purchase.";
     [] call MWF_fnc_vehicleBuildCancel;
     private _cancelTimeout = diag_tickTime + 3;
     waitUntil {

@@ -29,6 +29,8 @@ if (_displayName isEqualTo "") then {
 };
 
 [] call MWF_fnc_cleanupVehiclePlacement;
+private _dbgPrefix = format ["[MWF VEHICLE DBG][CLIENT_SESSION][class:%1]", _className];
+diag_log format ["%1 starting purchase flow cost=%2 minTier=%3 unlock=%4 tier5=%5", _dbgPrefix, _cost, _minTier, _requiredUnlock, _isTier5];
 
 private _requestId = format ["%1_%2_%3", clientOwner, floor (diag_tickTime * 1000), floor (random 1000000)];
 missionNamespace setVariable ["MWF_VehiclePurchaseBegin_Result", nil];
@@ -44,13 +46,17 @@ waitUntil {
 private _beginResult = missionNamespace getVariable ["MWF_VehiclePurchaseBegin_Result", []];
 missionNamespace setVariable ["MWF_VehiclePurchaseBegin_Result", nil];
 if ((count _beginResult) < 4) exitWith {
+    diag_log format ["%1 no server response for requestId=%2", _dbgPrefix, _requestId];
     systemChat "Vehicle purchase failed. No server response.";
     false
 };
 
 private _beginSuccess = _beginResult param [1, false, [false]];
 private _reservedCost = _beginResult param [2, _cost, [0]];
-if !(_beginSuccess) exitWith { false };
+if !(_beginSuccess) exitWith {
+    diag_log format ["%1 begin denied requestId=%2", _dbgPrefix, _requestId];
+    false
+};
 _cost = _reservedCost;
 
 private _surfaceRule = if (_className isKindOf "Ship") then { "WATER" } else { "LAND" };
@@ -60,6 +66,7 @@ if (_ghostSpot isEqualTo []) then { _ghostSpot = _ghostMarkerPos vectorAdd [0, 0
 
 private _ghost = _className createVehicleLocal _ghostSpot;
 if (isNull _ghost) exitWith {
+    diag_log format ["%1 ghost create failed requestId=%2", _dbgPrefix, _requestId];
     [player, _requestId, "GHOST_CREATE_FAILED"] remoteExecCall ["MWF_fnc_serverCancelVehiclePurchase", 2];
     false
 };
@@ -170,6 +177,7 @@ private _finalDir = missionNamespace getVariable ["MWF_VehiclePlacement_LastDir"
 private _finalReason = missionNamespace getVariable ["MWF_VehiclePlacement_LastReason", "Placement invalid."];
 private _finalRequestId = missionNamespace getVariable ["MWF_VehiclePlacement_PurchaseRequestId", _requestId];
 
+diag_log format ["%1 placement loop ended state=%2 valid=%3 requestId=%4", _dbgPrefix, _finalState, _finalValid, _finalRequestId];
 [] call MWF_fnc_cleanupVehiclePlacement;
 
 if (_finalState == 2 && _finalValid) exitWith {
@@ -177,6 +185,7 @@ if (_finalState == 2 && _finalValid) exitWith {
     true
 };
 
+diag_log format ["%1 sending cancel request reason=%2 requestId=%3", _dbgPrefix, if (_finalState == 3) then {"CANCELLED"} else {"ABORTED"}, _finalRequestId];
 [player, _finalRequestId, if (_finalState == 3) then {"CANCELLED"} else {"ABORTED"}] remoteExecCall ["MWF_fnc_serverCancelVehiclePurchase", 2];
 
 if (_finalState == 2 && !_finalValid) exitWith {
