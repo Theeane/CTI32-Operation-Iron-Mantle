@@ -53,6 +53,12 @@ private _resolvedNotoriety = if (_notoriety < 0) then {
     0 max (100 min _notoriety)
 };
 
+private _previousSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+private _previousIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _previousNotoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
+private _economyChanged = (_resolvedSupplies != _previousSupplies) || (_resolvedIntel != _previousIntel);
+private _notorietyChanged = (_resolvedNotoriety != _previousNotoriety);
+
 missionNamespace setVariable ["MWF_Economy_Supplies", _resolvedSupplies, true];
 missionNamespace setVariable ["MWF_Supplies", _resolvedSupplies, true];
 missionNamespace setVariable ["MWF_Supply", _resolvedSupplies, true];
@@ -62,12 +68,19 @@ missionNamespace setVariable ["MWF_res_notoriety", _resolvedNotoriety, true];
 missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
 
 if (_refreshUI) then {
-    [_resolvedSupplies, _resolvedIntel, _resolvedNotoriety] remoteExecCall ["MWF_fnc_clientApplyEconomyState", 0, false];
-    remoteExec ["MWF_fnc_updateResourceUI", -2];
+    remoteExec ["MWF_fnc_updateResourceUI", -2]
 };
 
-if (_queueSave && {!isNil "MWF_fnc_requestDelayedSave"}) then {
-    [] call MWF_fnc_requestDelayedSave;
+if (_queueSave) then {
+    private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
+
+    if (_economyChanged && {!_debugMode} && {!isNil "MWF_fnc_saveGame"}) then {
+        ["Economy Update"] call MWF_fnc_saveGame;
+    } else {
+        if ((_economyChanged || _notorietyChanged) && {!isNil "MWF_fnc_requestDelayedSave"}) then {
+            [] call MWF_fnc_requestDelayedSave;
+        };
+    };
 };
 
 [_resolvedSupplies, _resolvedIntel, _resolvedNotoriety]
