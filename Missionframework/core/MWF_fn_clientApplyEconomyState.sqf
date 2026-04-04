@@ -1,12 +1,11 @@
 /*
-    Author: OpenAI
-    Function: MWF_fnc_clientApplyEconomyState
+    Author: Theane / ChatGPT
+    Function: MWF_fn_clientApplyEconomyState
     Project: Military War Framework
 
     Description:
-    Client-side authoritative economy mirror update for HUD refresh.
-    Used when the server changes economy state and the public namespace
-    replication is too slow for immediate visual feedback.
+    Applies the authoritative economy snapshot on each client and forces a local
+    HUD/UI refresh without waiting for publicVariable propagation timing.
 */
 
 if (!hasInterface) exitWith { false };
@@ -32,12 +31,12 @@ if (_notoriety >= 0) then {
     missionNamespace setVariable ["MWF_res_notoriety", _notoriety];
 };
 
-private _resolvedSupplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-private _resolvedIntel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel];
+missionNamespace setVariable ["MWF_Currency", (missionNamespace getVariable ["MWF_Economy_Supplies", 0]) + (missionNamespace getVariable ["MWF_res_intel", 0])];
 missionNamespace setVariable ["MWF_UI_RefreshRequested", true];
 
-if (!isNil "MWF_fnc_updateResourceUI") then {
+if (missionNamespace getVariable ["MWF_UI_UpdateLoopRunning", false]) then {
+    [] call MWF_fnc_updateResourceUI;
+} else {
     [] spawn MWF_fnc_updateResourceUI;
 };
 

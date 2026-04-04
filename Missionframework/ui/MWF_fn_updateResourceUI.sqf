@@ -164,8 +164,8 @@ while { hasInterface } do {
 
         private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
         private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-        private _heat = missionNamespace getVariable ["MWF_GlobalThreatPercent", missionNamespace getVariable ["MWF_res_notoriety", missionNamespace getVariable ["MWF_ThreatLevel", 0]]];
-        private _displayThreat = (floor (((_heat max 0) min 100) / 10)) * 10;
+        private _heat = missionNamespace getVariable ["MWF_res_notoriety", missionNamespace getVariable ["MWF_ThreatLevel", 0]];
+        private _heatDisplay = (floor (((_heat max 0) min 100) / 10)) * 10;
         private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
 
         private _resourceText = _display displayCtrl 9001;
@@ -175,7 +175,7 @@ while { hasInterface } do {
                 [_supplies] call _formatNumber,
                 [_intel] call _formatNumber,
                 [_worldTier] call _toRoman,
-                _displayThreat
+                _heatDisplay
             ];
         };
 

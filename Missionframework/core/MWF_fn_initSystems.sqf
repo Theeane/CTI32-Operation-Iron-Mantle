@@ -160,17 +160,6 @@ missionNamespace setVariable ["MWF_isUnderAttack", missionNamespace getVariable 
 
 setTimeMultiplier (["MWF_Param_TimeMultiplier", 1] call BIS_fnc_getParamValue);
 
-private _wipeRequested = ["MWF_Param_WipeSave", 0] call BIS_fnc_getParamValue;
-private _wipeConfirmed = ["MWF_Param_ConfirmWipe", 0] call BIS_fnc_getParamValue;
-
-if (_wipeRequested == 1 && _wipeConfirmed == 1) then {
-    missionNamespace setVariable ["MWF_isWiping", true, true];
-
-    if (!isNil "MWF_fnc_wipeSave") then {
-        [] call MWF_fnc_wipeSave;
-    };
-
-    diag_log "[MWF] Save wipe requested by lobby parameters.";
 };
 
 missionNamespace setVariable ["MWF_systems_ready", true, true];

@@ -103,55 +103,25 @@ saveProfileNamespace;
 
 profileNamespace setVariable ["MWF_SavedRespawnProfile", nil];
 saveProfileNamespace;
-[] remoteExecCall ["MWF_fnc_clearRespawnLoadoutProfile", 0];
-
-{
-    if (!isNull _x && {_x getVariable ["MWF_isBought", false]}) then {
-        deleteVehicle _x;
-    };
-} forEach (vehicles + allDead);
-
-{
-    private _terminal = _x param [1, objNull];
-    if (!isNull _terminal) then {
-        deleteVehicle _terminal;
-    };
-    private _anchor = _x param [4, objNull];
-    if (!isNull _anchor) then {
-        deleteVehicle _anchor;
-    };
-} forEach (missionNamespace getVariable ["MWF_FOB_Registry", []]);
-
-{
-    private _obj = _x param [1, objNull];
-    if (!isNull _obj) then {
-        deleteVehicle _obj;
-    };
-} forEach (missionNamespace getVariable ["MWF_BuiltUpgradeRegistry", []]);
-
-{
-    private _garageObj = _x param [0, objNull];
-    if (!isNull _garageObj) then {
-        deleteVehicle _garageObj;
-    };
-} forEach (missionNamespace getVariable ["MWF_GarageRegistry", []]);
 
 missionNamespace setVariable ["MWF_HasCampaignSave", false, true];
 missionNamespace setVariable ["MWF_FOB_Positions", [], true];
-missionNamespace setVariable ["MWF_FOB_Registry", [], true];
-missionNamespace setVariable ["MWF_HUD_AnchorRegistry", [], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", [], true];
-missionNamespace setVariable ["MWF_PendingBuiltUpgradeStructures", [], true];
 missionNamespace setVariable ["MWF_GarageStoredVehicles", [], true];
-missionNamespace setVariable ["MWF_BuiltUpgradeRegistry", [], true];
-missionNamespace setVariable ["MWF_GarageRegistry", [], true];
-missionNamespace setVariable ["MWF_PendingFOBAttackState", [], true];
+missionNamespace setVariable ["MWF_PendingBuiltUpgradeStructures", [], true];
+missionNamespace setVariable ["MWF_PendingActiveSideMissions", [], true];
+missionNamespace setVariable ["MWF_LoadedZoneSaveData", [], true];
+missionNamespace setVariable ["MWF_completedMissions", [], true];
+missionNamespace setVariable ["MWF_DestroyedHQs", [], true];
+missionNamespace setVariable ["MWF_DestroyedRoadblocks", [], true];
 missionNamespace setVariable ["MWF_DamagedFOBs", [], true];
 missionNamespace setVariable ["MWF_PendingDamagedFOBs", [], true];
-missionNamespace setVariable ["MWF_FOBsRestored", false, true];
-missionNamespace setVariable ["MWF_SessionVehiclesRestored", false, true];
-missionNamespace setVariable ["MWF_BuiltUpgradeStructuresRestored", false, true];
-missionNamespace setVariable ["MWF_InitialFOBAssetRef", objNull, true];
+missionNamespace setVariable ["MWF_RevealedInfrastructureIDs", [], true];
+missionNamespace setVariable ["MWF_PersistentRevealedInfrastructureSites", [], true];
 
-diag_log "[MWF PERSISTENCE] All campaign data has been wiped. Bought vehicles, FOB registry, garage registry, and saved profiles were cleared for a fresh start.";
-["Campaign data reset. Restart mission/server for a clean new campaign."] remoteExec ["systemChat", 0];
+if (!isNil "MWF_fnc_clearRespawnLoadoutProfile") then {
+    [] remoteExecCall ["MWF_fnc_clearRespawnLoadoutProfile", 0];
+};
+
+["[MWF] Campaign save wiped. Restart the mission for a clean fresh campaign."] remoteExecCall ["systemChat", 0];
+diag_log "[MWF PERSISTENCE] All campaign data has been wiped before campaign load.";
