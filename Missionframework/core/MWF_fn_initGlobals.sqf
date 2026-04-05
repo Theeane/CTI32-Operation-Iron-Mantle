@@ -295,6 +295,15 @@ if ((_resolvedSupplies <= 0) && {_tutorialBootstrapPhase isEqualTo "TUTORIAL"} &
 if (_sessionDebugMode) then {
     _resolvedSupplies = 9999;
     _resolvedIntel = 9999;
+    missionNamespace setVariable ["MWF_Economy_Supplies", _resolvedSupplies, true];
+    missionNamespace setVariable ["MWF_res_intel", _resolvedIntel, true];
+    missionNamespace setVariable ["MWF_Supplies", _resolvedSupplies, true];
+    missionNamespace setVariable ["MWF_Intel", _resolvedIntel, true];
+    missionNamespace setVariable ["MWF_Supply", _resolvedSupplies, true];
+    missionNamespace setVariable ["MWF_Currency", _resolvedSupplies + _resolvedIntel, true];
+    if (!isNil "MWF_fnc_syncEconomyState") then {
+        [_resolvedSupplies, _resolvedIntel, -1, true, false] call MWF_fnc_syncEconomyState;
+    };
 };
 
 missionNamespace setVariable ["MWF_Supplies", _resolvedSupplies, true];

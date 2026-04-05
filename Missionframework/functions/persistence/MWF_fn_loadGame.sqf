@@ -112,9 +112,11 @@ private _loadFactionLock = {
 private _supplies = [profileNamespace getVariable ["MWF_Save_Supplies", _lockedStartSupplies], 0, 100000, _lockedStartSupplies] call _clampNumber;
 private _intel = [profileNamespace getVariable ["MWF_Save_Intel", 0], 0, 50000, 0] call _clampNumber;
 
-// Starting supplies should only come from params on a true fresh start via the
-// default value in the getVariable call above. Do not re-raise supplies on
-// tutorial restarts, otherwise spent resources snap back to 200 after reboot.
+private _loadedPhase = profileNamespace getVariable ["MWF_Save_Campaign_Phase", "TUTORIAL"];
+private _loadedTutorialSupplyRunDone = profileNamespace getVariable ["MWF_Save_Tutorial_SupplyRunDone", false];
+if ((_loadedPhase isEqualTo "TUTORIAL") && {!_loadedTutorialSupplyRunDone}) then {
+    _supplies = _supplies max 200;
+};
 private _civRepState = [profileNamespace getVariable ["MWF_Save_CivRep_State", _lockedCivRep], -1000, 1000, _lockedCivRep] call _clampNumber;
 private _notoriety = [profileNamespace getVariable ["MWF_Save_Notoriety_State", 0], 0, 1000, 0] call _clampNumber;
 
@@ -232,7 +234,8 @@ if ((missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"]) isEqualTo 
     missionNamespace setVariable ["MWF_current_stage", 3, true];
 };
 
-if (missionNamespace getVariable ["MWF_DebugMode", false]) then {
+private _debugSession = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
+if (_debugSession) then {
     if (!isNil "MWF_fnc_syncEconomyState") then {
         [9999, 9999, -1, true, false] call MWF_fnc_syncEconomyState;
     } else {

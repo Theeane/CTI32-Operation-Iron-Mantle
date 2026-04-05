@@ -36,9 +36,18 @@ private _buttonDefs = [
     };
 } forEach _buttonDefs;
 
-private _status = [] call MWF_fnc_getHudStatusData;
+private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
+private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
+private _carriedIntel = player getVariable ["MWF_carriedIntelValue", 0];
+private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
+private _baseTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+private _phase = missionNamespace getVariable ["MWF_Campaign_Phase", "TUTORIAL"];
+private _debugMode = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
 if (!isNull _terminalStatusCtrl) then {
-    _terminalStatusCtrl ctrlSetStructuredText parseText ([_status, createHashMap] call MWF_fnc_formatTerminalStatus);
+    _terminalStatusCtrl ctrlSetStructuredText parseText format [
+        "<t size='0.9' color='#FFFFFF'>SUP %1</t><t color='#AAAAAA'> | </t><t size='0.9' color='#8CC8FF'>INT %2</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFD27A'>TEMP %3</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>WORLD T%4</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>BASE T%5</t><t color='#AAAAAA'> | </t><t size='0.9' color='#FFFFFF'>PHASE %6</t>",
+        _supplies, _intel, _carriedIntel, _worldTier, _baseTier, _phase
+    ];
 };
 
 private _catalog = uiNamespace getVariable ["MWF_VehicleMenu_Catalog", []];
@@ -106,6 +115,13 @@ private _evaluateEntry = {
         _state set ["canAfford", false];
         _state set ["reason", "Invalid preset entry."];
         _state set ["statusText", "INVALID"];
+        _state
+    };
+
+    if (_debugMode) exitWith {
+        _state set ["canAfford", true];
+        _state set ["reason", "Ready to purchase. DEBUG progression override active."];
+        _state set ["statusText", "AVAILABLE"];
         _state
     };
 

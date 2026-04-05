@@ -70,11 +70,15 @@ private _evaluateEntry = {
 
     private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
     private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
-    private _debugMode = missionNamespace getVariable ["MWF_DebugMode", false];
+    private _debugMode = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
     private _lockReason = if (_debugMode) then {"Ready to build. DEBUG progression override active."} else {"Ready to build."};
     private _isLocked = false;
 
     if (_className isEqualTo "") exitWith { [true, "Empty preset placeholder.", false] };
+
+    if (_debugMode) exitWith {
+        [false, "Ready to build. DEBUG progression override active.", true]
+    };
 
     if (_isTier5 && {!( ["TIER5"] call MWF_fnc_hasProgressionAccess )}) then {
         _isLocked = true;

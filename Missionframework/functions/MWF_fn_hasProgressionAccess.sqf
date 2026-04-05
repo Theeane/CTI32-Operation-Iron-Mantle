@@ -31,5 +31,7 @@ private _realUnlocked = switch (_key) do {
 };
 
 if (_realUnlocked) exitWith { true };
+private _debugMode = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
+if (_debugMode) exitWith { true };
 
-(missionNamespace getVariable ["MWF_DebugMode", false]) && { _key in ["HELI", "JETS", "ARMOR", "TIER5"] }
+false
