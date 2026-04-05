@@ -1,16 +1,38 @@
 params [
-    ["_className", "", [""]],
-    ["_cost", 0, [0]],
-    ["_minTier", 1, [0]],
+    ["_buyer", objNull, [objNull]],
+    ["_requestId", "", [""]],
     ["_posASL", [0, 0, 0], [[]]],
     ["_dir", 0, [0]],
-    ["_surfaceRule", "LAND", [""]],
-    ["_requiredUnlock", "", [""]],
-    ["_isTier5", false, [false]]
+    ["_surfaceRule", "LAND", [""]]
 ];
 
 if (!isServer) exitWith { false };
-if (_className isEqualTo "") exitWith { false };
+if (_requestId isEqualTo "") exitWith { false };
+
+private _ownerId = if (isNull _buyer) then { remoteExecutedOwner } else { owner _buyer };
+private _sessionKey = format ["MWF_PendingVehiclePurchase_%1", _ownerId];
+private _session = missionNamespace getVariable [_sessionKey, []];
+if ((count _session) < 6) exitWith {
+    ["Vehicle purchase failed. Pending placement session missing."] remoteExec ["systemChat", _ownerId];
+    false
+};
+
+private _storedRequestId = _session param [0, "", [""]];
+if !(_storedRequestId isEqualTo _requestId) exitWith {
+    ["Vehicle purchase failed. Placement request mismatch."] remoteExec ["systemChat", _ownerId];
+    false
+};
+
+private _className = _session param [1, "", [""]];
+private _cost = _session param [2, 0, [0]];
+private _minTier = _session param [3, 1, [0]];
+private _requiredUnlock = _session param [4, "", [""]];
+private _isTier5 = _session param [5, false, [false]];
+if (_className isEqualTo "") exitWith {
+    missionNamespace setVariable [_sessionKey, nil, false];
+    ["Vehicle purchase failed. Pending session had no class."] remoteExec ["systemChat", _ownerId];
+    false
+};
 
 private _debugMode = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
@@ -26,62 +48,17 @@ if (_debugMode) then {
     missionNamespace setVariable ["MWF_Currency", 19998, true];
 };
 
-private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
-private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
-private _hasRequiredUpgradeStructure = {
-    params [["_requiredUnlockLocal", "", [""]]];
-    private _structureClass = switch (toUpper _requiredUnlockLocal) do {
-        case "HELI": { missionNamespace getVariable ["MWF_Heli_Tower_Class", ""] };
-        case "JETS": { missionNamespace getVariable ["MWF_Jet_Control_Class", ""] };
-        default { "" };
-    };
-    if (_structureClass isEqualTo "") exitWith { false };
-    ({ typeOf _x isEqualTo _structureClass } count (nearestObjects [_mobPos, [_structureClass], 120])) > 0
-};
-
-private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
-    case "HELI": { ["HELI"] call MWF_fnc_hasProgressionAccess };
-    case "JETS": { ["JETS"] call MWF_fnc_hasProgressionAccess };
-    case "ARMOR": { ["ARMOR"] call MWF_fnc_hasProgressionAccess };
-    default { true };
-};
-if (!_debugMode && {!_unlockSatisfied}) exitWith {
-    [format ["Vehicle purchase failed. %1 unlock required.", if (_requiredUnlock isEqualTo "") then {"category"} else {_requiredUnlock}]] remoteExec ["systemChat", remoteExecutedOwner];
-    false
-};
-
-if (!_debugMode && {_isTier5 && { !(["TIER5"] call MWF_fnc_hasProgressionAccess) }}) exitWith {
-    ["Vehicle purchase failed. Complete Apex Predator first."] remoteExec ["systemChat", remoteExecutedOwner];
-    false
-};
-
-if (!_debugMode && {(toUpper _requiredUnlock) in ["HELI", "JETS"] && { !([_requiredUnlock] call _hasRequiredUpgradeStructure) }}) exitWith {
-    [format ["Vehicle purchase failed. Build the %1 structure at the MOB first.", if ((toUpper _requiredUnlock) isEqualTo "HELI") then {"Helicopter Uplink"} else {"Aircraft Control"}]] remoteExec ["systemChat", remoteExecutedOwner];
-    false
-};
-
-if ((toUpper _requiredUnlock) isEqualTo "HELI") then {
-    private _discount = missionNamespace getVariable ["MWF_Perk_HeliDiscount", 1];
-    if (_discount < 1) then {
-        _cost = round ((_cost * _discount) max 1);
-    };
-};
-
-if (!_debugMode && {_supplies < _cost}) exitWith {
-    [format ["Vehicle purchase failed. Need %1 supplies.", _cost]] remoteExec ["systemChat", remoteExecutedOwner];
-    false
-};
-
-if (!_debugMode && {_currentTier < _minTier}) exitWith {
-    [format ["Vehicle purchase failed. Tier %1 required.", _minTier]] remoteExec ["systemChat", remoteExecutedOwner];
-    false
-};
-
 private _spawnVehicle = createVehicle [_className, [0, 0, 0], [], 0, "CAN_COLLIDE"];
 if (isNull _spawnVehicle) exitWith {
-    ["Vehicle purchase failed. Spawn returned null."] remoteExec ["systemChat", remoteExecutedOwner];
+    missionNamespace setVariable [_sessionKey, nil, false];
+    if (!isNil "MWF_fnc_serverCancelVehiclePurchase") then {
+        [_buyer, _requestId, "SPAWN_FAILED"] call MWF_fnc_serverCancelVehiclePurchase;
+    };
+    ["Vehicle purchase failed. Spawn returned null."] remoteExec ["systemChat", _ownerId];
     false
 };
+
+missionNamespace setVariable [_sessionKey, nil, false];
 
 _spawnVehicle setVariable ["MWF_isBought", true, true];
 _spawnVehicle setDir _dir;
@@ -103,7 +80,7 @@ private _respawnTruckClass = missionNamespace getVariable ["MWF_Respawn_Truck", 
 private _respawnHeliClass = missionNamespace getVariable ["MWF_Respawn_Heli", ""];
 if ((_respawnTruckClass isNotEqualTo "" && {_className isEqualTo _respawnTruckClass}) || (_respawnHeliClass isNotEqualTo "" && {_className isEqualTo _respawnHeliClass})) then {
     [_spawnVehicle] call MWF_fnc_initMobileRespawn;
-    [if (_className isEqualTo _respawnHeliClass) then {"Respawn Helicopter deployed."} else {"Mobile Respawn Unit deployed."}] remoteExec ["systemChat", remoteExecutedOwner];
+    [if (_className isEqualTo _respawnHeliClass) then {"Respawn Helicopter deployed."} else {"Mobile Respawn Unit deployed."}] remoteExec ["systemChat", _ownerId];
 };
 
 [_spawnVehicle] spawn {
@@ -116,7 +93,7 @@ if ((_respawnTruckClass isNotEqualTo "" && {_className isEqualTo _respawnTruckCl
 
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
-private _newSupplies = if (_debugMode) then {9999} else {(_supplies - _cost) max 0};
+private _newSupplies = if (_debugMode) then {9999} else {_supplies};
 
 if (!isNil "MWF_fnc_syncEconomyState") then {
     [_newSupplies, _intel, _notoriety] call MWF_fnc_syncEconomyState;
@@ -132,8 +109,8 @@ if (!isNil "MWF_fnc_requestDelayedSave") then {
     [] call MWF_fnc_requestDelayedSave;
 };
 
-[format ["Vehicle deployed: %1", _className]] remoteExec ["systemChat", remoteExecutedOwner];
+[format ["Vehicle deployed: %1", _className]] remoteExec ["systemChat", _ownerId];
 if (_debugMode) then {
-    [format ["DEBUG: Vehicle placed at %1", mapGridPosition (ASLToATL _posASL)]] remoteExec ["systemChat", remoteExecutedOwner];
+    [format ["DEBUG: Vehicle placed at %1", mapGridPosition (ASLToATL _posASL)]] remoteExec ["systemChat", _ownerId];
 };
 true

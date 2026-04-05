@@ -14,13 +14,14 @@ if (_requestId isEqualTo "" || {_className isEqualTo ""}) exitWith { false };
 private _ownerId = if (isNull _buyer) then { remoteExecutedOwner } else { owner _buyer };
 private _sessionKey = format ["MWF_PendingVehiclePurchase_%1", _ownerId];
 private _buyerName = if (isNull _buyer) then { format ["owner_%1", _ownerId] } else { name _buyer };
+private _debugMode = missionNamespace getVariable ["MWF_DebugMode", ((["MWF_Param_DebugMode", 0] call BIS_fnc_getParamValue) > 0)];
 
 private _dbg = {
     params ["_message", ["_notifyBuyer", false, [false]]];
     private _line = format ["[MWF VEHICLE DBG][BEGIN][owner:%1][buyer:%2][req:%3][class:%4] %5", _ownerId, _buyerName, _requestId, _className, _message];
     diag_log _line;
     missionNamespace setVariable ["MWF_VehiclePurchase_LastDebug", _line, true];
-    if (_notifyBuyer && {missionNamespace getVariable ["MWF_DebugMode", false]}) then {
+    if (_notifyBuyer && {_debugMode}) then {
         [_line] remoteExecCall ["systemChat", _ownerId];
     };
 };
@@ -40,6 +41,16 @@ if ((count _existing) > 0) exitWith {
 };
 
 private _currentTier = missionNamespace getVariable ["MWF_CurrentTier", 1];
+if (_debugMode) then {
+    _currentTier = 99;
+    missionNamespace setVariable ["MWF_Economy_Supplies", 9999, true];
+    missionNamespace setVariable ["MWF_Supplies", 9999, true];
+    missionNamespace setVariable ["MWF_Supply", 9999, true];
+    missionNamespace setVariable ["MWF_res_intel", 9999, true];
+    missionNamespace setVariable ["MWF_Intel", 9999, true];
+    missionNamespace setVariable ["MWF_Currency", 19998, true];
+};
+
 private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
 private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
 private _hasRequiredUpgradeStructure = {
@@ -59,25 +70,25 @@ private _unlockSatisfied = switch (toUpper _requiredUnlock) do {
     case "ARMOR": { ["ARMOR"] call MWF_fnc_hasProgressionAccess };
     default { true };
 };
-if !(_unlockSatisfied) exitWith {
+if (!_debugMode && {!(_unlockSatisfied)}) exitWith {
     ["failed unlock gate", true] call _dbg;
     [false, 0, format ["Vehicle purchase failed. %1 unlock required.", if (_requiredUnlock isEqualTo "") then {"category"} else {_requiredUnlock}]] call _sendResult;
     false
 };
 
-if (_isTier5 && { !(["TIER5"] call MWF_fnc_hasProgressionAccess) }) exitWith {
+if (!_debugMode && {_isTier5 && { !(["TIER5"] call MWF_fnc_hasProgressionAccess) }}) exitWith {
     ["failed tier5 gate", true] call _dbg;
     [false, 0, "Vehicle purchase failed. Complete Apex Predator first."] call _sendResult;
     false
 };
 
-if ((toUpper _requiredUnlock) in ["HELI", "JETS"] && { !([_requiredUnlock] call _hasRequiredUpgradeStructure) }) exitWith {
+if (!_debugMode && {(toUpper _requiredUnlock) in ["HELI", "JETS"] && { !([_requiredUnlock] call _hasRequiredUpgradeStructure) }}) exitWith {
     [format ["failed structure gate requiredUnlock=%1", _requiredUnlock], true] call _dbg;
     [false, 0, format ["Vehicle purchase failed. Build the %1 structure at the MOB first.", if ((toUpper _requiredUnlock) isEqualTo "HELI") then {"Helicopter Uplink"} else {"Aircraft Control"}]] call _sendResult;
     false
 };
 
-if (_currentTier < _minTier) exitWith {
+if (!_debugMode && {_currentTier < _minTier}) exitWith {
     [format ["failed tier gate currentTier=%1 required=%2", _currentTier, _minTier], true] call _dbg;
     [false, 0, format ["Vehicle purchase failed. Tier %1 required.", _minTier]] call _sendResult;
     false
@@ -92,7 +103,8 @@ if ((toUpper _requiredUnlock) isEqualTo "HELI") then {
 };
 
 private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-if (_supplies < _reservedCost) exitWith {
+if (_debugMode) then { _supplies = 9999; };
+if (!_debugMode && {_supplies < _reservedCost}) exitWith {
     [format ["failed economy gate suppliesBefore=%1 reservedCost=%2", _supplies, _reservedCost], true] call _dbg;
     [false, 0, format ["Vehicle purchase failed. Need %1 supplies.", _reservedCost]] call _sendResult;
     false
@@ -100,7 +112,7 @@ if (_supplies < _reservedCost) exitWith {
 
 private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
 private _notoriety = missionNamespace getVariable ["MWF_res_notoriety", 0];
-private _newSupplies = (_supplies - _reservedCost) max 0;
+private _newSupplies = if (_debugMode) then { 9999 } else { (_supplies - _reservedCost) max 0 };
 
 [format ["before debit supplies=%1 intel=%2 notoriety=%3 cost=%4 newSupplies=%5", _supplies, _intel, _notoriety, _reservedCost, _newSupplies], true] call _dbg;
 
