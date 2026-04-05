@@ -11,15 +11,6 @@
 
 if (!isServer) exitWith {};
 
-private _wipeRequested = (["MWF_Param_WipeSave", 0] call BIS_fnc_getParamValue) isEqualTo 1;
-private _wipeConfirmed = (["MWF_Param_ConfirmWipe", 0] call BIS_fnc_getParamValue) isEqualTo 1;
-if (_wipeRequested && _wipeConfirmed && {!(missionNamespace getVariable ["MWF_WipeSaveApplied", false])}) then {
-    if (!isNil "MWF_fnc_wipeSave") then {
-        [] call MWF_fnc_wipeSave;
-    };
-    missionNamespace setVariable ["MWF_WipeSaveApplied", true, true];
-};
-
 private _hasCampaignSave = profileNamespace getVariable ["MWF_Save_HasCampaign", false];
 missionNamespace setVariable ["MWF_HasCampaignSave", _hasCampaignSave, true];
 

@@ -99,12 +99,11 @@ private _keys = [
     } forEach ["Source", "Choice", "ResolvedChoice", "Label", "File"];
 } forEach ["Blufor", "Opfor", "Resistance", "Civs"];
 
-saveProfileNamespace;
-
 profileNamespace setVariable ["MWF_SavedRespawnProfile", nil];
 saveProfileNamespace;
 
 missionNamespace setVariable ["MWF_HasCampaignSave", false, true];
+missionNamespace setVariable ["MWF_WipeSaveApplied", true, true];
 missionNamespace setVariable ["MWF_FOB_Positions", [], true];
 missionNamespace setVariable ["MWF_PendingBoughtVehicles", [], true];
 missionNamespace setVariable ["MWF_GarageStoredVehicles", [], true];
@@ -123,5 +122,4 @@ if (!isNil "MWF_fnc_clearRespawnLoadoutProfile") then {
     [] remoteExecCall ["MWF_fnc_clearRespawnLoadoutProfile", 0];
 };
 
-["[MWF] Campaign save wiped. Restart the mission for a clean fresh campaign."] remoteExecCall ["systemChat", 0];
-diag_log "[MWF PERSISTENCE] All campaign data has been wiped before campaign load.";
+diag_log "[MWF PERSISTENCE] Campaign save wiped before campaign load.";

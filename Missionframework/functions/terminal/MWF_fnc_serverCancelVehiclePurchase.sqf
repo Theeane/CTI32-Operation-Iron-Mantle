@@ -15,7 +15,7 @@ private _dbg = {
     private _line = format ["[MWF VEHICLE DBG][CANCEL][owner:%1][buyer:%2][req:%3] %4", _ownerId, _buyerName, _requestId, _message];
     diag_log _line;
     missionNamespace setVariable ["MWF_VehiclePurchase_LastDebug", _line, true];
-    if (_notifyBuyer) then {
+    if (_notifyBuyer && {missionNamespace getVariable ["MWF_DebugMode", false]}) then {
         [_line] remoteExecCall ["systemChat", _ownerId];
     };
 };

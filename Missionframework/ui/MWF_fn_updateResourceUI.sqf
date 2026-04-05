@@ -125,12 +125,12 @@ private _applyLayout = {
     private _positionMode = missionNamespace getVariable ["MWF_UI_Position", 0];
     private _opacity = missionNamespace getVariable ["MWF_UI_Opacity", 0.35];
 
-    private _groupW = 0.152;
-    private _groupH = 0.318;
+    private _groupW = 0.154;
+    private _groupH = 0.292;
     private _rightX = safeZoneX + safeZoneW - _groupW - 0.012;
     private _leftX = safeZoneX + 0.018;
     private _baseX = if (_positionMode isEqualTo 1) then { _leftX } else { _rightX };
-    private _baseY = safeZoneY + (safeZoneH * 0.355);
+    private _baseY = safeZoneY + (safeZoneH * 0.338);
 
     if (!isNull _resourceGroup) then {
         _resourceGroup ctrlSetPosition [_baseX, _baseY, _groupW, _groupH];
@@ -161,22 +161,11 @@ while { hasInterface } do {
 
         private _showHud = call _isPlayerNearHudAnchor;
         player setVariable ["MWF_isNearFOB", _showHud];
-
-        private _supplies = missionNamespace getVariable ["MWF_Economy_Supplies", missionNamespace getVariable ["MWF_Supplies", 0]];
-        private _intel = missionNamespace getVariable ["MWF_res_intel", missionNamespace getVariable ["MWF_Intel", 0]];
-        private _heat = missionNamespace getVariable ["MWF_res_notoriety", missionNamespace getVariable ["MWF_ThreatLevel", 0]];
-        private _heatRounded = (floor ((_heat max 0 min 100) / 10)) * 10;
-        private _worldTier = missionNamespace getVariable ["MWF_WorldTier", 1];
+        private _status = [] call MWF_fnc_getHudStatusData;
 
         private _resourceText = _display displayCtrl 9001;
         if (!isNull _resourceText) then {
-            _resourceText ctrlSetStructuredText parseText format [
-                "<t font='PuristaBold' size='0.84' color='#F3F5F7' shadow='1'>SUPPLIES:</t><br/><t font='PuristaSemiBold' size='1.00' color='#FFFFFF' shadow='1'>%1</t><br/><t font='PuristaBold' size='0.84' color='#7DD7FF' shadow='1'>INTEL:</t><br/><t font='PuristaSemiBold' size='1.00' color='#BEEBFF' shadow='1'>%2</t><br/><t font='PuristaBold' size='0.84' color='#FF6B82' shadow='1'>THREAT:</t><br/><t font='PuristaSemiBold' size='1.00' color='#FFD0D7' shadow='1'>%3%%</t><br/><t font='PuristaBold' size='0.84' color='#F1D88B' shadow='1'>WORLD:</t><br/><t font='PuristaSemiBold' size='1.00' color='#FFF2C2' shadow='1'>T %4</t>",
-                [_supplies] call _formatNumber,
-                [_intel] call _formatNumber,
-                _heatRounded,
-                [_worldTier] call _toRoman
-            ];
+            _resourceText ctrlSetStructuredText ([_status] call MWF_fnc_formatSidebarStatus);
         };
 
         if (_showHud != _lastHudVisible) then {
