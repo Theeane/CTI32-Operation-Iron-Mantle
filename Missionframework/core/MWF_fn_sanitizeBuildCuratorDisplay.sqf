@@ -15,7 +15,7 @@ if (isNull _display) exitWith { false };
 private _keepRootTokens = ["object", "objects"];
 private _blockedRootTokens = [
     "all", "blufor", "opfor", "independent", "civilian",
-    "vehicle", "vehicles", "empty", "men", "man",
+    "vehicle", "vehicles", "empty", "empty vehicles", "men", "man",
     "group", "groups", "module", "modules",
     "marker", "markers", "waypoint", "waypoints",
     "trigger", "triggers", "system", "systems"
@@ -33,7 +33,8 @@ private _shouldDeleteNode = {
     private _hasKeep = (_keepTokens findIf { _txt find _x > -1 }) > -1;
     if (_hasKeep) exitWith { false };
 
-    if ((_depth <= 1) && {(_blockedRoots findIf { _txt find _x > -1 }) > -1}) exitWith { true };
+    /* At root and first category level, keep only Objects and delete everything else. */
+    if (_depth <= 1) exitWith { true };
 
     false
 };
@@ -73,6 +74,10 @@ private _pruneTree = {
         };
 
         if (!_hide && {(_blockedRootTokens findIf { _label find _x > -1 }) > -1} && {(_keepRootTokens findIf { _label find _x > -1 }) isEqualTo -1}) then {
+            _hide = true;
+        };
+
+        if (!_hide && {(_label find "all") > -1} && {(_keepRootTokens findIf { _label find _x > -1 }) isEqualTo -1}) then {
             _hide = true;
         };
 
