@@ -1,95 +1,47 @@
 /*
-    Author: Theane / ChatGPT
-    Function: MWF_fn_limitZeusAssets
-    Project: Military War Framework (MWF)
-
-    Description:
-    Restricts Zeus build mode to safe build assets and installs runtime guards that
-    delete any human units placed through compositions or direct Zeus placement.
-    This preserves Workshop composition utility while blocking unit-spawn abuse.
+    Restricted Base Build Zeus asset configuration.
+    Keeps build mode in object/structure libraries while preventing editing of
+    already existing world/base assets.
 */
-
 params ["_curator"];
 
 if (!isServer) exitWith {};
+if (isNull _curator) exitWith { false };
 
-// 1. Clear all default addons (This hides BLUFOR, OPFOR, Rebels, and Civilians)
 removeAllCuratorAddons _curator;
-
-// 2. Re-add only the structure and object libraries
-// This provides the "Objects" tab with Houses, Walls, Camping, etc.
 _curator addCuratorAddons [
     "A3_Structures_F",
     "A3_Structures_F_Exp",
     "A3_Structures_F_Enoch",
     "A3_Structures_F_Orange",
-    "A3_Structures_F_Heli",
-    "A3_Modules_F_Curator" // Allows basic utility modules
+    "A3_Structures_F_Heli"
 ];
 
-// 3. Allow interaction with existing objects for moving/deleting
-_curator addCuratorEditableObjects [allMissionObjects "Static" + vehicles, true];
+_curator setCuratorCoef ["Place", 0];
+_curator setCuratorCoef ["Delete", 0];
+_curator setCuratorCoef ["Edit", -1e8];
+_curator setCuratorCoef ["Destroy", -1e8];
 
-// 4. Security guards against unit-spawning through direct placement or compositions.
+removeAllCuratorEditableObjects _curator;
+
 if !(_curator getVariable ["MWF_ZeusSanitizerHandlersAdded", false]) then {
     _curator setVariable ["MWF_ZeusSanitizerHandlersAdded", true, false];
 
-    private _securityDelete = {
-        params ["_curator", "_entity", ["_eventName", "Unknown", [""]]];
-
+    _curator addEventHandler ["CuratorObjectPlaced", {
+        params ["_curatorModule", "_entity"];
         if (isNull _entity) exitWith {};
 
-        if (_entity isKindOf "Man") then {
-            private _className = typeOf _entity;
+        private _className = typeOf _entity;
+        private _check = [_className] call MWF_fnc_isBuildAssetAllowed;
+        if !(_check # 0) then {
             deleteVehicle _entity;
-            diag_log format ["[MWF Security] Unit blocked in Zeus build mode (%1): %2", _eventName, _className];
 
-            {
-                if (!isNull _x) then {
-                    ["Unit spawn blocked by sanitizer."] remoteExec ["systemChat", owner _x];
-                };
-            } forEach curatorEditableObjects _curator;
-        };
-    };
-
-    _curator addEventHandler ["CuratorObjectPlaced", {
-        params ["_curator", "_entity"];
-        [_curator, _entity, "CuratorObjectPlaced"] call {
-            params ["_curator", "_entity", "_eventName"];
-            if (isNull _entity) exitWith {};
-            if (_entity isKindOf "Man") then {
-                private _className = typeOf _entity;
-                deleteVehicle _entity;
-                diag_log format ["[MWF Security] Unit blocked in Zeus build mode (%1): %2", _eventName, _className];
-                {
-                    if (!isNull _x) then {
-                        ["Unit spawn blocked by sanitizer."] remoteExec ["systemChat", owner _x];
-                    };
-                } forEach curatorEditableObjects _curator;
+            private _owner = getAssignedCuratorUnit _curatorModule;
+            if (isNull _owner) then {
+                _owner = _curatorModule getVariable ["MWF_BaseArchitect_Owner", objNull];
             };
-        };
-    }];
-
-    _curator addEventHandler ["CuratorObjectEdited", {
-        params ["_curator", "_entity"];
-        [_curator, _entity, "CuratorObjectEdited"] call {
-            params ["_curator", "_entity", "_eventName"];
-            if (isNull _entity) exitWith {};
-            if (_entity isKindOf "Man") then {
-                private _className = typeOf _entity;
-                deleteVehicle _entity;
-                diag_log format ["[MWF Security] Unit blocked in Zeus build mode (%1): %2", _eventName, _className];
-                {
-                    if (!isNull _x) then {
-                        ["Unit spawn blocked by sanitizer."] remoteExec ["systemChat", owner _x];
-                    };
-                } forEach curatorEditableObjects _curator;
-            } else {
-                private _owner = getAssignedCuratorUnit _curator;
-                if (!isNull _owner) then {
-                    private _sessionId = _owner getVariable ["MWF_BaseArchitect_SessionId", ""];
-                    [_entity, _owner, _sessionId, "EDIT"] remoteExec ["MWF_fnc_handleBuildPlacement", 2];
-                };
+            if (!isNull _owner) then {
+                [(_check # 1)] remoteExec ["systemChat", owner _owner];
             };
         };
     }];
