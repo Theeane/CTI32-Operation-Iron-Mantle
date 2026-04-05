@@ -85,6 +85,33 @@ private _showSelectedEntry = {
 
     switch (_modeNow) do {
 
+        case "BUILD_MENU": {
+            private _anchorType = _meta getOrDefault ["anchorType", "BUILD"];
+            private _contextLabel = _meta getOrDefault ["contextLabel", _label];
+            private _range = _meta getOrDefault ["range", 500];
+            private _description = _meta getOrDefault ["description", "Open Zeus base building."];
+            private _tooltipText = _meta getOrDefault ["tooltipText", "Open Zeus base building."];
+            private _assetPolicy = _meta getOrDefault ["assetPolicy", "Allowed: structures, props, vehicles. Blocked: units."];
+            private _costText = _meta getOrDefault ["costText", "Placed assets are supply-priced when validated on the server."];
+
+            if (!isNull _statusCtrl) then {
+                _statusCtrl ctrlSetText format ["Base Building: %1 | Ready", _label];
+            };
+
+            [_infoCtrl, [
+                format ["<t size='1.05' color='#111111'>%1</t>", _label],
+                format ["<t color='#222222'>Anchor: %1 | %2</t>", _anchorType, _contextLabel],
+                format ["<t color='#222222'>Range: %1m Zeus construction radius.</t>", _range],
+                format ["<t color='#222222'>%1</t>", _description],
+                format ["<t color='#222222'>%1</t>", _assetPolicy],
+                format ["<t color='#222222'>%1</t>", _costText],
+                format ["<t color='#222222'>%1</t>", _tooltipText]
+            ]] call _setInfoText;
+
+            [_actionCtrl, "Open Zeus", true, _tooltipText] call _setButtonState;
+            [_leftCtrl, "Back", true, "Return to the operations map."] call _setButtonState;
+        };
+
         case "UPGRADES": {
             private _statusText = _meta getOrDefault ["statusText", "Locked"];
             private _tooltipText = _meta getOrDefault ["tooltipText", ""];
@@ -310,7 +337,7 @@ switch (_modeUpper) do {
             };
         };
 
-        if !(_initialMode in ["ZONES", "UPGRADES", "SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT"]) then {
+        if !(_initialMode in ["ZONES", "BUILD_MENU", "UPGRADES", "SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "VEHICLE_MENU"]) then {
             _initialMode = "ZONES";
         };
 
@@ -379,7 +406,7 @@ switch (_modeUpper) do {
 
         {
             _x params ["_kind", "_label", "_pos", "_meta"];
-            if ((_modeNow isEqualTo "REDEPLOY" && {_kind isEqualTo "RESPAWN"}) || (_modeNow isEqualTo "SIDE_MISSIONS" && {_kind isEqualTo "SIDE_MISSION"}) || (_modeNow isEqualTo "MAIN_OPERATIONS" && {_kind isEqualTo "MAIN_OPERATION"}) || (_modeNow isEqualTo "SUPPORT" && {_kind isEqualTo "SUPPORT"}) || (_modeNow isEqualTo "UPGRADES" && {_kind isEqualTo "UPGRADE"})) then {
+            if ((_modeNow isEqualTo "REDEPLOY" && {_kind isEqualTo "RESPAWN"}) || (_modeNow isEqualTo "SIDE_MISSIONS" && {_kind isEqualTo "SIDE_MISSION"}) || (_modeNow isEqualTo "MAIN_OPERATIONS" && {_kind isEqualTo "MAIN_OPERATION"}) || (_modeNow isEqualTo "SUPPORT" && {_kind isEqualTo "SUPPORT"}) || (_modeNow isEqualTo "UPGRADES" && {_kind isEqualTo "UPGRADE"}) || (_modeNow isEqualTo "BUILD_MENU" && {_kind isEqualTo "BUILD_ANCHOR"})) then {
                 private _dist = _worldPos distance2D _pos;
                 if (_dist < _bestDistance) then {
                     _bestDistance = _dist;

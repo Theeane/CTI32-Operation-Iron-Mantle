@@ -9,6 +9,7 @@ class CoreRuntime {
     class initZones               { file = "core\MWF_fn_initZones.sqf"; };
     class limitZeusAssets         { file = "core\MWF_fn_limitZeusAssets.sqf"; };
     class openBaseArchitect       { file = "core\MWF_fn_openBaseArchitect.sqf"; };
+    class resolveBuildAnchor     { file = "core\MWF_fn_resolveBuildAnchor.sqf"; };
     class presetManager           { file = "core\MWF_fn_presetManager.sqf"; };
     class showNotification        { file = "core\MWF_fn_showNotification.sqf"; };
     class finalizeBuild           { file = "core\MWF_fn_finalizeBuild.sqf"; };

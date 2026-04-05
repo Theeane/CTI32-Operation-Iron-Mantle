@@ -35,6 +35,41 @@ private _getDefinitionValue = {
 };
 
 switch (_modeUpper) do {
+    case "BUILD_MENU": {
+        private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
+        private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };
+        private _mobLabel = missionNamespace getVariable ["MWF_MOB_Name", "Main Operating Base"];
+        private _commandTerminal = missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull];
+        private _playerPos = if (!isNull player) then { getPosATL player } else { _mobPos };
+
+        private _contextTerminal = objNull;
+        private _contextLabel = _mobLabel;
+        private _contextPos = _mobPos;
+        private _anchorType = "MOB";
+
+        if (!isNull _commandTerminal && {alive _commandTerminal} && {_playerPos distance2D _commandTerminal <= 25}) then {
+            _contextTerminal = _commandTerminal;
+            _contextLabel = _mobLabel;
+            _contextPos = getPosATL _commandTerminal;
+        };
+
+        _entries pushBack [
+            "BUILD_ANCHOR",
+            "Base Architect",
+            _contextPos,
+            createHashMapFromArray [
+                ["contextTerminal", _contextTerminal],
+                ["contextLabel", _contextLabel],
+                ["anchorType", _anchorType],
+                ["range", 500],
+                ["description", "Open the Zeus construction view for this base anchor."],
+                ["assetPolicy", "Allowed: structures, props, vehicles. Blocked: infantry and compositions that place units."],
+                ["costText", "Each placed asset is server-validated and billed in Supplies from MWF_Supplies."],
+                ["tooltipText", format ["Open Zeus build mode at %1.", _contextLabel]]
+            ]
+        ];
+    };
+
     case "UPGRADES": {
         private _mainBase = missionNamespace getVariable ["MWF_MainBase", missionNamespace getVariable ["MWF_MOB", objNull]];
         private _mobPos = if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" };

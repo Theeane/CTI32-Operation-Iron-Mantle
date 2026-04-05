@@ -7,6 +7,11 @@ if (_modeNow isEqualTo "VEHICLE_MENU") exitWith {
     [] call MWF_fnc_vehicleMenuSecondaryAction
 };
 
+if (_modeNow isEqualTo "BUILD_MENU") exitWith {
+    ["SET_MODE", "ZONES"] call MWF_fnc_dataHub;
+    true
+};
+
 if (_modeNow isEqualTo "SUPPORT") exitWith {
     private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
     if (_selected isEqualTo []) exitWith { false };

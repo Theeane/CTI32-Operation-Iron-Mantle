@@ -11,17 +11,22 @@
 
 if (!hasInterface) exitWith {};
 
-params [["_terminal", objNull, [objNull]]];
+params [
+    ["_terminal", objNull, [objNull]],
+    ["_forcedAnchorPos", [], [[]]]
+];
 
 if (!isNull (getAssignedCuratorLogic player)) exitWith {
     systemChat "Base Architect is already active.";
 };
 
-private _anchorPos = if (!isNull _terminal) then {
-    getPosATL _terminal
-} else {
-    private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull];
-    if (!isNull _mainBase) then { getPosATL _mainBase } else { getPosATL player };
+private _resolved = [_terminal] call MWF_fnc_resolveBuildAnchor;
+private _anchorPos = if (_forcedAnchorPos isEqualType [] && {count _forcedAnchorPos >= 2}) then { +_forcedAnchorPos } else { _resolved param [0, getPosATL player, [[]]] };
+if (_anchorPos isEqualTo [] || {_anchorPos isEqualTo [0, 0, 0]}) then {
+    _anchorPos = _resolved param [0, getPosATL player, [[]]];
+};
+if (_anchorPos isEqualTo [] || {_anchorPos isEqualTo [0, 0, 0]}) then {
+    _anchorPos = getPosATL player;
 };
 
 private _maxRange = 500;

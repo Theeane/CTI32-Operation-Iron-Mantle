@@ -18,6 +18,20 @@ if (_modeNow isEqualTo "VEHICLE_MENU") exitWith {
     true
 };
 
+if (_modeNow isEqualTo "BUILD_MENU") exitWith {
+    private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
+    if (_selected isEqualTo []) exitWith {
+        if (!isNull _statusCtrl) then { _statusCtrl ctrlSetText "Base Building: select a build anchor first."; };
+        false
+    };
+
+    private _meta = _selected param [3, createHashMap, [createHashMap]];
+    private _terminal = _meta getOrDefault ["contextTerminal", uiNamespace getVariable ["MWF_DataHub_ContextTerminal", missionNamespace getVariable ["MWF_CommandTerminal_Object", objNull]]];
+    ["CLOSE"] call MWF_fnc_dataHub;
+    [_terminal] spawn MWF_fnc_enterBuildMode;
+    true
+};
+
 if (_modeNow isEqualTo "SUPPORT") exitWith {
     private _selected = uiNamespace getVariable ["MWF_DataHub_SelectedEntry", []];
     if (_selected isEqualTo []) exitWith { false };

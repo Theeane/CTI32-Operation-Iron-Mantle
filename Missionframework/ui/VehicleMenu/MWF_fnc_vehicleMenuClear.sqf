@@ -28,7 +28,7 @@ if (!isNull _infoCtrl) then { _infoCtrl ctrlShow true; };
 
 private _buttonDefs = [
     [12210, "Vehicle Menu", "['SET_MODE','VEHICLE_MENU'] call MWF_fnc_dataHub;", "Open vehicle menu."],
-    [12211, "Base Building", "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; [_terminal] spawn MWF_fnc_enterBuildMode;", "Base building."],
+    [12211, "Base Building", "['SET_MODE','BUILD_MENU'] call MWF_fnc_dataHub;", "Base building."],
     [12212, "Main Operations", "['SET_MODE','MAIN_OPERATIONS'] call MWF_fnc_dataHub;", "Main operations."],
     [12213, "Build Support", "['SET_MODE','SUPPORT'] call MWF_fnc_dataHub;", "Build support."],
     [12214, "Base Upgrades", "['SET_MODE','UPGRADES'] call MWF_fnc_dataHub;", "Base upgrades."]

@@ -41,7 +41,7 @@ private _modeDefinition = [_modeUpper] call MWF_fnc_dataHubResolveModeDefinition
 if (!isNull _statusCtrl) then {
     private _modeLabel = [_modeUpper, "_", " "] call BIS_fnc_replaceString;
     private _statusText = format ["Mode: %1 | Entries: %2", _modeLabel, count _entries];
-    if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "UPGRADES"]) then {
+    if (_modeUpper in ["SIDE_MISSIONS", "MAIN_OPERATIONS", "REDEPLOY", "SUPPORT", "UPGRADES", "BUILD_MENU"]) then {
         _statusText = _statusText + " | Double click marker for details | Esc = back.";
     };
     _statusCtrl ctrlSetText _statusText;
@@ -122,6 +122,24 @@ private _sessionId = format ["%1_%2", floor diag_tickTime, floor random 100000];
             _marker setMarkerTypeLocal "mil_triangle";
             _marker setMarkerColorLocal "ColorBLUFOR";
             _marker setMarkerTextLocal _label;
+        };
+
+        case "BUILD_ANCHOR": {
+            private _anchorType = toUpper (_meta getOrDefault ["anchorType", "BUILD"]);
+            _marker setMarkerShapeLocal "ICON";
+            _marker setMarkerTypeLocal "mil_box";
+            _marker setMarkerColorLocal "ColorBlue";
+            _marker setMarkerTextLocal format ["%1 [%2M]", _label, _meta getOrDefault ["range", 500]];
+
+            private _ringName = format ["%1_ring", _markerName];
+            private _ring = createMarkerLocal [_ringName, _pos];
+            _ring setMarkerShapeLocal "ELLIPSE";
+            private _range = _meta getOrDefault ["range", 500];
+            _ring setMarkerSizeLocal [_range, _range];
+            _ring setMarkerBrushLocal "Border";
+            _ring setMarkerColorLocal "ColorBlue";
+            _ring setMarkerAlphaLocal 0.45;
+            _markerNames pushBack _ringName;
         };
 
         case "UPGRADE": {

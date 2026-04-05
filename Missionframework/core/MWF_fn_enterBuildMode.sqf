@@ -1,21 +1,38 @@
 /*
-    Smoothly enters build mode away from the terminal to avoid blocking collisions.
+    Minimal stage-1 button wake-up path for Base Build.
+    Scope intentionally kept tiny so startup systems, cinematics, and loadouts stay untouched.
 */
 if (!hasInterface) exitWith {};
+
 params [["_terminal", objNull, [objNull]]];
+
 ["CLOSE"] call MWF_fnc_dataHub;
 closeDialog 0;
-private _anchorPos = if (!isNull _terminal) then { getPosATL _terminal } else { private _mainBase = missionNamespace getVariable ["MWF_MainBase", objNull]; if (!isNull _mainBase) then { getPosATL _mainBase } else { getMarkerPos "respawn_west" } };
-if (_anchorPos isEqualTo [0,0,0]) then { _anchorPos = getPosATL player; };
-private _buildPos = _anchorPos vectorAdd [0,-6,0];
-private _found = _buildPos findEmptyPosition [1, 15, typeOf player];
-if !(_found isEqualTo []) then { _buildPos = _found; };
-cutText ["", "BLACK OUT", 0.25];
+
+private _anchorPos = if (!isNull _terminal) then {
+    getPosATL _terminal
+} else {
+    getPosATL player
+};
+
+if (_anchorPos isEqualTo [0,0,0]) then {
+    _anchorPos = getPosATL player;
+};
+
+private _buildPos = _anchorPos vectorAdd [0, -5, 0];
+private _found = _buildPos findEmptyPosition [1, 12, typeOf player];
+if !(_found isEqualTo []) then {
+    _buildPos = _found;
+};
+
 [_buildPos, _terminal] spawn {
     params ["_buildPos", "_terminal"];
 
-    uiSleep 0.25;
+    cutText ["", "BLACK OUT", 0.1];
+    uiSleep 0.1;
+
     player setPosATL _buildPos;
     [_terminal] call MWF_fnc_openBaseArchitect;
-    cutText ["", "BLACK IN", 0.25];
+
+    cutText ["", "BLACK IN", 0.1];
 };

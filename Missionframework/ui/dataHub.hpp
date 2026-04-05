@@ -166,7 +166,7 @@ class MWF_RscDataHub {
             y = 0.179 * safezoneH + safezoneY;
             w = 0.110 * safezoneW;
             h = 0.070 * safezoneH;
-            action = "private _terminal = uiNamespace getVariable ['MWF_DataHub_ContextTerminal', missionNamespace getVariable ['MWF_CommandTerminal_Object', objNull]]; ['CLOSE'] call MWF_fnc_dataHub; [_terminal] spawn MWF_fnc_enterBuildMode;";
+            action = "['SET_MODE','BUILD_MENU'] call MWF_fnc_dataHub;";
         };
 
         class BtnMainOpsBG: RscPicture {
