@@ -14,7 +14,7 @@ if ((player getVariable ["MWF_BaseArchitect_SessionId", ""]) isNotEqualTo _sessi
 [_sessionId, _maxRange] spawn {
     params ["_sessionId", "_maxRange"];
 
-    private _timeoutAt = time + 5;
+    private _timeoutAt = time + 8;
     waitUntil {
         uiSleep 0.05;
         (!isNull (getAssignedCuratorLogic player)) || {time > _timeoutAt}
@@ -32,16 +32,36 @@ if ((player getVariable ["MWF_BaseArchitect_SessionId", ""]) isNotEqualTo _sessi
 
     missionNamespace setVariable ["MWF_BaseArchitect_Active", true];
 
-    private _openTimeoutAt = time + 4;
-    waitUntil {
-        if (isNull (findDisplay 312)) then {
-            openCuratorInterface;
+    [] spawn {
+        private _deadline = time + 20;
+        waitUntil {
+            uiSleep 0.1;
+            (!isNull (findDisplay 312)) || {time > _deadline}
         };
-        uiSleep 0.15;
-        (!isNull (findDisplay 312)) || {time > _openTimeoutAt}
+
+        if (!isNull (findDisplay 312)) then {
+            [findDisplay 312] call MWF_fnc_sanitizeBuildCuratorDisplay;
+        };
     };
 
-    if (isNull (findDisplay 312)) then {
+    private _openSucceeded = false;
+    private _openTimeoutAt = time + 8;
+    uiSleep 0.35;
+
+    while {time <= _openTimeoutAt} do {
+        if (!isNull (findDisplay 312)) exitWith {
+            _openSucceeded = true;
+        };
+
+        openCuratorInterface;
+        uiSleep 0.2;
+
+        if (!isNull (findDisplay 312)) exitWith {
+            _openSucceeded = true;
+        };
+    };
+
+    if (!_openSucceeded) then {
         systemChat "Base Build ready. Press Y if Zeus did not open automatically.";
     };
 

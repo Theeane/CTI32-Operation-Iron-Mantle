@@ -11,6 +11,7 @@ class CoreRuntime {
     class openBaseArchitect         { file = "core\MWF_fn_openBaseArchitect.sqf"; };
     class startBuildArchitectServer { file = "core\MWF_fn_startBuildArchitectServer.sqf"; };
     class beginBuildArchitectClient { file = "core\MWF_fn_beginBuildArchitectClient.sqf"; };
+    class sanitizeBuildCuratorDisplay { file = "core\MWF_fn_sanitizeBuildCuratorDisplay.sqf"; };
     class stopBuildArchitectServer  { file = "core\MWF_fn_stopBuildArchitectServer.sqf"; };
     class resolveBuildAnchor        { file = "core\MWF_fn_resolveBuildAnchor.sqf"; };
     class presetManager             { file = "core\MWF_fn_presetManager.sqf"; };
