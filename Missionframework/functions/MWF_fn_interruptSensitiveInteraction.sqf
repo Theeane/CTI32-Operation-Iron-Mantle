@@ -1,9 +1,4 @@
 /*
-    Author: Theane / ChatGPT
-    Function: MWF_fn_interruptSensitiveInteraction
-    Project: Military War Framework
-
-    Description:
     Cleanly interrupts sensitive local interactions when the player takes damage.
     No invulnerability is granted; this only closes UI/build states and cleans up
     transient placement helpers.
@@ -30,6 +25,12 @@ if (missionNamespace getVariable ["MWF_BuildPlacement_Active", false]) then {
 private _dataHubDisplay = uiNamespace getVariable ["MWF_DataHub_Display", displayNull];
 if (!isNull _dataHubDisplay) then {
     ["CLOSE"] call MWF_fnc_dataHub;
+    _interrupted = true;
+};
+
+if (player getVariable ["MWF_BaseArchitect_Active", false]) then {
+    player setVariable ["MWF_BaseArchitect_ForceClosed", true];
+    player setVariable ["MWF_BaseArchitect_BlockKeyUntil", diag_tickTime + 3];
     _interrupted = true;
 };
 

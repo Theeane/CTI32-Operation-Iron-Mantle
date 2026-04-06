@@ -14,8 +14,16 @@ if (isNull _builder) exitWith {};
 if (!isPlayer _builder) exitWith {};
 if (_sessionId isEqualTo "") exitWith {};
 
+private _resetBuilderState = {
+    _builder setVariable ["MWF_BaseArchitect_Active", false, true];
+    _builder setVariable ["MWF_BaseArchitect_AnchorPos", nil, true];
+    _builder setVariable ["MWF_BaseArchitect_MaxRange", nil, true];
+    _builder setVariable ["MWF_BaseArchitect_SessionId", nil, true];
+};
+
 private _existing = getAssignedCuratorLogic _builder;
 if (!isNull _existing) exitWith {
+    call _resetBuilderState;
     ["Base Build unavailable: curator already assigned."] remoteExec ["systemChat", owner _builder];
 };
 
@@ -25,6 +33,7 @@ if (isNull _curator) exitWith {
     if (!isNull _group) then {
         deleteGroup _group;
     };
+    call _resetBuilderState;
     ["Base Build failed: curator creation failed."] remoteExec ["systemChat", owner _builder];
 };
 
